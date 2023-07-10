@@ -1,0 +1,7 @@
+__pycache__
+.webassets-cache
+.venv
+settings.json
+*.code-workspace
+medias
+app/media/*

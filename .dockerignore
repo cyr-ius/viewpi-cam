@@ -1,0 +1,11 @@
+app/FIFO
+app/FIFO1
+app/pipan_off
+app/raspimjpeg
+app/scheduleLog.txt
+app/settings.json
+app/status_mjpeg.txt
+app/media
+app/h264
+app/static
+*__pycache__*

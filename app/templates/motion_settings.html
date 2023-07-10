@@ -1,0 +1,92 @@
+{% block motion_settings %}
+
+{% set options_vp = {'Off':'0', 'On':'1'} %}
+{% set options_mf = {'Off':'0', 'On':'1'} %}
+
+<div class="offcanvas offcanvas-start offcanvas-size-xl" tabindex="-1" id="motionSetting" aria-labelledby="motionSettingLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="motionSettingLabel">Motion Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <hr/>
+    <div class="offcanvas-body">
+        <div class="row row-col-2 g-3">
+            <label class="col col-form-label">Motion Vector Preview:</label>
+            <div class="col">
+                <select class="form-select form-select-sm" onchange="send_cmd('vp ' + this.value);setTimeout(function(){location.reload(true);}, 1000);" id="preview_select">{{ render.make_options(options_vp, 'vector_preview')}}</select>
+            </div>
+        </div>
+        <div class="row row-col-2 g-3">
+            <label class="col col-form-label">Noise level (1-255 / >1000):</label>
+            <div class="col">
+                <div class="input-group mb-3">
+                    {{ render.make_input('motion_noise', null, null, 'number')}}
+                    <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('mn ' + $('#motion_noise').val())">OK</button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-col-2 g-3">
+            <label class="col col-form-label">Threshold (1-32000):</label>
+            <div class="col">
+                <div class="input-group mb-3">
+                    {{ render.make_input('motion_threshold', null, null, 'number')}}
+                    <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('mt ' + $('#motion_threshold').val())">OK</button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-col-2 g-3">
+            <label class="col col-form-label">Clipping factor (2-50), default 3:</label>
+            <div class="col">
+                <div class="input-group mb-3">
+                    {{ render.make_input('motion_clip', null, null, 'number')}}
+                    <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('mc ' + $('#motion_clip').val())">OK</button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-col-2 g-3">
+            <label class="col col-form-label">Mask Image:</label>
+            <div class="col">
+                <div class="input-group mb-3">
+                    {{ render.make_input('motion_image')}}
+                    <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('mi ' + $('#motion_image').val())">OK</button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-col-2 g-3">
+            <label class="col col-form-label">Delay Frames to detect:</label>
+            <div class="col">
+                <div class="input-group mb-3">
+                    {{ render.make_input('motion_initframes', null, null, 'number')}}
+                    <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('ms ' + $('#motion_initframes').val())">OK</button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-col-2 g-3">
+            <label class="col col-form-label">Change Frames to start:</label>
+            <div class="col">
+                <div class="input-group mb-3">
+                    {{ render.make_input('motion_startframes', null, null, 'number')}}
+                    <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('mb ' + $('#motion_startframes').val())">OK</button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-col-2 g-3">
+            <label class="col col-form-label">Still Frames to stop:</label>
+            <div class="col">
+                <div class="input-group mb-3">
+                    {{ render.make_input('motion_stopframes', null, null, 'number')}}
+                    <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('me ' + $('#motion_stopframes').val())">OK</button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-col-2 g-3">
+            <label class="col col-form-label">Save vectors to .dat:<br>(Uses more space)</label>
+            <div class="col">
+                <select class="form-select form-select-sm" onchange="send_cmd('mf ' + this.value);">{{ render.make_options(options_mf, 'motion_file')}}</select>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock motion_settings %}
+{% block extrascripts%}
+{% endblock%}

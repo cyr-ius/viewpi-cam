@@ -1,0 +1,48 @@
+{% import "_macros.html" as render %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+  {% block head %}
+    {% block metas %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    {% endblock %} 
+    {% block extrameta%}
+    {% endblock %}
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
+    {% assets "css_main" -%}<link rel="stylesheet" href="{{ ASSET_URL }}">{%- endassets %}
+    {% assets "css_custom" -%}<link rel="stylesheet" href="{{ ASSET_URL }}">{%- endassets %}
+    {% block extracss%}
+    {% if g.extra['select'] %}<link rel="stylesheet" href="{{ url_for('static', filename='extrastyles/'+g.extra['select']) }}"/>{%endif%}
+    {% endblock %}
+    <title>{% block title %}{{ config['CAM_STRING'] }}{% endblock %}</title>
+  {% endblock %}
+  </head>
+  {% block body %}  
+  <body>
+    <!-- Content -->
+    {%block container%}
+    {# {% debug %} #}
+    <!-- Header -->
+    <header>
+        {% include "navbar.html" %}
+    </header>    
+    <!-- Contains page content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>      
+    <footer class="footer mt-auto bg-body-tertiary">
+      {% include "footer.html" %}
+    </footer> 
+    {%endblock%} 
+    <!-- Scripts -->
+    {% block scripts %}
+    {% assets "js_main" -%}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{%- endassets %}
+    {% assets "js_custom" -%}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{%- endassets %}
+      {% endblock %}
+    <!-- Extra scripts -->
+    {% block extrascripts %}
+    {% endblock %}
+  </body>  
+{% endblock  body %}
+</html>

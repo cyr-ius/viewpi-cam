@@ -1,0 +1,15 @@
+version: "3.6"
+services:
+  wireguard:
+    image: viewpicam:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile    
+    container_name: viewpicam
+    restart: unless-stopped
+    environment:
+      - SALT=2b12yLUMTIfl21FKJQpTkRQXCu
+      - SECRET_KEY=pf9Wkove4IKEAXvy-cQkeDPhv9Cb3Ag-wyJILbq_dFw
+      - LOG_LEVEL=INFO
+    ports:
+      - 8000:8000/tcp

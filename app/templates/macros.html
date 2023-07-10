@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container overflow-auto">
+    <div class="row">
+    <div class="row"><h4 class="p-0">Macros settings</h3></div>
+    <hr class="p-0 ">    
+        {%for macro in macros%}
+        <div class="row row-cols-4 row-cols-md-4 g-1">
+            <div class="col">Macro:{{macro}}</div>
+            <div class="col text-center">
+                <input class="form-control-checkbox" type="checkbox" id="{{macro}}_chk"
+                {% if g.config[macro][:1] == "-" %}
+                    {% set value=g.config[macro][1:] %}
+                    checked=""
+                {%else%}
+                    {% set value=g.config[macro] %}
+                    checked="checked"
+                {%endif%}
+                ></div>
+            <div class="col"><input class="form-control form-control-sm" type="text" size="16" id="{{macro}}" value="{{value}}"></div>
+            <div class="col"><button class="btn btn-sm btn-outline-secondary" type="button" onclick="send_macroUpdate({{loop.index0}},'{{macro}}');">OK</button></div>
+        </div>
+        {%endfor%}
+    </div>
+</div>
+{% endblock %}
+{%block extrascripts%}
+<script language="javascript">
+
+function send_macroUpdate(i, macro) {
+  var macrovalue = $('#'+macro).val();
+
+  if(! $("#"+macro+"_chk").prop("checked")) {
+	  macrovalue = "-" + macrovalue;
+  }
+  send_cmd("um " + i + " " + macrovalue);
+
+}
+
+</script>
+
+{%endblock%}
