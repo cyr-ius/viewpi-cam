@@ -50,7 +50,7 @@ jobs:
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@79abd3f86f79a9d68a23c75a09a9a85889262adf
         with:
-          platform: linux/arm/v6, linux/arm/v7
+          platforms: linux/arm/v6,linux/arm/v7
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
