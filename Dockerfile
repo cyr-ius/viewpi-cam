@@ -1,17 +1,11 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
 FROM python:3.11-alpine
 
-# RPI 0
-ENV QEMU_CPU=arm1176
-ENV QEMU_MACHINE=versatilepb
-# ENV CFLAGS=" -marm -mfpu=vfp -mtune=arm1176jzf-s -mfloat-abi=softfp"
-
-
 # set version label
 ARG BUILD_DATE
 ARG VERSION
 LABEL build_version="version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL org.opencontainers.image.description "ViewPI Cam (inspired Rpi Cam Interface)"
+LABEL org.opencontainers.image.description="ViewPI Cam (inspired Rpi Cam Interface)"
 LABEL maintainer="cyr-ius"
 
 # Keeps Python from generating .pyc files in the container
