@@ -51,7 +51,7 @@ THUMBNAIL_EXT = ".th.jpg"
 # file where a debug file is stored
 LOGFILE_DEBUG = "debugLog.txt"
 # file where schedule log is stored
-LOGFILE_SCHEDULE = "scheduleLog.txt"
+LOGFILE_SCHEDULE = "schedule.log"
 # control how filesize is extracted, 0 is fast and works for files up to 4GB, 1 is slower
 FILESIZE_METHOD = 0
 # User Buttons

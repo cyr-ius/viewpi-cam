@@ -10,13 +10,14 @@ from flask_mail import Mail
 # from flask_swagger import swagger
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from .assets import css_main, js_main, css_custom, js_custom, js_pipan
-from .handle import (
+from .services.assets import css_custom, css_main, js_custom, js_main, js_pipan
+from .services.handle import (
     handle_access_forbidden,
     handle_bad_request,
     handle_internal_server_error,
     handle_page_not_found,
 )
+from .services.scheduler import scheduler as job_scheduler
 
 mail = Mail()
 assets = Environment()
@@ -90,8 +91,6 @@ def create_app(config=None):
 
     @app.cli.command("scheduler")
     def scheduler():
-        from .scheduler import scheduler
-
-        scheduler()
+        job_scheduler()
 
     return app

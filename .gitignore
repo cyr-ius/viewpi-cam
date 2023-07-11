@@ -5,3 +5,6 @@ settings.json
 *.code-workspace
 medias
 app/media/*
+*.log
+static/
+media/

@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime as dt
 
-from .const import (
+from ..const import (
     SCHEDULE_AUTOCAMERAINTERVAL,
     SCHEDULE_AUTOCAPTUREINTERVAL,
     SCHEDULE_CMDPOLL,
@@ -34,14 +34,14 @@ from .const import (
     SCHEDULE_PURGESPACELEVEL,
     SCHEDULE_PURGESPACEMODE,
 )
-from .helpers.schedule import (
+from app.helpers.schedule import (
     day_period,
     get_time_offset,
     get_current_local_time,
     get_sunrise,
     get_sunset,
 )
-from .helpers.filer import (
+from app.helpers.filer import (
     delete_log,
     file_get_content,
     open_pipe,
@@ -51,6 +51,7 @@ from .helpers.filer import (
     check_motion,
     get_log_size,
     get_settings,
+    file_exists,
 )
 
 
@@ -80,13 +81,16 @@ def wrap_day_period(settings):
 
 
 def scheduler():
+    basedir = os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
     settings = get_settings()
     if len(settings) == 0:
         write_log("Setttings for scheduler not found")
         return
+    if not file_exists(f"{basedir}/status_mjpeg.txt"):
+        write_log("Status mjpeg not found")
+        return
 
     write_log("RaspiCam support started")
-    basedir = os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
 
     fifo_out = settings[SCHEDULE_FIFOOUT]
     pipeIn = open_pipe(settings[SCHEDULE_FIFOIN])

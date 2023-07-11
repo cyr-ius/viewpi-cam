@@ -80,8 +80,8 @@
         </div>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 my-1">
             {% for thumbnail in thumbnails%}
-            <div class="col">
-                <div class='card shadow-sm' style="width:{{thumb_size}}px">
+            <div class="col-auto">
+                <div class='card shadow-sm'>
                     {% if thumbnail["file_size"] > 0 %}
                     <a id="load_preview" title="{{thumbnail['real_file']}}" href="#" onclick="load_preview('{{thumbnail['file_name']}}');">
                     {% endif%}
@@ -91,7 +91,6 @@
                     {%endif%}
                     <div class="card-img-overlay" style="height:5px;">
                         <i class="float-start {{thumbnail['file_icon']}}" style="font-size: 16px;color: white;"></i>
-                        {# <input class="mt-1 float-end" type="checkbox" name="check_list" {{select_all}} value="{{thumbnail.file_name}}"/> #}
                     </div>
                     <div class="card-body">
                         <p class="card-text">Created {{ thumbnail.file_datetime.strftime('%Y-%m-%d') }} at {{thumbnail.file_datetime.strftime('%H:%M:%S') }}</p>
@@ -108,7 +107,6 @@
                             </small>
                             {% endif%}                    
                         </div>    
-                        <a target="_blank" href="{{ url_for('static', filename=config['MEDIA']+'/'+thumbnail['real_file']) }}">{{thumbnail["file_number"]}}</a>
                     </div>
                 </div>
             </div>
@@ -239,8 +237,9 @@ function load_preview(thumbnail) {
 	if (imageIndex > 0) {
 		prev = thumbnails[imageIndex-1];
         $('#display button[name="prev"]').prop('disabled', false);
-        $('#display button[name="prev"]').click(function(){load_preview(prev);});
-		if (fileExtension(imageFromThumbnail(prev)) == 'jpg') {
+        $('#display button[name="prev"]').unbind();
+        $('#display button[name="prev"]').click(function(){load_preview(prev);});	
+        if (fileExtension(imageFromThumbnail(prev)) == 'jpg') {
 			preloadImage(mediaBase + imageFromThumbnail(prev));
 		}
 	} else {
@@ -249,11 +248,14 @@ function load_preview(thumbnail) {
 	}
 
 	// Next
-	if (imageIndex >= 0 && imageIndex < thumbnails.length-1) {
+    console.log(imageIndex)
+    console.log(thumbnails.length - 1)
+	if (imageIndex >= 0 && imageIndex < thumbnails.length - 1) {
 		next = thumbnails[imageIndex+1];
         $('#display button[name="next"]').prop('disabled', false);
+        $('#display button[name="next"]').unbind();
         $('#display button[name="next"]').click(function(){load_preview(next);});
-		if (fileExtension(imageFromThumbnail(next)) == 'jpg') {
+        if (fileExtension(imageFromThumbnail(next)) == 'jpg') {
 			preloadImage(mediaBase + imageFromThumbnail(next));
 		}
 	} else {
@@ -270,7 +272,7 @@ function load_preview(thumbnail) {
 		}
         $('#media').html(media_content);
 	}
-
+    console.log("ici")
 	if (fileType(thumbnail) == 't') {
         $('#display button[name="convert"]').removeClass("d-none");
 		$('#display button[name="convert"]').val(thumbnail);

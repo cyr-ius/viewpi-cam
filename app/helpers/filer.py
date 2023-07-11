@@ -331,9 +331,9 @@ def get_file_config(config: dict[str, any], filename):
 def get_raspimjpeg_config(config: dict[str, any]) -> dict[str, any]:
     rpath = current_app.config.root_path
     config_file1 = current_app.config["CONFIG_FILE1"]
-    config_file2 = current_app.config["CONFIG_FILE2"]
+    user_file = current_app.config["CONFIG_FILE2"]
     config = get_file_config(config, f"{rpath}/{config_file1}")
-    config = get_file_config(config, f"{rpath}/{config_file2}")
+    config = get_file_config(config, f"{rpath}/{user_file}")
     return config
 
 

@@ -86,8 +86,7 @@ video_split 0
 #MP4Box Off=leave as raw h264, background=box in background
 MP4Box background
 MP4Box_fps 25
-#MP4Box_cmd (set -e;MP4Box -fps %i -add %s %s > /dev/null 2>&1;rm "%s";) &
-MP4Box_cmd (set -e;FPS=%i;TNAME='%s';FNAME='%s';TNAME='%s';LOGS="$TNAME.log";rm -f "$FNAME";if MP4Box -fps $FPS -add "$TNAME" "$FNAME" > "$LOGS" 2>&1;then touch -r "$TNAME" "$FNAME"; rm "$TNAME" "$LOGS";else mv "$TNAME" "$TNAME.bad";fi;) &
+MP4Box_cmd (set -e;MP4Box -fps %i -add %s %s > /dev/null 2>&1;rm "%s";) &
 #
 # Image Options
 #
@@ -172,9 +171,9 @@ callback_timeout 30
 user_config /var/www/uconfig
 
 #logfile for raspimjpeg, default to merge with scheduler log
-log_file /var/www/scheduleLog.txt
+log_file /var/www/schedule.log
 log_size 5000
-motion_logfile /var/www/motionLog.txt
+motion_logfile /var/www/motion.log
 
 #enforce_lf set to 1 to only process FIFO commands when terminated with LF
 enforce_lf 0

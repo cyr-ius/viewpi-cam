@@ -3,6 +3,7 @@ app/FIFO1
 app/pipan_off
 app/raspimjpeg
 app/scheduleLog.txt
+app/*.log
 app/settings.json
 app/status_mjpeg.txt
 app/media
