@@ -17,32 +17,40 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
-RUN apk add --no-cache libstdc++
+RUN apk add --no-cache libstdc++ py3-virtualenv
 RUN apk add --no-cache --virtual build build-base python3-dev gcc linux-headers ninja
 
+RUN python3 -m venv --system-site-packages /env 
 
 # Install pip requirements
 COPY requirements.txt .
-RUN python -m pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements.txt && rm -rf requirements.txt
 
 # clean content
 RUN apk del build
 
-COPY docker-entrypoint.sh .
+COPY ./dockerfiles/docker-entrypoint.sh .
 RUN chmod +x docker-entrypoint.sh
 
-# Copy App
-COPY ./app /app
-COPY ./etc /etc
-COPY ./bin/raspimjpeg /bin/raspimjpeg
+# Create folders
+RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
 
-RUN ["ln", "-sf", "/etc/raspimjpeg/raspimjpeg", "/app/raspimjpeg"]
+COPY ./dockerfiles/etc /etc
+COPY ./dockerfiles/bin/raspimjpeg /bin/raspimjpeg
+COPY ./dockerfiles/macros /app/macros
 
-RUN mkdir -p /app/media
-RUN mkdir -p /app/h264
-RUN mkfifo /app/FIFO
-RUN mkfifo /app/FIFO1
-RUN mkfifo /app/FIFO9
+RUN ["ln", "-sf", "/app/media", "/app/static/media"]
+
+WORKDIR /app
+
+# Copy datas
+COPY ./viewpicam ./viewpicam
+
+
+VOLUME /app/static
+VOLUME /app/macros
+VOLUME /app/media
+VOLUME /app/h264
 
 EXPOSE 8000
 ENTRYPOINT ["/docker-entrypoint.sh"]

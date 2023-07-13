@@ -10,7 +10,7 @@
       "request": "launch",
       "module": "flask",
       "env": {
-        "FLASK_APP": "app",
+        "FLASK_APP": "viewpicam",
         "FLASK_DEBUG": "1",
         "FLASK_ENV": "development"
       },
@@ -24,7 +24,7 @@
         "request": "launch",
         "module": "flask",
         "env": {
-          "FLASK_APP": "app",
+          "FLASK_APP": "viewpicam",
           "FLASK_DEBUG": "1",
           "FLASK_ENV": "development"
         },

@@ -1,10 +1,9 @@
 __pycache__
 .webassets-cache
 .venv
-settings.json
 *.code-workspace
-medias
-app/media/*
 *.log
 static/
 media/
+macros/
+system/
