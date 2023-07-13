@@ -46,11 +46,11 @@ WORKDIR /app
 # Copy datas
 COPY ./viewpicam ./viewpicam
 
-
 VOLUME /app/static
 VOLUME /app/macros
 VOLUME /app/media
 VOLUME /app/h264
+VOLUME /app/system
 
 EXPOSE 8000
 ENTRYPOINT ["/docker-entrypoint.sh"]
