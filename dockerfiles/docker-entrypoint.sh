@@ -24,7 +24,6 @@ raspimjpeg > /dev/null 2>&1 &
 
 # Static folder
 cp -Rv ./app/ressources/css/fonts /app/static/css
-cp -Rv ./app/ressources/extrastyles /app/static
 
 # Assets
 flask assets build
