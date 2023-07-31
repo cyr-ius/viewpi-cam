@@ -10,13 +10,12 @@
       "request": "launch",
       "module": "flask",
       "env": {
-        "FLASK_APP": "viewpicam",
         "FLASK_DEBUG": "1",
         "FLASK_ENV": "development"
       },
       "args": ["run", "--no-debugger", "--no-reload"],
       "jinja": true,
-      "justMyCode": true
+      "justMyCode": false
     },
     {
         "name": "Python: Scheduler Flask",
@@ -24,7 +23,6 @@
         "request": "launch",
         "module": "flask",
         "env": {
-          "FLASK_APP": "viewpicam",
           "FLASK_DEBUG": "1",
           "FLASK_ENV": "development"
         },

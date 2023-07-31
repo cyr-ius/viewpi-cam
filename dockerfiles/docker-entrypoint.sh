@@ -23,15 +23,15 @@ mkfifo /dev/raspimjpeg/FIFO9 && chmod 766 /dev/raspimjpeg/FIFO
 raspimjpeg > /dev/null 2>&1 &
 
 # Static folder
-cp -Rv ./viewpicam/ressources/css/fonts /app/static/css
-cp -Rv ./viewpicam/ressources/extrastyles /app/static
+cp -Rv ./app/ressources/css/fonts /app/static/css
+cp -Rv ./app/ressources/extrastyles /app/static
 
 # Assets
-flask --app viewpicam assets build
+flask assets build
 
 #Run scheduler
-flask --app viewpicam scheduler >/dev/null 2&>1 &
+flask scheduler >/dev/null 2&>1 &
 
-exec gunicorn --bind 0.0.0.0:8000 --workers 2 'viewpicam:create_app()' "$@"
+exec gunicorn --bind 0.0.0.0:8000 --workers 2 'app:create_app()' "$@"
 
 
