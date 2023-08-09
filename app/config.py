@@ -68,8 +68,7 @@ CAM_NAME = "mycam"
 # Unique camera string build from application name, camera name, host name
 CAM_STRING = f"{SITE_NAME} {VERSION}: {CAM_NAME}@{HOSTNAME}"
 # File where default settings changes are storedHOSTNAME = "Test"
-# CONFIG_FILE1 = "/etc/raspimjpeg/raspimjpeg"
-CONFIG_FILE1 = "dockerfiles/etc/raspimjpeg/raspimjpeg"
+CONFIG_FILE1 = "/etc/raspimjpeg/raspimjpeg"
 # File where user specific settings changes are stored
 MEDIA = "media"
 # Character used to flatten file paths
@@ -84,10 +83,10 @@ SERVO_FILE = f"{basedir}/../system/servo"
 PIPAN_FILE = f"{basedir}/../system/pipan"
 
 # USER LEVEL
-USERLEVEL_MIN = 0
-USERLEVEL_MINP = 1  # minimum+preview
-USERLEVEL_MEDIUM = 2
-USERLEVEL_MAX = 4
+USERLEVEL_MIN = 1
+USERLEVEL_MINP = 2  # minimum+preview
+USERLEVEL_MEDIUM = 4
+USERLEVEL_MAX = 8
 
 # MACROS
 MACROS = [

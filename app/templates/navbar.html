@@ -10,7 +10,7 @@
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
     <ul class="navbar-nav" id="main">
         <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">Camera Settings</a></li>    
-        {% if g.config.motion_external == 1%}
+        {% if g.raspiconfig.motion_external == 1%}
         <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#motionExternal">Motion settings</a></li>
         {% else %}
         <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#motionSetting">Motion Settings</a></li>    
@@ -59,7 +59,7 @@
     {%endif%}        
     <ul class="navbar-nav ms-md-auto" id="nav-right">
         {% if session["user_level"] >= config['USERLEVEL_MINP']%}
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.gallery') }}">Gallery</a></li> 
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('preview.index') }}">Gallery</a></li> 
         {% endif %}    
         {% if session["user_level"] >= config['USERLEVEL_MAX']%}        
         <li class="nav-item dropdown">
@@ -73,7 +73,6 @@
             <div id="system">
             <li class="nav-item"><a class="dropdown-item" href="{{url_for('settings.index')}}">Settings</a></li>
             <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">Schedule</a></li>
-            <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.macros') }}">Macros</a></li>            
             <li><hr class="dropdown-divider"></li>
             </div>
             <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_shutdown();">Shutdown system</a></li>

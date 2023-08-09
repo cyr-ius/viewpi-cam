@@ -19,8 +19,6 @@
 {% set options_st = {'Off':'0', 'On':'1'} %}
 {% set options_hp = {'Off':'0', 'On':'1'} %}
 
-
-
 <div class="offcanvas offcanvas-start offcanvas-size-xl" tabindex="-1" id="cameraSetting" aria-labelledby="cameraSettingLabel">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="cameraSettingLabel">Camera Settings</h5>
@@ -46,14 +44,14 @@
                 <div class="row">
                     <div class="col">
                         <div class="input-group input-group-sm mb-3">
-                            <input class="form-control form-control-sm" id="video_width" type="number" value="{{g.config.video_width}}">
+                            <input class="form-control form-control-sm" id="video_width" type="number" value="{{g.raspiconfig.video_width}}">
                             {# {{ render.make_input('video_width', null, null, 'number')}} #}
                             <span class="input-group-text">px</span>
                         </div>
                     </div> x
                     <div class="col">
                         <div class="input-group input-group-sm mb-3">
-                            <input class="form-control form-control-sm" id="video_height" type="number" value="{{g.config.video_height}}">
+                            <input class="form-control form-control-sm" id="video_height" type="number" value="{{g.raspiconfig.video_height}}">
                             {# {{ render.make_input('video_height', null, null, 'number')}} #}
                             <span class="input-group-text">px</span>
                         </div>       
@@ -67,14 +65,14 @@
                 <div class="row">
                     <div class="col">
                         <div class="input-group input-group-sm mb-3">
-                            <input class="form-control form-control-sm" id="video_fps" type="number" value="{{g.config.video_fps}}">
+                            <input class="form-control form-control-sm" id="video_fps" type="number" value="{{g.raspiconfig.video_fps}}">
                             {# {{ render.make_input('video_fps', null, null, 'number')}} #}
                             <span class="input-group-text">recording</span>
                         </div>
                     </div>
                     <div class="col">
                         <div class="input-group input-group-sm mb-3">
-                            <input class="form-control form-control-sm" id="MP4Box_fps" type="number" value="{{g.config.MP4Box_fps}}">
+                            <input class="form-control form-control-sm" id="MP4Box_fps" type="number" value="{{g.raspiconfig.MP4Box_fps}}">
                             {# {{ render.make_input('MP4Box_fps', null, null, 'number')}} #}
                             <span class="input-group-text">boxing</span>
                         </div>       
@@ -85,7 +83,7 @@
         <div class="row row-col-2 g-3">
             <label class="col col-form-label">FPS divider</label>
             <div class="col">
-                <input class="form-control form-control-sm" id="fps_divider" type="number" value="{{g.config.fps_divider}}">
+                <input class="form-control form-control-sm" id="fps_divider" type="number" value="{{g.raspiconfig.fps_divider}}">
                 {# {{ render.make_input('fps_divider', null, null, 'number')}} #}
             </div>
         </div>
@@ -95,14 +93,14 @@
                 <div class="row">
                     <div class="col">
                         <div class="input-group input-group-sm mb-3">
-                            <input class="form-control form-control-sm" id="image_width" type="number" value="{{g.config.image_width}}">
+                            <input class="form-control form-control-sm" id="image_width" type="number" value="{{g.raspiconfig.image_width}}">
                             {# {{ render.make_input('image_width', null, null, 'number')}} #}
                             <span class="input-group-text">px</span>
                         </div>
                     </div> x
                     <div class="col">
                         <div class="input-group input-group-sm mb-3">
-                            <input class="form-control form-control-sm" id="image_height" type="number" value="{{g.config.image_height}}">
+                            <input class="form-control form-control-sm" id="image_height" type="number" value="{{g.raspiconfig.image_height}}">
                             {# {{ render.make_input('image_height', null, null, 'number')}} #}
                             <span class="input-group-text">px</span>
                         </div>       
@@ -117,7 +115,7 @@
             </div>
         </div>
         <hr>
-        {% if g.config['camera_num']|int > 0 %} 
+        {% if g.raspiconfig.camera_num|int > 0 %} 
         <div class="row row-col-2 g-3">
             <span>Camera select (Compute module only)</span>
             <label class="col col-form-label">Use camera</label>
@@ -130,7 +128,7 @@
             <label class="col col-form-label">Timelapse-Interval (0.1...3200):</label>
             <div class="col">
                 <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="tl_interval" type="number" value="{{g.config.tl_interval|int /10 |default(3)}}">
+                    <input class="form-control form-control-sm" id="tl_interval" type="number" value="{{g.raspiconfig.tl_interval|int /10 |default(3)}}">
                     {# {{ render.make_input('tl_interval', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('tv ' + 10 * $('#tl_interval').val())">OK</button>       
                 </div>
@@ -140,7 +138,7 @@
             <label class="col col-form-label">Video Split (seconds, default 0=off):</label>
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
-                    <input class="form-control form-control-sm" id="video_split" type="number" value="{{g.config.video_split}}">
+                    <input class="form-control form-control-sm" id="video_split" type="number" value="{{g.raspiconfig.video_split}}">
                     {# {{ render.make_input('video_split', null, null, 'number')}} #}
                     <span class="input-group-text">sec.</span>
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('vi ' + $('#video_split').val())">OK</button>
@@ -167,7 +165,7 @@
             <label class="col col-form-label">Annotation size(0-99):</label> 
             <div class="col">
                 <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="anno_text_size" type="number" value="{{g.config.anno_text_size}}">
+                    <input class="form-control form-control-sm" id="anno_text_size" type="number" value="{{g.raspiconfig.anno_text_size}}">
                     {# {{ render.make_input('anno_text_size', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('as ' + $('#anno_text_size').val())">OK</button>
                 </div>

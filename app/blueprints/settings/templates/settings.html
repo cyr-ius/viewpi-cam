@@ -1,178 +1,147 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    <form id="form-ubuttons" class="row needs-validation" action="{{ url_for('settings.index') }}" method="POST">
-        {{form_ubuttons.csrf_token}}
         <div class="row">
             <h4 class="p-0">Settings</h3>
         </div>
         <hr class="p-0 ">
         <div class="p-0 mt-1">Users buttons</div>
-        {% for field in form_ubuttons.user_buttons %}
-        <div id="{{field.label.text|lower}}" class="row row-cols-4 row-cols-md-4 g-1">
-            {{ field.csrf_token}}
-            <div class="col">{{render.field(field["name"])}}</div>
-            <div class="col">{{render.field(field.macro)}}</div>
-            <div class="col">{{render.field(field.css_class)}}</div>
-            <div class="col">{{render.field(field.style)}}</div>
-            <div class="col">{{render.field(field.other)}}</div>
-            <div class="col {% if not field.name %}d-none{%endif%}" id="btn_add_button">{{field.add_button}}</div>
-            <div class="col {% if field.name %}d-none{%endif%}" id="btn_del_button">{{field.del_button}}</div>
+        <div id="ubuttons" class="row">
+            {%for ubutton in settings.ubuttons%}
+            <div class="row row-cols-6 row-cols-md-6 g-1 ms-2">
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value="{{ubutton.name}}"></div>
+                <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value="{{ubutton.macro}}"></div>
+                <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value="{{ubutton.css_class}}"></div>
+                <div class="col"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text" value="{{ubutton.style}}"></div>
+                <div class="col"><input class="form-control form-control-sm" name="other" placeholder="Other" type="text" value="{{ubutton.other}}"></div>
+                <div class="col" id="btn_del_button"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+            </div>
+            {% endfor%}
+            <div id="ubuttons-ref" class="row row-cols-6 row-cols-md-6 g-1 ms-2">
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value=""></div>
+                <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value=""></div>
+                <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value=""></div>
+                <div class="col"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text" value=""></div>
+                <div class="col"><input class="form-control form-control-sm" name="other" placeholder="Other" type="text" value=""></div>
+                <div class="col" id="btn_add_button"><button class="btn btn-sm btn-success add_button" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
+                <div class="col d-none" id="btn_del_button"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+            </div>
         </div>
-        {% endfor%}
-    </form>
         <hr class="mt-3">
         <div class="p-0 m-0">Users</div>
-    <form id="form-users" class="row needs-validation" action="{{ url_for('settings.index') }}" method="POST">
-        {% for field in form_users.users %}
-        {{form_users.csrf_token}}
-        <div id="{{field.label.text|lower}}" class="row row-cols-4 row-cols-md-4 g-1">
-            {{ field.csrf_token}}
-            <div class="col">{{render.field(field.user_id)}}</div>
-            <div class="col">{{render.field(field.password)}}</div>
-            <div class="col">{{render.field(field.rights)}}</div>
-            <div class="col {% if field.user_id.data is not none %}d-none{%endif%}" id="btn_add_user">{{field.add_user}}
+        <div id="users" class="row">
+            {%for user in settings.users%}
+            <div class="row row-cols-4 row-cols-md-4 g-1 ms-2">                
+                <div class="col"><input class="form-control form-control-sm" name="user_id" placeholder="Username" required="" type="text" value="{{user.user_id}}"></div>
+                <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" value=""></div>
+                <div class="col">
+                    <select class="form-select form-select-sm" id="users-0-rights" name="rights" onchange="$(this).trigger('submit');" required="">
+                        <option {% if user.rights == 1 %}selected{%endif%} value="1">Minimum</option>
+                        <option {% if user.rights == 2 %}selected{%endif%} value="2">Minimum+</option>
+                        <option {% if user.rights == 4 %}selected{%endif%} value="4">Medium</option>
+                        <option {% if user.rights == 8 %}selected{%endif%} value="8">Max</option>
+                    </select>
+                </div>
+                <div class="col" id="btn_del_user"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
-            <div class="col {% if field.user_id.data is none %}d-none{%endif%}" id="btn_del_user">{{field.del_user}}
-            </div>
+            {%endfor%}
+            <div id="users-ref" class="row row-cols-4 row-cols-md-4 g-1 ms-2">                
+                <div class="col"><input class="form-control form-control-sm" name="user_id" placeholder="Username" required type="text"></div>
+                <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" required></div>
+                <div class="col">
+                    <select class="form-select form-select-sm" id="users-0-rights" name="rights" onchange="$(this).trigger('submit');" required>
+                        <option value="1">Minimum</option>
+                        <option value="2">Minimum+</option>
+                        <option value="4">Medium</option>
+                        <option value="8">Max</option>
+                    </select>
+                </div>
+                <div class="col" id="btn_add_user"><button class="btn btn-sm btn-success add_user" name="add_user" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
+                <div class="col d-none" id="btn_del_user"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+            </div>                
         </div>
-        {%endfor%}
-    </form>
         <hr class="mt-3">
-     <form id="form-token" class="row needs-validation" action="{{ url_for('settings.index') }}" method="POST">
-        {{form_token.csrf_token}}
         <div class="p-0 m-0">Token camera<p class="text-body-secondary">The generation of the token allows it to be
                 passed as a parameter of the pages to avoid authentication. ex: {url}/?token=B123456</p>
         </div>
-        <div class="row row-cols-4 row-cols-md-4 g-1">
-            <div class="col col-md-7">
-                <div class="input-group">
-                    {{form_token.token(class="form-control form-control-sm",disabled="disabled")}}
-                    {{form_token.copy(class="btn btn-sm btn-outline-secondary")|safe}}
-                    {{form_token.generate(class="btn btn-sm btn-outline-secondary")|safe}}
-                    {{form_token.reset(class="btn btn-sm btn-outline-secondary")|safe}}
-                </div>
-            </div>
-        </div>
-    </form>
-    <hr class="mt-3">
-    <form id="form-sets" class="row needs-validation" method="POST" action="{{url_for('settings.index')}}">
-        {{form_sets.csrf_token}}
-        <div class="row row-cols-2 row-cols-md-2 g-1">
-            <div class="col">{{form_sets.servo.label(class="form-check-label")}}</div>
-            <div class="col col-md-2">
-                <div class="form-check form-switch">
-                    {{form_sets.servo(class="form-check-input")}}
-                </div>
-            </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-2 g-1">
-            <div class="col">{{form_sets.pipan.label(class="form-check-label")}}</div>
-            <div class="col col-md-2">
-                <div class="form-check form-switch">
-                    {{form_sets.pipan(class="form-check-input")}}
-                </div>
-            </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-2 g-1">
-            <div class="col">{{form_sets.pilight.label(class="form-check-label")}}</div>
-            <div class="col col-md-2">
-                <div class="form-check form-switch">
-                    {{form_sets.pilight(class="form-check-input")}}
+        <div class="row">
+            <div class="row row-cols-1 row-cols-md-1 g-1 ms-2">
+                <div class="col col-md-8">
+                    <div class="input-group">
+                        <input class="form-control form-control-sm" disabled="disabled" id="token" name="token" type="text" value="{{settings.token}}">
+                        <button class="btn btn-sm btn-outline-secondary" id="copy" name="copy" type="button"><i class="bi bi-clipboard"></i></button>
+                        <button class="btn btn-sm btn-outline-secondary" id="generate" name="generate" type="button">Generate</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="reset" name="reset" type="button">Reset</button>
+                    </div>
                 </div>
             </div>
         </div>
         <hr class="mt-3">
-        <div class="row row-cols-2 row-cols-md-2 g-1">
-            <div class="col">{{form_sets.upreset.label(class="form-label")}}</div>
-            <div class="col col-md-2">{{form_sets.upreset}}</div>
+        <div class="row">
+            <div class="row row-cols-2 row-cols-md-2 g-1 ms-2">
+                <div class="col col-md-5"><label class="form-check-label" for="servo">Servo blaster</label></div>
+                <div class="col col-md-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" id="servo" name="servo" type="checkbox" {% if settings.servo == 1 %}checked{%endif%}>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-cols-2 row-cols-md-2 g-1 ms-2">
+                <div class="col col-md-5"><label class="form-check-label" for="pipan">Pi Pan</label></div>
+                <div class="col col-md-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" id="pipan" name="pipan" type="checkbox" {% if settings.pipan == 1 %}checked{%endif%}>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-cols-2 row-cols-md-2 g-1 ms-2">
+                <div class="col col-md-5"><label class="form-check-label" for="pilight">Pi Light</label></div>
+                <div class="col col-md-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" id="pilight" name="pilight" type="checkbox" {% if settings.pilight == 1 %}checked{%endif%}>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-3">
+            <div class="row row-cols-2 row-cols-md-2 g-1 ms-2">
+                <div class="col col-md-5"><label class="form-label" for="upreset">UPreset</label></div>
+                <div class="col col-md-4">
+                    <select class="form-select form-select-sm" id="upreset" name="upreset">
+                        <option {% if settings.upreset == "v2" %}selected{%endif%} value="v2">v2</option>
+                        <option {% if settings.upreset == "N-IMX219" %}selected{%endif%} value="N-IMX219">N-IMX219</option>
+                        <option {% if settings.upreset == "P-IMX219" %}selected{%endif%} value="P-IMX219">P-IMX219</option>
+                        <option {% if settings.upreset == "N-OV5647" %}selected{%endif%} value="N-OV5647">N-OV5647</option>
+                        <option {% if settings.upreset == "P-OV5647" %}selected{%endif%} value="P-OV5647">P-OV5647</option>
+                    </select>
+                </div>
+            </div>
         </div>
-    </form>
+        <hr class="mt-3"> 
+        {%for macro in macros%}
+        <div class="row row-cols-4 row-cols-md-4 g-1 mb-2">
+            <div class="col">Macro:{{macro}}</div>
+            <div class="col col-md-2 text-center">
+                <input class="form-control-checkbox" type="checkbox" id="{{macro}}_chk"
+                {% if raspiconfig[macro][:1] == "-" %}
+                    {% set value=raspiconfig[macro][1:] %}
+                    checked=""
+                {%else%}
+                    {% set value=raspiconfig[macro] %}
+                    checked="checked"
+                {%endif%}
+                ></div>
+            <div class="col col-md-4"><input class="form-control form-control-sm" type="text" id="{{macro|lower}}" value="{{value}}"></div>
+            <div class="col"><button class="btn btn-sm btn-outline-secondary" type="button" onclick="send_macroUpdate({{loop.index0}},'{{macro}}');">OK</button></div>
+        </div>
+        {%endfor%}
+
 </div>
 {% endblock %}
 
 {%block extrascripts%}
 <script language="javascript">
-    var templ_user = $('div[id|="users"]:last').clone();
-    var templ_ubutton = $('div[id|="user_buttons"]:last').clone();
-
-    $('div[id|=users]:last [name|="users"]').removeAttr('onchange', 'onclick')
-    $('div[id|=user_buttons]:last [name|="user_buttons"]').removeAttr('onchange', 'onclick')
-
-    function add_line(last_obj, template) {
-        ref = template.clone()
-        last_id = last_obj.prop("id").split('-')
-        prefix = last_id[0]
-        id = parseInt(last_id[1])
-        ref_id = ref.prop("id")
-        ref.prop("id", ref_id.replace(/(.*)-(.*)/, '$1-' + (id + 1)))
-        ref.find('[id|="' + prefix + '"]').filter(function () {
-            this_id = $(this).prop("id")
-            $(this).prop("id", this_id.replace(/(.*)-(.*)-(.*)/, '$1-' + (id + 1) + '-$3'))
-            if ($(this).attr("name"))
-                $(this).attr("name", $(this).prop("id"))
-        });
-        ref.insertAfter('#' + last_obj.prop('id'))
-    }
-
-    $(document).ready(function () {
-        $('#main').addClass("d-none")
-    });
-
-    $('#generate').unbind();
-    $('#generate').click(function () {
-        $.post('{{ url_for('settings.index') }}', { 'token': 'generate' }, function (data) {
-            $('#token').val(data['token']);
-        });
-    });
-
-    $('#reset').unbind();
-    $('#reset').click(function () {
-        $.post('{{url_for('settings.index')}}', { 'token': 'reset' }, function () {
-            $('#token').val('');
-        });
-    });
-
-    $('#copy').unbind();
-    $('#copy').click(function () {
-        copyToClipboard('#token');
-    });
-
-    $('form').unbind();
-    $('form').on("submit", function (event) {
-        $.post(event.target.action, $(event.target).find('input,select,textarea').serialize())
-        event.preventDefault();
-    });
-
-    function add_user(obj) {
-        $('#form-users').trigger("submit");
-        ref = $(obj).parent().parent();
-        ref.find('#btn_add_user').addClass('d-none');
-        ref.find('#btn_del_user').removeClass('d-none');
-        add_line($('div[id|="users"]:last'), templ_user);
-    }
-
-    function del_user(obj) {
-        $(obj).parent().parent().remove();
-        $('div[id|="users"]:last').remove()
-        $('#form-users').trigger("submit");
-        add_line($('div[id|="users"]:last'), templ_user);
-    }
-
-    function add_button(obj) {
-        $('#form-ubuttons').trigger("submit");
-        ref = $(obj).parent().parent();
-        ref.find('#btn_add_ubutton').addClass('d-none');
-        ref.find('#btn_del_ubutton').removeClass('d-none');
-        add_line($('div[id|="user_buttons"]:last'), templ_ubutton);
-    }
-
-    function del_button(obj) {
-        $(obj).parent().parent().remove()
-        $('div[id|="user_buttons"]:last').remove()
-        $('#form-ubuttons').trigger("submit");
-        add_line($('div[id|="user_buttons"]:last'), templ_ubutton);
-    }
+    var templ_user = $('#users-ref').clone();
+    var templ_ubutton = $('#ubuttons-ref').clone();
 
     function copyToClipboard(element) {
         var $temp = $("<input>");
@@ -181,6 +150,90 @@
         document.execCommand("copy");
         $temp.remove();
     }
+
+
+
+    $(function () {
+        $('#main').addClass("d-none")
+    }); 
+
+    $('#upreset').unbind()
+    $('#upreset').on("change", function(event) {
+        data = $(this).serializeArray()[0];
+        queryData("POST","{{ url_for('settings.index')}}",data);
+    })
+
+    $('#pilight, #pipan, #servo').unbind()
+    $('#pilight, #pipan, #servo').on("change", function(event) {
+        data = $(this).serializeArray()[0];
+        queryData("POST","{{ url_for('settings.index')}}",data);
+    })
+
+    $('#copy').unbind();
+    $('#copy').click(function () {
+        copyToClipboard('#token');
+        event.preventDefault();
+    });
+
+    $('#generate').unbind();
+    $('#generate').click(function () {
+        callback = function(data){$('#token').val(data["token"])}
+        queryData("POST","{{ url_for('settings.index')}}",{"token":"generate"},callback);
+    });     
+
+    $('#reset').unbind();
+    $('#reset').click(function () {
+        callback = function(data){$('#token').val('')}
+        queryData("DELETE","{{ url_for('settings.index')}}",{"token":"generate"},callback);
+    });    
+
+    $('#users').on('click','.add_user', function() {
+        user = $(this).parent().parent()
+        data = $(user).find('input, select').serializeArray()
+
+        callback = function(data){
+                user.find('#btn_add_user').addClass('d-none');
+                user.find('#btn_del_user').removeClass('d-none');
+                user.removeAttr('id')                
+                templ_user.insertAfter(user);
+        }
+        queryData("POST","{{ url_for('settings.index')}}",data,callback);
+
+    });
+
+    $('#users').on('click','.del_user', function() {
+        user = $(this).parent().parent()
+        data = convertFormToJSON($(user).find('input, select'));
+        callback = function(data){ user.remove() }
+        queryData("DELETE","{{ url_for('settings.index')}}",data,callback);
+    });
+
+    $('#ubuttons').on('click','.add_button', function() {
+        button = $(this).parent().parent();
+        data = convertFormToJSON($(button).find('input'));
+        callback = function(data){
+                button.find('#btn_add_button').addClass('d-none');
+                button.find('#btn_del_button').removeClass('d-none');
+                button.removeAttr('id')                
+                templ_ubutton.insertAfter(button);
+        }
+        queryData("POST","{{ url_for('settings.index')}}",data,callback);
+    });
+
+    $('#ubuttons').on('click','.del_button', function() {
+        button = $(this).parent().parent();
+        data = convertFormToJSON($(button).find('input'));
+        callback = function(data){ button.remove() }
+        queryData("DELETE","{{ url_for('settings.index')}}",data,callback);
+    });
+
+    function send_macroUpdate(i, macro) {
+        var macrovalue = $('#'+macro).val();        
+        if(! $("#"+macro+"_chk").prop("checked")) {
+            macrovalue = "-" + macrovalue;
+        }
+        send_cmd("um " + i + " " + macrovalue);
+    }    
 
 </script>
 {%endblock%}

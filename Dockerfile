@@ -39,12 +39,9 @@ COPY ./dockerfiles/etc /etc
 COPY ./dockerfiles/bin/raspimjpeg /bin/raspimjpeg
 COPY ./dockerfiles/macros /app/macros
 
-RUN ["ln", "-sf", "/app/media", "/app/static/media"]
-
 WORKDIR /app
 
-# Copy datas
-COPY ./viewpicam ./viewpicam
+COPY ./app ./app
 
 VOLUME /app/static
 VOLUME /app/macros

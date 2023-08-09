@@ -13,23 +13,22 @@
         "FLASK_DEBUG": "1",
         "FLASK_ENV": "development"
       },
-      "args": ["run", "--no-debugger", "--no-reload"],
+      "args": ["run", "--no-debugger"],
       "jinja": true,
       "justMyCode": false
     },
     {
-        "name": "Python: Scheduler Flask",
-        "type": "python",
-        "request": "launch",
-        "module": "flask",
-        "env": {
-          "FLASK_DEBUG": "1",
-          "FLASK_ENV": "development"
-        },
-        "args": ["scheduler"],
-        "jinja": true,
-        "justMyCode": true
-      },    
-
+      "name": "Python: Scheduler Flask",
+      "type": "python",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_DEBUG": "1",
+        "FLASK_ENV": "development"
+      },
+      "args": ["scheduler"],
+      "jinja": true,
+      "justMyCode": true
+    }
   ]
 }

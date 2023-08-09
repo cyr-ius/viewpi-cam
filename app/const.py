@@ -84,7 +84,7 @@ ATTR_TIMES_MAX = 12
 SCHEDULE_ZENITH = 90.8
 
 ATTR_USERS = "users"
-ATTR_USER_BUTTONS = "user_buttons"
+ATTR_USER_BUTTONS = "ubuttons"
 
 PRESETS = {
     "v2": {

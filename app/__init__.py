@@ -18,11 +18,13 @@ from .services.handle import (
     handle_page_not_found,
 )
 from .helpers.settings import Settings
+from .helpers.raspiconfig import RaspiConfig
 
 mail = Mail()
 assets = Environment()
 babel = Babel()
 settings = Settings()
+raspiconfig = RaspiConfig()
 
 
 def create_app(config=None):
@@ -64,6 +66,9 @@ def create_app(config=None):
     mail.init_app(app)
     assets.init_app(app)
     babel.init_app(app)
+
+    # Important ordering
+    raspiconfig.init_app(app)
     settings.init_app(app)
 
     # Register Assets
@@ -74,15 +79,17 @@ def create_app(config=None):
     assets.register("js_pipan", js_pipan)
 
     # Create app blueprints
-    from .blueprints.main.routes import bp as main_bp
-    from .blueprints.auth.routes import bp as auth_bp
-    from .blueprints.schedule.routes import bp as sch_bp
+    from .blueprints.main.route import bp as main_bp
+    from .blueprints.auth.route import bp as auth_bp
+    from .blueprints.schedule.route import bp as sch_bp
     from .blueprints.settings.route import bp as sets_bp
+    from .blueprints.preview.route import bp as pview_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(sch_bp)
     app.register_blueprint(sets_bp)
+    app.register_blueprint(pview_bp)
 
     # Register error handler
     app.register_error_handler(400, handle_bad_request)
@@ -101,13 +108,10 @@ def create_app(config=None):
 
         return {"file_exists": file_exists}
 
-    # Init settings
-    app.settings = settings
-
     # Start scheduler
     if "SCHEDULER_START" in os.environ:
         """Start scheduler"""
-        from .blueprints.schedule.routes import launch_schedule
+        from .blueprints.schedule.route import launch_schedule
 
         launch_schedule()
 

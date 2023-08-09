@@ -175,12 +175,12 @@
                 <div class="col" style="background-color: LightGreen;"><label class="col-form-label-sm">All Days</label></div>
                 <div class="col text-center">      
                     {% for i in range(0,7)%}             
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[0][]" value="{{i}}" {%if i in  settings.days['0'] %} checked="checked" {%endif%}>
+                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[0]" value="{{i}}" {%if i in  settings.days['0'] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on[]" value="{{settings.commands_on[0]}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_off[]" value="{{settings.commands_off[0]}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="modes[]" value="{{settings.modes[0]}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on" value="{{settings.commands_on[0]}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_off" value="{{settings.commands_off[0]}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="modes" value="{{settings.modes[0]}}"></div>
             </div>
             {% for d_mode in ["Night","Dawn","Day","Dusk"]%}
             {% set index = loop.index %}
@@ -188,26 +188,26 @@
                 <div class="col" {%if day_period == index  %}style="background-color: LightGreen;"{%endif%}><label class="col-form-label-sm">{{d_mode}}</label></div>
                 <div class="col text-center">
                     {% for i in range(0,7)%}      
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}][]" value="{{i}}" {%if i in  settings.days[index|string] %} checked="checked" {%endif%}>
+                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}]" value="{{i}}" {%if i in  settings.days[index|string] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on[]" value="{{settings.commands_on[index]}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_off[]" value="{{settings.commands_off[index]}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="modes[]" value="{{settings.modes[index]}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on" value="{{settings.commands_on[index]}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_off" value="{{settings.commands_off[index]}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="modes" value="{{settings.modes[index]}}"></div>
             </div>
             {%endfor%}
             {% for time in  settings.times %}
             {% set tindex = loop.index %}
             <div class="row fixed d-none row-cols-5 row-cols-md-5 gy-1 gx-2">
-                <div class="col" {%if day_period == tindex %}style="background-color: LightGreen;"{%endif%}><input class="form-control form-control-sm" type="text" autocomplete="off" name="times[]" value="{{time}}"></div>
+                <div class="col" {%if day_period == tindex %}style="background-color: LightGreen;"{%endif%}><input class="form-control form-control-sm" type="text" autocomplete="off" name="times" value="{{time}}"></div>
                 <div class="col text-center">
                     {% for i in range(0,7)%}             
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{tindex+5}}][]" value="{{i}}" {%if i in  settings.days[tindex|string] %} checked="checked" {%endif%}>
+                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{tindex+5}}]" value="{{i}}" {%if i in  settings.days[tindex|string] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on[]" value="{{settings.commands_on[tindex + 5]}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_off[]" value="{{settings.commands_off[tindex + 5]}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="modes[]" value="{{settings.modes[tindex + 5]}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on" value="{{settings.commands_on[tindex + 5]}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_off" value="{{settings.commands_off[tindex + 5]}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="modes" value="{{settings.modes[tindex + 5]}}"></div>
             </div>
             {%endfor%}
         </div>
@@ -227,8 +227,23 @@ $( document ).ready(function(){
 
 $('#schedule button').unbind();
 $('#schedule button').click(function(){
-    $("#action").val($(this).val())
-    $("#form_schedule").trigger("submit");
+    json = convertFormToJSON($("#form_schedule"))
+    // Format days field
+    var days = new Object();
+    const regexp = /days\[(.*)\]/g;    
+    keys = Object.keys(json)
+    for (const key of keys) {
+        const matchs = key.matchAll(regexp);
+        for (const match of matchs) {
+            days[parseInt(match[1])] = json[key]
+            delete json[key]
+        }        
+    }
+    json.days = days 
+    json.action = $(this).val()
+
+    // Post data
+    queryData("POST", "{{ url_for('schedule.index')}}", json) 
 });
 
 $('#daymode').unbind();

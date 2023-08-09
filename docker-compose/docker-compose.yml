@@ -18,8 +18,6 @@ services:
       - /opt/vc:/opt/vc
       - /dev/vchiq:/dev/vchiq
       - /dev/vcsm:/dev/vcsm
-      - ./settings.json:/app/settings.json
-
   web:
     image: nginx:stable-alpine
     restart: unless-stopped

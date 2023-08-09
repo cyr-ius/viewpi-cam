@@ -8,12 +8,12 @@
   </symbol>
 </svg>
 <main class="form-signin w-100 m-auto">
-  <form class="needs-validation" method="POST" action="{{ url_for('auth.register') if g.first_run else url_for('auth.login') }}" novalidate>
+  <form id="login" class="needs-validation" method="POST" action="{{ url_for('auth.register') if g.first_run else url_for('auth.login') }}" novalidate>
       {{ form.hidden_tag('csrf_token') }}
       <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
       <div class="form-floating">
-        {{ render.field(form.user, class="form-control", placeholder=form.user.label.text) }}
-        {{ form.user.label }}
+        {{ render.field(form.user_id, class="form-control", placeholder=form.user_id.label.text) }}
+        {{ form.user_id.label }}
       </div>
       <div class="form-floating">
         {{ render.field(form.password, class="form-control", placeholder=form.password.label.text) }}

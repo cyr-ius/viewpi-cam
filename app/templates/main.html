@@ -5,8 +5,8 @@
 <div class="container text-center liveimage overflow-auto">
     <div>
         <img id="mjpeg_dest" 
-            {% if g.config['fullscreen'] == 1 %}class="fullscreen"{%endif%} 
-            {% if g.config['vector_preview'] %}style="width:{{g.config['width']}}px"{%endif%} 
+            {% if g.raspiconfig['fullscreen'] == 1 %}class="fullscreen"{%endif%} 
+            {% if g.raspiconfig['vector_preview'] %}style="width:{{g.raspiconfig['width']}}px"{%endif%} 
             {% if mode == 1 %}onclick="ontouchstart=pipan_start();" {%endif%}
             onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.jpg') }}">
     </div>
@@ -77,8 +77,8 @@
     var btn_class_a = "btn btn-warning"
     var elem = document.documentElement;
 
-    $(document).ready(function(){   
-        setTimeout('init({{mjpegmode}},{{g.config.video_fps}}, {{g.config.divider}});', 100);
+    $(function(){   
+        setTimeout('init({{mjpegmode}},{{g.raspiconfig.video_fps}}, {{g.raspiconfig.divider}});', 100);
     });
 
     $('#main-buttons button').unbind();

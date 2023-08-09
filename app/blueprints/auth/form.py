@@ -3,7 +3,7 @@ from wtforms import HiddenField, StringField, PasswordField, validators, SubmitF
 
 
 class frm_login(FlaskForm):
-    user = StringField(label="Username", validators=[validators.DataRequired()])
+    user_id = StringField(label="Username", validators=[validators.DataRequired()])
     password = PasswordField(
         label="Password",
         validators=[validators.DataRequired()],

@@ -1,0 +1,18 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "python.linting.flake8Args": ["--ignore=E501,D100,D101,D102,D103"],
+    "liveSassCompile.settings.formats": [
+      {
+        "format": "expanded",
+        "extensionName": ".css",
+        "savePath": "/resources/css"
+      }
+    ]
+  }
+}

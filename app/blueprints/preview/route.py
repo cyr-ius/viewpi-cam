@@ -1,0 +1,318 @@
+import os
+import time
+import zipfile
+from datetime import datetime as dt
+from io import BytesIO
+
+from flask import (
+    Blueprint,
+    current_app,
+    make_response,
+    render_template,
+    request,
+    send_file,
+)
+
+from ...helpers.decorator import auth_required
+from ...helpers.filer import (
+    data_file_ext,
+    data_filename,
+    delete_mediafiles,
+    disk_usage,
+    find_lapse_files,
+    get_file_type,
+    list_folder_files,
+    get_file_index,
+    filesize_n,
+)
+
+bp = Blueprint(
+    "preview",
+    __name__,
+    template_folder="templates",
+    url_prefix="/preview",
+)
+
+
+@bp.route("/", methods=["GET", "POST"])
+@auth_required
+def index():
+    media_path = current_app.raspiconfig.media_path
+    select_all = ""
+
+    preview_size = (
+        int(preview_size)
+        if (preview_size := request.cookies.get("preview_size"))
+        else 640
+    )
+    thumb_size = (
+        int(thumb_size) if (thumb_size := request.cookies.get("thumb_size")) else 96
+    )
+    sort_order = (
+        int(sort_order) if (sort_order := request.cookies.get("sort_order")) else 1
+    )
+    show_types = (
+        int(show_types) if (show_types := request.cookies.get("show_types")) else 1
+    )
+    time_filter = (
+        int(time_filter) if (time_filter := request.cookies.get("time_filter")) else 1
+    )
+
+    time_filter_max = 8
+    preview_file = ""
+    if request.method == "GET" and (thumb_file := request.args.get("preview")):
+        preview_file = thumb_file
+
+    if request.method == "POST":
+        if time_filter := request.form.get("time_filter"):
+            time_filter = int(time_filter)
+
+        if sort_order := request.form.get("sort_order"):
+            sort_order = int(sort_order)
+
+        if show_types := request.form.get("show_types"):
+            show_types = int(show_types)
+
+        if (delete1 := request.form.get("delete1")) and check_media_path(delete1):
+            delete_mediafiles(delete1)
+            maintain_folders(media_path, False, False)
+
+        if (download1 := request.form.get("download1")) and check_media_path(download1):
+            if get_file_type(download1) != "t":
+                dx_file = data_filename(download1)
+                if data_file_ext(download1) == "jpg":
+                    mimetype = "image/jpeg"
+                else:
+                    mimetype = "video/mp4"
+
+                return send_file(
+                    f"{media_path}/{dx_file}",
+                    mimetype=mimetype,
+                    as_attachment=True,
+                    download_name=dx_file,
+                )
+            else:
+                return get_zip([download1])
+
+        if action := request.form.get("action"):
+            match action:
+                case "deleteAll":
+                    maintain_folders(media_path, True, True)
+                case "selectAll":
+                    select_all = "checked"
+                case "selectNone":
+                    select_all = ""
+                case "deleteSel":
+                    for item in request.form.getlist("check_list"):
+                        if check_media_path(item):
+                            delete_mediafiles(item)
+                    maintain_folders(media_path, False, False)
+                case "lockSel":
+                    for item in request.form.getlist("check_list"):
+                        if check_media_path(item):
+                            lock_file(item, True)
+                case "unlockSel":
+                    for item in request.form.getlist("check_list"):
+                        if check_media_path(item):
+                            lock_file(item, False)
+                case "updateSizeOrder":
+                    if preview_size := request.form.get("preview_size"):
+                        preview_size = max(int(preview_size), 100)
+                        preview_size = min(int(preview_size), 1920)
+                    if thumb_size := request.form.get("thumb_size"):
+                        thumb_size = max(int(thumb_size), 32)
+                        thumb_size = min(int(thumb_size), 320)
+                case "zipSel":
+                    if check_list := request.form.getlist("check_list"):
+                        return get_zip(check_list)
+
+    thumb_filenames = get_thumbnails(
+        sort_order=sort_order,
+        show_types=show_types,
+        time_filter=time_filter,
+        time_filter_max=time_filter_max,
+    )
+
+    thumbnails = draw_files(thumb_filenames)
+
+    response = make_response(
+        render_template(
+            "gallery.html",
+            raspiconfig=current_app.raspiconfig,
+            disk_usage=disk_usage(),
+            preview_size=preview_size,
+            thumb_size=thumb_size,
+            sort_order=sort_order,
+            show_types=show_types,
+            time_filter=time_filter,
+            time_filter_max=time_filter_max,
+            preview_file=preview_file,
+            thumbnails=thumbnails,
+            select_all=select_all,
+        )
+    )
+
+    if request.method == "POST":
+        response.set_cookie("time_filter", str(time_filter))
+        response.set_cookie("sort_order", str(sort_order))
+        response.set_cookie("show_types", str(show_types))
+        response.set_cookie("preview_size", str(preview_size))
+        response.set_cookie("thumb_size", str(thumb_size))
+
+    return response
+
+
+# function to lock or unlock all files associated with a thumb name
+def lock_file(filename: str, lock: bool):
+    media_path = current_app.raspiconfig.media_path
+    if lock == 1:
+        attr = "0444"
+    else:
+        attr = "0644"
+    t = get_file_type(filename)
+    if t == "t":
+        #  For time lapse lock all from this batch
+        files = find_lapse_files(filename)
+        for file in files:
+            os.popen(f"chmod {attr} {file}")
+    else:
+        tFile = data_filename(filename)
+        if os.path.isfile(f"{media_path}/{tFile}"):
+            os.popen(f"chmod {attr} {media_path}/{tFile}")
+        if t == "v" and os.path.isfile(f"{media_path}/{tFile}.dat"):
+            os.popen(f"chmod {attr} {media_path}/{tFile}.dat")
+        if t == "v" and os.path.isfile(f"{media_path}/{tFile}.h264"):
+            os.popen(f"chmod {attr} {media_path}/{tFile}.h264")
+
+    os.popen(f"chmod {attr} {media_path}/{filename}")
+
+
+def get_zip(files: list):
+    media_path = current_app.raspiconfig.media_path
+    date_str = dt.now().strftime("%Y%m%d_%H%M%S")
+    zipname = f"cam_{date_str}.zip"
+
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, "a") as zf:
+        for individualFile in files:
+            file_name = data_filename(individualFile)
+            try:
+                data = zipfile.ZipInfo(file_name)
+                data.date_time = time.localtime(time.time())[:6]
+                data.compress_type = zipfile.ZIP_DEFLATED
+                # zf.writestr(data, f"{media_path}/{data_filename(individualFile)}")
+                zf.write(f"{media_path}/{file_name}", file_name, data.compress_type)
+            except FileNotFoundError:
+                continue
+    memory_file.seek(0)
+
+    return send_file(
+        memory_file,
+        mimetype="application/zip",
+        as_attachment=True,
+        download_name=zipname,
+    )
+
+
+def maintain_folders(path, delete_main_files, delete_sub_files, root: bool = True):
+    empty = True
+    for file in list_folder_files(path):
+        if os.path.isdir(file):
+            if not maintain_folders(file, delete_main_files, delete_sub_files, False):
+                empty = False
+        else:
+            if (delete_sub_files and not root) or (delete_main_files and root):
+                os.remvove(file)
+            else:
+                empty = False
+    return empty and not root and os.rmdir(path)
+
+
+def get_thumbnails(sort_order, show_types, time_filter, time_filter_max):
+    media_path = current_app.raspiconfig.media_path
+    files = list_folder_files(media_path)
+    thumbnails = {}
+    for file in files:
+        file_timestamp = os.path.getmtime(f"{media_path}/{file}")
+        if time_filter == 1:
+            include = True
+        else:
+            time_delta = dt.now().timestamp() - file_timestamp
+            if time_filter == time_filter_max:
+                include = time_delta >= (86400 * (time_filter - 2))
+            else:
+                include = time_delta >= (86400 * (time_filter - 2)) and (
+                    time_delta < ((time_filter - 1) * 86400)
+                )
+        if include:
+            file_type = get_file_type(file)
+            if (
+                show_types == 1
+                or (  # noqa: W503
+                    show_types == 2 and (file_type == "i" or file_type == "t")
+                )
+                or (show_types == 3 and file_type == "v")  # noqa: W503
+            ):
+                thumbnails[file] = f"{file_type}_{file_timestamp}"
+
+    if sort_order == 1:
+        thumbnails = dict(sorted(thumbnails.items()))
+    else:
+        thumbnails = dict(sorted(thumbnails.items(), reverse=True))
+
+    return list(thumbnails.keys())
+
+
+def draw_files(filesnames: list):
+    media_path = current_app.raspiconfig.media_path
+    thumbnails = []
+    for file in filesnames:
+        file_type = get_file_type(file)
+        real_file = data_filename(file)
+        f_number = get_file_index(file)
+        lapse_count = 0
+        match file_type:
+            case "v":
+                file_icon = "bi-camera-reels"
+            case "t":
+                file_icon = "bi-images"
+                lapse_count = f"({find_lapse_files(file)})"
+            case "i":
+                file_icon = "bi-camera"
+            case _:
+                file_icon = "bi-camera"
+        duration = 0
+        if os.path.isfile(f"{media_path}/{real_file}"):
+            file_size = round(filesize_n(f"{media_path}/{real_file}") / 1024)
+            file_timestamp = os.path.getmtime(f"{media_path}/{real_file}")
+            if file_type == "v":
+                duration = file_timestamp - os.path.getmtime(f"{media_path}/{file}")
+        else:
+            file_size = 0
+            file_timestamp = os.path.getmtime(f"{media_path}/{file}")
+
+        if file_type:
+            file_datetime = dt.fromtimestamp(file_timestamp)
+            thumbnails.append(
+                {
+                    "file_name": file,
+                    "file_type": file_type,
+                    "file_size": file_size,
+                    "file_icon": file_icon,
+                    "file_datetime": file_datetime,
+                    "real_file": real_file,
+                    "file_number": f_number,
+                    "lapse_count": lapse_count,
+                    "duration": duration,
+                }
+            )
+
+    return thumbnails
+
+
+def check_media_path(filename):
+    media_path = current_app.raspiconfig.media_path
+    if os.path.realpath(
+        os.path.dirname(f"{media_path}/{filename}")
+    ) == os.path.realpath(media_path):
+        return os.path.isfile(f"{media_path}/{filename}")

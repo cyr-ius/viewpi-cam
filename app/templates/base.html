@@ -29,6 +29,7 @@
     <!-- Contains page content -->
     {%block main%}
     <main>
+        {% include "toast.html" %}     
         {% block content %}{% endblock %}
     </main>
     {% endblock %}

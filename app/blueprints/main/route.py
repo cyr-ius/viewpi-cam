@@ -1,5 +1,4 @@
 import glob
-import json
 import os
 import time
 
@@ -8,46 +7,24 @@ from flask import (
     Response,
     current_app,
     g,
-    make_response,
-    redirect,
     render_template,
     request,
     send_file,
     session,
+    json,
 )
 
-from ...const import SCHEDULE_FIFOOUT, PRESETS
+from ...const import PRESETS
 from app.helpers.decorator import auth_required
-from app.helpers.filer import (
-    check_media_path,
-    data_file_ext,
-    data_filename,
-    delete_mediafiles,
-    disk_usage,
-    draw_files,
-    file_exists,
-    file_get_content,
-    file_set_content,
-    get_file_type,
-    get_log,
-    get_config,
-    get_settings,
-    get_shm_cam,
-    get_thumbnails,
-    get_zip,
-    lock_file,
-    maintain_folders,
-    send_pipe,
-    write_log,
-    gather_img,
-)
+from app.helpers.filer import get_log, send_pipe, write_log
 
 bp = Blueprint("main", __name__, template_folder="templates")
 
 
 @bp.before_app_request
 def before_app_request():
-    g.config = get_config()
+    current_app.raspiconfig.refresh()
+    g.raspiconfig = current_app.raspiconfig
 
 
 @bp.route("/", methods=["GET", "POST"])
@@ -80,162 +57,28 @@ def index():
     mode = 0
     cam_pos = None
     pipan_file = current_app.config["PIPAN_FILE"]
-    if file_exists(pipan_file):
-        pipan = file_get_content(pipan_file)
-        cam_pos = pipan.split(" ")
+    if os.path.isfile(pipan_file):
         mode = 1
-    if get_settings("servo"):
+        with open(pipan_file, "r") as f:
+            pipan = f.read()
+            cam_pos = pipan.split(" ")
+            f.close()
+    if current_app.settings.servo:
         mode = 2
-
-    user_buttons = get_settings("user_buttons", [])
-    preset = get_settings("preset", "v2")
 
     return render_template(
         "main.html",
         mode=mode,
         cam_pos=cam_pos,
-        user_buttons=user_buttons,
+        user_buttons=current_app.settings.ubuttons,
         toggle_button=toggle_button,
         allow_simple=allow_simple,
         simple=simple,
         mjpegmode=mjpegmode,
         stream_button=stream_button,
-        preset=preset,
+        preset=current_app.settings.upreset,
         presets=PRESETS,
     )
-
-
-@bp.route("/macros", methods=["GET", "POST"])
-@auth_required
-def macros():
-    return render_template("macros.html", macros=current_app.config["MACROS"])
-
-
-@bp.route("/gallery", methods=["GET", "POST"])
-@auth_required
-def gallery():
-    media_path = get_config("media_path")
-    select_all = ""
-
-    preview_size = (
-        int(preview_size)
-        if (preview_size := request.cookies.get("preview_size"))
-        else 640
-    )
-    thumb_size = (
-        int(thumb_size) if (thumb_size := request.cookies.get("thumb_size")) else 96
-    )
-    sort_order = (
-        int(sort_order) if (sort_order := request.cookies.get("sort_order")) else 1
-    )
-    show_types = (
-        int(show_types) if (show_types := request.cookies.get("show_types")) else 1
-    )
-    time_filter = (
-        int(time_filter) if (time_filter := request.cookies.get("time_filter")) else 1
-    )
-
-    time_filter_max = 8
-    preview_file = ""
-    if request.method == "GET" and (thumb_file := request.args.get("preview")):
-        preview_file = thumb_file
-
-    if request.method == "POST":
-        if time_filter := request.form.get("time_filter"):
-            time_filter = int(time_filter)
-
-        if sort_order := request.form.get("sort_order"):
-            sort_order = int(sort_order)
-
-        if show_types := request.form.get("show_types"):
-            show_types = int(show_types)
-
-        if (delete1 := request.form.get("delete1")) and check_media_path(delete1):
-            delete_mediafiles(delete1)
-            maintain_folders(media_path, False, False)
-
-        if (download1 := request.form.get("download1")) and check_media_path(download1):
-            if get_file_type(download1) != "t":
-                dx_file = data_filename(download1)
-                if data_file_ext(download1) == "jpg":
-                    mimetype = "image/jpeg"
-                else:
-                    mimetype = "video/mp4"
-
-                return send_file(
-                    f"{media_path}/{dx_file}",
-                    mimetype=mimetype,
-                    as_attachment=True,
-                    download_name=dx_file,
-                )
-            else:
-                return get_zip([download1])
-
-        if action := request.form.get("action"):
-            match action:
-                case "deleteAll":
-                    maintain_folders(media_path, True, True)
-                case "selectAll":
-                    select_all = "checked"
-                case "selectNone":
-                    select_all = ""
-                case "deleteSel":
-                    for item in request.form.getlist("check_list"):
-                        if check_media_path(item):
-                            delete_mediafiles(item)
-                    maintain_folders(media_path, False, False)
-                case "lockSel":
-                    for item in request.form.getlist("check_list"):
-                        if check_media_path(item):
-                            lock_file(item, True)
-                case "unlockSel":
-                    for item in request.form.getlist("check_list"):
-                        if check_media_path(item):
-                            lock_file(item, False)
-                case "updateSizeOrder":
-                    if preview_size := request.form.get("preview_size"):
-                        preview_size = max(int(preview_size), 100)
-                        preview_size = min(int(preview_size), 1920)
-                    if thumb_size := request.form.get("thumb_size"):
-                        thumb_size = max(int(thumb_size), 32)
-                        thumb_size = min(int(thumb_size), 320)
-                case "zipSel":
-                    if check_list := request.form.getlist("check_list"):
-                        return get_zip(check_list)
-
-    thumb_filenames = get_thumbnails(
-        sort_order=sort_order,
-        show_types=show_types,
-        time_filter=time_filter,
-        time_filter_max=time_filter_max,
-    )
-
-    thumbnails = draw_files(thumb_filenames)
-
-    response = make_response(
-        render_template(
-            "gallery.html",
-            disk_usage=disk_usage(),
-            preview_size=preview_size,
-            thumb_size=thumb_size,
-            sort_order=sort_order,
-            show_types=show_types,
-            time_filter=time_filter,
-            time_filter_max=time_filter_max,
-            preview_file=preview_file,
-            thumbnails=thumbnails,
-            select_all=select_all,
-        )
-    )
-
-    if request.method == "POST":
-        response.set_cookie("time_filter", str(time_filter))
-        response.set_cookie("sort_order", str(sort_order))
-        response.set_cookie("show_types", str(show_types))
-        response.set_cookie("preview_size", str(preview_size))
-        response.set_cookie("thumb_size", str(thumb_size))
-
-    return response
 
 
 @bp.route("/log", methods=["GET", "POST"])
@@ -244,10 +87,10 @@ def log():
     if request.method == "POST" and (action := request.form.get("action")):
         match action:
             case "downloadlog":
-                filename = get_config("log_file")
+                filename = current_app.raspiconfig.log_file
                 return send_file(filename, as_attachment=True)
             case "clearlog":
-                filename = get_config("log_file")
+                filename = current_app.raspiconfig.log_file
                 os.remove(filename)
 
     return render_template("logs.html", log=get_log())
@@ -277,7 +120,7 @@ def cam_pic():
 @bp.route("/cam_picLatestTL", methods=["GET"])
 @auth_required
 def cam_pictl():
-    media_path = get_config("media_path")
+    media_path = current_app.raspiconfig.media_path
     list_of_files = filter(os.path.isfile, glob.glob(media_path + "*"))
     list_of_files = sorted(list_of_files, key=lambda x: os.stat(x).st_ctime)
     last_element = list_of_files[-1]
@@ -309,21 +152,24 @@ def cam_pic_new():
 @bp.route("/system/<cmd>", methods=["GET"])
 @auth_required
 def sys_cmd(cmd):
-    if cmd == "reboot":
-        os.popen("sudo shutdown -r now")
-    if cmd == "shutdown":
-        os.popen("sudo shutdown -h now")
-    if cmd == "settime" and (timestr := request.args.get("timestr")):
-        os.popen(f'sudo date -s "{timestr}')
+    try:
+        if cmd == "reboot":
+            os.popen("sudo shutdown -r now")
+        if cmd == "shutdown":
+            os.popen("sudo shutdown -h now")
+        if cmd == "settime" and (timestr := request.args.get("timestr")):
+            os.popen(f'sudo date -s "{timestr}')
+    except Exception as error:
+        return {"type": "error", "message": f"{error}"}
 
-    return redirect(request.url)
+    return {"type": "success", "message": f"Send {cmd} successful"}
 
 
 @bp.route("/cmd_pipe/<cmd>", methods=["GET"])
 @auth_required
 def pipe_cmd(cmd):
-    send_pipe(get_settings(SCHEDULE_FIFOOUT), cmd)
-    return {}
+    rslt = send_pipe(current_app.settings.fifo_out, cmd)
+    return rslt
 
 
 @bp.route("/status_mjpeg", methods=["GET"])
@@ -331,11 +177,13 @@ def pipe_cmd(cmd):
 def status_mjpeg():
     file_content = ""
     for i in range(0, 30):
-        file_content = file_get_content(get_config("status_file"))
-        if file_content != request.args.get("last"):
-            break
-        time.sleep(0.1)
-    os.popen(f"touch {get_config('status_file')}")
+        with open(current_app.raspiconfig.status_file, "r") as f:
+            file_content = f.read()
+            if file_content != request.args.get("last"):
+                break
+            time.sleep(0.1)
+            f.close()
+    os.popen(f"touch {current_app.raspiconfig.status_file}")
     return Response(file_content)
 
 
@@ -375,7 +223,10 @@ def pipan():
         pipe = open("FIFO_pipan", "w")
         pipe.write(f"servo {pan} {tilt} ")
         pipe.close()
-        file_set_content("pipan_bak.txt", f"{pan} {tilt}")
+
+        with open("pipan_bak.txt", "w") as f:
+            f.write(f"{pan} {tilt}")
+            f.close
 
     if (
         (red := request.args.get("red"))
@@ -391,7 +242,8 @@ def pipan():
 
     if action := request.args.get("action"):
         try:
-            input = json.loads(file_get_content(SERVO_DATA))
+            with open(SERVO_DATA, "r") as f:
+                input = json.load(f)
             for key, value in servoData:
                 if key in input.keys():
                     servoData[key] = input[key]
@@ -425,6 +277,21 @@ def pipan():
             fs.write(servo)
             fs.close()
 
-        file_set_content(SERVO_DATA, json.dumps(servoData))
+        with open(SERVO_DATA, "w") as f:
+            json.dump(servoData, f, sort_keys=True, indent=4)
+            f.close()
 
     return status_mjpeg()
+
+
+def get_shm_cam():
+    preview_path = current_app.raspiconfig.preview_path
+    if os.path.isfile(preview_path):
+        return open(preview_path, "rb").read()
+
+
+def gather_img(pDelay=0.1):
+    """Stream image."""
+    while True:
+        yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + get_shm_cam() + b"\r\n")
+        time.sleep(pDelay)
