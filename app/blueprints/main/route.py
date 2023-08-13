@@ -165,11 +165,13 @@ def sys_cmd(cmd):
     return {"type": "success", "message": f"Send {cmd} successful"}
 
 
-@bp.route("/cmd_pipe/<cmd>", methods=["GET"])
+@bp.route("/pipe_cmd", methods=["POST"])
 @auth_required
-def pipe_cmd(cmd):
-    rslt = send_pipe(current_app.settings.fifo_out, cmd)
-    return rslt
+def pipe_cmd():
+    if cmd := request.json.get("cmd"):
+        msg = send_pipe(current_app.settings.fifo_out, cmd)
+        return msg
+    return {"type": "error", "message": "Command not found"}
 
 
 @bp.route("/status_mjpeg", methods=["GET"])
@@ -273,9 +275,9 @@ def pipan():
                 servo = f"0={servoData['y']}\n"
 
         if servo:
-            fs = open(SERVO_CMD, "w")
-            fs.write(servo)
-            fs.close()
+            with open(SERVO_CMD, "w") as fs:
+                fs.write(servo)
+                fs.close()
 
         with open(SERVO_DATA, "w") as f:
             json.dump(servoData, f, sort_keys=True, indent=4)

@@ -26,7 +26,7 @@
         "FLASK_DEBUG": "1",
         "FLASK_ENV": "development"
       },
-      "args": ["scheduler"],
+      "args": ["scheduler", "start"],
       "jinja": true,
       "justMyCode": true
     }

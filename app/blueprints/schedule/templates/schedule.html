@@ -2,7 +2,7 @@
 {% block content %}
 {% set lbl_periods = ['AllDay','Night','Dawn','Day','Dusk'] %}
 <div class="container">
-    <form id="form_schedule" class="row" action="{{ url_for('schedule.index')}}" method="POST">
+    <form id="form_schedule" class="row needs-validation" action="{{ url_for('schedule.index')}}" method="POST" novalidate>
         {% if day_period < 5%}{% set period = lbl_periods[day_period]%}{%else%}{%set period = day_period -4%}{%endif%}
         <div class="row"><h4 class="p-0">Scheduler</h3></div>
         <hr class="p-0 ">          
@@ -27,14 +27,14 @@
             <div class="col"><label class="col-form-label-sm">AutoCamera</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocamera_interval" value="{{ settings.autocamera_interval}}">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocamera_interval" value="{{ settings.autocamera_interval|default(0, true)}}" required>
                     <span class="input-group-text">seconds</span>
                 </div>               
             </div>
             <div class="col"><label class="col-form-label-sm">AutoCapture</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocapture_interval" value="{{ settings.autocapture_interval}}">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocapture_interval" value="{{ settings.autocapture_interval|default(0, true)}}" required>
                     <span class="input-group-text">seconds</span>
                 </div>               
             </div>                    
@@ -42,12 +42,12 @@
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Cmd Poll</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="cmd_poll" value="{{ settings.cmd_poll}}">
+                <input class="form-control form-control-sm" type="number" autocomplete="off" name="cmd_poll" value="{{ settings.cmd_poll|default(0, true)}}" required>
             </div>
             <div class="col"><label class="col-form-label-sm">DawnStart</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="dawnstart_minutes" value="{{ settings.dawnstart_minutes}}">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="dawnstart_minutes" value="{{ settings.dawnstart_minutes|default(0, true)}}" required>
                     <span class="input-group-text">minutes</span>
                 </div>
             </div>
@@ -56,13 +56,13 @@
             <div class="col"><label class="col-form-label-sm">DayEnd</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="dayend_minutes" value="{{ settings.dayend_minutes}}">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="dayend_minutes" value="{{ settings.dayend_minutes|default(0, true)}}" required>
                     <span class="input-group-text">minutes</span>
                 </div>            
             </div>
             <div class="col"><label class="col-form-label-sm">Day Mode</label></div>
             <div class="col">
-                <select id="daymode" class="form-select form-select-sm" name="daymode">
+                <select id="daymode" class="form-select form-select-sm" name="daymode" required>
                     <option value="1" {%if  settings.daymode == 1 %}selected="selected"{%endif%}>All Day</option>
                     <option value="0" {%if  settings.daymode == 0 %}selected="selected"{%endif%}>Sun based</option>
                     <option value="2" {%if  settings.daymode == 2 %}selected="selected"{%endif%}>Fixed Times</option>
@@ -73,14 +73,14 @@
             <div class="col"><label class="col-form-label-sm">DayStart</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="daystart_minutes" value="{{ settings.daystart_minutes}}">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="daystart_minutes" value="{{ settings.daystart_minutes|default(0, true)}}" required>
                     <span class="input-group-text">minutes</span>
                 </div>                        
             </div>
             <div class="col"><label class="col-form-label-sm">DuskEnd</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="duskend_minutes" value="{{ settings.duskend_minutes}}">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="duskend_minutes" value="{{ settings.duskend_minutes|default(0, true)}}" required>
                     <span class="input-group-text">minutes</span>
                 </div>              
             </div>            
@@ -89,7 +89,7 @@
             <div class="col"><label class="col-form-label-sm">Purge Video</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgevideo_hours" value="{{ settings.purgevideo_hours}}">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgevideo_hours" value="{{ settings.purgevideo_hours}}" required>
                     <span class="input-group-text">hours</span>
                 </div>              
             </div>        
@@ -124,25 +124,25 @@
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Max capture</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="max_capture" value="{{ settings.max_capture}}">
+                <input class="form-control form-control-sm" type="number" autocomplete="off" name="max_capture" value="{{ settings.max_capture}}" required>
             </div>
             <div class="col"><label class="col-form-label-sm">Mode Poll</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="mode_poll" value="{{ settings.mode_poll}}">
+                <input class="form-control form-control-sm" type="number" autocomplete="off" name="mode_poll" value="{{ settings.mode_poll}}" required>
             </div>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Purge image</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgeimage_hours" value="{{ settings.purgeimage_hours}}">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgeimage_hours" value="{{ settings.purgeimage_hours}}" required>
                     <span class="input-group-text">hours</span>
                 </div>              
             </div>
             <div class="col"><label class="col-form-label-sm">Purge lapse</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgelapse_hours" value="{{ settings.purgelapse_hours}}">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgelapse_hours" value="{{ settings.purgelapse_hours}}" required>
                     <span class="input-group-text">hours</span>
                 </div>              
             </div>
@@ -150,11 +150,11 @@
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Purge space level</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgespace_level" value="{{ settings.purgespace_level}}">
+                <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgespace_level" value="{{ settings.purgespace_level}}" required>
             </div>                   
             <div class="col"><label class="col-form-label-sm">PurgeSpace ModeEx</label></div>
             <div class="col">
-                <select id="PurgeSpace_ModeEx" class="form-select form-select-sm" name="purgespace_modeex">
+                <select id="PurgeSpace_ModeEx" class="form-select form-select-sm" name="purgespace_modeex" required>
                     <option value="0" {% if  settings.purgespace_modeex == 0%}selected{%endif%}>Off</option>
                     <option value="1" {% if  settings.purgespace_modeex == 1%}selected{%endif%}>Min Space %</option>
                     <option value="2" {% if  settings.purgespace_modeex == 2%}selected{%endif%}>Max Usage %</option>
@@ -175,7 +175,7 @@
                 <div class="col" style="background-color: LightGreen;"><label class="col-form-label-sm">All Days</label></div>
                 <div class="col text-center">      
                     {% for i in range(0,7)%}             
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[0]" value="{{i}}" {%if i in  settings.days['0'] %} checked="checked" {%endif%}>
+                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[0]" value="{{i}}" {%if settings.days['0'][i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
                 <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on" value="{{settings.commands_on[0]}}"></div>
@@ -187,8 +187,8 @@
             <div class="row sun d-none row-cols-5 row-cols-md-5 gy-1 gx-2">
                 <div class="col" {%if day_period == index  %}style="background-color: LightGreen;"{%endif%}><label class="col-form-label-sm">{{d_mode}}</label></div>
                 <div class="col text-center">
-                    {% for i in range(0,7)%}      
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}]" value="{{i}}" {%if i in  settings.days[index|string] %} checked="checked" {%endif%}>
+                    {% for i in range(0,7)%}    
+                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}]" value="{{i}}" {%if settings.days[index|string][i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
                 <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on" value="{{settings.commands_on[index]}}"></div>
@@ -201,8 +201,8 @@
             <div class="row fixed d-none row-cols-5 row-cols-md-5 gy-1 gx-2">
                 <div class="col" {%if day_period == tindex %}style="background-color: LightGreen;"{%endif%}><input class="form-control form-control-sm" type="text" autocomplete="off" name="times" value="{{time}}"></div>
                 <div class="col text-center">
-                    {% for i in range(0,7)%}             
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{tindex+5}}]" value="{{i}}" {%if i in  settings.days[tindex|string] %} checked="checked" {%endif%}>
+                    {% for i in range(0,7)%}                           
+                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{tindex+5}}]" value="{{i}}" {%if settings.days[(tindex+5)|string][i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
                 <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on" value="{{settings.commands_on[tindex + 5]}}"></div>
@@ -211,7 +211,6 @@
             </div>
             {%endfor%}
         </div>
-        <input id="action" type="hidden" name="action" value="">
     </form>
 </div>
 
@@ -227,23 +226,30 @@ $( document ).ready(function(){
 
 $('#schedule button').unbind();
 $('#schedule button').click(function(){
-    json = convertFormToJSON($("#form_schedule"))
-    // Format days field
-    var days = new Object();
-    const regexp = /days\[(.*)\]/g;    
-    keys = Object.keys(json)
-    for (const key of keys) {
-        const matchs = key.matchAll(regexp);
-        for (const match of matchs) {
-            days[parseInt(match[1])] = json[key]
-            delete json[key]
-        }        
-    }
-    json.days = days 
-    json.action = $(this).val()
+    if (!document.getElementById('form_schedule').checkValidity()) {
+        $("#form_schedule").addClass('was-validated')
+    } else {
+        $("#form_schedule").removeClass('was-validated')
+        data = $("#form_schedule").serializeObject({'checkboxesAsBools': true});
 
-    // Post data
-    queryData("POST", "{{ url_for('schedule.index')}}", json) 
+        // Format days field
+        var days = new Object();
+        const regexp = /days\[(.*)\]/g;    
+        keys = Object.keys(data)
+        for (const key of keys) {
+            const matchs = key.matchAll(regexp);
+            for (const match of matchs) {
+                days[parseInt(match[1])] = data[key]
+                delete data[key]
+            }        
+        }
+        data.days = days 
+        data.action = $(this).val()
+
+        // Post data
+        queryData("POST", "{{ url_for('schedule.index')}}", data) 
+    }
+
 });
 
 $('#daymode').unbind();

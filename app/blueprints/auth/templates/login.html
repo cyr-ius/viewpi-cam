@@ -9,24 +9,23 @@
 </svg>
 <main class="form-signin w-100 m-auto">
   <form id="login" class="needs-validation" method="POST" action="{{ url_for('auth.register') if g.first_run else url_for('auth.login') }}" novalidate>
-      {{ form.hidden_tag('csrf_token') }}
       <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
       <div class="form-floating">
-        {{ render.field(form.user_id, class="form-control", placeholder=form.user_id.label.text) }}
-        {{ form.user_id.label }}
+        <input class="form-control" id="user_id" name="user_id" placeholder="Username" type="text" required>
+        <label for="user_id">Username</label>
       </div>
       <div class="form-floating">
-        {{ render.field(form.password, class="form-control", placeholder=form.password.label.text) }}
-        {{ form.password.label }}
+        <input class="form-control" id="password" name="password" placeholder="Password" type="password" required>
+        <label for="password">Password</label>
       </div>
       {% if g.first_run %}
       <div class="form-floating">
-        {{ render.field(form.password_2, class="form-control", placeholder=form.password_2.label.text) }}
-        {{ form.password_2.label }}
+        <input class="form-control" id="password_2" name="password_2" placeholder="Password" type="password" required>
+        <label for="password_2">Password</label>
       </div>
       {%endif%}
-      {{ render.field(form.next, value=request.args.next) }}
-      {{ render.field(form.submit, class="btn btn-primary w-100 py-2")}}
+      <input id="next" name="next" type="hidden" value="{{request.args.next}}">
+      <input class="btn btn-primary w-100 py-2" id="submit" name="submit" type="submit" value="Sign in">
       {% for message in get_flashed_messages() %}
       <div class="alert alert-danger d-flex align-items-center mt-2" role="alert">
         <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:" style="width:20px;height:20px;">

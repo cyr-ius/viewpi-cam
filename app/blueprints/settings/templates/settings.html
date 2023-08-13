@@ -159,13 +159,14 @@
 
     $('#upreset').unbind()
     $('#upreset').on("change", function(event) {
-        data = $(this).serializeArray()[0];
+        data = $(this).serializeObject({"checkboxesAsBools":true});
         queryData("POST","{{ url_for('settings.index')}}",data);
     })
 
     $('#pilight, #pipan, #servo').unbind()
     $('#pilight, #pipan, #servo').on("change", function(event) {
-        data = $(this).serializeArray()[0];
+        data = $(this).serializeObject({"checkboxesAsBools":true});
+        console.log(data)
         queryData("POST","{{ url_for('settings.index')}}",data);
     })
 
@@ -189,7 +190,7 @@
 
     $('#users').on('click','.add_user', function() {
         user = $(this).parent().parent()
-        data = $(user).find('input, select').serializeArray()
+        data = $(user).find('input, select').serializeObject()
 
         callback = function(data){
                 user.find('#btn_add_user').addClass('d-none');
@@ -203,14 +204,14 @@
 
     $('#users').on('click','.del_user', function() {
         user = $(this).parent().parent()
-        data = convertFormToJSON($(user).find('input, select'));
+        data = $(user).find('input, select').serializeObject();
         callback = function(data){ user.remove() }
         queryData("DELETE","{{ url_for('settings.index')}}",data,callback);
     });
 
     $('#ubuttons').on('click','.add_button', function() {
         button = $(this).parent().parent();
-        data = convertFormToJSON($(button).find('input'));
+        data = $(button).find('input').serializeObject();
         callback = function(data){
                 button.find('#btn_add_button').addClass('d-none');
                 button.find('#btn_del_button').removeClass('d-none');
@@ -222,7 +223,7 @@
 
     $('#ubuttons').on('click','.del_button', function() {
         button = $(this).parent().parent();
-        data = convertFormToJSON($(button).find('input'));
+        data = $(button).find('input').serializeObject();
         callback = function(data){ button.remove() }
         queryData("DELETE","{{ url_for('settings.index')}}",data,callback);
     });

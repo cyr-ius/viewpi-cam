@@ -26,8 +26,9 @@ def index():
     if request.method == "POST" and (json := request.json):
         if "upreset" in json.keys():
             current_app.settings.upreset = json["upreset"]
-        if ("pilight" or "pipan" or "servo") in json.keys():
-            current_app.settings.pilight = json["pilight"]
+        if any(key in json.keys() for key in ("pilight", "pipan", "servo")):
+            for k, v in json.items():
+                setattr(current_app.settings, k, v)
         if "token" in json.keys():
             token = f"B{random.getrandbits(256)}"
             current_app.settings.token = token
@@ -35,10 +36,10 @@ def index():
         if "macro" in json.keys():
             current_app.settings.ubuttons.append(json)
         if "user_id" in json.keys():
-            current_app.settings.users.append(json)
+            current_app.settings.set_user(**json)
 
     if request.method == "DELETE" and (json := request.json):
-        if ("token") in json.keys():
+        if "token" in json.keys():
             del current_app.settings.token
         if "macro" in json.keys():
             current_app.settings.ubuttons.remove(json)
@@ -51,3 +52,74 @@ def index():
         return msg_error.update({"message": str(error)})
     else:
         return msg_success
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

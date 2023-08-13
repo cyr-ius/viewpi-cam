@@ -1,22 +1,19 @@
 function send_cmd(cmd) {
   cmd.replace(/&/g, "%26").replace(/#/g, "%23").replace(/\+/g, "%2B");
-  $.get({
-    url:"cmd_pipe/" + cmd,
+  $.ajax({
+    method: "POST",
+    url:"/pipe_cmd",
+    data: JSON.stringify({"cmd":cmd}),
+    dataType:"json",
+    contentType:"application/json; charset=utf-8",        
     success: function(data){
       if (data["type"] == "error") $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
       $('#toast .toast-body').html(data["message"])
-      liveToast.show()
     }
   });
 }
 
 var filterFloat = function (value) {
-  if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value))
-    return Number(value);
-  return NaN;
-};
-
-$.fn.filterFloat = function (value) {
   if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value))
     return Number(value);
   return NaN;
@@ -35,26 +32,6 @@ function populate(frm, data) {
         ctrl.val(value);
     }
   });
-}
-
-function convertFormToJSON(form) {
-  return $(form)
-    .serializeArray({checkboxesAsBools: true})
-    .reduce(function (json, { name, value }) {
-      check_value = filterFloat(value) || value;
-      if (check_value == "0") check_value = 0;
-      if (! json.hasOwnProperty(name) ) {
-        json[name] = check_value;
-      } else {
-        if (Array.isArray(json[name])) {
-          json[name].push(check_value)
-        } else {
-          pval = json[name]
-          json[name] = [pval, check_value]
-        }
-      }
-      return json;
-    }, {});
 }
 
 function queryData(method="POST", url, data, callbackSuccess,callbackError){
@@ -129,51 +106,60 @@ function queryData(method="POST", url, data, callbackSuccess,callbackError){
           checkboxesAsBools: false
       }, options || {});
 
-      var rselectTextarea = /select|textarea/i;
-      var rinput = /text|hidden|password|search|number/i;
+      var rCRLF = /\r?\n/g;
+      var rcheckableType = /^(?:checkbox|radio)$/i;
+      var rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i;
+      var rsubmittable = /^(?:input|select|textarea|keygen)/i;
 
-      return this.map(function () {
-          return this.elements ? $.makeArray(this.elements) : this;
-      })
-      .filter(function () {
-          return this.name && !this.disabled &&
-              (this.checked || (o.checkboxesAsBools && this.type === 'checkbox')
-              || rselectTextarea.test(this.nodeName)
-              || rinput.test(this.type));
-          })
-          .map(function (i, elem) {
-              var val = $(this).val();
-              return val == null ?
-              null :
-              $.isArray(val) ?
-              $.map(val, function (val, i) {
-                  return { name: elem.name, value: val };
-              }) :
-              {
+      return this.map( function() {
+        // Can add propHook for "elements" to filter or add form elements
+        var elements = jQuery.prop( this, "elements" );
+        return elements ? jQuery.makeArray( elements ) : this;
+      } ).filter( function() {
+        var type = this.type;
+          return this.name && !jQuery( this ).is( ":disabled" ) &&
+            rsubmittable.test( this.nodeName ) && !rsubmitterTypes.test( type );
+      } ).map(function (_i, elem) {
+              var val = jQuery( this ).val();
+              if ( val == null ) {
+                return null;
+              }
+              if ( Array.isArray( val ) ) {
+                return jQuery.map( val, function( val ) {
+                  return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+                } );
+              } else if (rcheckableType.test(this.type)) {    
+                return {
                   name: elem.name,
-                  value: (o.checkboxesAsBools && this.type === 'checkbox') ?
-                      (this.checked ? true : false) :
-                      val
-              };
-          }).get();
+                  value: (o.checkboxesAsBools &&  this.type === 'checkbox') ?
+                      (this.checked ? 1 : 0) :
+                      val 
+                }               
+              } else {
+                return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+              }
+      } ).get();
   };
 
-  $.fn.convertJson = function(){
-    this.reduce(function (json, { name, value }) {
-      check_value = filterFloat(value) || value;
+  $.fn.serializeObject = function(options){
+    var o = $.extend({checkboxesAsBools: false}, options || {}) ;
+    return this.serializeArray({checkboxesAsBools: o.checkboxesAsBools})
+    .reduce(function(obj, item) {
+      var name = item["name"]
+      var check_value = filterFloat(item["value"]) || item["value"];
       if (check_value == "0") check_value = 0;
-      if (! json.hasOwnProperty(name) ) {
-        json[name] = check_value;
+      if (! obj.hasOwnProperty(name) ) {
+        obj[name] = check_value;
       } else {
-        if (Array.isArray(json[name])) {
-          json[name].push(check_value)
+        if (Array.isArray(obj[name])) {
+          obj[name].push(check_value)
         } else {
-          pval = json[name]
-          json[name] = [pval, check_value]
+          var pval = obj[name]
+          obj[name] = [pval, check_value]
         }
       }
-      return json;
-    }, {});
+      return obj
+    }, {})
   }
 
 })()

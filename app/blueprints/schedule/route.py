@@ -3,6 +3,7 @@ import shutil
 import time
 from datetime import datetime as dt
 from datetime import timedelta as td
+from subprocess import Popen
 
 import pytz
 from flask import Blueprint, current_app, render_template, request
@@ -44,7 +45,8 @@ def index():
                     launch_schedule()
                     msg.update({"message": "Start scheduler"})
                 case "stop":
-                    stop_scheduler()
+                    pid = get_schedule_pid()
+                    os.popen(f"kill {pid}")
                     msg.update({"message": "Stop scheduler"})
                 case "save":
                     write_log("Saved schedule settings")
@@ -111,9 +113,12 @@ def stop_scheduler() -> int | None:
 @bp.cli.command("start", short_help="Start scheduler task")
 @with_appcontext
 def start_scheduler() -> int | None:
-    pid = get_schedule_pid()
-    if not pid:
-        scheduler()
+    scheduler()
+
+
+def launch_schedule():
+    ret = Popen(["python", "-m", "flask", "scheduler", "start"])
+    return ret
 
 
 def scheduler():
@@ -238,7 +243,7 @@ def scheduler():
                     if cmd != "":
                         write_log(f"exec_macro: {cmd}")
                         send_cmds(fifo=fifo_out, str_cmd=f"sy {cmd}")
-                    delete_log(current_app.raspiconfig.log_size)
+                    delete_log(int(current_app.raspiconfig.log_size))
                 if autocapturetime > 0 and (timenow > autocapturetime):
                     autocapturetime = (
                         timenow + current_app.settings.autocapture_interval
@@ -274,11 +279,6 @@ def get_schedule_pid():
         if "flask" and "scheduler" in proc.cmdline():
             return proc.pid
     return 0
-
-
-def launch_schedule():
-    ret = os.popen("python -m flask scheduler start >/dev/null &")
-    return ret
 
 
 def wrap_day_period():
