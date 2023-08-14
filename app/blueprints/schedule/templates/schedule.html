@@ -101,11 +101,11 @@
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Latitude</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" name="latitude" value="{{ settings.latitude}}">
+                <input class="form-control form-control-sm" type="number" autocomplete="off" name="latitude" value="{{ settings.latitude|default(0, true)}}" step="0.01">
             </div>
             <div class="col"><label class="col-form-label-sm">Longitude</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" name="longitude" value="{{ settings.longitude}}">
+                <input class="form-control form-control-sm" type="number" autocomplete="off" name="longitude" value="{{ settings.longitude|default(0, true)}}" step="0.01">
             </div>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
@@ -174,7 +174,7 @@
             <div class="row day d-none row-cols-5 row-cols-md-5 gy-1 gx-2">
                 <div class="col" style="background-color: LightGreen;"><label class="col-form-label-sm">All Days</label></div>
                 <div class="col text-center">      
-                    {% for i in range(0,7)%}             
+                    {% for i in range(0,7)%}      
                     <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[0]" value="{{i}}" {%if settings.days['0'][i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
@@ -202,7 +202,7 @@
                 <div class="col" {%if day_period == tindex %}style="background-color: LightGreen;"{%endif%}><input class="form-control form-control-sm" type="text" autocomplete="off" name="times" value="{{time}}"></div>
                 <div class="col text-center">
                     {% for i in range(0,7)%}                           
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{tindex+5}}]" value="{{i}}" {%if settings.days[(tindex+5)|string][i] %} checked="checked" {%endif%}>
+                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{tindex+4}}]" value="{{i}}" {%if settings.days[(tindex+4)|string][i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
                 <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on" value="{{settings.commands_on[tindex + 5]}}"></div>
@@ -247,7 +247,8 @@ $('#schedule button').click(function(){
         data.action = $(this).val()
 
         // Post data
-        queryData("POST", "{{ url_for('schedule.index')}}", data) 
+        reload = function(){location.reload();}
+        queryData("POST", "{{ url_for('schedule.index')}}", data, reload) 
     }
 
 });

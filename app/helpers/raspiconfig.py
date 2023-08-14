@@ -26,7 +26,7 @@ class RaspiConfig:
                 for line in f.read().split("\n"):
                     if len(line) and line[0:1] != "#":
                         index = line.find(" ")
-                        if index:
+                        if index >= 0:
                             key = line[0:index]
                             value = line[index + 1 :]  # noqa: E203
                             if value == "true":

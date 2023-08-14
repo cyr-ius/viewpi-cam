@@ -10,3 +10,9 @@ def auth_required(f):
         return f(*args, **kwargs)
 
     return decorator
+
+
+class ViewPiCamException(Exception):
+    """ViewPi Cam exception."""
+
+    pass

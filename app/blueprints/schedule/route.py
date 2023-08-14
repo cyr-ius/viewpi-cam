@@ -38,7 +38,7 @@ bp.cli.short_help = "Stop/Start scheduler"
 @auth_required
 def index():
     msg = {"type": "success"}
-    if request.method == "POST" and (action := request.json.pop("action")):
+    if request.method == "POST" and (action := request.json.pop("action", None)):
         try:
             match action:
                 case "start":
@@ -63,9 +63,9 @@ def index():
                     current_app.settings.restore()
                     msg.update({"message": "Restore file settings"})
         except RaspiConfigError as error:
-            msg = {"type": "erro", "message": str(error)}
-
-        return msg
+            msg = {"type": "error", "message": str(error)}
+        finally:
+            return msg
 
     if request.method == "GET":
         offset = get_time_offset(current_app.settings.gmt_offset)
@@ -196,6 +196,7 @@ def scheduler():
             elif cmd != "":
                 write_log(f"Ignore FIFO char {cmd}")
 
+            slow_poll -= 1
             if slow_poll < 0:
                 slow_poll = 10
                 timenow = dt.timestamp(dt.utcnow())
@@ -252,7 +253,8 @@ def scheduler():
                     autocapture = 1
                 if (
                     current_app.settings.autocamera_interval > 0
-                ) and timenow > autocameratime:
+                    and timenow > autocameratime
+                ):
                     autocameratime = timenow + 2
                     modTime = os.path.getmtime(current_app.raspiconfig.status_file)
                     with open(current_app.raspiconfig.status_file, "r") as f:
@@ -271,7 +273,6 @@ def scheduler():
                             lastStatusTime = timenow + 5
                         else:
                             lastStatusTime = timenow
-            slow_poll -= 1
 
 
 def get_schedule_pid():
@@ -476,10 +477,9 @@ def open_pipe(pipename: str):
 
     try:
         pipe = os.open(pipename, os.O_RDONLY | os.O_NONBLOCK)
+        return pipe
     except OSError as e:
         write_log(f"Error open pipe {pipename} {str(e)}")
-
-    return pipe
 
 
 def send_cmds(
@@ -511,6 +511,7 @@ def get_sorted_files(folder, ascending=True):
 
 def is_day_active(days, period: int) -> bool:
     if days:
-        day = dt.now().strftime("%w")
-        return int(day) in days[str(period)]
+        day = int(dt.now().strftime("%w"))
+        return days[str(period)][day] == 1
+        # return int(day) in days[str(period)]
     return False

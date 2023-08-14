@@ -2,6 +2,22 @@
 {% block content %}
 {% include "cam_settings.html" %}
 {% include "motion_settings.html" %}
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="up" viewBox="0 0 16 16">
+        <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z"/>
+    </symbol>
+    <symbol id="left" viewBox="0 0 16 16">
+        <path d="M16 14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12zm-4.5-6.5H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H11.5a.5.5 0 0 0 0-1z"/>
+    </symbol>                    
+    <symbol id="right" viewBox="0 0 16 16">
+        <path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1z"/>
+    </symbol>    
+    <symbol id="dow" viewBox="0 0 16 16">
+        <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z"/>
+    </symbol>
+</svg>
+
 <div class="container text-center liveimage overflow-auto">
     <div>
         <img id="mjpeg_dest" 
@@ -29,26 +45,18 @@
         {%if mode > 0%}
         <div class="container-fluid text-center liveimage">
             <div alt="Up" id="arrowUp" class="row" cmd="up">
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                    <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z"/>
-                </svg>
+                <svg width="64" height="64" fill="currentColor" class="bi bi-arrow-up-square-fill"><use href="#up"></use></svg>
             </div>
             <div class="row justify-content-center">
                 <div alt="Left" id="arrowLeft" class="col-2" cmd="left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-arrow-left-square-fill" viewBox="0 0 16 16">
-                        <path d="M16 14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12zm-4.5-6.5H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H11.5a.5.5 0 0 0 0-1z"/>
-                    </svg>                    
+                    <svg width="64" height="64" fill="currentColor" class="bi bi-arrow-left-square-fill"><use href="#left"></use></svg>                    
                 </div> 
                 <div alt="Right" id="arrowRight" class="col-2" cmd="right">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-arrow-right-square-fill" viewBox="0 0 16 16">
-                        <path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1z"/>
-                    </svg>    
+                    <svg  width="64" height="64" fill="currentColor" class="bi bi-arrow-right-square-fill"><use href="#right"></use></svg>    
                 </div>
             </div>
             <div alt="Down" id="arrowDown" class="row" cmd="down">
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                    <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z"/>
-                </svg>
+                <svg width="64" height="64" fill="currentColor" class="bi bi-arrow-down-square-fill"><use href="#down"></use></svg>
             </div>
         </div>
         {%endif%}
@@ -68,14 +76,15 @@
 {% endblock %}
 {% block extrascripts %}
 <script language="javascript">
-    var mjpeg_img;
-    var halted = 0;
-    var previous_halted = 99;
-    var mjpeg_mode = 0;
-    var preview_delay = 0;
-    var btn_class_p = "btn btn-primary"
-    var btn_class_a = "btn btn-warning"
-    var elem = document.documentElement;
+    let mjpeg_img;
+    let halted = 0;
+    let previous_halted = 99;
+    let mjpeg_mode = 0;
+    let preview_delay = 0;
+    let btn_class_p = "btn btn-primary"
+    let btn_class_a = "btn btn-warning"
+    let elem = document.documentElement;
+    let time = new Date().getTime();
 
     $(function(){   
         setTimeout('init({{mjpegmode}},{{g.raspiconfig.video_fps}}, {{g.raspiconfig.divider}});', 100);
@@ -105,16 +114,18 @@
     }
 
     function reload_img () {
-        if(!halted) mjpeg_img.src = "cam_pic?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
-        else setTimeout("reload_img()", 500);
+        let time = new Date().getTime()
+        if(!halted) {
+            mjpeg_img.src=`{{url_for('main.cam_pic')}}?time=${time}&pDelay=${preview_delay}`;
+        } else { setTimeout("reload_img()", 500);}
     }
 
     function error_img () {
-        setTimeout("mjpeg_img.src = 'cam_pic?time=' + new Date().getTime();", 100);
+        let time = new Date().getTime()
+        setTimeout(`mjpeg_img.src="{{url_for('main.cam_pic')}}?time=${time}";`, 100);
     }
 
     function init(mjpeg, video_fps, divider) {
-        mjpeg_img = document.getElementById("mjpeg_dest");
         hashHandler();
         window.onhashchange = hashHandler;
         preview_delay = Math.floor(divider / Math.max(video_fps,1) * 1000000);
@@ -122,6 +133,7 @@
             mjpegmode = 1;
         } else {
             mjpegmode = 0;
+            mjpeg_img = document.getElementById("mjpeg_dest");
             mjpeg_img.onload = reload_img;
             mjpeg_img.onerror = error_img;
             reload_img();
@@ -130,7 +142,7 @@
     }
 
     function reload_ajax (last) {
-        $.get("status_mjpeg?last=" + last,function(response){
+        $.get("{{url_for('main.status_mjpeg')}}?last=" + last,function(response){
             if(response == "ready") {
                 setButtonState("video_button", false, "record video start", "ca 1");
                 setButtonState("image_button", false, "record image", "im");
@@ -264,24 +276,25 @@
     }
 
     function setButtonState(btn_id, disabled, value, cmd=null) {
-        btn =$('#'+btn_id);
+        let btn =$('#'+btn_id);
         btn.prop('disabled', disabled)
         btn.val(cmd);
         btn.html(value);
     }
 
     function updatePreview(cycle) {
+        let time = new Date().getTime()
         if (mjpegmode) {
             if (cycle !== undefined && cycle == true) {
-                mjpeg_img.src = "/static/img/updating.jpg";
-                setTimeout("mjpeg_img.src = \"cam_pic_new?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
+                mjpeg_img.src = "{{ url_for('static', filename='img/updating.jpg') }}";
+                setTimeout(`mjpeg_img.src="{{ url_for('main.cam_pic_new') }}?time=${time}&pDelay=${preview_delay}";`, 1000);
                 return;
             }
             if (previous_halted != halted) {
                 if(!halted) {
-                    mjpeg_img.src = "cam_pic_new?time=" + new Date().getTime() + "&pDelay=" + preview_delay;			
+                    mjpeg_img.src = `{{ url_for('main.cam_pic_new') }}?time=${time}&pDelay=${preview_delay}`;			
                 } else {
-                    mjpeg_img.src = "/static/img/unavailable.jpg";
+                    mjpeg_img.src = "{{ url_for('static', filename='img/unavailable.jpg') }}";
                 }
             }
             previous_halted = halted;
@@ -289,10 +302,10 @@
     }
 
     function set_display(value) {
-        var d = new Date();
-        var val;
+        let d = new Date();
+        let val;
         d.setTime(d.getTime() + (365*24*60*60*1000));
-        var expires = "expires="+d.toUTCString();
+        let expires = "expires="+d.toUTCString();
         if (value == "SimpleOff") {
             val = "Off";
         } else if (value == "SimpleOn") {
@@ -306,9 +319,9 @@
     }
 
     function set_stream_mode(value) {
-        var d = new Date();
+        let d = new Date();
         d.setTime(d.getTime() + (365*24*60*60*1000));
-        var expires = "expires="+d.toUTCString();
+        let expires = "expires="+d.toUTCString();
         if (value == "DefaultStream") {
             $("#toggle_stream").val("MJPEG-Stream");
         } else {
@@ -335,7 +348,7 @@
     }
 
     function toggle_fullscreen(e) {
-        var background = document.getElementById("background");
+        let background = document.getElementById("background");
 
         if(!background) {
             background = document.createElement("div");
@@ -347,8 +360,7 @@
             e.className = "";
             background.style.display = "none";
             closeFullscreen();
-        }
-        else {
+        } else {
             e.className = "fullscreen";
             background.style.display = "block";
             openFullscreen();

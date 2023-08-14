@@ -38,64 +38,48 @@ bp = Blueprint(
 @auth_required
 def index():
     media_path = current_app.raspiconfig.media_path
+    time_filter_max = 8
     select_all = ""
 
-    preview_size = (
-        int(preview_size)
-        if (preview_size := request.cookies.get("preview_size"))
-        else 640
-    )
-    thumb_size = (
-        int(thumb_size) if (thumb_size := request.cookies.get("thumb_size")) else 96
-    )
-    sort_order = (
-        int(sort_order) if (sort_order := request.cookies.get("sort_order")) else 1
-    )
-    show_types = (
-        int(show_types) if (show_types := request.cookies.get("show_types")) else 1
-    )
-    time_filter = (
-        int(time_filter) if (time_filter := request.cookies.get("time_filter")) else 1
-    )
-
-    time_filter_max = 8
-    preview_file = ""
-    if request.method == "GET" and (thumb_file := request.args.get("preview")):
-        preview_file = thumb_file
+    preview_size = int(request.cookies.get("preview_size", 640))
+    thumb_size = int(request.cookies.get("thumb_size", 96))
+    sort_order = int(request.cookies.get("sort_order", 1))
+    show_types = int(request.cookies.get("show_types", 1))
+    time_filter = int(request.cookies.get("time_filter", 1))
+    preview_file = request.args.get("preview", "")
 
     if request.method == "POST":
-        if time_filter := request.form.get("time_filter"):
-            time_filter = int(time_filter)
+        time_filter = int(request.json.get("time_filter", time_filter))
+        sort_order = int(request.json.get("sort_order", sort_order))
+        show_types = int(request.json.get("show_types", show_types))
 
-        if sort_order := request.form.get("sort_order"):
-            sort_order = int(sort_order)
-
-        if show_types := request.form.get("show_types"):
-            show_types = int(show_types)
-
-        if (delete1 := request.form.get("delete1")) and check_media_path(delete1):
-            delete_mediafiles(delete1)
-            maintain_folders(media_path, False, False)
-
-        if (download1 := request.form.get("download1")) and check_media_path(download1):
-            if get_file_type(download1) != "t":
-                dx_file = data_filename(download1)
-                if data_file_ext(download1) == "jpg":
-                    mimetype = "image/jpeg"
-                else:
-                    mimetype = "video/mp4"
-
-                return send_file(
-                    f"{media_path}/{dx_file}",
-                    mimetype=mimetype,
-                    as_attachment=True,
-                    download_name=dx_file,
-                )
-            else:
-                return get_zip([download1])
-
-        if action := request.form.get("action"):
+        if action := request.json.get("action"):
             match action:
+                case "delete":
+                    if (filename := request.json.get("filename")) and check_media_path(
+                        filename
+                    ):
+                        delete_mediafiles(filename)
+                        maintain_folders(media_path, False, False)
+                case "download":
+                    if (filename := request.json.get("filename")) and check_media_path(
+                        filename
+                    ):
+                        if get_file_type(filename) != "t":
+                            dx_file = data_filename(filename)
+                            if data_file_ext(filename) == "jpg":
+                                mimetype = "image/jpeg"
+                            else:
+                                mimetype = "video/mp4"
+
+                            return send_file(
+                                f"{media_path}/{dx_file}",
+                                mimetype=mimetype,
+                                as_attachment=True,
+                                download_name=dx_file,
+                            )
+                        else:
+                            return get_zip([filename])
                 case "deleteAll":
                     maintain_folders(media_path, True, True)
                 case "selectAll":
@@ -103,27 +87,27 @@ def index():
                 case "selectNone":
                     select_all = ""
                 case "deleteSel":
-                    for item in request.form.getlist("check_list"):
+                    for item in request.json.get("check_list", []):
                         if check_media_path(item):
                             delete_mediafiles(item)
                     maintain_folders(media_path, False, False)
                 case "lockSel":
-                    for item in request.form.getlist("check_list"):
+                    for item in request.json.get("check_list", []):
                         if check_media_path(item):
                             lock_file(item, True)
                 case "unlockSel":
-                    for item in request.form.getlist("check_list"):
+                    for item in request.json.get("check_list", []):
                         if check_media_path(item):
                             lock_file(item, False)
                 case "updateSizeOrder":
-                    if preview_size := request.form.get("preview_size"):
+                    if preview_size := request.json.get("preview_size"):
                         preview_size = max(int(preview_size), 100)
                         preview_size = min(int(preview_size), 1920)
-                    if thumb_size := request.form.get("thumb_size"):
+                    if thumb_size := request.json.get("thumb_size"):
                         thumb_size = max(int(thumb_size), 32)
                         thumb_size = min(int(thumb_size), 320)
                 case "zipSel":
-                    if check_list := request.form.getlist("check_list"):
+                    if check_list := request.json.get("check_list", []):
                         return get_zip(check_list)
 
     thumb_filenames = get_thumbnails(
@@ -137,7 +121,7 @@ def index():
 
     response = make_response(
         render_template(
-            "gallery.html",
+            "preview.html",
             raspiconfig=current_app.raspiconfig,
             disk_usage=disk_usage(),
             preview_size=preview_size,

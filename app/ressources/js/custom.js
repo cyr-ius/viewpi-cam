@@ -39,7 +39,7 @@ function queryData(method="POST", url, data, callbackSuccess,callbackError){
       method: method,
       url: url,
       data: JSON.stringify(data),
-      dataType:"json",
+      // dataType:"json",
       contentType:"application/json; charset=utf-8",            
       success: function(data){
           $("#toast .toast-body").html(data["message"])
@@ -129,12 +129,17 @@ function queryData(method="POST", url, data, callbackSuccess,callbackError){
                   return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
                 } );
               } else if (rcheckableType.test(this.type)) {    
-                return {
-                  name: elem.name,
-                  value: (o.checkboxesAsBools &&  this.type === 'checkbox') ?
-                      (this.checked ? 1 : 0) :
-                      val 
-                }               
+                if (o.checkboxesAsBools) {
+                  return {
+                    name: elem.name,
+                    value: (o.checkboxesAsBools &&  this.type === 'checkbox') ?
+                        (this.checked ? 1 : 0) :
+                        val.replace( rCRLF, "\r\n" ) 
+                  } 
+                } else {
+                  if (this.checked)
+                    return {name: elem.name, value: val.replace( rCRLF, "\r\n" )}
+                }
               } else {
                 return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
               }

@@ -8,7 +8,7 @@
   </symbol>
 </svg>
 <main class="form-signin w-100 m-auto">
-  <form id="login" class="needs-validation" method="POST" action="{{ url_for('auth.register') if g.first_run else url_for('auth.login') }}" novalidate>
+  <form id="login" class="needs-validation" method="POST" action="{{ url_for('auth.register') if register else url_for('auth.login') }}" novalidate>
       <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
       <div class="form-floating">
         <input class="form-control" id="user_id" name="user_id" placeholder="Username" type="text" required>
@@ -18,7 +18,7 @@
         <input class="form-control" id="password" name="password" placeholder="Password" type="password" required>
         <label for="password">Password</label>
       </div>
-      {% if g.first_run %}
+      {% if register %}
       <div class="form-floating">
         <input class="form-control" id="password_2" name="password_2" placeholder="Password" type="password" required>
         <label for="password_2">Password</label>

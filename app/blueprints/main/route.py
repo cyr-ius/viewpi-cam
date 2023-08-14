@@ -15,8 +15,8 @@ from flask import (
 )
 
 from ...const import PRESETS
-from app.helpers.decorator import auth_required
-from app.helpers.filer import get_log, send_pipe, write_log
+from app.helpers.decorator import auth_required, ViewPiCamException
+from app.helpers.filer import file_exists, send_pipe, write_log
 
 bp = Blueprint("main", __name__, template_folder="templates")
 
@@ -93,7 +93,16 @@ def log():
                 filename = current_app.raspiconfig.log_file
                 os.remove(filename)
 
-    return render_template("logs.html", log=get_log())
+    log_file = current_app.raspiconfig.log_file
+    log = []
+    if file_exists(log_file):
+        with open(log_file, "r") as f:
+            lines = f.readlines()
+            lines.sort(reverse=True)
+            for line in lines:
+                log.append(line.replace("\n", ""))
+
+    return render_template("logs.html", log=log)
 
 
 @bp.route("/help", methods=["GET"])
@@ -160,9 +169,7 @@ def sys_cmd(cmd):
         if cmd == "settime" and (timestr := request.args.get("timestr")):
             os.popen(f'sudo date -s "{timestr}')
     except Exception as error:
-        return {"type": "error", "message": f"{error}"}
-
-    return {"type": "success", "message": f"Send {cmd} successful"}
+        raise ViewPiCamException(f"System command failed ({error})") from error
 
 
 @bp.route("/pipe_cmd", methods=["POST"])

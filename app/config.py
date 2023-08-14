@@ -1,7 +1,6 @@
 import os
 
 from .const import (
-    ATTR_USER_BUTTONS,
     ATTR_AUTOCAMERAINTERVAL,
     ATTR_AUTOCAPTUREINTERVAL,
     ATTR_CMDPOLL,
@@ -16,21 +15,25 @@ from .const import (
     ATTR_GMTOFFSET,
     ATTR_LATITUDE,
     ATTR_LONGITUDE,
+    ATTR_MAXCAPTURE,
     ATTR_MGMTCOMMAND,
     ATTR_MGMTINTERVAL,
-    ATTR_MAXCAPTURE,
     ATTR_MODE_ALLDAY,
     ATTR_MODE_POLL,
     ATTR_MODES,
+    ATTR_PILIGHT,
+    ATTR_PIPAN,
+    ATTR_PRESET,
     ATTR_PURGEIMAGEHOURS,
     ATTR_PURGELAPSEHOURS,
     ATTR_PURGESPACELEVEL,
     ATTR_PURGESPACEMODE,
     ATTR_PURGEVIDEOHOURS,
+    ATTR_SERVO,
     ATTR_TIMES,
-    ATTR_TIMES_MAX,
-    ATTR_TIMES_VALUE,
+    ATTR_USER_BUTTONS,
     ATTR_USERS,
+    SCHEDULE_TIMES_MAX,
 )
 
 basedir = os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
@@ -61,8 +64,7 @@ APP_PASSWORD = os.getenv("APP_PASSWORD", "admin")
 APP_MAIL = os.getenv("APP_MAIL", "please_change_me@localhost")
 
 # The host running the application
-# HOSTNAME = os.uname()[1]
-HOSTNAME = "Test"
+HOSTNAME = os.uname()[1]
 # Name of this camera
 CAM_NAME = "mycam"
 # Unique camera string build from application name, camera name, host name
@@ -114,9 +116,7 @@ DEFAULT_INIT = {
     ATTR_DAWNSTARTMINUTES: -180,
     ATTR_DAYENDMINUTES: 0,
     ATTR_DAYMODE: ATTR_MODE_ALLDAY,
-    ATTR_DAYS: {
-        i: [0, 1, 2, 3, 4, 5, 6] for i in range(len(ATTR_TIMES_VALUE), ATTR_TIMES_MAX)
-    },
+    ATTR_DAYS: {i: [1, 1, 1, 1, 1, 1, 1] for i in range(0, SCHEDULE_TIMES_MAX + 5)},
     ATTR_DAYSTARTMINUTES: 0,
     ATTR_DUSKENDMINUTES: 180,
     ATTR_GMTOFFSET: 0,
@@ -144,7 +144,9 @@ DEFAULT_INIT = {
     ATTR_PURGESPACELEVEL: 10,
     ATTR_PURGESPACEMODE: 0,
     ATTR_PURGEVIDEOHOURS: 0,
-    ATTR_TIMES: [
-        "{:02d}:00".format(i + 9) for i in range(len(ATTR_TIMES_VALUE), ATTR_TIMES_MAX)
-    ],
+    ATTR_TIMES: ["{:02d}:00".format(i + 9) for i in range(0, SCHEDULE_TIMES_MAX)],
+    ATTR_PIPAN: 0,
+    ATTR_SERVO: 0,
+    ATTR_PILIGHT: 0,
+    ATTR_PRESET: "v2",
 }

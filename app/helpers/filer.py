@@ -174,22 +174,10 @@ def file_add_content(filename, data):
 #     return os.popen(cmd)
 
 
-def get_log():
-    log_file = current_app.raspiconfig.log_file
-    log = []
-    if file_exists(log_file):
-        lines = open(log_file, "r").readlines()
-        lines.sort(reverse=True)
-        for line in lines:
-            log.append(line.replace("\n", ""))
-        return log
-
-
 def write_log(msg):
     log_file = current_app.raspiconfig.log_file
-    if file_exists(log_file):
-        str_now = dt.now().strftime("%Y/%m/%D %H:%M:%S")
-        file_add_content(log_file, f"{str_now} {msg}\n")
+    str_now = dt.now().strftime("%Y/%m/%D %H:%M:%S")
+    file_add_content(log_file, f"{str_now} {msg}\n")
 
 
 def delete_log(log_size):

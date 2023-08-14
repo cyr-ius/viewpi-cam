@@ -38,6 +38,7 @@ class Settings:
         for k, v in kwargs.items():
             setattr(self, k, v)
         self._save()
+        self._load()
 
     def refresh(self):
         try:
@@ -61,9 +62,6 @@ class Settings:
             raise SettingsException(
                 f"Error to restore settings file ({error})"
             ) from error
-
-    def save(self):
-        self._save()
 
     def has_user(self, user_id):
         for user in self.users:

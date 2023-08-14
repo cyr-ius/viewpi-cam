@@ -16,15 +16,14 @@ bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth"
 
 @bp.before_app_request
 def before_app_request():
-    if not current_app.settings.users:
-        g.first_run = True
-
-    g.user = session.get("user_id")
+    if len(current_app.settings.users) == 0:
+        session.clear()
+    g.user = session.get("user_id")        
 
 
 @bp.route("/register", methods=["GET", "POST"])
 def register():
-    if g.first_run and request.method == "POST":
+    if request.method == "POST" and len(current_app.settings.users) == 0:
         if (pwd := request.form.get("password")) == request.form.get("password_2"):
             current_app.settings.set_user(
                 user_id=request.form["user_id"],
@@ -36,12 +35,12 @@ def register():
             return redirect(next)
 
         flash("User or password invalid.")
-    return render_template("login.html")
+    return render_template("login.html", register=True, next=request.args.get("next"))
 
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
-    if not current_app.settings.users:
+    if not current_app.settings.users or len(current_app.settings.users) == 0:
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
         user = request.form.get("user_id")
