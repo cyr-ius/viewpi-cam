@@ -36,7 +36,7 @@ RUN chmod +x docker-entrypoint.sh
 RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
 
 COPY ./dockerfiles/etc /etc
-COPY ./dockerfiles/bin/raspimjpeg /bin/raspimjpeg
+COPY ./dockerfiles/bin/raspimjpeg /usr/local/bin/raspimjpeg
 COPY ./dockerfiles/macros /app/macros
 
 WORKDIR /app
