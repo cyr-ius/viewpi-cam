@@ -4,7 +4,7 @@ import queue
 from json import JSONDecodeError
 from threading import Thread
 from typing import Any
-import fcntl    
+from atomicwrites import atomic_write
 
 q = queue.Queue()
 
@@ -77,7 +77,8 @@ class JsonDB(AttrDict, object):
             folder = os.path.abspath(os.path.dirname(path))
             os.makedirs(folder, exist_ok=True)
             fpath = f"{path}.backup" if backup else path
-            with open(fpath, "w") as file:
+
+            with atomic_write(fpath, overwrite=True) as file:
                 json.dump(
                     self,
                     file,
@@ -86,9 +87,20 @@ class JsonDB(AttrDict, object):
                     indent=4,
                     **kwargs,
                 )
-                file.flush()
-                os.fsync(file.fileno())
-                file.close()
+                file
+
+            # with open(fpath, "w") as file:
+            #     json.dump(
+            #         self,
+            #         file,
+            #         default=lambda o: o.__dict__,
+            #         sort_keys=True,
+            #         indent=4,
+            #         **kwargs,
+            #     )
+            #     file.flush()
+            #     os.fsync(file.fileno())
+            #     file.close()
 
         def worker() -> None:
             while True:
