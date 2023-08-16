@@ -149,13 +149,14 @@ def cam_get():
 @auth_required
 def cam_pic_new():
     pDelay = float(request.args.get("pDelay", 1.0)) / 100
+    preview_path = current_app.raspiconfig.preview_path
     headers = {
         "Content-type": "multipart/x-mixed-replace; boundary=PIderman",
         "Cache-Control": "no-cache",
         "Pragma": "no-cache",
         "Connection": "close",
     }
-    return Response(gather_img(pDelay), headers=headers)
+    return Response(gather_img(preview_path, pDelay), headers=headers)
 
 
 @bp.route("/system/<cmd>", methods=["GET"])
@@ -293,14 +294,20 @@ def pipan():
     return status_mjpeg()
 
 
-def get_shm_cam():
-    preview_path = current_app.raspiconfig.preview_path
+def get_shm_cam(preview_path=None):
+    preview_path = (
+        current_app.raspiconfig.preview_path if preview_path is None else preview_path
+    )
     if os.path.isfile(preview_path):
         return open(preview_path, "rb").read()
 
 
-def gather_img(pDelay=0.1):
+def gather_img(preview_path, pDelay=0.1):
     """Stream image."""
     while True:
-        yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + get_shm_cam() + b"\r\n")
+        yield (
+            b"--PIderman\r\nContent-Type: image/jpeg\r\n\r\n"
+            + get_shm_cam(preview_path)
+            + b"\r\n"
+        )
         time.sleep(pDelay)

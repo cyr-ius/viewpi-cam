@@ -30,7 +30,7 @@ def register():
                 password=pwd,
                 rights=current_app.config["USERLEVEL_MAX"],
             )
-            current_app.settings.refresh()
+            # current_app.settings.refresh()
             next = next if (next := request.form.get("next")) else url_for("main.index")
             return redirect(next)
 

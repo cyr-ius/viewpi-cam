@@ -6,7 +6,8 @@ from subprocess import Popen
 from flask import Flask
 from flask_assets import Environment
 from flask_babel import Babel
-from flask_mail import Mail
+
+# from flask_mail import Mail
 
 # from flask_swagger import swagger
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -21,7 +22,7 @@ from .services.handle import (
     handle_page_not_found,
 )
 
-mail = Mail()
+# mail = Mail()
 assets = Environment()
 babel = Babel()
 settings = Settings()
@@ -64,7 +65,7 @@ def create_app(config=None):
         app.config.from_envvar("FLASK_CONF")
 
     # Load app's components
-    mail.init_app(app)
+    # mail.init_app(app)
     assets.init_app(app)
     babel.init_app(app)
 
