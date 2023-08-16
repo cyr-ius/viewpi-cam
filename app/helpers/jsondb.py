@@ -4,6 +4,7 @@ import queue
 from json import JSONDecodeError
 from threading import Thread
 from typing import Any
+import fcntl    
 
 q = queue.Queue()
 
@@ -86,6 +87,7 @@ class JsonDB(AttrDict, object):
                     **kwargs,
                 )
                 file.flush()
+                os.fsync(file.fileno())
                 file.close()
 
         def worker() -> None:
