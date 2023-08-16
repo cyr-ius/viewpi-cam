@@ -1,6 +1,7 @@
 import json
 import os
 import queue
+from json import JSONDecodeError
 from threading import Thread
 from typing import Any
 
@@ -52,11 +53,19 @@ class JsonDB(AttrDict, object):
         default: default dict for initializing
         """
 
-        def load(restore=False) -> None:
+        def load(restore=False, retry=3) -> None:
             fpath = f"{path}.backup" if restore else path
             if os.path.isfile(fpath):
                 with open(fpath, "r") as file:
-                    data = json.load(file, object_hook=lambda o: AttrDict(**o))
+                    try:
+                        data = json.load(file, object_hook=lambda o: AttrDict(**o))
+                    except JSONDecodeError as error:
+                        if retry > 0:
+                            retry -= 1
+                            load(restore=False, retry=retry)
+                        raise JsonDBException(
+                            f"Error while loading file {fpath} ({error})"
+                        )
             else:
                 data = AttrDict(default)
 
@@ -76,6 +85,7 @@ class JsonDB(AttrDict, object):
                     indent=4,
                     **kwargs,
                 )
+                file.flush()
                 file.close()
 
         def worker() -> None:
