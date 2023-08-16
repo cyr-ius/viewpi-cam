@@ -33,3 +33,6 @@ services:
 
 volumes:
   static_volume:  
+  
+  # Onliner
+  # docker run -v /dev/vchiq:/dev/vchiq -v  /dev/vcsm:/dev/vcsm -p 80:8000 --name viewpicam ghcr.io/cyr-ius/viewpi-cam:latest
