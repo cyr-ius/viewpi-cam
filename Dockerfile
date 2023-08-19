@@ -4,6 +4,7 @@ FROM python:3.11-alpine
 # set version label
 ARG BUILD_DATE
 ARG VERSION
+ARG TARGETPLATFORM
 LABEL build_version="version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 LABEL org.opencontainers.image.source="https://github.com/cyr-ius/viewpi-cam"
 LABEL org.opencontainers.image.description="ViewPI Cam (inspired Rpi Cam Interface)"
@@ -19,6 +20,8 @@ ENV PYTHONUNBUFFERED=1
 # Install dependencies
 RUN apk add --no-cache libstdc++ py3-virtualenv
 RUN apk add --no-cache --virtual build build-base python3-dev gcc linux-headers ninja
+
+RUN if [ "$TARGETPLATFORM" = "linux/armv6" ] || [ "$TARGETPLATFORM" = "linux/armv7" ]; then apk add --no-cache rpi-userland; fi
 
 RUN python3 -m venv --system-site-packages /env 
 

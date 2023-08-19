@@ -24,17 +24,17 @@ def index():
 
     try:
         if request.method == "POST" and (json := request.json):
-            if "upreset" in json.keys():
-                current_app.settings.upreset = json["upreset"]
-            if any(key in json.keys() for key in ("pilight", "pipan", "servo")):
-                for k, v in json.items():
-                    setattr(current_app.settings, k, v)
+            if any(
+                key in json.keys() for key in ("pilight", "pipan", "servo", "upreset")
+            ):
+                current_app.settings.update(**json)
             if "token" in json.keys():
                 token = f"B{random.getrandbits(256)}"
-                current_app.settings.token = token
+                current_app.settings.update(token=token)
                 msg.update({"token": token})
             if "macro" in json.keys():
                 current_app.settings.ubuttons.append(json)
+                current_app.settings.update(**current_app.settings.ubuttons)
             if "user_id" in json.keys():
                 current_app.settings.set_user(**json)
 
@@ -43,6 +43,7 @@ def index():
                 del current_app.settings.token
             if "macro" in json.keys():
                 current_app.settings.ubuttons.remove(json)
+                current_app.settings.update(**current_app.settings.ubuttons)
             if "user_id" in json.keys():
                 current_app.settings.del_user(json["user_id"])
 

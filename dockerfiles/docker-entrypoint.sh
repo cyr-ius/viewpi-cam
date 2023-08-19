@@ -19,6 +19,6 @@ flask assets build
 #Run scheduler
 # flask scheduler >/dev/null 2&>1 &
 
-exec gunicorn --bind 0.0.0.0:8000 --workers 2 'app:create_app()' "$@"
+exec gunicorn --bind 0.0.0.0:8000 --workers 1 --worker-class gthread --threads 4 'app:create_app()' "$@"
 
 
