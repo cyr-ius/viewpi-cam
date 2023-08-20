@@ -1,0 +1,29 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Docker Buildx ARM",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "buildx",
+                "build",
+                "--platform",
+                "linux/arm/v6,linux/arm/v7",
+                "-t",
+                "viewpicam:arm",
+                "."
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
