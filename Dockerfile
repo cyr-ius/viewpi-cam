@@ -43,7 +43,7 @@ RUN chmod +x docker-entrypoint.sh
 # Create folders
 RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
 
-COPY ./dockerfiles/raspimjpeg /etc/
+COPY ./dockerfiles/raspimjpeg /etc/raspimjpeg
 COPY ./dockerfiles/macros /app/macros
 
 WORKDIR /app
