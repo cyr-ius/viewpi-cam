@@ -23,7 +23,8 @@ RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-hea
 
 # Build raspimjpeg
 RUN git clone https://github.com/roberttidey/userland.git /tmp/raspimjpeg
-RUN /bin/bash -c /tmp/raspimjpeg/buildme
+WORKDIR /tmp/raspimjpeg
+RUN /bin/bash -c ./buildme
 # COPY ./dockerfiles/raspimjpeg-src /tmp/raspimjpeg
 # RUN make -C /tmp/raspimjpeg  && make -C /tmp/raspimjpeg install
 
