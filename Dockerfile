@@ -26,7 +26,7 @@ RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-hea
 # Build raspimjpeg
 COPY ./dockerfiles/raspimjpeg /tmp/raspimjpeg
 WORKDIR /tmp/raspimjpeg
-RUN make && make install
+RUN make . && make install
 
 WORKDIR /
 
