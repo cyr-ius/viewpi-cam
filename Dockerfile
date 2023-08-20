@@ -24,7 +24,7 @@ RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-hea
 # RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then apk add --no-cache --virtual build raspberrypi-userland ; fi
 
 # Build raspimjpeg
-COPY ./dockerfiles/raspimjpeg /tmp/raspimjpeg
+COPY ./dockerfiles/raspimjpeg-src /tmp/raspimjpeg
 WORKDIR /tmp/raspimjpeg
 RUN make . && make install
 
