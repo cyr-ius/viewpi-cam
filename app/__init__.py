@@ -1,13 +1,12 @@
 """ViewPI Camera."""
 import logging
 import os
+import shutil
 from subprocess import Popen
 
 from flask import Flask
 from flask_assets import Environment
 from flask_babel import Babel
-
-# from flask_mail import Mail
 
 # from flask_swagger import swagger
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -22,6 +21,9 @@ from .services.handle import (
     handle_page_not_found,
 )
 
+# from flask_mail import Mail
+
+
 # mail = Mail()
 assets = Environment()
 babel = Babel()
@@ -35,9 +37,16 @@ def create_app(config=None):
     # Create static folder outside app folder
     app.static_folder = f"{app.root_path}/../static"
 
-    app.system_folder = f"{app.root_path}/../system"
-    if os.path.isdir(app.system_folder) is False:
-        os.mkdir(app.system_folder)
+    shutil.copytree(
+        f"{app.root_path}/ressources/css/fonts",
+        f"{ app.static_folder}/css/fonts",
+        dirs_exist_ok=True,
+    )
+    shutil.copytree(
+        f"{app.root_path}/ressources/img",
+        f"{ app.static_folder}/img",
+        dirs_exist_ok=True,
+    )
 
     # Read log level from environment variable
     log_level_name = os.environ.get("LOG_LEVEL", "WARNING")
@@ -113,6 +122,11 @@ def create_app(config=None):
     # Create files & folders
     os.makedirs(os.path.dirname(app.raspiconfig.status_file), exist_ok=True)
     os.makedirs(os.path.dirname(app.raspiconfig.control_file), exist_ok=True)
+
+    app.system_folder = f"{app.root_path}/../system"
+    if os.path.isdir(app.system_folder) is False:
+        os.makedirs(app.system_folder, exist_ok=True)
+
     if (media := app.raspiconfig.media_path) != "":
         os.makedirs(media, exist_ok=True)
     if (macros := app.raspiconfig.macros_path) != "":
@@ -120,11 +134,13 @@ def create_app(config=None):
     if (boxing := app.raspiconfig.boxing_path) != "":
         os.makedirs(boxing, exist_ok=True)
 
+    # Create FIFO
     if os.path.isfile(app.raspiconfig.control_file):
         os.mkfifo(app.raspiconfig.control_file)
     if os.path.isfile(app.raspiconfig.motion_pipe):
         os.mkfifo(app.raspiconfig.motion_pipe)
 
+    # Create /dev/shm/mjpeg/status-file
     if not os.path.isfile(app.raspiconfig.status_file):
         status_file = open(app.raspiconfig.status_file, "a")
         status_file.close()
