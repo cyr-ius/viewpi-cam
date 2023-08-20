@@ -6,9 +6,9 @@ ARG BUILD_DATE
 ARG VERSION
 ARG TARGETPLATFORM
 LABEL build_version="version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL org.opencontainers.image.source="https://github.com/cyr-ius/viewpi-cam"
-LABEL org.opencontainers.image.description="ViewPI Cam (inspired Rpi Cam Interface)"
-LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.source https://github.com/cyr-ius/viewpi-cam
+LABEL org.opencontainers.image.description ViewPI Cam (inspired Rpi Cam Interface)
+LABEL org.opencontainers.image.licenses MIT
 LABEL maintainer="cyr-ius"
 
 # Keeps Python from generating .pyc files in the container
