@@ -15,6 +15,7 @@ CC=cc
 CFLAGS=
 CC_OPTS=-lmmal -lmmal_core -lmmal_util -lbcm_host 
 LDFLAGS=$(CC_OPTS)
+LD=-L/usr/lib -L/opt/vc/lib
 
 INSTALL=install
 
@@ -26,7 +27,7 @@ OBJ_RASPIMJPEG=RaspiMJPEG.o
 all: raspimjpeg
 
 raspimjpeg: $(OBJ_RASPIMJPEG)
-	$(CC) $(CFLAGS) $(OBJ_RASPIMJPEG) -o raspimjpeg $(LDFLAGS) $(CC_OPTS)
+	$(CC) $(CFLAGS) $(OBJ_RASPIMJPEG) -o raspimjpeg $(LD) $(LDFLAGS) $(CC_OPTS)
 
 install:
 	$(INSTALL) -m 0755 -d $(DESTDIR)/usr/local/bin
