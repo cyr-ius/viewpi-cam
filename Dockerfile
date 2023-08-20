@@ -18,13 +18,13 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
-RUN apk add --no-cache libstdc++ raspberrypi-userland
+RUN apk add --no-cache libstdc++
 RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-dev git cmake bash
 
 # Build raspimjpeg
 RUN git clone https://github.com/roberttidey/userland.git /tmp/raspimjpeg
 WORKDIR /tmp/raspimjpeg
-RUN /bin/bash -c ./buildme
+RUN /bin/bash -c ./buildme /usr/bin
 WORKDIR /
 # COPY ./dockerfiles/raspimjpeg-src /tmp/raspimjpeg
 # RUN make -C /tmp/raspimjpeg  && make -C /tmp/raspimjpeg install
