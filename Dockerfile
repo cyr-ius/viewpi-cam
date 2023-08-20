@@ -21,8 +21,6 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache libstdc++ py3-virtualenv raspberrypi-userland
 RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-dev
 
-# RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then apk add --no-cache --virtual build raspberrypi-userland ; fi
-
 # Build raspimjpeg
 COPY ./dockerfiles/raspimjpeg-src /tmp/raspimjpeg
 WORKDIR /tmp/raspimjpeg
@@ -31,8 +29,12 @@ RUN make install
 
 WORKDIR /
 
-# RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] ; then make -C /tmp/raspimjpeg && make -C /tmp/raspimjpeg install; fi
-# RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then make -C /tmp/raspimjpeg && make -C /tmp/raspimjpeg install; fi
+#Add library path
+RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then \
+        echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armhf.path ; \
+    else \
+        echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armel.path; \
+    fi
 
 # RUN python3 -m venv --system-site-packages /env 
 
