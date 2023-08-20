@@ -19,11 +19,13 @@ ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
 RUN apk add --no-cache libstdc++ raspberrypi-userland
-RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-dev
+RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-dev git cmake bash
 
 # Build raspimjpeg
-COPY ./dockerfiles/raspimjpeg-src /tmp/raspimjpeg
-RUN make -C /tmp/raspimjpeg  && make -C /tmp/raspimjpeg install
+RUN git clone https://github.com/roberttidey/userland.git /tmp/raspimjpeg
+RUN /bin/bash -c /tmp/raspimjpeg/buildme
+# COPY ./dockerfiles/raspimjpeg-src /tmp/raspimjpeg
+# RUN make -C /tmp/raspimjpeg  && make -C /tmp/raspimjpeg install
 
 #Add library path
 RUN echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armhf.path
@@ -41,7 +43,7 @@ RUN chmod +x docker-entrypoint.sh
 # Create folders
 RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
 
-COPY ./dockerfiles/etc /etc
+COPY ./dockerfiles/raspimjpeg /etc/
 COPY ./dockerfiles/macros /app/macros
 
 WORKDIR /app
