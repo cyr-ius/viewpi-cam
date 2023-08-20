@@ -21,8 +21,12 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache libstdc++ py3-virtualenv
 RUN apk add --no-cache --virtual build build-base python3-dev gcc linux-headers ninja
 
-RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] ; then apk add --no-cache raspberrypi-userland ; fi
-RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then apk add --no-cache raspberrypi-userland ; fi
+RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then apk add --no-cache --virtual build raspberrypi-userland ; fi
+
+# Build raspimjpeg
+COPY ./dockerfiles/raspimjpeg /tmp/raspimjpeg
+RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then cd /tmp/raspimjpeg;make;make install ; fi
+
 
 RUN python3 -m venv --system-site-packages /env 
 
