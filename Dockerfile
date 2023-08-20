@@ -19,7 +19,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
 RUN apk add --no-cache libstdc++ py3-virtualenv
-RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-userland
+RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-dev
 
 # RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then apk add --no-cache --virtual build raspberrypi-userland ; fi
 
