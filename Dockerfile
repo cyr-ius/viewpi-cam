@@ -18,16 +18,12 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
-RUN apk add --no-cache libstdc++ py3-virtualenv raspberrypi-userland
+RUN apk add --no-cache libstdc++ raspberrypi-userland
 RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-dev
 
 # Build raspimjpeg
 COPY ./dockerfiles/raspimjpeg-src /tmp/raspimjpeg
-WORKDIR /tmp/raspimjpeg
-RUN make
-RUN make install
-
-WORKDIR /
+RUN make -C /tmp/raspimjpeg  && make -C /tmp/raspimjpeg install
 
 #Add library path
 RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then \
@@ -35,8 +31,6 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then \
     else \
         echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armel.path; \
     fi
-
-# RUN python3 -m venv --system-site-packages /env 
 
 # Install pip requirements
 COPY requirements.txt /tmp/requirements.txt
@@ -52,7 +46,6 @@ RUN chmod +x docker-entrypoint.sh
 RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
 
 COPY ./dockerfiles/etc /etc
-# COPY ./dockerfiles/bin/raspimjpeg /usr/local/bin/raspimjpeg
 COPY ./dockerfiles/macros /app/macros
 
 WORKDIR /app
