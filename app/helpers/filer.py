@@ -177,6 +177,7 @@ def file_add_content(filename, data):
 def write_log(msg):
     log_file = current_app.raspiconfig.log_file
     str_now = dt.now().strftime("%Y/%m/%D %H:%M:%S")
+    current_app.logger.info(msg)
     file_add_content(log_file, f"{str_now} {msg}\n")
 
 
@@ -193,6 +194,7 @@ def delete_log(log_size):
 def write_debug_log(msg):
     log_file = current_app.config["LOGFILE_DEBUG"]
     str_now = dt.now().strftime("%Y/%m/%D %H:%M:%S")
+    current_app.logger.debug(msg)
     file_add_content(log_file, f"{str_now} {msg}\n")
 
 
