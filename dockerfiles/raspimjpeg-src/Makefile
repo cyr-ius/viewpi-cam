@@ -6,7 +6,8 @@ CXX_OPTS=-I$(BCM_H_DIR)/ \
 	-I$(BCM_H_DIR)/interface/ \
 	-I$(BCM_H_DIR)/vcos/ \
 	-I$(BCM_H_DIR)/vcos/pthreads/ \
-	-I$(BCM_H_DIR)/vmcs_host/linux
+	-I$(BCM_H_DIR)/vmcs_host/linux \
+	-I/usr/include
 
 CXXFLAGS=$(CXX_OPTS)
 
