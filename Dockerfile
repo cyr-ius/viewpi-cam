@@ -25,7 +25,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/ar
 
 # Build raspimjpeg
 COPY ./dockerfiles/raspimjpeg /tmp/raspimjpeg
-RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then cd /tmp/raspimjpeg;make;make install ; fi
+RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then make -C /tmp/raspimjpeg && make -C /tmp/raspimjpeg install ; fi
 
 
 RUN python3 -m venv --system-site-packages /env 
