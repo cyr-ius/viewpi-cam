@@ -19,20 +19,25 @@ ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
 RUN apk add --no-cache libstdc++ py3-virtualenv
-RUN apk add --no-cache --virtual build build-base python3-dev gcc linux-headers ninja make
+RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-userland
 
-RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then apk add --no-cache --virtual build raspberrypi-userland ; fi
+# RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then apk add --no-cache --virtual build raspberrypi-userland ; fi
 
 # Build raspimjpeg
 COPY ./dockerfiles/raspimjpeg /tmp/raspimjpeg
-# RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] ; then make -C /tmp/raspimjpeg && make -C /tmp/raspimjpeg install; fi
-RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then make -C /tmp/raspimjpeg && make -C /tmp/raspimjpeg install; fi
+WORKDIR /tmp/raspimjpeg
+RUN make && make install
 
-RUN python3 -m venv --system-site-packages /env 
+WORKDIR /
+
+# RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] ; then make -C /tmp/raspimjpeg && make -C /tmp/raspimjpeg install; fi
+# RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then make -C /tmp/raspimjpeg && make -C /tmp/raspimjpeg install; fi
+
+# RUN python3 -m venv --system-site-packages /env 
 
 # Install pip requirements
-COPY requirements.txt .
-RUN python -m pip install --no-cache-dir -r requirements.txt && rm -rf requirements.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN python -m pip install --no-cache-dir -r /tmp/requirements.txt
 
 # clean content
 RUN apk del build
@@ -44,7 +49,7 @@ RUN chmod +x docker-entrypoint.sh
 RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
 
 COPY ./dockerfiles/etc /etc
-COPY ./dockerfiles/bin/raspimjpeg /usr/local/bin/raspimjpeg
+# COPY ./dockerfiles/bin/raspimjpeg /usr/local/bin/raspimjpeg
 COPY ./dockerfiles/macros /app/macros
 
 WORKDIR /app
