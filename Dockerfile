@@ -26,11 +26,7 @@ COPY ./dockerfiles/raspimjpeg-src /tmp/raspimjpeg
 RUN make -C /tmp/raspimjpeg  && make -C /tmp/raspimjpeg install
 
 #Add library path
-RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then \
-        echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armhf.path ; \
-    else \
-        echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armel.path; \
-    fi
+RUN echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armhf.path
 
 # Install pip requirements
 COPY requirements.txt /tmp/requirements.txt
