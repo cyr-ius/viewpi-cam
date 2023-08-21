@@ -70,7 +70,7 @@ CAM_NAME = "mycam"
 # Unique camera string build from application name, camera name, host name
 CAM_STRING = f"{SITE_NAME} {VERSION}: {CAM_NAME}@{HOSTNAME}"
 # File where default settings changes are storedHOSTNAME = "Test"
-CONFIG_FILE1 = "/etc/raspimjpeg/raspimjpeg"
+CONFIG_FILE1 = "/etc/raspimjpeg"
 # File where user specific settings changes are stored
 MEDIA = "media"
 # Character used to flatten file paths
