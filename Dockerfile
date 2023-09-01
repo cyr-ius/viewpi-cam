@@ -41,8 +41,8 @@ RUN python -m pip install --no-cache-dir -r /tmp/requirements.txt
 # clean content
 RUN apk del build
 
-COPY ./dockerfiles/docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
+COPY ./dockerfiles/docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
 
 # Create folders
 RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
