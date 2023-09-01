@@ -1,4 +1,3 @@
-# For more information, please refer to https://aka.ms/vscode-docker-python
 FROM python:3.11-alpine
 
 # set version label
@@ -21,17 +20,17 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache libstdc++
 RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-dev git cmake bash
 
+WORKDIR /tmp
+
 # Build raspimjpeg
 RUN git clone https://github.com/roberttidey/userland.git /tmp/raspimjpeg
-WORKDIR /tmp/raspimjpeg
-RUN sed -i 's/sudo//g' buildme
-RUN /bin/bash -c ./buildme
-WORKDIR /
-# COPY ./dockerfiles/raspimjpeg-src /tmp/raspimjpeg
-# RUN make -C /tmp/raspimjpeg  && make -C /tmp/raspimjpeg install
+
+RUN sed -i 's/sudo//g' raspimjpeg/buildme
+RUN /bin/bash -c ./raspimjpeg/buildme
 
 #Add library path
 RUN echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armhf.path
+
 #Add binary path
 RUN export PATH="${PATH}:/op/vc/bin"
 
@@ -50,6 +49,7 @@ RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
 
 COPY ./dockerfiles/raspimjpeg /etc/raspimjpeg
 COPY ./dockerfiles/macros /app/macros
+RUN chmod -R +x /app/macros
 
 WORKDIR /app
 
