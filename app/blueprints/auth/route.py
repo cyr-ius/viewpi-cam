@@ -64,8 +64,8 @@ def login():
             session.clear()
             session["user_id"] = user
             session["user_level"] = current_app.settings.get_user(user).get("rights")
-            next = next if (next := request.form.get("next")) else url_for("main.index")
-            return redirect(next)
+            next_page = next_page if (next_page := request.form.get("next")) else url_for("main.index")
+            return redirect(next_page)
 
         flash("User or password invalid.")
 

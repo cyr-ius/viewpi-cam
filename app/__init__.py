@@ -2,7 +2,6 @@
 import logging
 import os
 import shutil
-from subprocess import Popen
 
 from flask import Flask
 from flask_assets import Environment
@@ -37,6 +36,7 @@ settings = Settings()
 raspiconfig = RaspiConfig()
 
 
+# pylint: disable=E1101,W0613
 def create_app(config=None):
     """Create Flask application."""
     app = Flask(__name__)
@@ -148,8 +148,7 @@ def create_app(config=None):
 
     # Start Raspimjpeg
     if "NO_RASPIMJPEG" not in os.environ and not get_pid(app.config["RASPI_BINARY"]):
-        app.logger.info("Start raspimjpeg")
-        Popen(app.config["RASPI_BINARY"])
+        app.raspiconfig.run()
 
     # Start scheduler
     if "NO_SCHEDULER" not in os.environ:

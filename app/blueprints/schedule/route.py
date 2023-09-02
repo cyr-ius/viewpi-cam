@@ -18,11 +18,11 @@ from app.helpers.filer import (
     delete_log,
     delete_mediafiles,
     get_file_type,
+    get_pid,
     is_thumbnail,
     list_folder_files,
     send_pipe,
     write_log,
-    get_pid,
 )
 from app.helpers.raspiconfig import RaspiConfigError
 
@@ -66,8 +66,8 @@ def index():
                     msg.update({"message": "Restore file settings"})
         except RaspiConfigError as error:
             msg = {"type": "error", "message": str(error)}
-        finally:
-            return msg
+
+        return msg
 
     if request.method == "GET":
         offset = get_time_offset(current_app.settings.gmt_offset)
@@ -110,7 +110,6 @@ def index():
 def stop_scheduler() -> int | None:
     pid = get_pid("scheduler")
     os.popen(f"kill {pid}")
-    current_app.logger.info("Stop scheduler")
 
 
 @bp.cli.command("start", short_help="Start scheduler task")
@@ -121,7 +120,6 @@ def start_scheduler() -> int | None:
 
 def launch_schedule():
     if not get_pid("scheduler"):
-        current_app.logger.info("Start scheduler")
         ret = Popen(["python", "-m", "flask", "scheduler", "start"])
         return ret
 
@@ -157,7 +155,7 @@ def scheduler():
             autocapturetime = 0
             autocapture = 0
 
-        lastStatusTime = os.path.getmtime(current_app.raspiconfig.status_file)
+        last_status_time = os.path.getmtime(current_app.raspiconfig.status_file)
         while timeout_max == 0 or timeout < timeout_max:
             time.sleep(poll_time)
             cmd = check_motion(pipeIn)
@@ -258,26 +256,28 @@ def scheduler():
                     autocapture = 1
                 if (
                     current_app.settings.autocamera_interval > 0
-                    and timenow > autocameratime
+                    and timenow > autocameratime  # pylint: ignore=W503
                 ):
                     autocameratime = timenow + 2
-                    modTime = os.path.getmtime(current_app.raspiconfig.status_file)
-                    with open(current_app.raspiconfig.status_file, "r") as f:
-                        content = f.read()
-                        f.close()
+                    mod_time = os.path.getmtime(current_app.raspiconfig.status_file)
+                    with open(
+                        current_app.raspiconfig.status_file, mode="r", encoding="utf-8"
+                    ) as file:
+                        content = file.read()
+                        file.close()
                     if content == "halted":
-                        if modTime > lastStatusTime:
+                        if mod_time > last_status_time:
                             write_log("Autocamera startup")
                             send_cmds(fifo=fifo_out, str_cmd="ru 1")
                     else:
                         if (
-                            timenow - modTime
+                            timenow - mod_time
                         ) > current_app.settings.autocamera_interval:
                             write_log("Autocamera shutdown")
                             send_cmds(fifo=fifo_out, str_cmd="md 0;ru 0")
-                            lastStatusTime = timenow + 5
+                            last_status_time = timenow + 5
                         else:
-                            lastStatusTime = timenow
+                            last_status_time = timenow
 
 
 def wrap_day_period():
@@ -423,7 +423,7 @@ def purge_files(
                         write_log("Purged orphan zip file")
 
     if sch_purgespacemode > 0:
-        total, used, free = shutil.disk_usage(f"{media_path}")
+        total, _, free = shutil.disk_usage(f"{media_path}")
         # level = str_replace(
         #     array("%", "G", "B", "g", "b"), "", sch_purgespacelevel
         # )
@@ -459,7 +459,7 @@ def check_motion(pipe):
         return ""
     try:
         ret = os.read(pipe, 0).decode("utf-8")
-    except Exception as error:  # noqa: F841
+    except Exception:  # pylint: disable=W0718
         ret = ""
 
     return ret
@@ -476,8 +476,8 @@ def open_pipe(pipename: str):
     try:
         pipe = os.open(pipename, os.O_RDONLY | os.O_NONBLOCK)
         return pipe
-    except OSError as e:
-        write_log(f"Error open pipe {pipename} {str(e)}")
+    except OSError as error:
+        write_log(f"Error open pipe {pipename} {str(error)}")
 
 
 def send_cmds(
@@ -493,13 +493,13 @@ def send_cmds(
 
 
 # functions to find and delete data files
-def get_sorted_files(folder, ascending=True):
+def get_sorted_files(folder: str, ascending: bool = True) -> list:
     scanfiles = list_folder_files(folder)
     files = {}
     for file in scanfiles:
         if file != "." and file != ".." and is_thumbnail(file):
-            fDate = os.path.getmtime(f"{folder}/{file}").hour()
-            files[file] = fDate
+            f_date = os.path.getmtime(f"{folder}/{file}").hour()
+            files[file] = f_date
     if ascending:
         files.sort()
     else:

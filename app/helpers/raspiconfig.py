@@ -1,5 +1,6 @@
 """Class for raspimjpeg file."""
 import os
+from subprocess import Popen
 
 
 class RaspiConfig:
@@ -9,10 +10,14 @@ class RaspiConfig:
         """Init object."""
         self.path_file = None
         self.user_config = None
+        self.logging = None
+        self.bin = None
 
     def init_app(self, app=None, path_file=None):
         """Initialize application."""
         self.path_file = app.config["RASPI_CONFIG"] if app else path_file
+        self.bin = app.config.get("RASPI_BINARY", "raspimjpeg")
+        self.logging = app.logger
         self._load()
         app.raspiconfig = self
 
@@ -65,6 +70,14 @@ class RaspiConfig:
             file.close()
 
         self._load()
+
+    def run(self) -> None:
+        """Execute binary file."""
+        if os.path.isfile(self.bin):
+            Popen(self.bin)
+            self.logging.info("Start raspimjpeg")
+        else:
+            self.logging.error(f"Error: File not found ({self.bin})")
 
 
 class RaspiConfigError(Exception):
