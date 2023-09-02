@@ -35,6 +35,7 @@ RUN echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armhf.path
 
 #Add binary path
 ENV PATH="$PATH:/op/vc/bin"
+RUN echo "export PATH=$PATH:/opt/vc/bin" >> ~/.bashrc
 
 # Install pip requirements
 COPY requirements.txt /tmp/requirements.txt
