@@ -34,7 +34,7 @@ RUN rm -rf /opt/vc/src /opt/vc/man
 RUN echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armhf.path
 
 #Add binary path
-RUN export PATH="${PATH}:/op/vc/bin"
+ENV PATH="$PATH:/op/vc/bin"
 
 # Install pip requirements
 COPY requirements.txt /tmp/requirements.txt
