@@ -12,7 +12,7 @@ class RaspiConfig:
 
     def init_app(self, app=None, path_file=None):
         """Initialize application."""
-        self.path_file = app.config["CONFIG_FILE1"] if app else path_file
+        self.path_file = app.config["RASPI_CONFIG"] if app else path_file
         self._load()
         app.raspiconfig = self
 

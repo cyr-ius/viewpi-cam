@@ -1,15 +1,17 @@
 from flask import (
     Blueprint,
-    request,
-    flash,
     current_app,
-    render_template,
-    url_for,
-    redirect,
-    session,
+    flash,
     g,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
 )
+
 from ...helpers.decorator import auth_required
+from ...helpers.settings import SettingsException
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -25,20 +27,29 @@ def before_app_request():
 def register():
     if request.method == "POST" and len(current_app.settings.users) == 0:
         if (pwd := request.form.get("password")) == request.form.get("password_2"):
-            next = next if (next := request.form.get("next")) else url_for("main.index")
-            state = current_app.settings.set_user(
-                user_id=request.form["user_id"],
-                password=pwd,
-                rights=current_app.config["USERLEVEL_MAX"],
+            next_page = (
+                next_page
+                if (next_page := request.form.get("next"))
+                else url_for("main.index")
             )
-            if state is True:
-                return redirect(next)
+            try:
+                current_app.settings.set_user(
+                    user_id=request.form["user_id"],
+                    password=pwd,
+                    rights=current_app.config["USERLEVEL_MAX"],
+                )
+                return redirect(next_page)
+            except SettingsException as error:
+                current_app.logger.error(error)
+                flash_msg = "Error while registering user (view log)"
+        else:
+            flash_msg = "User or password invalid."
 
-        flash("User or password invalid.")
+        flash(flash_msg)
 
-    register = len(current_app.settings.users) == 0
+    has_registered = len(current_app.settings.users) == 0
     return render_template(
-        "login.html", register=register, next=request.args.get("next")
+        "login.html", register=has_registered, next=request.args.get("next")
     )
 
 

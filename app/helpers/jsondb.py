@@ -89,7 +89,6 @@ class JsonDB(AttrDict, object):
         try:
             with open(fpath, mode="w", encoding="utf-8") as file:
                 obj = self.copy()
-                print(obj)
                 obj.pop("_JsonDB__path", None)
                 json.dump(
                     obj,
