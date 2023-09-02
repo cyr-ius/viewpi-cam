@@ -11,6 +11,11 @@ from flask_babel import Babel
 # from flask_swagger import swagger
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from .blueprints.auth.route import bp as auth_bp
+from .blueprints.main.route import bp as main_bp
+from .blueprints.preview.route import bp as pview_bp
+from .blueprints.schedule.route import bp as sch_bp, launch_schedule
+from .blueprints.settings.route import bp as sets_bp
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
 from .services.assets import css_custom, css_main, js_custom, js_main, js_pipan
@@ -32,6 +37,7 @@ raspiconfig = RaspiConfig()
 
 
 def create_app(config=None):
+    """Create Flask application."""
     app = Flask(__name__)
 
     # Create static folder outside app folder
@@ -90,12 +96,6 @@ def create_app(config=None):
     assets.register("js_pipan", js_pipan)
 
     # Create app blueprints
-    from .blueprints.auth.route import bp as auth_bp
-    from .blueprints.main.route import bp as main_bp
-    from .blueprints.preview.route import bp as pview_bp
-    from .blueprints.schedule.route import bp as sch_bp
-    from .blueprints.settings.route import bp as sets_bp
-
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(sch_bp)
@@ -151,9 +151,6 @@ def create_app(config=None):
 
     # Start scheduler
     if "SCHEDULER_START" in os.environ:
-        """Start scheduler"""
-        from .blueprints.schedule.route import launch_schedule
-
         launch_schedule()
 
     return app

@@ -69,5 +69,3 @@ class RaspiConfig:
 
 class RaspiConfigError(Exception):
     """Error for Raspiconfig."""
-
-    pass
