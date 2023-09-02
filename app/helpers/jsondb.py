@@ -1,3 +1,4 @@
+"""Class to save properties object to json file."""
 import json
 import os
 from json import JSONDecodeError
@@ -53,41 +54,40 @@ class JsonDB(AttrDict, object):
         self.__path = path
         self.__maping(default)
 
-    def __maping(self, default, restore=False) -> None:
+    def __maping(self, default=None, restore=False) -> None:
         fpath = f"{self.__path}.backup" if restore else self.__path
         saveset = False
         if os.path.isfile(fpath):
-            with open(fpath, "r") as file:
+            with open(fpath, mode="r", encoding="utf-8") as file:
                 try:
                     data = json.load(file, object_hook=lambda o: AttrDict(**o))
                 except JSONDecodeError as error:
-                    raise JsonDBException(f"Error while loading file {fpath} ({error})")
+                    raise JsonDBException(f"Error while loading file {fpath} ({error})") from error
         else:
             data = AttrDict(default)
             saveset = True
 
-        for k, v in data.items():
-            setattr(self, k, v)
+        for key, value in data.items():
+            setattr(self, key, value)
 
         if saveset:
             self.save()
 
     def update(self, **kwargs):
         try:
-            for k, v in kwargs.items():
-                setattr(self, k, v)
+            for key, value in kwargs.items():
+                setattr(self, key, value)
             self.save()
-            return True
         except JsonDBException as error:
-            _LOGGER.error("Error to update (%s)" % error)
-            return False
+            raise JsonDBException(f"Error while updating file ({error})") from error
 
     def save(self, backup=False, **kwargs) -> bool:
+        """Save properties to Json file."""
         folder = os.path.abspath(os.path.dirname(self.__path))
         os.makedirs(folder, exist_ok=True)
         fpath = f"{self.__path}.backup" if backup else self.__path
         try:
-            with open(fpath, "w") as file:
+            with open(fpath, mode="w", encoding="utf-8") as file:
                 obj = self.copy()
                 print(obj)
                 obj.pop("_JsonDB__path", None)
@@ -102,20 +102,18 @@ class JsonDB(AttrDict, object):
                 file.flush()
                 os.fsync(file.fileno())
                 file.close()
-                return True
         except Exception as error:
-            _LOGGER.error("Error to save json (%s)" % error)
-            return False
+            raise JsonDBException(f"Error to save json ({error})") from error
 
     def backup(self) -> bool:
+        """Backup file."""
         return self.save(backup=True)
 
     def restore(self) -> bool:
+        """Restore file."""
         self.__maping(restore=True)
         return self.save()
 
 
 class JsonDBException(Exception):
     """JsonDB Exception class."""
-
-    pass
