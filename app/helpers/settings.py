@@ -24,10 +24,6 @@ class Settings(JsonDB):
         super().__init__(path, default)
         app.settings = self
 
-    def update(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
     def has_user(self, user_id):
         for user in self.users:
             if user.get("user_id") == user_id:
@@ -51,7 +47,7 @@ class Settings(JsonDB):
     def del_user(self, user_id: str) -> None:
         user = self.get_user(user_id)
         self.users.remove(user)
-        self.update(users=self.users)
+        return self.update(users=self.users)
 
     def set_user(self, **kwargs):
         user_list = self.get_user(kwargs.get("user_id"))
@@ -63,7 +59,7 @@ class Settings(JsonDB):
             kwargs["password"] = self._hash_password(kwargs["password"])
 
         self.users.append(kwargs)
-        self.update(users=self.users)
+        return self.update(users=self.users)
 
     @staticmethod
     def _hash_password(password: str) -> bool:

@@ -1,12 +1,10 @@
 import json
 import os
-import queue
 from json import JSONDecodeError
-from threading import Thread
 from typing import Any
-from atomicwrites import atomic_write
+import logging
 
-q = queue.Queue()
+_LOGGER = logging.getLogger(__name__)
 
 
 class AttrDict(dict):
@@ -24,7 +22,6 @@ class AttrDict(dict):
         if isinstance(value, dict) and len(value) == 0:
             value = AttrDict()
         self[attr] = value
-        q.put(attr)
 
     def __delattr__(self, attr: str) -> Any:
         """Delete attribut."""
@@ -53,73 +50,69 @@ class JsonDB(AttrDict, object):
         path : full qualified path json file , folder create if not exist
         default: default dict for initializing
         """
+        self.__path = path
+        self.__maping(default)
 
-        def load(restore=False, retry=3) -> None:
-            fpath = f"{path}.backup" if restore else path
-            if os.path.isfile(fpath):
-                with open(fpath, "r") as file:
-                    try:
-                        data = json.load(file, object_hook=lambda o: AttrDict(**o))
-                    except JSONDecodeError as error:
-                        if retry > 0:
-                            retry -= 1
-                            load(restore=False, retry=retry)
-                        raise JsonDBException(
-                            f"Error while loading file {fpath} ({error})"
-                        )
-            else:
-                data = AttrDict(default)
+    def __maping(self, default, restore=False) -> None:
+        fpath = f"{self.__path}.backup" if restore else self.__path
+        saveset = False
+        if os.path.isfile(fpath):
+            with open(fpath, "r") as file:
+                try:
+                    data = json.load(file, object_hook=lambda o: AttrDict(**o))
+                except JSONDecodeError as error:
+                    raise JsonDBException(f"Error while loading file {fpath} ({error})")
+        else:
+            data = AttrDict(default)
+            saveset = True
 
-            for k, v in data.items():
+        for k, v in data.items():
+            setattr(self, k, v)
+
+        if saveset:
+            self.save()
+
+    def update(self, **kwargs):
+        try:
+            for k, v in kwargs.items():
                 setattr(self, k, v)
+            self.save()
+            return True
+        except JsonDBException as error:
+            _LOGGER.error("Error to update (%s)" % error)
+            return False
 
-        def save(backup=False, **kwargs) -> None:
-            folder = os.path.abspath(os.path.dirname(path))
-            os.makedirs(folder, exist_ok=True)
-            fpath = f"{path}.backup" if backup else path
-
-            with atomic_write(fpath, overwrite=True) as file:
+    def save(self, backup=False, **kwargs) -> bool:
+        folder = os.path.abspath(os.path.dirname(self.__path))
+        os.makedirs(folder, exist_ok=True)
+        fpath = f"{self.__path}.backup" if backup else self.__path
+        try:
+            with open(fpath, "w") as file:
+                obj = self.copy()
+                print(obj)
+                obj.pop("_JsonDB__path", None)
                 json.dump(
-                    self,
+                    obj,
                     file,
-                    default=lambda o: o.__dict__,
                     sort_keys=True,
                     indent=4,
+                    default=lambda o: o.__dict__,
                     **kwargs,
                 )
-                file
+                file.flush()
+                os.fsync(file.fileno())
+                file.close()
+                return True
+        except Exception as error:
+            _LOGGER.error("Error to save json (%s)" % error)
+            return False
 
-            # with open(fpath, "w") as file:
-            #     json.dump(
-            #         self,
-            #         file,
-            #         default=lambda o: o.__dict__,
-            #         sort_keys=True,
-            #         indent=4,
-            #         **kwargs,
-            #     )
-            #     file.flush()
-            #     os.fsync(file.fileno())
-            #     file.close()
+    def backup(self) -> bool:
+        return self.save(backup=True)
 
-        def worker() -> None:
-            while True:
-                item = q.get()
-                if item == "__backup__":
-                    save(backup=True)
-                if item == "__restore__":
-                    load(path)
-                save()
-                q.task_done()
-
-        Thread(target=worker, daemon=True).start()
-        load()
-
-    def backup(self):
-        q.put("__backup__")
-
-    def restore(self):
-        q.put("__restore__")
+    def restore(self) -> bool:
+        self.__maping(restore=True)
+        return self.save()
 
 
 class JsonDBException(Exception):
