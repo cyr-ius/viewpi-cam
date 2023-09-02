@@ -26,7 +26,7 @@ WORKDIR /tmp
 RUN git clone https://github.com/roberttidey/userland.git /tmp/raspimjpeg
 
 RUN sed -i 's/sudo//g' raspimjpeg/buildme
-RUN cd raspimjpeg;/bin/bash -c ./buildme /user/bin
+RUN cd raspimjpeg;/bin/bash -c ./buildme /usr/bin
 
 #Add library path
 RUN echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armhf.path
