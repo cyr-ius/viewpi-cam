@@ -3,6 +3,7 @@ import os
 from subprocess import Popen
 
 
+# pylint: disable=E1101
 class RaspiConfig:
     """Raspi config."""
 
@@ -74,6 +75,12 @@ class RaspiConfig:
     def run(self) -> None:
         """Execute binary file."""
         if os.path.isfile(self.bin):
+            # Create FIFO
+            if not os.path.isfile(self.control_file):
+                os.mkfifo(self.control_file)
+            if not os.path.isfile(self.motion_pipe):
+                os.mkfifo(self.motion_pipe)
+            # Execute binary
             Popen(self.bin)
             self.logging.info("Start raspimjpeg")
         else:

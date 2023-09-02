@@ -135,12 +135,6 @@ def create_app(config=None):
     if (boxing := app.raspiconfig.boxing_path) != "":
         os.makedirs(boxing, exist_ok=True)
 
-    # Create FIFO
-    if os.path.isfile(app.raspiconfig.control_file):
-        os.mkfifo(app.raspiconfig.control_file)
-    if os.path.isfile(app.raspiconfig.motion_pipe):
-        os.mkfifo(app.raspiconfig.motion_pipe)
-
     # Create /dev/shm/mjpeg/status-file
     if not os.path.isfile(app.raspiconfig.status_file):
         status_file = open(app.raspiconfig.status_file, mode="a", encoding="utf-8")

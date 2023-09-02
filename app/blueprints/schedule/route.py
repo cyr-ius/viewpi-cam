@@ -384,14 +384,15 @@ def get_time_offset(offset: int | float | str = 0) -> td:
 def find_fixed_time_period(times, c_mins: dt) -> int:
     period = len(times) - 1
     max_less_v = -1
-    for i in range(0, len(times)):
-        f_mins = dt.strptime(times[i], "%H:%M")
+    for str_time in times:
+        f_mins = dt.strptime(str_time, "%H:%M")
         if (
             f_mins.time() < c_mins.time()
-            and (f_mins.hour * 60 + f_mins.minute) > max_less_v  # noqa: W503
+            and (f_mins.hour * 60 + f_mins.minute) > max_less_v
         ):
             max_less_v = f_mins.hour * 60 + f_mins.minute
-            period = i
+            period = times.index(str_time)
+
     return period + 5
 
 
