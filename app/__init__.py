@@ -142,7 +142,7 @@ def create_app(config=None):
 
     # Create /dev/shm/mjpeg/status-file
     if not os.path.isfile(app.raspiconfig.status_file):
-        status_file = open(app.raspiconfig.status_file, "a")
+        status_file = open(app.raspiconfig.status_file, mode="a", encoding="utf-8")
         status_file.close()
 
     # Start Raspimjpeg

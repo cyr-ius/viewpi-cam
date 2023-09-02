@@ -1,3 +1,4 @@
+"""Confilg file."""
 import os
 
 from .const import (
@@ -144,7 +145,7 @@ DEFAULT_INIT = {
     ATTR_PURGESPACELEVEL: 10,
     ATTR_PURGESPACEMODE: 0,
     ATTR_PURGEVIDEOHOURS: 0,
-    ATTR_TIMES: ["{:02d}:00".format(i + 9) for i in range(0, SCHEDULE_TIMES_MAX)],
+    ATTR_TIMES: [f"{i + 9:02d}:00" for i in range(0, SCHEDULE_TIMES_MAX)],
     ATTR_PIPAN: 0,
     ATTR_SERVO: 0,
     ATTR_PILIGHT: 0,
