@@ -8,12 +8,13 @@ from subprocess import Popen
 import pytz
 from flask import Blueprint, current_app, render_template, request
 from flask.cli import with_appcontext
-from psutil import process_iter
+
+# from psutil import process_iter
 from suntime import Sun
 
-from ...const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
-from ...helpers.decorator import auth_required
-from ...helpers.filer import (
+from app.const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
+from app.helpers.decorator import auth_required
+from app.helpers.filer import (
     delete_log,
     delete_mediafiles,
     get_file_type,
@@ -21,8 +22,9 @@ from ...helpers.filer import (
     list_folder_files,
     send_pipe,
     write_log,
+    get_pid,
 )
-from ...helpers.raspiconfig import RaspiConfigError
+from app.helpers.raspiconfig import RaspiConfigError
 
 bp = Blueprint(
     "schedule",
@@ -45,7 +47,7 @@ def index():
                     launch_schedule()
                     msg.update({"message": "Start scheduler"})
                 case "stop":
-                    pid = get_schedule_pid()
+                    pid = get_pid("scheduler")
                     os.popen(f"kill {pid}")
                     msg.update({"message": "Stop scheduler"})
                 case "save":
@@ -94,7 +96,7 @@ def index():
         return render_template(
             "schedule.html",
             settings=current_app.settings,
-            schedule_pid=get_schedule_pid(),
+            schedule_pid=get_pid("scheduler"),
             day_period=period,
             offset=offset,
             sunrise=sunrise.strftime("%H:%M"),
@@ -106,8 +108,9 @@ def index():
 @bp.cli.command("stop", short_help="Stop scheduler task")
 @with_appcontext
 def stop_scheduler() -> int | None:
-    pid = get_schedule_pid()
+    pid = get_pid("scheduler")
     os.popen(f"kill {pid}")
+    current_app.logger.info("Stop scheduler")
 
 
 @bp.cli.command("start", short_help="Start scheduler task")
@@ -117,8 +120,10 @@ def start_scheduler() -> int | None:
 
 
 def launch_schedule():
-    ret = Popen(["python", "-m", "flask", "scheduler", "start"])
-    return ret
+    if not get_pid("scheduler"):
+        current_app.logger.info("Start scheduler")
+        ret = Popen(["python", "-m", "flask", "scheduler", "start"])
+        return ret
 
 
 def scheduler():
@@ -273,13 +278,6 @@ def scheduler():
                             lastStatusTime = timenow + 5
                         else:
                             lastStatusTime = timenow
-
-
-def get_schedule_pid():
-    for proc in process_iter():
-        if "flask" and "scheduler" in proc.cmdline():
-            return proc.pid
-    return 0
 
 
 def wrap_day_period():

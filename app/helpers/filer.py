@@ -4,6 +4,17 @@ from datetime import datetime as dt
 from functools import reduce
 
 from flask import current_app
+from psutil import process_iter
+
+
+def get_pid(pid_type):
+    for proc in process_iter():
+        if pid_type == "scheduler":
+            if "flask" and "scheduler" in proc.cmdline():
+                return proc.pid
+        if pid_type in proc.cmdline():
+            return proc.pid
+    return 0
 
 
 def getr(data, keys, default: any = None) -> any:

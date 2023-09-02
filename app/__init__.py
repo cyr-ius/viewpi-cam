@@ -25,6 +25,7 @@ from .services.handle import (
     handle_internal_server_error,
     handle_page_not_found,
 )
+from .helpers.filer import get_pid
 
 # from flask_mail import Mail
 
@@ -55,7 +56,7 @@ def create_app(config=None):
     )
 
     # Read log level from environment variable
-    log_level_name = os.environ.get("LOG_LEVEL", "WARNING")
+    log_level_name = os.environ.get("LOG_LEVEL", "INFO")
     log_level = logging.getLevelName(log_level_name.upper())
     # Setting logger
     logging.basicConfig(
@@ -146,11 +147,12 @@ def create_app(config=None):
         status_file.close()
 
     # Start Raspimjpeg
-    if "RASPIMJPEG_START" in os.environ:
-        Popen("raspimjpeg")
+    if "NO_RASPIMJPEG" not in os.environ and not get_pid(app.config["RASPI_BINARY"]):
+        app.logger.info("Start raspimjpeg")
+        Popen(app.config["RASPI_BINARY"])
 
     # Start scheduler
-    if "SCHEDULER_START" in os.environ:
+    if "NO_SCHEDULER" not in os.environ:
         launch_schedule()
 
     return app
