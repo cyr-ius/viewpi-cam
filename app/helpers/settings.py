@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 from flask import current_app
 
-from ..const import SCHEDULE_FIFOIN, SCHEDULE_FIFOOUT
 from .jsondb import JsonDB
 
 
@@ -14,13 +13,6 @@ class Settings(JsonDB):
     def init_app(self, app=None, path_file=None):
         path = app.config["FILE_SETTINGS"] if app else path_file
         default = app.config["DEFAULT_INIT"]
-        default.update(
-            {
-                SCHEDULE_FIFOIN: app.raspiconfig.motion_pipe,
-                SCHEDULE_FIFOOUT: app.raspiconfig.control_file,
-            }
-        )
-
         super().__init__(path, default)
         app.settings = self
 

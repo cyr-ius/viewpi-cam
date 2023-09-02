@@ -56,7 +56,7 @@ def index():
                     write_log("Saved schedule settings")
                     current_app.settings.update(**request.json)
                     write_log("Send Schedule reset")
-                    send_pipe(current_app.settings.fifo_in, SCHEDULE_RESET)
+                    send_pipe(current_app.raspiconfig.motion_pipe, SCHEDULE_RESET)
                     msg.update({"message": "Save data"})
                 case "backup":
                     write_log("Backed up schedule settings")
@@ -137,8 +137,8 @@ def scheduler():
 
     write_log("RaspiCam support started")
 
-    fifo_out = current_app.settings.fifo_out
-    pipe_in = open_pipe(current_app.settings.fifo_in)
+    ctrl_fifo = current_app.raspiconfig.control_file
+    motion_fifo_in = open_pipe(current_app.raspiconfig.motion_pipe)
 
     capture_start = 0
     timeout = 0
@@ -164,17 +164,13 @@ def scheduler():
         last_status_time = os.path.getmtime(current_app.raspiconfig.status_file)
         while timeout_max == 0 or timeout < timeout_max:
             time.sleep(poll_time)
-            cmd = check_motion(pipe_in)
+            cmd = check_motion(motion_fifo_in)
             if cmd == SCHEDULE_STOP and autocapture == 0:
                 if last_on_cmd >= 0:
                     write_log("Stop capture requested")
                     send = current_app.settings.commands_off[last_on_cmd]
                     if send:
-                        send_cmds(
-                            fifo=fifo_out,
-                            str_cmd=send,
-                            days=last_day_period,
-                        )
+                        send_cmds(fifo=ctrl_fifo, str_cmd=send, days=last_day_period)
                         last_on_cmd = -1
                 else:
                     write_log("Stop capture request ignored, already stopped")
@@ -188,11 +184,7 @@ def scheduler():
 
                     send = current_app.settings.commands_on[last_day_period]
                     if send:
-                        send_cmds(
-                            fifo=fifo_out,
-                            str_cmd=send,
-                            days=last_day_period,
-                        )
+                        send_cmds(fifo=ctrl_fifo, str_cmd=send, days=last_day_period)
                         last_on_cmd = last_day_period
                         capture_start = dt.timestamp(dt.utcnow())
                 else:
@@ -217,7 +209,7 @@ def scheduler():
                         ) >= current_app.settings.max_capture:
                             write_log("Maximum Capture reached. Sending off command")
                             send_cmds(
-                                fifo=fifo_out,
+                                fifo=ctrl_fifo,
                                 str_cmd=current_app.settings.commands_off[last_on_cmd],
                             )
                             last_on_cmd = -1
@@ -232,7 +224,7 @@ def scheduler():
                         if new_day_period != last_day_period:
                             write_log(f"New period detected {new_day_period}")
                             send_cmds(
-                                fifo=fifo_out,
+                                fifo=ctrl_fifo,
                                 str_cmd=current_app.settings.modes[new_day_period],
                                 days=current_app.settings.days,
                                 period=new_day_period,
@@ -252,7 +244,7 @@ def scheduler():
                     cmd = current_app.settings.management_command
                     if cmd != "":
                         write_log(f"exec_macro: {cmd}")
-                        send_cmds(fifo=fifo_out, str_cmd=f"sy {cmd}")
+                        send_cmds(fifo=ctrl_fifo, str_cmd=f"sy {cmd}")
                     delete_log(int(current_app.raspiconfig.log_size))
                 if autocapturetime > 0 and (timenow > autocapturetime):
                     autocapturetime = (
@@ -274,13 +266,13 @@ def scheduler():
                     if content == "halted":
                         if mod_time > last_status_time:
                             write_log("Autocamera startup")
-                            send_cmds(fifo=fifo_out, str_cmd="ru 1")
+                            send_cmds(fifo=ctrl_fifo, str_cmd="ru 1")
                     else:
                         if (
                             timenow - mod_time
                         ) > current_app.settings.autocamera_interval:
                             write_log("Autocamera shutdown")
-                            send_cmds(fifo=fifo_out, str_cmd="md 0;ru 0")
+                            send_cmds(fifo=ctrl_fifo, str_cmd="md 0;ru 0")
                             last_status_time = timenow + 5
                         else:
                             last_status_time = timenow

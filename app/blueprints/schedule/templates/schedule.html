@@ -14,13 +14,13 @@
             <span class="col">Period: <b>{{period}}</b></span>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">Fifo In</label></div>
+            <div class="col"><label class="col-form-label-sm">Motion - Fifo In</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" name="fifo_in" disabled="disabled" value="{{ settings.fifo_in}}">
+                <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{ g.raspiconfig.motion_pipe}}">
             </div>
-            <div class="col"><label class="col-form-label-sm">Fifo Out</label></div>
+            <div class="col"><label class="col-form-label-sm">Control - Fifo Out</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" name="fifo_out" disabled="disabled" value="{{ settings.fifo_out}}">
+                <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{ g.raspiconfig.control_file}}">
             </div>            
         </div>    
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">

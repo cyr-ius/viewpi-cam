@@ -178,9 +178,9 @@ def sys_cmd(cmd):
 @bp.route("/pipe_cmd", methods=["POST"])
 @auth_required
 def pipe_cmd():
-    """Send command to fifo out."""
+    """Send command to control fifo."""
     if cmd := request.json.get("cmd"):
-        msg = send_pipe(current_app.settings.fifo_out, cmd)
+        msg = send_pipe(current_app.raspiconfig.control_file, cmd)
         return msg
     return {"type": "error", "message": "Command not found"}
 

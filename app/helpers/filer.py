@@ -208,16 +208,12 @@ def list_folder_files(path: str, ext=None) -> list:
 
 def send_pipe(pipename: str, cmd: str) -> None:
     """Send command to pipe."""
-    if not os.path.exists(pipename):
-        write_log(f"Making Pipe {pipename}")
-        os.popen(f"mkfifo {pipename}")
-        os.popen(f"chmod 666 {pipename}")
     try:
         pipe = os.open(pipename, os.O_WRONLY | os.O_NONBLOCK)
         os.write(pipe, f"{cmd}\n".encode("utf-8"))
         os.close(pipe)
         current_app.raspiconfig.refresh()
-        write_log(f"Send {cmd}")
+        write_log(f"{pipename} - send {cmd}")
         return {"type": "success", "message": f"Send {cmd} successful"}
     except Exception as error:  # pylint: disable=W0718
         write_log(str(error))
