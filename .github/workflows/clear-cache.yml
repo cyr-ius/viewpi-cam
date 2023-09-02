@@ -5,10 +5,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  my-job:
+  clear-cache:
     name: Delete all caches
-    runs-on: ubuntu-20.04
-
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - name: Clear caches
         uses: easimon/wipe-cache@main
