@@ -1,3 +1,4 @@
+"""Blueprint Scheduler."""
 import os
 import shutil
 import time
@@ -39,6 +40,7 @@ bp.cli.short_help = "Stop/Start scheduler"
 @bp.route("/", methods=["GET", "POST"])
 @auth_required
 def index():
+    """Index page."""
     msg = {"type": "success"}
     if request.method == "POST" and (action := request.json.pop("action", None)):
         try:
@@ -108,6 +110,7 @@ def index():
 @bp.cli.command("stop", short_help="Stop scheduler task")
 @with_appcontext
 def stop_scheduler() -> int | None:
+    """Stop scheduler."""
     pid = get_pid("scheduler")
     os.popen(f"kill {pid}")
 
@@ -115,16 +118,19 @@ def stop_scheduler() -> int | None:
 @bp.cli.command("start", short_help="Start scheduler task")
 @with_appcontext
 def start_scheduler() -> int | None:
+    """Start scheduler."""
     scheduler()
 
 
 def launch_schedule():
+    """Run scheduler."""
     if not get_pid("scheduler"):
         ret = Popen(["python", "-m", "flask", "scheduler", "start"])
         return ret
 
 
 def scheduler():
+    """Scheduler."""
     if not os.path.isfile(current_app.raspiconfig.status_file):
         write_log("Status mjpeg not found")
         return
@@ -132,7 +138,7 @@ def scheduler():
     write_log("RaspiCam support started")
 
     fifo_out = current_app.settings.fifo_out
-    pipeIn = open_pipe(current_app.settings.fifo_in)
+    pipe_in = open_pipe(current_app.settings.fifo_in)
 
     capture_start = 0
     timeout = 0
@@ -158,7 +164,7 @@ def scheduler():
         last_status_time = os.path.getmtime(current_app.raspiconfig.status_file)
         while timeout_max == 0 or timeout < timeout_max:
             time.sleep(poll_time)
-            cmd = check_motion(pipeIn)
+            cmd = check_motion(pipe_in)
             if cmd == SCHEDULE_STOP and autocapture == 0:
                 if last_on_cmd >= 0:
                     write_log("Stop capture requested")
@@ -203,7 +209,7 @@ def scheduler():
             if slow_poll < 0:
                 slow_poll = 10
                 timenow = dt.timestamp(dt.utcnow())
-                forcePeriodCheck = 0
+                force_period_check = 0
                 if last_on_cmd >= 0:
                     if current_app.settings.max_capture > 0:
                         if (
@@ -216,22 +222,22 @@ def scheduler():
                             )
                             last_on_cmd = -1
                             autocapture = 0
-                            forcePeriodCheck = 1
-                if timenow > modechecktime or forcePeriodCheck == 1:
+                            force_period_check = 1
+                if timenow > modechecktime or force_period_check == 1:
                     modechecktime = timenow + current_app.settings.mode_poll
-                    forcePeriodCheck = 0
+                    force_period_check = 0
                     if last_on_cmd < 0:
-                        newDayPeriod = wrap_day_period()
+                        new_day_period = wrap_day_period()
                         # newDay = dt.now().strftime("%w")
-                        if newDayPeriod != last_day_period:
-                            write_log(f"New period detected {newDayPeriod}")
+                        if new_day_period != last_day_period:
+                            write_log(f"New period detected {new_day_period}")
                             send_cmds(
                                 fifo=fifo_out,
-                                str_cmd=current_app.settings.modes[newDayPeriod],
+                                str_cmd=current_app.settings.modes[new_day_period],
                                 days=current_app.settings.days,
-                                period=newDayPeriod,
+                                period=new_day_period,
                             )
-                            last_day_period = newDayPeriod
+                            last_day_period = new_day_period
                             # lastDay = newDay
                 if timenow > managechecktime:
                     managechecktime = timenow + current_app.settings.management_interval
@@ -256,7 +262,7 @@ def scheduler():
                     autocapture = 1
                 if (
                     current_app.settings.autocamera_interval > 0
-                    and timenow > autocameratime  # pylint: ignore=W503
+                    and timenow > autocameratime
                 ):
                     autocameratime = timenow + 2
                     mod_time = os.path.getmtime(current_app.raspiconfig.status_file)
@@ -281,6 +287,7 @@ def scheduler():
 
 
 def wrap_day_period():
+    """Wrap day period."""
     offset = get_time_offset(current_app.settings.gmt_offset)
 
     sunrise = get_sunrise(
@@ -316,6 +323,7 @@ def day_period(
     day_end: int | float,
     times,
 ):
+    """Get day period."""
     match day_mode:
         case 0:
             if local_time < (sunrise + td(minutes=daw)).replace(tzinfo=None):
@@ -337,6 +345,7 @@ def day_period(
 
 
 def get_current_local_time(minute: bool = False, offset: td = None) -> dt | int:
+    """Get current local time."""
     now = dt.utcnow()
     if offset:
         now = now + offset
@@ -346,18 +355,21 @@ def get_current_local_time(minute: bool = False, offset: td = None) -> dt | int:
 
 
 def get_sunrise(latitude, longitude, offset: td) -> dt:
+    """Get sunrise time."""
     sun = Sun(latitude, longitude)
     day_sunrise: dt = sun.get_sunrise_time()
     return day_sunrise + offset
 
 
 def get_sunset(latitude, longitude, offset: td) -> dt:
+    """Get sunset time."""
     sun = Sun(latitude, longitude)
     day_sunset: dt = sun.get_sunset_time()
     return day_sunset + offset
 
 
 def get_time_offset(offset: int | float | str = 0) -> td:
+    """Get time offset."""
     if isinstance(offset, (int, float)):
         offset = td(hours=offset)
     else:
@@ -369,16 +381,16 @@ def get_time_offset(offset: int | float | str = 0) -> td:
     return offset
 
 
-def find_fixed_time_period(times, cMins: dt) -> int:
+def find_fixed_time_period(times, c_mins: dt) -> int:
     period = len(times) - 1
     max_less_v = -1
     for i in range(0, len(times)):
-        fMins = dt.strptime(times[i], "%H:%M")
+        f_mins = dt.strptime(times[i], "%H:%M")
         if (
-            fMins.time() < cMins.time()
-            and (fMins.hour * 60 + fMins.minute) > max_less_v  # noqa: W503
+            f_mins.time() < c_mins.time()
+            and (f_mins.hour * 60 + f_mins.minute) > max_less_v  # noqa: W503
         ):
-            max_less_v = fMins.hour * 60 + fMins.minute
+            max_less_v = f_mins.hour * 60 + f_mins.minute
             period = i
     return period + 5
 
@@ -390,33 +402,34 @@ def purge_files(
     sch_purgespacelevel: int,
     sch_purgespacemode: int,
 ):
+    """Purge files."""
     media_path = current_app.raspiconfig.media_path
-    purgeCount = 0
+    purge_count = 0
     if sch_purgevideohours > 0 or sch_purgeimagehours > 0 or sch_purgelapsehours > 0:
         files = list_folder_files(media_path)
-        currentHours = dt.utcnow().timestamp() / 3600
+        current_hours = dt.utcnow().timestamp() / 3600
         for file in files:
             if file != "." and file != ".." and is_thumbnail(file):
-                fType = get_file_type(file)
-                purgeHours = 0
-                match fType:
+                f_type = get_file_type(file)
+                purge_hours = 0
+                match f_type:
                     case "i":
-                        purgeHours = sch_purgeimagehours
+                        purge_hours = sch_purgeimagehours
                     case "t":
-                        purgeHours = sch_purgelapsehours
+                        purge_hours = sch_purgelapsehours
                     case "v":
-                        purgeHours = sch_purgevideohours
-                if purgeHours > 0:
-                    fModHours = os.path.getmtime(f"{media_path}/{file}").hour()
-                    if fModHours > 0 and (currentHours - fModHours) > purgeHours:
+                        purge_hours = sch_purgevideohours
+                if purge_hours > 0:
+                    f_mod_hours = os.path.getmtime(f"{media_path}/{file}").hour()
+                    if f_mod_hours > 0 and (current_hours - f_mod_hours) > purge_hours:
                         os.remove(f"{media_path}/{file}")
-                        purgeCount += 1
+                        purge_count += 1
             elif sch_purgevideohours > 0:
                 if ".zip" in file:
-                    fModHours = os.path.getmtime(f"{media_path}/{file}").hour()
+                    f_mod_hours = os.path.getmtime(f"{media_path}/{file}").hour()
                     if (
-                        fModHours > 0
-                        and (currentHours - fModHours)  # noqa: W503
+                        f_mod_hours > 0
+                        and (current_hours - f_mod_hours)  # noqa: W503
                         > sch_purgevideohours  # noqa: W503
                     ):
                         os.remove(f"{media_path}/{file}")
@@ -441,17 +454,17 @@ def purge_files(
                     for p_file in p_files:
                         if free < level:
                             free += delete_mediafiles(p_file)
-                        purgeCount += 1
+                        purge_count += 1
             case 2, 4:
                 p_files = get_sorted_files(media_path, False)
                 for p_file in p_files:
                     del_l = level <= 0
                     level -= delete_mediafiles(p_file, del_l)
                     if del_l:
-                        purgeCount += 1
+                        purge_count += 1
 
-    if purgeCount > 0:
-        write_log("Purged purgeCount Files")
+    if purge_count > 0:
+        write_log("Purged purge_count Files")
 
 
 def check_motion(pipe):
