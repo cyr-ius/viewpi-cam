@@ -77,9 +77,9 @@ class RaspiConfig:
         if os.path.isfile(self.bin):
             # Create FIFO
             if not os.path.isfile(self.control_file):
-                os.mkfifo(self.control_file)
+                os.mkfifo(self.control_file, mode="0o600")
             if not os.path.isfile(self.motion_pipe):
-                os.mkfifo(self.motion_pipe)
+                os.mkfifo(self.motion_pipe, mode="0o600")
             # Execute binary
             Popen(self.bin)
             self.logging.info("Start raspimjpeg")
