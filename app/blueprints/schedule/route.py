@@ -4,7 +4,7 @@ import shutil
 import time
 from datetime import datetime as dt
 from datetime import timedelta as td
-from subprocess import Popen
+from subprocess import Popen, PIPE
 
 import pytz
 from flask import Blueprint, current_app, render_template, request
@@ -125,8 +125,7 @@ def start_scheduler() -> int | None:
 def launch_schedule():
     """Run scheduler."""
     if not get_pid("scheduler"):
-        ret = Popen(["python", "-m", "flask", "scheduler", "start"])
-        return ret
+        Popen(["python", "-m", "flask", "scheduler", "start"], stdout=PIPE)
 
 
 def scheduler():

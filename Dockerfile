@@ -2,15 +2,6 @@ FROM alpine:3.18 AS gpac_builder
 
 WORKDIR /app
 
-# RUN apk update && \
-#     apk add --no-cache \
-#         wget \
-#         g++ \
-#         make \
-#         && \
-#     wget --no-check-certificate https://codeload.github.com/gpac/gpac/zip/master -O gpac-master.zip && \
-#     unzip gpac-master.zip
-
 RUN apk update && apk add --no-cache build-base git
 RUN git clone https://github.com/gpac/gpac.git gpac-master
 
@@ -18,12 +9,6 @@ WORKDIR gpac-master
 
 RUN ./configure --static-bin --use-zlib=no --prefix=/usr/bin
 RUN make
-# RUN mkdir -p install/bin && \
-#     cp -R ./bin/gcc ./install/lib && \
-#     rm ./install/lib/gm_* ./install/lib/*.a && \
-#     rm -Rf ./install/lib/temp && \
-#     mv ./install/lib/MP4* ./install/bin
-
 
 FROM alpine:3.18 AS userland_builder
 
