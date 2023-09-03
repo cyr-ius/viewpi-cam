@@ -1,3 +1,4 @@
+"""Settings class."""
 import hashlib
 from dataclasses import dataclass
 
@@ -64,5 +65,3 @@ class Settings(JsonDB):
 
 class SettingsException(Exception):
     """Exception for settings class."""
-
-    pass

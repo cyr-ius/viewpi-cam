@@ -4,13 +4,11 @@ import shutil
 import time
 from datetime import datetime as dt
 from datetime import timedelta as td
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 import pytz
 from flask import Blueprint, current_app, render_template, request
 from flask.cli import with_appcontext
-
-# from psutil import process_iter
 from suntime import Sun
 
 from app.const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
@@ -522,5 +520,4 @@ def is_day_active(days, period: int) -> bool:
     if days:
         day = int(dt.now().strftime("%w"))
         return days[str(period)][day] == 1
-        # return int(day) in days[str(period)]
     return False
