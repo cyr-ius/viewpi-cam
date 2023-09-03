@@ -9,7 +9,8 @@ on:
   schedule:
     - cron: "39 6 * * *"
   release:
-    types: [published, released]
+    types: ["published"]
+  workflow_dispatch:
 
 env:
   # Use docker.io for Docker Hub if empty
