@@ -37,7 +37,7 @@ def find_lapse_files(filename):
     padlen = len(batch)
     fullname = f"{media_path}/{data_filename(filename)}"
     path = f"{media_path}"
-    start = os.path.getmtime(fullname).hour()
+    start = os.path.getmtime(fullname)
     files = {}
     scanfiles = list_folder_files(f"{media_path}")
     lapsefiles = []
@@ -48,13 +48,13 @@ def find_lapse_files(filename):
                 and (ext := get_file_ext(file))
                 and ext == "jpg"
             ):
-                f_date = os.path.getmtime(f"{media_path}/{file}").hour()
+                f_date = os.path.getmtime(f"{media_path}/{file}")
                 if f_date >= start:
-                    files[file] = f_date + file
-    files.sort()
+                    files[file] = str(f_date) + file
+
     lapse_count = 1
-    for key in files:
-        if key[lapse_count.zfile(padlen) :]:  # noqa: E203
+    for key in sorted(files):
+        if key[int(str(lapse_count).zfill(padlen)):]:  # noqa: E203
             lapsefiles.append(f"{path}/{key}")
             lapse_count += 1
         else:
@@ -132,7 +132,7 @@ def data_file_ext(file: str):
 def get_file_ext(file: str):
     """Return extension file."""
     _, ext = os.path.splitext(file)
-    return ext
+    return ext[1:]
 
 
 # Support naming functions
@@ -153,7 +153,7 @@ def get_file_index(file: str):
     """Return index file."""
     i = file.rfind(".", 0, len(file) - 8)
     if i > 0:
-        return file[i + 2 : len(file) - i - 9]  # noqa: E203
+        return file[i + 2 : len(file) - 7]  # noqa: E203
     return ""
 
 
