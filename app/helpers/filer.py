@@ -3,7 +3,7 @@ import os
 import shutil
 from datetime import datetime as dt
 from functools import reduce
-
+from subprocess import PIPE, Popen
 from flask import current_app
 from psutil import process_iter
 
@@ -28,6 +28,14 @@ def getr(data, keys, default: any = None) -> any:
     )
 
 
+def get_crdatetime(path) -> dt:
+    """Return created date."""
+    df = Popen(["stat", "-c", "%w", path], stdout=PIPE)
+    output = df.communicate()[0].decode().replace("\n", "").split(" ")
+    str_field = f"{output[0]} {output[1].split('.')[0]}.{output[1].split('.')[1][:6]} {output[2]}"
+    return dt.strptime(str_field, "%Y-%m-%d %H:%M:%S.%f %z")
+
+
 # functions to find and delete data files
 def find_lapse_files(filename):
     """Return lapse files."""
@@ -37,7 +45,7 @@ def find_lapse_files(filename):
     padlen = len(batch)
     fullname = f"{media_path}/{data_filename(filename)}"
     path = f"{media_path}"
-    start = os.path.getmtime(fullname)
+    start = os.path.getctime(fullname)
     files = {}
     scanfiles = list_folder_files(f"{media_path}")
     lapsefiles = []
@@ -48,13 +56,13 @@ def find_lapse_files(filename):
                 and (ext := get_file_ext(file))
                 and ext == "jpg"
             ):
-                f_date = os.path.getmtime(f"{media_path}/{file}")
+                f_date = os.path.getctime(f"{media_path}/{file}")
                 if f_date >= start:
                     files[file] = str(f_date) + file
 
     lapse_count = 1
     for key in sorted(files):
-        if key[int(str(lapse_count).zfill(padlen)):]:  # noqa: E203
+        if key[int(str(lapse_count).zfill(padlen)) :]:  # noqa: E203
             lapsefiles.append(f"{path}/{key}")
             lapse_count += 1
         else:
@@ -62,16 +70,11 @@ def find_lapse_files(filename):
     return lapsefiles
 
 
-# function to get filesize (native php has 2GB limit)
-def filesize_n(path):
+def get_file_size(path):
+    """Return file size."""
     if current_app.config["FILESIZE_METHOD"] == 0:
-        size = os.stat(path).st_size
-        if size > 0:
-            return size
-        else:
-            return 4294967296 - size
-    else:
-        return f"stat -c%s {path}".strip()
+        return os.path.getsize(path)
+    return f"stat -c%s {path}".strip()
 
 
 def delete_mediafiles(filename, delete=True):
@@ -84,7 +87,7 @@ def delete_mediafiles(filename, delete=True):
         #  For time lapse try to delete all from this batch
         files = find_lapse_files(filename)
         for file in files:
-            size += filesize_n(f"{media_path}/{file}")
+            size += get_file_size(f"{media_path}/{file}")
             if delete:
                 os.remove(f"{media_path}/{file}")
     else:
@@ -92,7 +95,7 @@ def delete_mediafiles(filename, delete=True):
 
         def compute_delete_file(filename, size, delete=True):
             if os.path.isfile(filename):
-                size += filesize_n(filename)
+                size += get_file_size(filename)
                 if delete:
                     os.remove(filename)
 
@@ -108,14 +111,14 @@ def delete_mediafiles(filename, delete=True):
             ):
                 compute_delete_file(filename, size)
 
-    size += filesize_n(f"{media_path}/{filename}")
+    size += get_file_size(f"{media_path}/{filename}")
     if delete:
         os.remove(f"{media_path}/{filename}")
     return size / 1024
 
 
-# Support naming functions
 def data_filename(file):
+    """Get name file."""
     subdir_char = current_app.raspiconfig.subdir_char
     i = file.rfind(".", 0, len(file) - 8)
     if i > 0:

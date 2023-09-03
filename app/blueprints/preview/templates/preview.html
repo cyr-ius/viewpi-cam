@@ -102,8 +102,8 @@
                             </div>
                             {% if thumbnail["file_size"] > 0%}
                             <small class="text-body-secondary">
-                            {% if thumbnail["file_size"] > 1024 %}{{ thumbnail["file_size"]/1024 | round }} MB {%else%} {{thumbnail["file_size"]}} KB {%endif%}
-                            {{thumbnail["lapse_count"]}} {{thumbnail["duration"]}}
+                            {% if thumbnail["file_size"] > 1024 %}{{ (thumbnail["file_size"]/1024) | round(2) }} MB {%else%} {{thumbnail["file_size"]}} KB {%endif%}
+                            {{thumbnail["lapse_count"]}} {{thumbnail["duration"]}}s
                             </small>
                             {% endif%}                    
                         </div>    

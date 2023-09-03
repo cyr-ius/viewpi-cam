@@ -12,9 +12,9 @@ WORKDIR /app
 #     unzip gpac-master.zip
 
 RUN apk update && apk add --no-cache build-base git
-RUN git clone https://github.com/gpac/gpac.git gpac_public
+RUN git clone https://github.com/gpac/gpac.git gpac-master
 
-WORKDIR gpac_public
+WORKDIR gpac-master
 
 RUN ./configure --static-bin --use-zlib=no --prefix=/usr/bin
 RUN make
