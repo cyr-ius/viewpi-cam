@@ -197,7 +197,7 @@ def scheduler():
                     )
             elif cmd == SCHEDULE_RESET:
                 write_log("Reload parameters command requested")
-                current_app.settings.refresh()
+                # current_app.settings.refresh()
             elif cmd != "":
                 write_log(f"Ignore FIFO char {cmd}")
 
@@ -470,10 +470,9 @@ def check_motion(pipe):
     if isinstance(pipe, bool):
         return ""
     try:
-        ret = os.read(pipe, 0).decode("utf-8")
+        ret = os.read(pipe, 1).decode("utf-8").replace("\n", "")
     except Exception:  # pylint: disable=W0718
         ret = ""
-
     return ret
 
 
