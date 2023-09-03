@@ -130,6 +130,11 @@ def launch_schedule():
 
 def scheduler():
     """Scheduler."""
+
+    def dt_now():
+        offset = get_time_offset(current_app.settings.gmt_offset)
+        return get_current_local_time(offset=offset)
+
     if not os.path.isfile(current_app.raspiconfig.status_file):
         write_log("Status mjpeg not found")
         return
@@ -149,7 +154,7 @@ def scheduler():
         # lastDay = -1
         poll_time = current_app.settings.cmd_poll
         slow_poll = 0
-        managechecktime = dt.timestamp(dt.utcnow())
+        managechecktime = dt.timestamp(dt_now())
         autocameratime = managechecktime
         modechecktime = managechecktime
 
@@ -185,7 +190,7 @@ def scheduler():
                     if send:
                         send_cmds(fifo=ctrl_fifo, str_cmd=send, days=last_day_period)
                         last_on_cmd = last_day_period
-                        capture_start = dt.timestamp(dt.utcnow())
+                        capture_start = dt.timestamp(dt_now())
                 else:
                     write_log(
                         "Start capture request ignored, day period not initialised yet"
@@ -199,7 +204,7 @@ def scheduler():
             slow_poll -= 1
             if slow_poll < 0:
                 slow_poll = 10
-                timenow = dt.timestamp(dt.utcnow())
+                timenow = dt.timestamp(dt_now())
                 force_period_check = 0
                 if last_on_cmd >= 0:
                     if current_app.settings.max_capture > 0:
@@ -232,7 +237,9 @@ def scheduler():
                             # lastDay = newDay
                 if timenow > managechecktime:
                     managechecktime = timenow + current_app.settings.management_interval
-                    write_log(f"Scheduled management tasks. Next at {managechecktime}")
+                    write_log(
+                        f"Scheduled management tasks. Next at {time.ctime(managechecktime)}"
+                    )
                     purge_files(
                         current_app.settings.purgevideo_hours,
                         current_app.settings.purgeimage_hours,
