@@ -2,26 +2,43 @@ FROM alpine:3.18 AS gpac_builder
 
 WORKDIR /app
 
-RUN apk update && \
-    apk add --no-cache \
-        wget \
-        g++ \
-        make \
-        && \
-    wget --no-check-certificate https://codeload.github.com/gpac/gpac/zip/master -O gpac-master.zip && \
-    unzip gpac-master.zip
+# RUN apk update && \
+#     apk add --no-cache \
+#         wget \
+#         g++ \
+#         make \
+#         && \
+#     wget --no-check-certificate https://codeload.github.com/gpac/gpac/zip/master -O gpac-master.zip && \
+#     unzip gpac-master.zip
 
-WORKDIR gpac-master
+RUN apk update && apk add --no-cache build-base git
+RUN git clone https://github.com/gpac/gpac.git gpac_public
 
-RUN ./configure --use-zlib=no && \
-    make && \
-    mkdir -p install/bin && \
-    cp -R ./bin/gcc ./install/lib && \
-    rm ./install/lib/gm_* ./install/lib/*.a && \
-    rm -Rf ./install/lib/temp && \
-    mv ./install/lib/MP4* ./install/bin
+WORKDIR gpac_public
+
+RUN ./configure --static-bin --use-zlib=no --prefix=/usr/bin
+RUN make
+# RUN mkdir -p install/bin && \
+#     cp -R ./bin/gcc ./install/lib && \
+#     rm ./install/lib/gm_* ./install/lib/*.a && \
+#     rm -Rf ./install/lib/temp && \
+#     mv ./install/lib/MP4* ./install/bin
+
+
+FROM alpine:3.18 AS userland_builder
+
+WORKDIR /app
+
+RUN apk update && apk add --no-cache build-base git cmake bash make linux-headers
+RUN git clone https://github.com/roberttidey/userland.git
+WORKDIR userland
+RUN sed -i 's/sudo//g' buildme
+RUN /bin/bash -c ./buildme
+
 
 FROM python:3.11-alpine
+
+WORKDIR /app
 
 # set version label
 ARG BUILD_DATE
@@ -41,24 +58,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
 RUN apk add --no-cache libstdc++
-RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja raspberrypi-dev git cmake bash
-
-WORKDIR /tmp
-
-# Build raspimjpeg
-RUN git clone https://github.com/roberttidey/userland.git /tmp/raspimjpeg
-
-RUN sed -i 's/sudo//g' raspimjpeg/buildme
-RUN cd raspimjpeg;/bin/bash -c ./buildme
-RUN cp -R /tmp/raspimjpeg/build/bin /tmp/raspimjpeg/build/lib /opt/vc
-RUN rm -rf /opt/vc/src /opt/vc/man
-
-#Add library path
-RUN echo "/lib:/usr/lib:/opt/vc/lib" > /etc/ld-musl-armhf.path
-
-#Add binary path
-ENV PATH="$PATH:/op/vc/bin"
-RUN echo "export PATH=$PATH:/opt/vc/bin" >> ~/.bashrc
+RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja git
 
 # Install pip requirements
 COPY requirements.txt /tmp/requirements.txt
@@ -77,10 +77,11 @@ COPY ./dockerfiles/raspimjpeg /etc/raspimjpeg
 COPY ./dockerfiles/macros /app/macros
 RUN chmod -R +x /app/macros
 
-WORKDIR /app
-
-COPY --from=gpac_builder /app/gpac-master/install/lib /usr/lib
-COPY --from=gpac_builder /app/gpac-master/install/bin /usr/bin
+COPY --from=gpac_builder /app/gpac-master/bin/gcc/MP4Box /usr/bin
+COPY --from=gpac_builder /app/gpac-master/bin/gcc/gpac /usr/bin
+COPY --from=userland_builder /app/userland/build/bin /usr/bin
+COPY --from=userland_builder /app/userland/build/lib /usr/lib
+# COPY --from=userland_builder /opt/vc/include /usr/include
 
 COPY ./app ./app
 
