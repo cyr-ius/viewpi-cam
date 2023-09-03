@@ -28,3 +28,5 @@ jobs:
           body: ${{ steps.changelog.outputs.changelog }}
           draft: false
           prerelease: false
+  publish:
+    uses: ./.github/workflows/docker-publish.yml
