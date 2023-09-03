@@ -83,33 +83,30 @@ def delete_mediafiles(filename, delete=True):
     size = 0
     type_file = get_file_type(filename)
 
+    def compute_delete_file(file_name, size, delete=True):
+        if os.path.isfile(file_name):
+            size += get_file_size(file_name)
+            if delete:
+                os.remove(file_name)
+
     if type_file == "t":
         #  For time lapse try to delete all from this batch
         files = find_lapse_files(filename)
         for file in files:
-            size += get_file_size(f"{media_path}/{file}")
-            if delete:
-                os.remove(f"{media_path}/{file}")
+            compute_delete_file(file, size)
     else:
         thumb_file = data_filename(filename)
-
-        def compute_delete_file(filename, size, delete=True):
-            if os.path.isfile(filename):
-                size += get_file_size(filename)
-                if delete:
-                    os.remove(filename)
-
         compute_delete_file(f"{media_path}/{thumb_file}", size)
 
         if type_file == "v":
             raw_file = thumb_file[: thumb_file.find(".")]
-            for filename in (
+            for file in (
                 f"{media_path}/{thumb_file}.dat",
                 f"{media_path}/{raw_file}.h264",
                 f"{media_path}/{raw_file}.h264.bad",
                 f"{media_path}/{raw_file}.h264.log",
             ):
-                compute_delete_file(filename, size)
+                compute_delete_file(file, size)
 
     size += get_file_size(f"{media_path}/{filename}")
     if delete:
