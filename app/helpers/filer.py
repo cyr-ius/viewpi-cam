@@ -30,8 +30,8 @@ def getr(data, keys, default: any = None) -> any:
 
 def get_crdatetime(path) -> dt:
     """Return created date."""
-    df = Popen(["stat", "-c", "%w", path], stdout=PIPE)
-    output = df.communicate()[0].decode().replace("\n", "").split(" ")
+    stat = Popen(["stat", "-c", "%w", path], stdout=PIPE)
+    output = stat.communicate()[0].decode().replace("\n", "").split(" ")
     str_field = f"{output[0]} {output[1].split('.')[0]}.{output[1].split('.')[1][:6]} {output[2]}"
     return dt.strptime(str_field, "%Y-%m-%d %H:%M:%S.%f %z")
 
