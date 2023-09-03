@@ -11,6 +11,7 @@ on:
   release:
     types: [published, created]
   workflow_dispatch:
+  workflow_call:
 
 env:
   # Use docker.io for Docker Hub if empty
