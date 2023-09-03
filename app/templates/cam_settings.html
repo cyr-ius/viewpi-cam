@@ -1,24 +1,5 @@
 {% block cam_settings %}
 
-{# {% set options_mm = {'Average':'average', 'Spot':'spot', 'Backlit':'backlit', 'Matrix':'matrix'} %} #}
-{# {% set options_em = {'Off':'off', 'Auto':'auto', 'Night':'night', 'Nightpreview':'nightpreview', 'Backlight':'backlight', 'Spotlight':'spotlight', 'Sports':'sports', 'Snow':'snow', 'Beach':'beach', 'Verylong':'verylong', 'Fixedfps':'fixedfps'} %} #}
-{# {% set options_wb = {'Off':'off', 'Auto':'auto', 'Sun':'sun', 'Cloudy':'cloudy', 'Shade':'shade', 'Tungsten':'tungsten', 'Fluorescent':'fluorescent', 'Incandescent':'incandescent', 'Flash':'flash', 'Horizon':'horizon', 'Greyworld':'greyworld'} %} #}
-{# {% set options_ie = {'None':'none', 'Negative':'negative', 'Solarise':'solarise', 'Sketch':'sketch', 'Denoise':'denoise', 'Emboss':'emboss', 'Oilpaint':'oilpaint', 'Hatch':'hatch', 'Gpen':'gpen', 'Pastel':'pastel', 'Watercolour':'watercolour', 'Film':'film', 'Blur':'blur', 'Saturation':'saturation', 'Colourswap':'colourswap', 'Washedout':'washedout', 'Posterise':'posterise', 'Cartoon':'cartoon'} %} #}
-{# {% set options_ce_en = {'Disabled':'0', 'Enabled':'1'} %} #}
-{# {% set options_ro = {'No rotate':'0', 'Rotate_90':'90', 'Rotate_180':'180', 'Rotate_270':'270'} %} #}
-{# {% set options_fl = {'None':'0', 'Horizontal':'1', 'Vertical':'2', 'Both':'3'} %} #}
-{# {% set options_bo = {'Off':'0', 'Background':'2'} %} #}
-{# {% set options_av = {'V2':'2', 'V3':'3'} %} #}
-{# {% set options_at_en = {'Disabled':'0', 'Enabled':'1'} %} #}
-{# {% set options_ac_en = {'Disabled':'0', 'Enabled':'1'} %} #}
-{# {% set options_ab = {'Off':'0', 'On':'1'} %} #}
-{# {% set options_vs = {'Off':'0', 'On':'1'} %} #}
-{# {% set options_rl = {'Off':'0', 'On':'1'} %} #}
-{# {% set options_mx = {'Internal':'0', 'External':'1', 'Monitor':'2'} %} #}
-{# {% set options_cn = {'First':'1', 'Second':'2'} %} #}
-{# {% set options_st = {'Off':'0', 'On':'1'} %} #}
-{# {% set options_hp = {'Off':'0', 'On':'1'} %} #}
-
 <div class="offcanvas offcanvas-start offcanvas-size-xl" tabindex="-1" id="cameraSetting" aria-labelledby="cameraSettingLabel">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="cameraSettingLabel">Camera Settings</h5>
@@ -31,9 +12,9 @@
             <div class="col">
                 <select class="form-select form-select-sm" onchange="set_preset(this.value)">
                     <option value="">Select option...</option>
-                {% for k,v in presets[preset].items()%}
+                    {% for k,v in presets[preset].items()%}
                     <option value="{{v}}">{{k}}</option>
-                {%endfor%}
+                    {%endfor%}
                 </select>
             </div>
         </div>
@@ -114,8 +95,8 @@
             <label class="col col-form-label">Use camera</label>
             <div class="col">
             <select class="form-select form-select-sm"onchange="send_cmd('cn ' + this.value)">
-                <option value="1" {% if g.raspiconfig.camera_num == 1 %}selected{%endif%}>First</option>
-                <option value="2" {% if g.raspiconfig.camera_num == 2 %}selected{%endif%}>Second</option>
+                <option value="1" {% if g.raspiconfig.camera_num|int == 1 %}selected{%endif%}>First</option>
+                <option value="2" {% if g.raspiconfig.camera_num|int == 2 %}selected{%endif%}>Second</option>
                 {# {{ render.make_options(options_cn, 'camera_num')}} #}
             </select>
             </div>
@@ -155,8 +136,8 @@
             <label class="col col-form-label">Background</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="send_cmd('ab ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.anno_background == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if g.raspiconfig.anno_background == 1 %}selected{%endif%}>On</option>                
+                    <option value="0" {% if g.raspiconfig.anno_background|int == 0 %}selected{%endif%}>Off</option>
+                    <option value="1" {% if g.raspiconfig.anno_background|int == 1 %}selected{%endif%}>On</option>                
                     {# {{ render.make_options(options_ab, 'anno_background')}} #}
                 </select>
             </div>            
@@ -174,8 +155,8 @@
             <label class="col col-form-label">Custom text color:</label>
             <div class="col">
                 <select class="form-select form-select-sm" id="at_en">
-                    <option value="0" {% if g.raspiconfig.anno3_custom_text_colour == 0 %}selected{%endif%}>Disabled</option>
-                    <option value="1" {% if g.raspiconfig.anno3_custom_text_colour == 1 %}selected{%endif%}>Enabled</option>
+                    <option value="0" {% if g.raspiconfig.anno3_custom_text_colour|int == 0 %}selected{%endif%}>Disabled</option>
+                    <option value="1" {% if g.raspiconfig.anno3_custom_text_colour|int == 1 %}selected{%endif%}>Enabled</option>
                     {# {{ render.make_options(options_at_en, 'anno3_custom_text_colour')}} #}
                 </select>
             </div>
@@ -210,8 +191,8 @@
             <label class="col col-form-label">Custom background color:</label>
             <div class="col">
                 <select class="form-select form-select-sm"id="ac_en">
-                    <option value="0" {% if g.raspiconfig.anno3_custom_background_colour == 0 %}selected{%endif%}>Disabled</option>
-                    <option value="1" {% if g.raspiconfig.anno3_custom_background_colour == 1 %}selected{%endif%}>Enabled</option>                
+                    <option value="0" {% if g.raspiconfig.anno3_custom_background_colour|int == 0 %}selected{%endif%}>Disabled</option>
+                    <option value="1" {% if g.raspiconfig.anno3_custom_background_colour|int == 1 %}selected{%endif%}>Enabled</option>                
                     {# {{ render.make_options(options_ac_en, 'anno3_custom_background_colour')}} #}
                 </select>
             </div>
@@ -326,8 +307,8 @@
             <label class="col col-form-label">Video Stabilisation, default: 'off'</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('vs ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.video_stabilisation == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if g.raspiconfig.video_stabilisation == 1 %}selected{%endif%}>On</option>
+                    <option value="0" {% if g.raspiconfig.video_stabilisation|int == 0 %}selected{%endif%}>Off</option>
+                    <option value="1" {% if g.raspiconfig.video_stabilisation|int == 1 %}selected{%endif%}>On</option>
                     {# {{ render.make_options(options_vs, 'video_stabilisation')}} #}
                 </select>
             </div>
@@ -436,8 +417,8 @@
             <label class="col col-form-label">Colour Effect, default 'disabled':</label>
             <div class="col">
                 <select class="form-select form-select-sm" id="ce_en">
-                    <option value="0" {% if g.raspiconfig.colour_effect_en == 0 %}selected{%endif%}>Disabled</option>
-                    <option value="1" {% if g.raspiconfig.colour_effect_en == 1 %}selected{%endif%}>Enabled</option>                
+                    <option value="0" {% if g.raspiconfig.colour_effect_en|int == 0 %}selected{%endif%}>Disabled</option>
+                    <option value="1" {% if g.raspiconfig.colour_effect_en|int == 1 %}selected{%endif%}>Enabled</option>                
                     {# {{ render.make_options(options_ce_en, 'colour_effect_en')}} #}
                 </select>
             </div>
@@ -457,8 +438,8 @@
             <label class="col col-form-label">Image Statistics, default 'Off':</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('st ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.stat_pass == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if g.raspiconfig.stat_pass == 1 %}selected{%endif%}>On</option>
+                    <option value="0" {% if g.raspiconfig.stat_pass|int == 0" %}selected{%endif%}>Off</option>
+                    <option value="1" {% if g.raspiconfig.stat_pass|int == 1 %}selected{%endif%}>On</option>
                     {# {{ render.make_options(options_st, 'stat_pass')}} #}
                 </select>
             </div>
@@ -467,10 +448,10 @@
             <label class="col col-form-label">Rotation, default 0:</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('ro ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.stat_pass == 0 %}selected{%endif%}>No rotate</option>
-                    <option value="90" {% if g.raspiconfig.stat_pass == 90 %}selected{%endif%}>Rotate 90°</option>                
-                    <option value="180" {% if g.raspiconfig.stat_pass == 180 %}selected{%endif%}>Rotate 180°</option>                
-                    <option value="270" {% if g.raspiconfig.stat_pass == 270 %}selected{%endif%}>Rotate 270°</option>                
+                    <option value="0" {% if g.raspiconfig.stat_pass|int == 0 %}selected{%endif%}>No rotate</option>
+                    <option value="90" {% if g.raspiconfig.stat_pass|int == 90 %}selected{%endif%}>Rotate 90°</option>                
+                    <option value="180" {% if g.raspiconfig.stat_pass|int == 180 %}selected{%endif%}>Rotate 180°</option>                
+                    <option value="270" {% if g.raspiconfig.stat_pass|int == 270 %}selected{%endif%}>Rotate 270°</option>                
                     {# {{ render.make_options(options_ro, 'rotation')}} #}
                 </select>
             </div>
@@ -479,10 +460,10 @@
             <label class="col col-form-label">Flip, default 'none':</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('fl ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.flip == 0 %}selected{%endif%}>None</option>
-                    <option value="1" {% if g.raspiconfig.flip == 1 %}selected{%endif%}>Horizontal</option>                
-                    <option value="2" {% if g.raspiconfig.flip == 1 %}selected{%endif%}>Vertical</option>                
-                    <option value="3" {% if g.raspiconfig.flip == 1 %}selected{%endif%}>Both</option>                
+                    <option value="0" {% if g.raspiconfig.flip|int == 0 %}selected{%endif%}>None</option>
+                    <option value="1" {% if g.raspiconfig.flip|int == 1 %}selected{%endif%}>Horizontal</option>                
+                    <option value="2" {% if g.raspiconfig.flip|int == 2 %}selected{%endif%}>Vertical</option>                
+                    <option value="3" {% if g.raspiconfig.flip|int == 3 %}selected{%endif%}>Both</option>                
                     {# {{ render.make_options(options_fl, 'flip')}} #}
                 </select>
             </div>
@@ -574,8 +555,8 @@
             <label class="col col-form-label">Raw Layer, default: 'off'</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('rl ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.raw_layer == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if g.raspiconfig.raw_layer == 1 %}selected{%endif%}>On</option>
+                    <option value="0" {% if g.raspiconfig.raw_layer|int == 0 %}selected{%endif%}>Off</option>
+                    <option value="1" {% if g.raspiconfig.raw_layer|int == 1 %}selected{%endif%}>On</option>
                     {# {{ render.make_options(options_rl, 'raw_layer')}}</select> #}
             </div>
         </div>
@@ -622,8 +603,8 @@
             <label class="col col-form-label">MP4 Boxing mode :</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('bo ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.raw_layer == 0 %}selected{%endif%}>Off</option>
-                    <option value="2" {% if g.raspiconfig.raw_layer == 2 %}selected{%endif%}>Background</option>                
+                    <option value="0" {% if g.raspiconfig.raw_layer|int == 0 %}selected{%endif%}>Off</option>
+                    <option value="2" {% if g.raspiconfig.raw_layer|int == 2 %}selected{%endif%}>Background</option>                
                     {# {{ render.make_options(options_bo, 'MP4Box')}} #}
                 </select>
             </div>
@@ -647,9 +628,9 @@
             <label class="col col-form-label">Motion detect mode:</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('mx ' + this.value);setTimeout(function(){location.reload(true);}, 1000);">
-                    <option value="0" {% if g.raspiconfig.motion_external == 0 %}selected{%endif%}>Internal</option>
-                    <option value="1" {% if g.raspiconfig.motion_external == 1 %}selected{%endif%}>External</option>                
-                    <option value="2" {% if g.raspiconfig.motion_external == 2 %}selected{%endif%}>Monitor</option>                
+                    <option value="0" {% if g.raspiconfig.motion_external|int == 0 %}selected{%endif%}>Internal</option>
+                    <option value="1" {% if g.raspiconfig.motion_external|int == 1 %}selected{%endif%}>External</option>                
+                    <option value="2" {% if g.raspiconfig.motion_external|int == 2 %}selected{%endif%}>Monitor</option>                
                     {# {{ render.make_options(options_mx, 'motion_external')}} #}
                 </select>
             </div>
@@ -668,8 +649,8 @@
             <label class="col col-form-label">HDMI Preview, default: 'off'</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="send_cmd('hp ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.hdmi_preview == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if g.raspiconfig.hdmi_preview == 1 %}selected{%endif%}>On</option>
+                    <option value="0" {% if g.raspiconfig.hdmi_preview|int == 0 %}selected{%endif%}>Off</option>
+                    <option value="1" {% if g.raspiconfig.hdmi_preview|int == 1 %}selected{%endif%}>On</option>
                     {# {{ render.make_options(options_hp, 'hdmi_preview')}} #}
                 </select>
             </div>
