@@ -35,6 +35,7 @@ volumes:
   static_volume:  
   
 # Onliner
+# mkdir -p /mnt/data/media /mnt/data/h264 /mnt/data/macros /mnt/data/system
 # docker pull ghcr.io/cyr-ius/viewpi-cam:main
-# docker run -d --privileged -p 80:8000 --name viewpicam ghcr.io/cyr-ius/viewpi-cam:main
+# docker run -d --privileged -p 80:8000 -v /mnt/data/media:/app/media -v /mnt/data/system:/app/system --name viewpicam ghcr.io/cyr-ius/viewpi-cam:main
 # docker logs viewpicam -f

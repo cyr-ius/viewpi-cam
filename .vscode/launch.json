@@ -13,7 +13,7 @@
         "FLASK_DEBUG": "1",
         "FLASK_ENV": "development"
       },
-      "args": ["run", "--no-debugger"],
+      "args": ["run", "--no-debugger", "--no-reload"],
       "jinja": true,
       "justMyCode": false
     },
