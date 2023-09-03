@@ -438,7 +438,7 @@
             <label class="col col-form-label">Image Statistics, default 'Off':</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('st ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.stat_pass|int == 0" %}selected{%endif%}>Off</option>
+                    <option value="0" {% if g.raspiconfig.stat_pass|int == 0 %}selected{%endif%}>Off</option>
                     <option value="1" {% if g.raspiconfig.stat_pass|int == 1 %}selected{%endif%}>On</option>
                     {# {{ render.make_options(options_st, 'stat_pass')}} #}
                 </select>
@@ -448,10 +448,10 @@
             <label class="col col-form-label">Rotation, default 0:</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('ro ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.stat_pass|int == 0 %}selected{%endif%}>No rotate</option>
-                    <option value="90" {% if g.raspiconfig.stat_pass|int == 90 %}selected{%endif%}>Rotate 90°</option>                
-                    <option value="180" {% if g.raspiconfig.stat_pass|int == 180 %}selected{%endif%}>Rotate 180°</option>                
-                    <option value="270" {% if g.raspiconfig.stat_pass|int == 270 %}selected{%endif%}>Rotate 270°</option>                
+                    <option value="0" {% if g.raspiconfig.rotation|int == 0 %}selected{%endif%}>No rotate</option>
+                    <option value="90" {% if g.raspiconfig.rotation|int == 90 %}selected{%endif%}>Rotate 90°</option>                
+                    <option value="180" {% if g.raspiconfig.rotation|int == 180 %}selected{%endif%}>Rotate 180°</option>                
+                    <option value="270" {% if g.raspiconfig.rotation|int == 270 %}selected{%endif%}>Rotate 270°</option>                
                     {# {{ render.make_options(options_ro, 'rotation')}} #}
                 </select>
             </div>
@@ -460,10 +460,10 @@
             <label class="col col-form-label">Flip, default 'none':</label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('fl ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.flip|int == 0 %}selected{%endif%}>None</option>
-                    <option value="1" {% if g.raspiconfig.flip|int == 1 %}selected{%endif%}>Horizontal</option>                
-                    <option value="2" {% if g.raspiconfig.flip|int == 2 %}selected{%endif%}>Vertical</option>                
-                    <option value="3" {% if g.raspiconfig.flip|int == 3 %}selected{%endif%}>Both</option>                
+                    <option value="0" {% if g.raspiconfig.flip == 0 %}selected{%endif%}>None</option>
+                    <option value="1" {% if g.raspiconfig.flip == 1 %}selected{%endif%}>Horizontal</option>                
+                    <option value="2" {% if g.raspiconfig.flip == 2 %}selected{%endif%}>Vertical</option>                
+                    <option value="3" {% if g.raspiconfig.flip == 3 %}selected{%endif%}>Both</option>                
                     {# {{ render.make_options(options_fl, 'flip')}} #}
                 </select>
             </div>
