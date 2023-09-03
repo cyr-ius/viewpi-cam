@@ -8,8 +8,6 @@ name: Docker
 on:
   schedule:
     - cron: "39 6 * * *"
-  release:
-    types: [published, created]
   workflow_dispatch:
   workflow_call:
 
