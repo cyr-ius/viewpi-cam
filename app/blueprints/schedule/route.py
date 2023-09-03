@@ -161,7 +161,7 @@ def scheduler():
             autocapturetime = 0
             autocapture = 0
 
-        last_status_time = os.path.getctime(current_app.raspiconfig.status_file)
+        last_status_time = os.path.getmtime(current_app.raspiconfig.status_file)
         while timeout_max == 0 or timeout < timeout_max:
             time.sleep(poll_time)
             cmd = check_motion(motion_fifo_in)
@@ -257,7 +257,7 @@ def scheduler():
                     and timenow > autocameratime
                 ):
                     autocameratime = timenow + 2
-                    mod_time = os.path.getctime(current_app.raspiconfig.status_file)
+                    mod_time = os.path.getmtime(current_app.raspiconfig.status_file)
                     with open(
                         current_app.raspiconfig.status_file, mode="r", encoding="utf-8"
                     ) as file:
@@ -413,13 +413,13 @@ def purge_files(
                     case "v":
                         purge_hours = sch_purgevideohours
                 if purge_hours > 0:
-                    f_mod_hours = os.path.getctime(f"{media_path}/{file}").hour()
+                    f_mod_hours = os.path.getmtime(f"{media_path}/{file}").hour()
                     if f_mod_hours > 0 and (current_hours - f_mod_hours) > purge_hours:
                         os.remove(f"{media_path}/{file}")
                         purge_count += 1
             elif sch_purgevideohours > 0:
                 if ".zip" in file:
-                    f_mod_hours = os.path.getctime(f"{media_path}/{file}").hour()
+                    f_mod_hours = os.path.getmtime(f"{media_path}/{file}").hour()
                     if (
                         f_mod_hours > 0
                         and (current_hours - f_mod_hours)  # noqa: W503
@@ -504,7 +504,7 @@ def get_sorted_files(folder: str, ascending: bool = True) -> list:
     files = {}
     for file in scanfiles:
         if file != "." and file != ".." and is_thumbnail(file):
-            f_date = os.path.getctime(f"{folder}/{file}").hour()
+            f_date = os.path.getmtime(f"{folder}/{file}").hour()
             files[file] = f_date
     if ascending:
         files = sorted(files)

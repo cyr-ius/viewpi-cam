@@ -226,7 +226,7 @@ def get_thumbnails(sort_order, show_types, time_filter, time_filter_max):
     files = list_folder_files(media_path)
     thumbnails = {}
     for file in files:
-        file_timestamp = os.path.getctime(f"{media_path}/{file}")
+        file_timestamp = os.path.getmtime(f"{media_path}/{file}")
         if time_filter == 1:
             include = True
         else:
@@ -278,19 +278,15 @@ def draw_files(filesnames: list):
         duration = 0
         if os.path.isfile(f"{media_path}/{real_file}"):
             file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
-            file_datetime = dt.fromtimestamp(
-                os.path.getctime(f"{media_path}/{real_file}")
-            )
+            file_timestamp = os.path.getmtime(f"{media_path}/{real_file}")
             if file_type == "v":
-                duration = (
-                    dt.fromtimestamp(os.path.getctime(f"{media_path}/{file}"))
-                    - file_datetime
-                ).total_seconds()
+                duration = os.path.getmtime(f"{media_path}/{file}") - file_timestamp
         else:
             file_size = 0
-            file_datetime = os.path.getctime(f"{media_path}/{file}")
+            file_timestamp = os.path.getmtime(f"{media_path}/{file}")
 
         if file_type:
+            file_datetime = dt.fromtimestamp(file_timestamp)
             thumbnails.append(
                 {
                     "file_name": file,

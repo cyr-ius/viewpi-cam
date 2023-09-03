@@ -45,7 +45,7 @@ def find_lapse_files(filename):
     padlen = len(batch)
     fullname = f"{media_path}/{data_filename(filename)}"
     path = f"{media_path}"
-    start = os.path.getctime(fullname)
+    start = os.path.getmtime(fullname)
     files = {}
     scanfiles = list_folder_files(f"{media_path}")
     lapsefiles = []
@@ -56,7 +56,7 @@ def find_lapse_files(filename):
                 and (ext := get_file_ext(file))
                 and ext == "jpg"
             ):
-                f_date = os.path.getctime(f"{media_path}/{file}")
+                f_date = os.path.getmtime(f"{media_path}/{file}")
                 if f_date >= start:
                     files[file] = str(f_date) + file
 
