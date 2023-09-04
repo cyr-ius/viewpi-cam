@@ -190,7 +190,7 @@ def pipe_cmd():
 def status_mjpeg():
     """Return status_mjpeg."""
     file_content = ""
-    for i in range(0, 30):
+    for _ in range(0, 30):
         with open(
             current_app.raspiconfig.status_file, mode="r", encoding="utf-8"
         ) as file:
@@ -229,7 +229,7 @@ def pipan():
     }
 
     if (
-        f_type(pan := request.args.get("pan"))
+        (pan := request.args.get("pan"))
         and isinstance(pan, int | float)
         and (tilt := request.args.get("tilt"))
         and isinstance(tilt, int | float)
