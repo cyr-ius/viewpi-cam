@@ -92,14 +92,19 @@
                     <div class="card-img-overlay" style="height:5px;">
                         <i class="float-start {{thumbnail['file_icon']}}" style="font-size: 16px;color: white;"></i>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text">Created {{ thumbnail.file_datetime.strftime('%Y-%m-%d') }} at {{thumbnail.file_datetime.strftime('%H:%M:%S') }}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <input class="btn-check" id="btn-check-{{loop.index}}" type="checkbox" name="check_list" {{select_all}} value="{{thumbnail.file_name}}">
-                                <label class="btn btn-secondary btn-sm" for="btn-check-{{loop.index}}">Select</label>
-                                <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumbnail.file_name}}"><i class="bi bi-trash"></i>Delete</button>
-                            </div>
+                    <div class="card-body">                  
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="btn-check-{{loop.index}}" name="check_list" {{select_all}} value="{{thumbnail.file_name}}">
+                            <label class="form-check-label" for="{{thumbnail.file_name}}">Created {{ thumbnail.file_datetime.strftime('%Y-%m-%d') }} at {{thumbnail.file_datetime.strftime('%H:%M:%S') }}</label>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                             <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumbnail.file_name}}"><i class="bi bi-trash"></i>Delete</button>
+                            {# <div class="btn-group"> #}
+                                {# <input class="btn-check" id="btn-check-{{loop.index}}" type="checkbox" name="check_list" {{select_all}} value="{{thumbnail.file_name}}"> #}
+                                {# <label class="btn btn-secondary btn-sm" for="btn-check-{{loop.index}}">Select</label> #}
+                                {# <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumbnail.file_name}}"><i class="bi bi-trash"></i>Delete</button> #}
+                            {# </div> #}
                             {% if thumbnail["file_size"] > 0%}
                             <small class="text-body-secondary">
                             {% if thumbnail["file_size"] > 1024 %}{{ (thumbnail["file_size"]/1024) | round(2) }} MB {%else%} {{thumbnail["file_size"]}} KB {%endif%}
@@ -188,9 +193,10 @@ $('#selectAll').click(function(){
 
 $('#deleteSel, #lockSel, #unlockSel').unbind();
 $('#deleteSel, #lockSel, #unlockSel').click(function(){
+    callback = function(data) {location.reload();}
     data = $('#form_gallery').serializeObject();
     data.action = $(this).val()
-    queryData("POST", "{{url_for('preview.index')}}", data)    
+    queryData("POST", "{{url_for('preview.index')}}", data, callback)    
 });
 
 $('#deleteAll').unbind();

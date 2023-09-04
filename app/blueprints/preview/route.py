@@ -90,16 +90,25 @@ def index():
                 case "selectNone":
                     select_all = ""
                 case "deleteSel":
-                    for item in request.json.get("check_list", []):
+                    check_list = request.json.get("check_list", [])
+                    if isinstance(check_list, str):
+                        check_list = [request.json["check_list"]]
+                    for item in check_list:
                         if check_media_path(item):
                             delete_mediafiles(item)
                     maintain_folders(media_path, False, False)
                 case "lockSel":
-                    for item in request.json.get("check_list", []):
+                    check_list = request.json.get("check_list", [])
+                    if isinstance(check_list, str):
+                        check_list = [request.json["check_list"]]
+                    for item in check_list:
                         if check_media_path(item):
                             lock_file(item, True)
                 case "unlockSel":
-                    for item in request.json.get("check_list", []):
+                    check_list = request.json.get("check_list", [])
+                    if isinstance(check_list, str):
+                        check_list = [request.json["check_list"]]
+                    for item in check_list:
                         if check_media_path(item):
                             lock_file(item, False)
                 case "updateSizeOrder":
@@ -110,7 +119,10 @@ def index():
                         thumb_size = max(int(thumb_size), 32)
                         thumb_size = min(int(thumb_size), 320)
                 case "zipSel":
-                    if check_list := request.json.get("check_list", []):
+                    check_list = request.json.get("check_list", [])
+                    if isinstance(check_list, str):
+                        check_list = [request.json["check_list"]]
+                    if check_list:
                         return get_zip(check_list)
 
     thumb_filenames = get_thumbnails(
