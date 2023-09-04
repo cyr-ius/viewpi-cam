@@ -108,9 +108,8 @@ def delete_mediafiles(filename, delete=True):
             ):
                 compute_delete_file(file, size)
 
-    size += get_file_size(f"{media_path}/{filename}")
-    if delete:
-        os.remove(f"{media_path}/{filename}")
+    compute_delete_file(f"{media_path}/{filename}", size)
+
     return size / 1024
 
 
