@@ -5,7 +5,6 @@ import zipfile
 from datetime import datetime as dt
 from io import BytesIO
 
-
 from flask import (
     Blueprint,
     current_app,
@@ -26,6 +25,7 @@ from app.helpers.filer import (
     get_file_size,
     get_file_type,
     list_folder_files,
+    write_log,
 )
 
 bp = Blueprint(
@@ -129,6 +129,8 @@ def index():
                         check_list = [request.json["check_list"]]
                     if check_list:
                         return get_zip(check_list)
+                case "convert":
+                    video_convert(request.json.get("filename"))
 
     thumb_filenames = get_thumbnails(
         sort_order=sort_order,
@@ -220,6 +222,36 @@ def get_zip(files: list):
         as_attachment=True,
         download_name=zipname,
     )
+
+
+def video_convert(filename: str):
+    media_path = current_app.raspiconfig.media_path
+
+    if check_media_path(filename):
+        file_type = get_file_type(filename)
+        file_index = get_file_index(filename)
+
+        if file_type == "t" and isinstance(int(file_index), int):
+            thumb_files = find_lapse_files(filename)
+            tmp = f"{media_path}/{file_type}{file_index}"
+            if not os.path.isdir(tmp):
+                os.makedirs(tmp, 0o077, True)
+
+            i = 0
+            for thumb in thumb_files:
+                os.symlink(thumb, f"{tmp}/i_{i:05d}.jpg")
+                i += 1
+
+            video_file = f"{data_filename(filename)[:-3]}.mp4"
+            # fp = fopen(BASE_DIR . '/' . CONVERT_CMD, 'r')
+            # cmd = trim(fgets(fp))
+            # fclose(fp)
+            # rst = cmd.replace(f"i_{i:05d}", f"tmp/i_{i:05d}")
+            # cmd = f"({rst}){media_path}/{video_file}; rm -rf {tmp};) >/dev/null 2>&1 &"
+            # write_log("start lapse convert: {cmd}")
+            # os.popen(cmd)
+            # os.popen(f"cp {media_path}/{filename}", {media_path}/{video_file}v{get_file_index(filename)}.{current_app.config["THUMBNAIL_EXT"]})
+            write_log("Convert finished")
 
 
 def maintain_folders(path, delete_main_files, delete_sub_files, root: bool = True):

@@ -196,6 +196,7 @@ def scheduler():
             elif cmd == SCHEDULE_RESET:
                 write_log("Reload parameters command requested")
                 # current_app.settings.refresh()
+                break
             elif cmd != "":
                 write_log(f"Ignore FIFO char {cmd}")
 

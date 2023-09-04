@@ -78,19 +78,19 @@
                 </div>
             </div>
         </div>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-6 row-cols-xl-8 g-3 my-1">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-6 row-cols-xxl-8 g-3 my-1">
             {% for thumbnail in thumbnails%}
             <div class="col">
                 <div class='card shadow-sm'>
-                    {% if thumbnail["file_size"] > 0 %}
-                    <a id="load_preview" title="{{thumbnail['real_file']}}" href="#" onclick="load_preview('{{thumbnail['file_name']}}');">
+                    {% if thumbnail.file_size > 0 %}
+                    <a id="load_preview" title="{{thumbnail.real_file}}" href="#" onclick="load_preview('{{thumbnail.file_name}}');">
                     {% endif%}
-                    <img class="mx-auto d-block card-img-top" src="{{ url_for('static', filename=config['MEDIA']+'/'+thumbnail['file_name']) }}"/>
-                    {% if thumbnail["file_size"] > 0 %}
+                    <img class="mx-auto d-block card-img-top" src="{{ url_for('static', filename=config['MEDIA']+'/'+thumbnail.file_name) }}"/>
+                    {% if thumbnail.file_size > 0 %}
                     </a>
                     {%endif%}
                     <div class="card-img-overlay" style="height:5px;">
-                        <i class="float-start {{thumbnail['file_icon']}}" style="font-size: 16px;color: white;"></i>
+                        <i class="float-start {{thumbnail.file_icon}}" style="font-size: 16px;color: white;"></i>
                         {% if not thumbnail.file_right %}
                         <i class="float-start bi bi-lock-fill" style="font-size: 16px;color: rgb(209, 182, 28);position: absolute;right: 5px;"></i>
                         {% endif %}
@@ -102,18 +102,18 @@
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-2">
                              <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumbnail.file_name}}" {% if not thumbnail.file_right %}disabled{%endif%}><i class="bi bi-trash"></i>Delete</button>
-                            {% if thumbnail["file_size"] > 0%}
+                            {% if thumbnail.file_size > 0%}
                             <small class="text-body-secondary">
-                            {% if thumbnail["file_size"] > 1024 %}{{ (thumbnail["file_size"]/1024) | round(2) }} MB {%else%} {{thumbnail["file_size"]}} KB {%endif%}
-                            {{thumbnail["lapse_count"]}} {{thumbnail["duration"]}}s
+                            {% if thumbnail.file_size > 1024 %}{{ (thumbnail.file_size/1024) | round(2) }} MB {%else%} {{thumbnail.file_size}} KB {%endif%}
+                            {{thumbnail.lapse_count}} {{thumbnail.duration}}s
                             </small>
-                            {% endif%}                    
-                        </div>    
+                            {% endif%}
+                        </div>
                     </div>
                 </div>
             </div>
             {%endfor%}
-        </div>   
+        </div>
         {%else%}
         <p>No videos/images saved</p>
         {%endif%}
@@ -255,8 +255,12 @@ $('#display button[name="download"]').click(function(){
             window.URL.revokeObjectURL(url);
         }
     });
-
 });
+
+$('#display button[name="convert"]').click(function(){
+    queryData("POST","{{url_for('preview.index')}}",{"action":"convert","filename": $(this).val()})
+});
+
 
 function fileTitle(thumbnailName) {
 	return thumbnailName.substr(thumbnailName.length - suffixLength(thumbnailName) + 1).substr(0, suffixLength(thumbnailName) - 8);
