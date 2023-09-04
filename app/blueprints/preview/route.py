@@ -291,6 +291,7 @@ def draw_files(filesnames: list):
         if os.path.isfile(f"{media_path}/{real_file}"):
             file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
             file_timestamp = os.path.getmtime(f"{media_path}/{real_file}")
+            file_right = os.access(f"{media_path}/{real_file}", os.W_OK)
             if file_type == "v":
                 duration = os.path.getmtime(f"{media_path}/{file}") - file_timestamp
         else:
@@ -306,6 +307,7 @@ def draw_files(filesnames: list):
                     "file_size": file_size,
                     "file_icon": file_icon,
                     "file_datetime": file_datetime,
+                    "file_right": file_right,
                     "real_file": real_file,
                     "file_number": f_number,
                     "lapse_count": lapse_count,
