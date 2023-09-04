@@ -64,6 +64,7 @@ def index():
                     ):
                         delete_mediafiles(filename)
                         maintain_folders(media_path, False, False)
+                        return {"message": "Delete successful"}
                 case "download":
                     if (filename := request.json.get("filename")) and check_media_path(
                         filename
@@ -85,6 +86,7 @@ def index():
                             return get_zip([filename])
                 case "deleteAll":
                     maintain_folders(media_path, True, True)
+                    return {"message": "Delete successful"}
                 case "selectAll":
                     select_all = "checked"
                 case "selectNone":
@@ -97,6 +99,7 @@ def index():
                         if check_media_path(item):
                             delete_mediafiles(item)
                     maintain_folders(media_path, False, False)
+                    return {"message": "Delete successful"}
                 case "lockSel":
                     check_list = request.json.get("check_list", [])
                     if isinstance(check_list, str):
@@ -104,6 +107,7 @@ def index():
                     for item in check_list:
                         if check_media_path(item):
                             lock_file(item, True)
+                    return {"message": "Lock successful"}
                 case "unlockSel":
                     check_list = request.json.get("check_list", [])
                     if isinstance(check_list, str):
@@ -111,6 +115,7 @@ def index():
                     for item in check_list:
                         if check_media_path(item):
                             lock_file(item, False)
+                    return {"message": "Unlock successful"}
                 case "updateSizeOrder":
                     if preview_size := request.json.get("preview_size"):
                         preview_size = max(int(preview_size), 100)

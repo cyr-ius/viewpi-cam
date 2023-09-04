@@ -100,7 +100,6 @@
                             <input class="form-check-input" type="checkbox" role="switch" id="btn-check-{{loop.index}}" name="check_list" {{select_all}} value="{{thumbnail.file_name}}">
                             <label class="form-check-label" for="{{thumbnail.file_name}}">Created {{ thumbnail.file_datetime.strftime('%Y-%m-%d') }} at {{thumbnail.file_datetime.strftime('%H:%M:%S') }}</label>
                         </div>
-
                         <div class="d-flex justify-content-between align-items-center mt-2">
                              <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumbnail.file_name}}" {% if not thumbnail.file_right %}disabled{%endif%}><i class="bi bi-trash"></i>Delete</button>
                             {% if thumbnail["file_size"] > 0%}
@@ -191,10 +190,13 @@ $('#selectAll').click(function(){
 
 $('#deleteSel, #lockSel, #unlockSel').unbind();
 $('#deleteSel, #lockSel, #unlockSel').click(function(){
-    callback = function(data) {location.reload();}
+    callback = function(data) {
+        $('#form_gallery input:checkbox').prop('checked',false);   
+        location.reload();
+    }
     data = $('#form_gallery').serializeObject();
     data.action = $(this).val()
-    queryData("POST", "{{url_for('preview.index')}}", data, callback)    
+    queryData("POST", "{{url_for('preview.index')}}", data, callback)
 });
 
 $('#deleteAll').unbind();

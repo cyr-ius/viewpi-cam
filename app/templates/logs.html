@@ -21,7 +21,8 @@ $('#log button').click(function(){
         $.ajax({
             url: '{{url_for('main.log')}}',
             method: 'POST',
-            data: {"action": "downloadlog"},
+            data: JSON.stringify({"action": "downloadlog"}),
+            contentType:"application/json; charset=utf-8", 
             xhrFields: {
                 responseType: 'blob'
             },
@@ -37,8 +38,8 @@ $('#log button').click(function(){
             }
         });
     } else {
-        $.post('/log',{'action': $(this).val()});
-        location.reload();
+        callback = function(data) {location.reload();}
+        queryData("POST", "{{url_for('main.log')}}", {'action': $(this).val()}, callback)
     }
     
 });

@@ -17,7 +17,7 @@ from flask import (
 
 from app.const import PRESETS
 from app.helpers.decorator import auth_required, ViewPiCamException
-from app.helpers.filer import send_pipe, write_log
+from app.helpers.filer import send_pipe, write_log, delete_log
 
 bp = Blueprint("main", __name__, template_folder="templates")
 
@@ -61,8 +61,8 @@ def index():
     if os.path.isfile(pipan_file):
         mode = 1
         with open(pipan_file, mode="r", encoding="utf-8") as file:
-            pipan = file.read()
-            cam_pos = pipan.split(" ")
+            pipan_sck = file.read().decode("utf-8")
+            cam_pos = pipan_sck.split(" ")
             file.close()
     if current_app.settings.servo:
         mode = 2
@@ -85,14 +85,14 @@ def index():
 @bp.route("/log", methods=["GET", "POST"])
 @auth_required
 def log():
-    if request.method == "POST" and (action := request.form.get("action")):
+    if request.method == "POST" and (action := request.json.get("action")):
         match action:
             case "downloadlog":
                 filename = current_app.raspiconfig.log_file
                 return send_file(filename, as_attachment=True)
             case "clearlog":
                 filename = current_app.raspiconfig.log_file
-                os.remove(filename)
+                delete_log(1)
 
     log_file = current_app.raspiconfig.log_file
     logs = []
@@ -107,7 +107,7 @@ def log():
 
 
 @bp.route("/help", methods=["GET"])
-def help():
+def helpcmd():
     return render_template("help.html")
 
 
