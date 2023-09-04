@@ -434,25 +434,22 @@ def purge_files(
 
     if sch_purgespacemode > 0:
         total, _, free = shutil.disk_usage(f"{media_path}")
-        # level = str_replace(
-        #     array("%", "G", "B", "g", "b"), "", sch_purgespacelevel
-        # )
 
         match sch_purgespacemode:
-            case 1, 2:
+            case 1 | 2:
                 level = min(max(sch_purgespacelevel, 3), 97) * total / 100
-            case 3, 4:
-                level = level * 1048576.0
+            case 3 | 4:
+                level = sch_purgespacelevel * 1048576.0
 
         match sch_purgespacemode:
-            case 1, 3:
+            case 1 | 3:
                 if free < level:
                     p_files = get_sorted_files(media_path, False)
                     for p_file in p_files:
                         if free < level:
                             free += delete_mediafiles(p_file)
                         purge_count += 1
-            case 2, 4:
+            case 2 | 4:
                 p_files = get_sorted_files(media_path, False)
                 for p_file in p_files:
                     del_l = level <= 0
@@ -507,13 +504,10 @@ def get_sorted_files(folder: str, ascending: bool = True) -> list:
     files = {}
     for file in scanfiles:
         if file != "." and file != ".." and is_thumbnail(file):
-            f_date = os.path.getmtime(f"{folder}/{file}").hour()
+            f_date = os.path.getmtime(f"{folder}/{file}")
             files[file] = f_date
-    if ascending:
-        files = sorted(files)
-    else:
-        files = sorted(files, reverse=True)
-    return files.keys()
+
+    return sorted(files, reverse=ascending is False)
 
 
 def is_day_active(days, period: int) -> bool:
