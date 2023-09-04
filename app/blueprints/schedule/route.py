@@ -123,7 +123,7 @@ def start_scheduler() -> int | None:
 def launch_schedule():
     """Run scheduler."""
     if not get_pid("scheduler"):
-        Popen(["python", "-m", "flask", "scheduler", "start"], stdout=PIPE)
+        Popen(["flask", "scheduler", "start"], stdout=PIPE)
 
 
 def scheduler():

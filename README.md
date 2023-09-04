@@ -17,7 +17,7 @@ docker-compose up
 
 Set the `SESSION_SECRET` environment variable to a random value.
 
-In order to sent the wireguard configuration to clients via email (using sendgrid api) set the following environment variables
+In order to sent the viewpicam configuration to clients via email (using sendgrid api) set the following environment variables
 
 ```
 USERNAME: your root account

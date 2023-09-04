@@ -557,7 +557,8 @@
                 <select class="form-select form-select-sm"onchange="send_cmd('rl ' + this.value)">
                     <option value="0" {% if g.raspiconfig.raw_layer|int == 0 %}selected{%endif%}>Off</option>
                     <option value="1" {% if g.raspiconfig.raw_layer|int == 1 %}selected{%endif%}>On</option>
-                    {# {{ render.make_options(options_rl, 'raw_layer')}}</select> #}
+                    {# {{ render.make_options(options_rl, 'raw_layer')}} #}
+                </select>
             </div>
         </div>
         <div class="row row-col-2 g-3">

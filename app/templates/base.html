@@ -19,7 +19,9 @@
   {% block body %}  
   <body>
     <!-- Content -->
-    {# {% debug %} #}
+    {% if config["DEBUG"] == True %}
+      {% debug %}
+    {%endif%}
     <!-- Header -->
     {%block header%}
     <header>
