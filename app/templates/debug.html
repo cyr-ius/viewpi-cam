@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+    ------------ Raspiconfig ------------<br>
+    {% for k,v in  (g.raspiconfig.__dict__).items() %}
+    {{k}}: {{v}}</br>
+    {%endfor%}
+    ------------ Config ------------<br>
+    {% for k,v in  (config.__dict__).items() %}
+    {{k}}: {{v}}</br>
+    {%endfor%}
+
+
+{% endblock%}

@@ -11,7 +11,7 @@
     <form id="form_gallery" action="{{ url_for('preview.index') }}" method="POST">
         {% if thumbnails is iterable %}        
         <div class="row g-3 my-1">
-            <div class="col-auto">
+            {# <div class="col-auto">
                 <div class="row">
                     <div class="col-2 px-1">
                         <label class="col-form-label-sm">Preview</label>
@@ -33,7 +33,7 @@
             </div>                                                 
             <div class="col-auto">
                 <button class="btn btn-sm btn-primary" type="button" name="updateSize" value="updateSizeOrder">Update Size</button>
-            </div>
+            </div> #}
             <div class="col-auto">
                 <div class="row">
                     <div class="col-3 px-1">

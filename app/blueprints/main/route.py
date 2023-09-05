@@ -106,6 +106,11 @@ def log():
     return render_template("logs.html", log=logs)
 
 
+@bp.route("/debug", methods=["GET"])
+def debugcmd():
+    return render_template("debug.html", raspiconfig=current_app.raspiconfig.__dict__)
+
+
 @bp.route("/help", methods=["GET"])
 def helpcmd():
     return render_template("help.html")
