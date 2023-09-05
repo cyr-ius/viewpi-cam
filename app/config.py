@@ -73,6 +73,8 @@ FILESIZE_METHOD = 0
 FILE_SETTINGS = f"{basedir}/../system/settings.json"
 SERVO_FILE = f"{basedir}/../system/servo"
 PIPAN_FILE = f"{basedir}/../system/pipan"
+# Convert command
+CONVERT_CMD = "/usr/bin/ffmpeg -f image2 -i i_%05d.jpg"
 
 # USER LEVEL
 USERLEVEL_MIN = 1
