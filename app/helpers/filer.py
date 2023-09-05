@@ -223,7 +223,7 @@ def disk_usage() -> tuple[int, int, int, int, str]:
     """Disk usage."""
     media_path = current_app.raspiconfig.media_path
     total, used, free = shutil.disk_usage(f"{media_path}")
-    percent_used = round((total - used) / total * 100, 1)
+    percent_used = round(used / total * 100)
     if percent_used > 98:
         colour = "Red"
     elif percent_used > 90:
