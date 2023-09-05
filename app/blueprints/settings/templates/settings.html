@@ -117,16 +117,16 @@
             </div>
         </div>
         <hr class="mt-3"> 
-        {%for macro in macros%}
+        {%for macro in config["MACROS"]%}
         <div class="row row-cols-4 row-cols-md-4 g-1 mb-2">
             <div class="col">Macro:{{macro}}</div>
             <div class="col col-md-2 text-center">
                 <input class="form-control-checkbox" type="checkbox" id="{{macro}}_chk"
-                {% if raspiconfig[macro][:1] == "-" %}
-                    {% set value=raspiconfig[macro][1:] %}
+                {% if g.raspiconfig[macro][:1] == "-" %}
+                    {% set value=g.raspiconfig[macro][1:] %}
                     checked=""
                 {%else%}
-                    {% set value=raspiconfig[macro] %}
+                    {% set value=g.raspiconfig[macro] %}
                     checked="checked"
                 {%endif%}
                 ></div>

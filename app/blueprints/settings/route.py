@@ -15,12 +15,7 @@ bp = Blueprint(
 def index():
     msg = {"type": "success", "message": "Save data"}
     if request.method == "GET":
-        return render_template(
-            "settings.html",
-            settings=current_app.settings,
-            raspiconfig=current_app.raspiconfig,
-            macros=current_app.config["MACROS"],
-        )
+        return render_template("settings.html", settings=current_app.settings)
 
     try:
         if request.method == "POST" and (json := request.json):
@@ -46,8 +41,7 @@ def index():
                 current_app.settings.update(**current_app.settings.ubuttons)
             if "user_id" in json.keys():
                 current_app.settings.del_user(json["user_id"])
-
     except SettingsException as error:
         msg.update({"type": "error", "message": str(error)})
-    finally:
-        return msg
+
+    return msg
