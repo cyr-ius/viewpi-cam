@@ -235,22 +235,23 @@ def video_convert(filename: str):
             thumb_files = find_lapse_files(filename)
             tmp = f"{media_path}/{file_type}{file_index}"
             if not os.path.isdir(tmp):
-                os.makedirs(tmp, 0o077, True)
+                os.makedirs(tmp, 0o744, True)
 
             i = 0
             for thumb in thumb_files:
                 os.symlink(thumb, f"{tmp}/i_{i:05d}.jpg")
                 i += 1
 
-            video_file = f"{data_filename(filename)[:-3]}.mp4"
-            # fp = fopen(BASE_DIR . '/' . CONVERT_CMD, 'r')
-            # cmd = trim(fgets(fp))
-            # fclose(fp)
-            # rst = cmd.replace(f"i_{i:05d}", f"tmp/i_{i:05d}")
-            # cmd = f"({rst}){media_path}/{video_file}; rm -rf {tmp};) >/dev/null 2>&1 &"
-            # write_log("start lapse convert: {cmd}")
-            # os.popen(cmd)
-            # os.popen(f"cp {media_path}/{filename}", {media_path}/{video_file}v{get_file_index(filename)}.{current_app.config["THUMBNAIL_EXT"]})
+            i = 0
+            video_file = f"{data_filename(filename)[:-4]}.mp4"
+            cmd = current_app.config["CONVERT_CMD"]
+            rst = cmd.replace(f"i_{i:05d}", f"tmp/i_{i:05d}")
+            cmd = f"({rst} {media_path}/{video_file}; rm -rf {tmp};) >/dev/null 2>&1 &"
+            write_log(f"start lapse convert: {cmd}")
+            os.popen(cmd)
+            os.popen(
+                f"cp {media_path}/{filename} {media_path}/{video_file}.v{file_index}{current_app.config['THUMBNAIL_EXT']}"
+            )
             write_log("Convert finished")
 
 
