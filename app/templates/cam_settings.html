@@ -604,8 +604,8 @@
             <label class="col col-form-label">MP4 Boxing mode : </label>
             <div class="col">
                 <select class="form-select form-select-sm"onchange="send_cmd('bo ' + this.value)">
-                    <option value="0" {% if g.raspiconfig.MP4Box != "background" %}selected{%endif%}>Off</option>
-                    <option value="2" {% if g.raspiconfig.MP4Box == "background" %}selected{%endif%}>Background</option>                
+                    <option value="0" {% if g.raspiconfig.MP4Box|int == 0 %}selected{%endif%}>Off</option>
+                    <option value="2" {% if g.raspiconfig.MP4Box|int == 2 %}selected{%endif%}>Background</option>                
                     {# {{ render.make_options(options_bo, 'MP4Box')}} #}
                 </select>
             </div>
