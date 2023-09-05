@@ -24,7 +24,7 @@ bp = Blueprint("main", __name__, template_folder="templates")
 
 @bp.before_app_request
 def before_app_request():
-    current_app.raspiconfig.refresh()
+    # current_app.raspiconfig.refresh()
     g.raspiconfig = current_app.raspiconfig
 
 
