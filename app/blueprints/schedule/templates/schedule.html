@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 {% set lbl_periods = ['AllDay','Night','Dawn','Day','Dusk'] %}
-<div class="container overflow-auto">
+<div class="container-fluid overflow-auto px-5 py-2">
     <form id="form_schedule" class="row needs-validation" action="{{ url_for('schedule.index')}}" method="POST" novalidate>
         {% if day_period < 5%}{% set period = lbl_periods[day_period]%}{%else%}{%set period = settings.times[day_period - 5]%}{%endif%}
         <div class="row"><h4 class="p-0">Scheduler</h3></div>
