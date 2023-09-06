@@ -211,12 +211,16 @@ def send_pipe(pipename: str, cmd: str) -> None:
         pipe = os.open(pipename, os.O_WRONLY | os.O_NONBLOCK)
         os.write(pipe, f"{cmd}\n".encode("utf-8"))
         os.close(pipe)
-        current_app.raspiconfig.refresh()
         write_log(f"{pipename} - send {cmd}")
-        return {"type": "success", "message": f"Send {cmd} successful"}
+        msg = {"type": "success", "message": f"Send {cmd} successful"}
     except Exception as error:  # pylint: disable=W0718
         write_log(str(error))
-        return {"type": "error", "message": f"{error}"}
+        current_app.raspiconfig.refresh()
+        msg = {"type": "error", "message": f"{error}"}
+    
+    current_app.raspiconfig.refresh()
+
+    return msg
 
 
 def disk_usage() -> tuple[int, int, int, int, str]:
