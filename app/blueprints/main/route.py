@@ -24,7 +24,6 @@ bp = Blueprint("main", __name__, template_folder="templates")
 
 @bp.before_app_request
 def before_app_request():
-    # current_app.raspiconfig.refresh()
     g.raspiconfig = current_app.raspiconfig
 
 
@@ -115,10 +114,10 @@ def streamlog():
         if os.path.isfile(log_file):
             with open(log_file, mode="r", encoding="utf-8") as file:
                 while True:
-                    yield file.read()
+                    yield f"data: {file.read()}\n\n"
                     time.sleep(0.5)
 
-    return Response(generate(log_file), mimetype="text/plain")
+    return Response(generate(log_file), mimetype="text/event-stream")
 
 
 @bp.route("/debug", methods=["GET"])
