@@ -106,6 +106,21 @@ def log():
     return render_template("logs.html", log=logs)
 
 
+@bp.route("/streamlog", methods=["GET"])
+@auth_required
+def streamlog():
+    log_file = current_app.raspiconfig.log_file
+
+    def generate(log_file):
+        if os.path.isfile(log_file):
+            with open(log_file, mode="r", encoding="utf-8") as file:
+                while True:
+                    yield file.read()
+                    time.sleep(0.5)
+
+    return Response(generate(log_file), mimetype="text/plain")
+
+
 @bp.route("/debug", methods=["GET"])
 def debugcmd():
     return render_template("debug.html", raspiconfig=current_app.raspiconfig.__dict__)
