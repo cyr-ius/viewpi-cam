@@ -105,6 +105,31 @@ def index():
         )
 
 
+@bp.route("/period", methods=["GET"])
+def period():
+    offset = get_time_offset(current_app.settings.gmt_offset)
+    sunrise = get_sunrise(
+        current_app.settings.latitude, current_app.settings.longitude, offset
+    )
+    sunset = get_sunset(
+        current_app.settings.latitude, current_app.settings.longitude, offset
+    )
+    local_time = get_current_local_time(offset=offset)
+    return {
+        "period": day_period(
+            local_time=local_time,
+            sunrise=sunrise,
+            sunset=sunset,
+            day_mode=int(request.args.get("daymode")),
+            daw=current_app.settings.dawnstart_minutes,
+            day_start=current_app.settings.daystart_minutes,
+            dusk=current_app.settings.duskend_minutes,
+            day_end=current_app.settings.dayend_minutes,
+            times=current_app.settings.times,
+        )
+    }
+
+
 @bp.cli.command("stop", short_help="Stop scheduler task")
 @with_appcontext
 def stop_scheduler() -> int | None:
@@ -490,6 +515,7 @@ def open_pipe(pipename: str):
 def send_cmds(
     fifo: str, str_cmd: str, days: dict[str, any] | None = None, period: bool = False
 ):
+    """Send multiple commands to FIFO."""
     if str_cmd and (period is False or is_day_active(days, period)):
         cmds = str_cmd.split(";")
         for cmd in cmds:

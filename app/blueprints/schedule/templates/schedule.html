@@ -163,7 +163,7 @@
                 </select>
             </div>
         </div>
-        <div class="row mx-auto mt-5">
+        <div id="period_scheduler" class="row mx-auto mt-5">
             <div class="row row-cols-5 row-cols-md-5 text-center p-1 ">           
                 <span class="col-2">Period</span>
                 <span class="col-2">Days Su-Sa</span>
@@ -247,15 +247,22 @@ $('#schedule button').click(function(){
         data.action = $(this).val()
 
         // Post data
-        reload = function(){location.reload();}
-        queryData("POST", "{{ url_for('schedule.index')}}", data, reload) 
+        // callbackSuccess = function(){location.reload();}
+        queryData("POST", "{{ url_for('schedule.index')}}", data) 
     }
 
 });
 
 $('#daymode').unbind();
 $('#daymode').click(function(){
-   mode = $("#daymode").val();
+    mode = $("#daymode").val();
+
+    callbackSuccess = function(data) {
+        data["period"]
+        line = $('#period_scheduler').children()[data["period"]+1].children[0]
+        $(line).css("background-color","LightGreen")
+    }
+    queryData("GET", "{{ url_for('schedule.period')}}",{"daymode":mode} ,callbackSuccess) 
 
     $('.sun').addClass("d-none");
     $('.day').addClass("d-none");   
