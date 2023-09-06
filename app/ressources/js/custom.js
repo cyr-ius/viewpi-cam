@@ -35,10 +35,13 @@ function populate(frm, data) {
 }
 
 function queryData(method="POST", url, data, callbackSuccess,callbackError){
+  if (method == "POST") {
+    data = JSON.stringify(data)
+  }
   $.ajax({
       method: method,
       url: url,
-      data: JSON.stringify(data),
+      data: data,
       // dataType:"json",
       contentType:"application/json; charset=utf-8",            
       success: function(data){
@@ -51,6 +54,11 @@ function queryData(method="POST", url, data, callbackSuccess,callbackError){
       },
   })  
 }
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 
 (() => {
   'use strict'
