@@ -31,6 +31,7 @@ def before_app_request():
         for item in current_app.config["MACROS"]
     }
     g.motion_external = current_app.raspiconfig.motion_external
+    print("Here")
 
 
 @bp.route("/", methods=["GET", "POST"])
@@ -128,6 +129,7 @@ def streamlog():
 
 
 @bp.route("/debug", methods=["GET"])
+@auth_required
 def debugcmd():
     return render_template("debug.html", raspiconfig=current_app.raspiconfig.__dict__)
 
@@ -153,7 +155,7 @@ def sys_cmd(cmd):
         if cmd == "shutdown":
             os.popen("echo o > /proc/sysrq-trigger")
         if cmd == "restart_app":
-            os.popen("killall gunicorm")
+            os.popen("killall gunicorn")
         if cmd == "settime" and (timestr := request.args.get("timestr")):
             os.popen(f'sudo date -s "{timestr}')
     except Exception as error:
