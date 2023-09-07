@@ -28,12 +28,7 @@ from app.helpers.filer import (
     write_log,
 )
 
-bp = Blueprint(
-    "preview",
-    __name__,
-    template_folder="templates",
-    url_prefix="/preview",
-)
+bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
 
 @bp.route("/", methods=["GET", "POST"])

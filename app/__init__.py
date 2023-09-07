@@ -11,10 +11,13 @@ from flask_babel import Babel
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .blueprints.auth.route import bp as auth_bp
+from .blueprints.camera.route import bp as cam_bp
 from .blueprints.main.route import bp as main_bp
 from .blueprints.preview.route import bp as pview_bp
-from .blueprints.schedule.route import bp as sch_bp, launch_schedule
+from .blueprints.schedule.route import bp as sch_bp
+from .blueprints.schedule.route import launch_schedule
 from .blueprints.settings.route import bp as sets_bp
+from .helpers.filer import get_pid
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
 from .services.assets import css_custom, css_main, js_custom, js_main, js_pipan
@@ -24,7 +27,6 @@ from .services.handle import (
     handle_internal_server_error,
     handle_page_not_found,
 )
-from .helpers.filer import get_pid
 
 # from flask_mail import Mail
 
@@ -102,6 +104,7 @@ def create_app(config=None):
     app.register_blueprint(sch_bp)
     app.register_blueprint(sets_bp)
     app.register_blueprint(pview_bp)
+    app.register_blueprint(cam_bp)
 
     # Register error handler
     app.register_error_handler(400, handle_bad_request)

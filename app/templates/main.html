@@ -116,13 +116,13 @@
     function reload_img () {
         let time = new Date().getTime()
         if(!halted) {
-            mjpeg_img.src=`{{url_for('main.cam_pic')}}?time=${time}&pDelay=${preview_delay}`;
+            mjpeg_img.src=`{{url_for('camera.cam_pic')}}?time=${time}&pDelay=${preview_delay}`;
         } else { setTimeout("reload_img()", 500);}
     }
 
     function error_img () {
         let time = new Date().getTime()
-        setTimeout(`mjpeg_img.src="{{url_for('main.cam_pic')}}?time=${time}";`, 100);
+        setTimeout(`mjpeg_img.src="{{url_for('camera.cam_pic')}}?time=${time}";`, 100);
     }
 
     function init(mjpeg, video_fps, divider) {
@@ -142,7 +142,7 @@
     }
 
     function reload_ajax (last) {
-        $.get("{{url_for('main.status_mjpeg')}}?last=" + last,function(response){
+        $.get("{{url_for('camera.status_mjpeg')}}?last=" + last,function(response){
             if(response == "ready") {
                 setButtonState("video_button", false, "record video start", "ca 1");
                 setButtonState("image_button", false, "record image", "im");
@@ -287,12 +287,12 @@
         if (mjpegmode) {
             if (cycle !== undefined && cycle == true) {
                 mjpeg_img.src = "{{ url_for('static', filename='img/updating.jpg') }}";
-                setTimeout(`mjpeg_img.src="{{ url_for('main.cam_pic_new') }}?time=${time}&pDelay=${preview_delay}";`, 1000);
+                setTimeout(`mjpeg_img.src="{{ url_for('camera.cam_pic_new') }}?time=${time}&pDelay=${preview_delay}";`, 1000);
                 return;
             }
             if (previous_halted != halted) {
                 if(!halted) {
-                    mjpeg_img.src = `{{ url_for('main.cam_pic_new') }}?time=${time}&pDelay=${preview_delay}`;			
+                    mjpeg_img.src = `{{ url_for('camera.cam_pic_new') }}?time=${time}&pDelay=${preview_delay}`;			
                 } else {
                     mjpeg_img.src = "{{ url_for('static', filename='img/unavailable.jpg') }}";
                 }

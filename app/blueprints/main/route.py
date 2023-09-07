@@ -1,5 +1,4 @@
 """Blueprint Main."""
-import glob
 import os
 import time
 
@@ -18,6 +17,7 @@ from flask import (
 from app.const import PRESETS
 from app.helpers.decorator import auth_required, ViewPiCamException
 from app.helpers.filer import send_pipe, write_log, delete_log
+from ..camera.route import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
 
@@ -143,58 +143,17 @@ def minview():
     return render_template("min.html")
 
 
-@bp.route("/cam_pic", methods=["GET"])
-@auth_required
-def cam_pic():
-    delay = float(request.args.get("pDelay", 1.0)) / 1000000
-    cam_jpg = get_shm_cam()
-    time.sleep(delay)
-    headers = {"Access-Control-Allow-Origin": "*", "Content-Type": "image/jpeg"}
-    return Response(cam_jpg, headers=headers)
-
-
-@bp.route("/cam_picLatestTL", methods=["GET"])
-@auth_required
-def cam_pictl():
-    media_path = current_app.raspiconfig.media_path
-    list_of_files = filter(os.path.isfile, glob.glob(media_path + "*"))
-    list_of_files = sorted(list_of_files, key=lambda x: os.stat(x).st_ctime)
-    last_element = list_of_files[-1]
-    last_jpeg = open(f"{media_path}/{last_element}", "rb").read()
-    return Response(last_jpeg, headers={"Content-Type": "image/jpeg"})
-
-
-@bp.route("/cam_get", methods=["GET"])
-@auth_required
-def cam_get():
-    os.popen(f"touch {current_app.config.root_path}/status_mjpeg.txt")
-    cam_jpg = get_shm_cam()
-    return Response(cam_jpg, headers={"Content-Type": "image/jpeg"})
-
-
-@bp.route("/cam_pic_new", methods=["GET"])
-@auth_required
-def cam_pic_new():
-    delay = float(request.args.get("pDelay", 1.0)) / 100
-    preview_path = current_app.raspiconfig.preview_path
-    headers = {
-        "Content-type": "multipart/x-mixed-replace; boundary=PIderman",
-        "Cache-Control": "no-cache",
-        "Pragma": "no-cache",
-        "Connection": "close",
-    }
-    return Response(gather_img(preview_path, delay), headers=headers)
-
-
 @bp.route("/system/<cmd>", methods=["GET"])
 @auth_required
 def sys_cmd(cmd):
     """Execute system command."""
     try:
-        if cmd == "reboot":
-            os.popen("sudo shutdown -r now")
+        if cmd == "restart":
+            os.popen("echo b > /proc/sysrq-trigger")
         if cmd == "shutdown":
-            os.popen("sudo shutdown -h now")
+            os.popen("echo o > /proc/sysrq-trigger")
+        if cmd == "restart_app":
+            os.popen("echo o > /proc/sysrq-trigger")
         if cmd == "settime" and (timestr := request.args.get("timestr")):
             os.popen(f'sudo date -s "{timestr}')
     except Exception as error:
@@ -209,24 +168,6 @@ def pipe_cmd():
         msg = send_pipe(current_app.raspiconfig.control_file, cmd)
         return msg
     return {"type": "error", "message": "Command not found"}
-
-
-@bp.route("/status_mjpeg", methods=["GET"])
-@auth_required
-def status_mjpeg():
-    """Return status_mjpeg."""
-    file_content = ""
-    for _ in range(0, 30):
-        with open(
-            current_app.raspiconfig.status_file, mode="r", encoding="utf-8"
-        ) as file:
-            file_content = file.read()
-            if file_content != request.args.get("last"):
-                break
-            time.sleep(0.1)
-            file.close()
-    os.popen(f"touch {current_app.raspiconfig.status_file}")
-    return Response(file_content)
 
 
 @bp.route("/pipan", methods=["GET"])
@@ -325,23 +266,3 @@ def pipan():
             file.close()
 
     return status_mjpeg()
-
-
-def get_shm_cam(preview_path=None):
-    """Return binary data from cam.jpg."""
-    preview_path = (
-        current_app.raspiconfig.preview_path if preview_path is None else preview_path
-    )
-    if os.path.isfile(preview_path):
-        return open(preview_path, "rb").read()
-
-
-def gather_img(preview_path, delay=0.1):
-    """Stream image."""
-    while True:
-        yield (
-            b"--PIderman\r\nContent-Type: image/jpeg\r\n\r\n"
-            + get_shm_cam(preview_path)
-            + b"\r\n"
-        )
-        time.sleep(delay)

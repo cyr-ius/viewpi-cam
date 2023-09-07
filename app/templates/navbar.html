@@ -72,8 +72,9 @@
             <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">Schedule</a></li>
             <li><hr class="dropdown-divider"></li>
             </div>
-            <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_shutdown();">Shutdown system</a></li>
-            <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_reboot();">Reboot system</a></li>
+            <li class="nav-item"><a class="dropdown-item" href="#" onclick="app_restart();">Restart application</a></li>
+            <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_restart();">Restart system</a></li>
+            <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_shutdown();">Shutdown system</a></li>            
             <li class="nav-item"><a class="dropdown-item" href="#" onclick="if(confirm('Are you sure to reset the settings to the default values?')) {send_cmd('rs 1');setTimeout(function(){location.reload(true);}, 1000);}">Reset settings</a></li>
             <li><hr class="dropdown-divider"></li>
             <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">Show Log</a></li>
@@ -92,11 +93,15 @@
 {% block extrascripts%}
 <script language="javascript">
   function sys_shutdown() {
-    $.get("system/shutdown")
+    if(confirm('Are you sure to shutdown this host?')) {
+      $.get("system/shutdown")
+    }
   }
 
-  function sys_reboot() {
-    $.get("system/reboot")
+  function sys_restart() {
+    if(confirm('Are you sure to restart this host?')) {
+      $.get("system/restart")
+    }    
   }
 
   function sys_settime() {
@@ -105,5 +110,10 @@
       $.get("system/settime?timestr=" + $("#timestr").val())
     }
   }
+
+  function app_restart() {
+      $.get("system/restart_app")
+  }
+
 </script>
 {%endblock%}
