@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="container text-center liveimage overflow-auto">
     ------------ Raspiconfig ------------<br>
-    {% for k,v in  (g.raspiconfig.__dict__).items() %}
+    {% for k,v in  raspiconfig.items() %}
     {{k}}: {{v}}</br>
     {%endfor%}
     ------------ Config ------------<br>
@@ -12,5 +13,5 @@
     {% for k,v in config.items() %}
     {{k}}: {{v}}</br>
     {%endfor%}    
-
+</div>
 {% endblock%}

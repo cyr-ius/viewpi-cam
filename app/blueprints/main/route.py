@@ -24,7 +24,13 @@ bp = Blueprint("main", __name__, template_folder="templates")
 
 @bp.before_app_request
 def before_app_request():
-    g.raspiconfig = current_app.raspiconfig
+    g.motion_pipe = current_app.raspiconfig.motion_pipe
+    g.control_file = current_app.raspiconfig.control_file
+    g.macros = {
+        item: getattr(current_app.raspiconfig, item)
+        for item in current_app.config["MACROS"]
+    }
+    g.motion_external = current_app.raspiconfig.motion_external
 
 
 @bp.route("/", methods=["GET", "POST"])
@@ -71,6 +77,7 @@ def index():
         mode=mode,
         cam_pos=cam_pos,
         user_buttons=current_app.settings.ubuttons,
+        raspiconfig=current_app.raspiconfig,
         toggle_button=toggle_button,
         allow_simple=allow_simple,
         simple=simple,

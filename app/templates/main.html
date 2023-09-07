@@ -21,8 +21,8 @@
 <div class="container text-center liveimage overflow-auto">
     <div>
         <img id="mjpeg_dest" 
-            {% if g.raspiconfig['fullscreen'] == 1 %}class="fullscreen"{%endif%} 
-            {% if g.raspiconfig['vector_preview'] %}style="width:{{g.raspiconfig['width']}}px"{%endif%} 
+            {% if raspiconfig['fullscreen'] == 1 %}class="fullscreen"{%endif%} 
+            {% if raspiconfig['vector_preview'] %}style="width:{{raspiconfig['width']}}px"{%endif%} 
             {% if mode == 1 %}onclick="ontouchstart=pipan_start();" {%endif%}
             onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.jpg') }}">
     </div>
@@ -87,7 +87,7 @@
     let time = new Date().getTime();
 
     $(function(){   
-        setTimeout('init({{mjpegmode}},{{g.raspiconfig.video_fps}}, {{g.raspiconfig.divider}});', 100);
+        setTimeout('init({{mjpegmode}},{{raspiconfig.video_fps}}, {{raspiconfig.divider}});', 100);
     });
 
     $('#main-buttons button').unbind();

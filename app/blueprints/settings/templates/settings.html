@@ -122,11 +122,11 @@
             <div class="col">Macro:{{macro}}</div>
             <div class="col col-md-2 text-center">
                 <input class="form-control-checkbox" type="checkbox" id="{{macro}}_chk"
-                {% if g.raspiconfig[macro][:1] == "-" %}
-                    {% set value=g.raspiconfig[macro][1:] %}
+                {% if g.macros[macro][:1] == "-" %}
+                    {% set value=g.macros[macro][1:] %}
                     checked=""
                 {%else%}
-                    {% set value=g.raspiconfig[macro] %}
+                    {% set value=g.macros[macro] %}
                     checked="checked"
                 {%endif%}
                 ></div>

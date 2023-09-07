@@ -11,16 +11,16 @@
             <span class="col">Sunrise: <b>{{sunrise}}</b></span>
             <span class="col">Sunset: <b>{{sunset}}</b></span>
             <span class="col">Current: <b>{{current_time}}</b></span>
-            <span class="col">Period: <b>{{period}}</b></span>
+            <span id="period" class="col">Period: <b>{{period}}</b></span>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Motion - Fifo In</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{ g.raspiconfig.motion_pipe}}">
+                <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{ g.motion_pipe}}">
             </div>
             <div class="col"><label class="col-form-label-sm">Control - Fifo Out</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{ g.raspiconfig.control_file}}">
+                <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{ g.control_file}}">
             </div>            
         </div>    
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
@@ -247,8 +247,22 @@ $('#schedule button').click(function(){
         data.action = $(this).val()
 
         // Post data
-        // callbackSuccess = function(){location.reload();}
-        queryData("POST", "{{ url_for('schedule.index')}}", data) 
+        let callbackSuccess;
+        if (data.action == "restore")
+            callbackSuccess = function(){location.reload();}
+
+        if (data.action == "stop" || data.action == "start") {
+            next = data.action == "stop" ? "start" : "stop"
+            callbackSuccess = function(response) {
+                if (response.type == "success") {               
+                    $('.stopstart').val(next)
+                    $('.stopstart').prop("id", next)
+                    $('.stopstart').prop("name",next)
+                    $('.stopstart').html(capitalize(next))
+                }
+            }
+        }
+        queryData("POST", "{{ url_for('schedule.index')}}", data, callbackSuccess) 
     }
 
 });
@@ -256,10 +270,16 @@ $('#schedule button').click(function(){
 $('#daymode').unbind();
 $('#daymode').click(function(){
     mode = $("#daymode").val();
-
     callbackSuccess = function(data) {
-        data["period"]
-        line = $('#period_scheduler').children()[data["period"]+1].children[0]
+        let periods = ['AllDay','Night','Dawn','Day','Dusk']
+        let day_period = data["period"]
+        let line = $('#period_scheduler').children()[data["period"]+1].children[0]
+        if (data["period"] < 5) {
+            period = periods[day_period]
+        } else {
+            period = $(line).find('[name="times"]').val()
+        }
+        $('#period').html(`Period: <b>${period}</b>`)
         $(line).css("background-color","LightGreen")
     }
     queryData("GET", "{{ url_for('schedule.period')}}",{"daymode":mode} ,callbackSuccess) 

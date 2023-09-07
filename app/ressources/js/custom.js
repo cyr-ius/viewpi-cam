@@ -1,4 +1,4 @@
-function send_cmd(cmd) {
+function send_cmd(cmd, callbackSuccess, callbackError) {
   cmd.replace(/&/g, "%26").replace(/#/g, "%23").replace(/\+/g, "%2B");
   $.ajax({
     method: "POST",
@@ -9,28 +9,12 @@ function send_cmd(cmd) {
     success: function(data){
       if (data["type"] == "error") $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
       $('#toast .toast-body').html(data["message"])
-    }
-  });
-}
-
-var filterFloat = function (value) {
-  if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value))
-    return Number(value);
-  return NaN;
-};
-
-function populate(frm, data) {
-  $.each(data, function (key, value) {
-    var ctrl = $('[name=' + key + ']', frm);
-    switch (ctrl.prop("type")) {
-      case "radio": case "checkbox":
-        ctrl.each(function () {
-          if ($(this).attr('value') == value) $(this).attr("checked", value);
-        });
-        break;
-      default:
-        ctrl.val(value);
-    }
+      if (callbackSuccess) callbackSuccess(data)
+    },
+    error: function(data){
+      $("#toast .toast-body").html(data["message"])
+      if (callbackError) callbackError(data)
+    },  
   });
 }
 
@@ -45,6 +29,7 @@ function queryData(method="POST", url, data, callbackSuccess,callbackError){
       // dataType:"json",
       contentType:"application/json; charset=utf-8",            
       success: function(data){
+          if (data["type"] == "error") $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
           $("#toast .toast-body").html(data["message"])
           if (callbackSuccess) callbackSuccess(data)
       },
@@ -54,6 +39,12 @@ function queryData(method="POST", url, data, callbackSuccess,callbackError){
       },
   })  
 }
+
+var filterFloat = function (value) {
+  if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value))
+    return Number(value);
+  return NaN;
+};
 
 function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
