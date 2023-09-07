@@ -153,7 +153,7 @@ def sys_cmd(cmd):
         if cmd == "shutdown":
             os.popen("echo o > /proc/sysrq-trigger")
         if cmd == "restart_app":
-            os.popen("echo o > /proc/sysrq-trigger")
+            os.popen("killall gunicorm")
         if cmd == "settime" and (timestr := request.args.get("timestr")):
             os.popen(f'sudo date -s "{timestr}')
     except Exception as error:

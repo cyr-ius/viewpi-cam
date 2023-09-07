@@ -1,3 +1,4 @@
+"""Authentication decorators."""
 from functools import wraps
 from flask import redirect, url_for, request, g, current_app
 
@@ -25,5 +26,3 @@ def token_accept(f):
 
 class ViewPiCamException(Exception):
     """ViewPi Cam exception."""
-
-    pass
