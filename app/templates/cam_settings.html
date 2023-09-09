@@ -639,10 +639,10 @@ function set_at(value) {
     send_cmd("at " + enable + " " + yuv[0] + " " + yuv[1] + " " + yuv[2]);
 }
 
-function set_ac() {
+function set_ac(value) {
     let enable = 0
     let yuv = colorconv.RGB2YUV(colorconv.HEX2RGB(value))
-    if (value != "#ffffff")
+    if (value != "#000000")
         enable = 1    
     send_cmd("ac " + enable + " " + yuv[0] + " " + yuv[1] + " " + yuv[2]);
 }
