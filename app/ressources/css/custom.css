@@ -8,7 +8,16 @@ body {
 main > .container, main > .container-fluid {
     height: calc(100vh - 120px);
   }
-  
+
+.fullscreen {
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: auto;
+  height: 100%;
+  z-index: 1040;
+}
+
 .form-signin {
   max-width: 330px;
   padding: 1rem;
