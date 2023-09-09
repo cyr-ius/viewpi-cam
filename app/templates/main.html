@@ -19,15 +19,16 @@
 </svg>
 
 <div class="container text-center liveimage overflow-auto">
-    <div>
+    <div style="width: auto;height: calc(100vh - 335px);">
         <img id="mjpeg_dest" 
-            {% if raspiconfig['fullscreen'] == 1 %}class="fullscreen"{%endif%} 
-            {% if raspiconfig['vector_preview'] %}style="width:{{raspiconfig['width']}}px"{%endif%} 
+            {% if raspiconfig['fullscreen'] == 1 %}class="fullscreen"{%else%}class="standard"{%endif%} 
+            {% if raspiconfig.vector_preview %}style="width:{{raspiconfig.width}}px !important"{%endif%} 
             {% if mode == 1 %}onclick="ontouchstart=pipan_start();" {%endif%}
             onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.jpg') }}">
     </div>
-    <div id="main-buttons" class="my-2">
-        {% if session["user_level"] >= config['USERLEVEL_MEDIUM'] and simple != 1 %}
+    
+    <div id="main-buttons" class="my-2 {% if display_mode == "Off" %}invisible{%endif%}">
+        {% if session["user_level"] >= config['USERLEVEL_MEDIUM']%}
         <button id="video_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
         <button id="image_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
         <button id="timelapse_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
@@ -37,9 +38,6 @@
         <button id="halt_button" type="button" class="btn btn-sm btn-danger" value=""></button>
         {%endif%}
     </div>
-    {% if toggle_button != "Off" and session["user_level"] >= config['USERLEVEL_MIN'] %}
-        <input id="toggle_display" type="button" class="btn btn-primary" value="{{toggle_button}}" style="position:absolute;top:60px;right:10px;" onclick="set_display(this.value);">
-    {%endif%}
     <div id="secondary-buttons" class="container-fluid text-center">
         <!-- Pan Control -->
         {%if mode > 0%}
@@ -79,7 +77,7 @@
     let mjpeg_img;
     let halted = 0;
     let previous_halted = 99;
-    let mjpeg_mode = 0;
+    let mjpeg_mode = {{mjpegmode}};
     let preview_delay = 0;
     let btn_class_p = "btn btn-primary"
     let btn_class_a = "btn btn-warning"
@@ -306,28 +304,31 @@
         let val;
         d.setTime(d.getTime() + (365*24*60*60*1000));
         let expires = "expires="+d.toUTCString();
-        if (value == "SimpleOff") {
-            val = "Off";
-        } else if (value == "SimpleOn") {
-            val = "Full";
+         if (value == "On") {
+            $('#main-buttons').removeClass("invisible")
+            $('#display_mode').val("Off")
+            $('#display_mode').html("Display Off")
         } else {
-            val = value
+            $('#main-buttons').addClass("invisible")
+            $('#display_mode').val("On")
+            $('#display_mode').html("Display On")
         }
         
-        document.cookie="display_mode=" + val + "; " + expires;
-        document.location.reload(true);
+        document.cookie="display_mode=" + value + "; " + expires;
     }
 
     function set_stream_mode(value) {
         let d = new Date();
         d.setTime(d.getTime() + (365*24*60*60*1000));
         let expires = "expires="+d.toUTCString();
-        if (value == "DefaultStream") {
-            $("#toggle_stream").val("MJPEG-Stream");
+        if (value == 1) {
+            $("#toggle_stream").html("MJPEG-Stream");
+             $("#toggle_stream").val(0);
         } else {
-            $("#toggle_stream").val("Default-Stream");
+            $("#toggle_stream").html("Default-Stream");
+            $("#toggle_stream").val(1);
         }
-        document.cookie="stream_mode=" + value + "; " + expires;
+        document.cookie="mjpegmode=" + value + "; " + expires;
         document.location.reload(true);
     } 
 
@@ -347,7 +348,7 @@
         } 
     }
 
-    function toggle_fullscreen(e) {
+    function toggle_fullscreen(event) {
         let background = document.getElementById("background");
 
         if(!background) {
@@ -356,12 +357,12 @@
             document.body.appendChild(background);
         }
         
-        if(e.className == "fullscreen") {
-            e.className = "";
+        if(event.className == "fullscreen") {
+            event.className = "standard";
             background.style.display = "none";
             closeFullscreen();
         } else {
-            e.className = "fullscreen";
+            event.className = "fullscreen";
             background.style.display = "block";
             openFullscreen();
         }

@@ -62,9 +62,12 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">System</a>
           <ul class="dropdown-menu">
-            {% if request.path =="/"%}
-            <li><button id="toggle_stream" class="dropdown-item" onclick="set_stream_mode(this.value);" value="{{stream_button}}">{{stream_button}}</button></li>
-            <li><button id="allow_simple" class="dropdown-item" onclick="set_display(this.value);" value="{{allow_simple}}">{{allow_simple}}</button></li>
+            {% if request.path == url_for('main.index') %}
+            {% set mjpegmode = 1 if mjpegmode == 0 else 0%}
+            {% set label_stream = "MJPEG-Stream" if mjpegmode == 0 else "Default-Stream"%}
+            <li><button id="toggle_stream" class="dropdown-item" onclick="set_stream_mode(this.value);" value="{{mjpegmode}}">{{label_stream}}</button></li>
+            {% set display_mode = "Off" if display_mode == "On" else "On"%}
+            <li><button id="display_mode" class="dropdown-item" onclick="set_display(this.value);" value="{{display_mode}}">Display {{display_mode}}</button></li>
             <li><hr class="dropdown-divider"></li>
             {%endif%}
             <div id="system">
