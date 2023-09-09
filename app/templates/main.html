@@ -281,7 +281,6 @@
     }
 
     function updatePreview(cycle) {
-        {# let time = new Date().getTime() #}
         if (mjpegmode) {
             if (cycle !== undefined && cycle == true) {
                 mjpeg_img.src = "{{ url_for('static', filename='img/updating.jpg') }}";
