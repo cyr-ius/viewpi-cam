@@ -18,6 +18,11 @@ main > .container, main > .container-fluid {
   z-index: 1040;
 }
 
+.standard {
+  height: 100%;
+  width:auto;
+}
+
 .form-signin {
   max-width: 330px;
   padding: 1rem;
