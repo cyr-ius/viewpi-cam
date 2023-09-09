@@ -19,7 +19,7 @@
 </svg>
 
 <div class="container text-center liveimage overflow-auto">
-    <div style="width: auto;height: calc(100vh - 335px);">
+    <div>
         <img id="mjpeg_dest"   
             {% if raspiconfig.vector_preview == 1 %}style="width:{{raspiconfig.width}}px !important"{%endif%} 
             {% if mode == 1 %}onclick="ontouchstart=pipan_start();" {%endif%}

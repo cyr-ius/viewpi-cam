@@ -11,16 +11,17 @@ main > .container, main > .container-fluid {
 
 .fullscreen {
   position: absolute;
-  top: 0;
-  left: 25%;
+  left: 0;
   width: auto;
-  height: 100%;
+  height: calc(100vh -120px);
   z-index: 1040;
+  right:0;
+  margin: auto;
+
 }
 
 .standard {
-  height: 100%;
-  width:auto;
+  width:100%;
 }
 
 .form-signin {
