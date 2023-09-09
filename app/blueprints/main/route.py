@@ -31,7 +31,6 @@ def before_app_request():
         for item in current_app.config["MACROS"]
     }
     g.motion_external = current_app.raspiconfig.motion_external
-    print("Here")
 
 
 @bp.route("/", methods=["GET", "POST"])
@@ -39,27 +38,8 @@ def before_app_request():
 def index():
     write_log(f"Logged in user: {session['user_id']}:")
     write_log(f"UserLevel {session['user_level']}")
-    display_mode = request.cookies.get("display_mode", "")
-    if display_mode == "Full":
-        allow_simple = "SimpleOff"
-        toggle_button = "Simple"
-        simple = 2
-    elif display_mode == "Simple":
-        allow_simple = "SimpleOff"
-        toggle_button = "Full"
-        simple = 1
-    else:
-        allow_simple = "SimpleOn"
-        toggle_button = "Off"
-        simple = 0
-
-    stream_mode = request.cookies.get("stream_mode")
-    if stream_mode == "MJPEG-Stream":
-        stream_button = "Default-Stream"
-        mjpegmode = 1
-    else:
-        stream_button = "MJPEG-Stream"
-        mjpegmode = 0
+    display_mode = request.cookies.get("display_mode", "On")
+    mjpegmode = int(request.cookies.get("mjpegmode", 1))
 
     mode = 0
     cam_pos = None
@@ -79,11 +59,8 @@ def index():
         cam_pos=cam_pos,
         user_buttons=current_app.settings.ubuttons,
         raspiconfig=current_app.raspiconfig,
-        toggle_button=toggle_button,
-        allow_simple=allow_simple,
-        simple=simple,
+        display_mode=display_mode,
         mjpegmode=mjpegmode,
-        stream_button=stream_button,
         preset=current_app.settings.upreset,
         presets=PRESETS,
     )
