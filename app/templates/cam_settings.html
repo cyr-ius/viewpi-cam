@@ -97,7 +97,6 @@
             <select class="form-select form-select-sm"onchange="send_cmd('cn ' + this.value)">
                 <option value="1" {% if raspiconfig.camera_num|int == 1 %}selected{%endif%}>First</option>
                 <option value="2" {% if raspiconfig.camera_num|int == 2 %}selected{%endif%}>Second</option>
-                {# {{ render.make_options(options_cn, 'camera_num')}} #}
             </select>
             </div>
         </div>
@@ -126,9 +125,8 @@
             <div class="col">
                 <div class="input-group mb-3">
                     <input class="form-control form-control-sm " id="annotation" type="text" value="{{raspiconfig.annotation|safe }}">
-                    {# {{ render.make_input('annotation')}} #}
-                    <button class="btn btn-sm btn-outline-secondary" value="Default" onclick="$('#annotation').val('RPi Cam %Y.%M.%D_%h:%m:%s'); send_cmd('an ' + encodeURI($('#annotation').val()))">Default</button>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('an ' + encodeURI($('#annotation').val()))">OK</button>
+                    <button class="btn btn-sm btn-outline-secondary" value="Default" onclick="$('#annotation').val('RPi Cam %Y.%M.%D_%h:%m:%s'); send_cmd('an ' + $('#annotation').val())">Default</button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('an ' + $('#annotation').val())">OK</button>
                 </div>
             </div>  
         </div>
@@ -138,7 +136,6 @@
                 <select class="form-select form-select-sm" onchange="send_cmd('ab ' + this.value)">
                     <option value="0" {% if raspiconfig.anno_background|int == 0 %}selected{%endif%}>Off</option>
                     <option value="1" {% if raspiconfig.anno_background|int == 1 %}selected{%endif%}>On</option>                
-                    {# {{ render.make_options(options_ab, 'anno_background')}} #}
                 </select>
             </div>            
         </div>
@@ -157,7 +154,6 @@
                 <select class="form-select form-select-sm" id="at_en">
                     <option value="0" {% if raspiconfig.anno3_custom_text_colour|int == 0 %}selected{%endif%}>Disabled</option>
                     <option value="1" {% if raspiconfig.anno3_custom_text_colour|int == 1 %}selected{%endif%}>Enabled</option>
-                    {# {{ render.make_options(options_at_en, 'anno3_custom_text_colour')}} #}
                 </select>
             </div>
         </div>
@@ -166,21 +162,18 @@
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">y</span>
                     <input class="form-control form-control-sm " id="at_y" type="number" value="{{raspiconfig.anno3_custom_text_Y}}">
-                    {# {{ render.make_input('at_y', null, 'anno3_custom_text_Y')}} #}
                 </div>
             </div>
             <div class="col-auto">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">u</span>
                     <input class="form-control form-control-sm " id="at_y" type="number" value="{{raspiconfig.anno3_custom_text_U}}">
-                    {# {{ render.make_input('at_y', null, 'anno3_custom_text_U')}} #}
                 </div>
             </div>
             <div class="col-auto">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">v</span>
                     <input class="form-control form-control-sm " id="at_y" type="number" value="{{raspiconfig.anno3_custom_text_V}}">
-                    {# {{ render.make_input('at_y', null, 'anno3_custom_text_V')}} #}
                 </div>
             </div>                                        
             <div class="col-auto">
@@ -193,7 +186,6 @@
                 <select class="form-select form-select-sm"id="ac_en">
                     <option value="0" {% if raspiconfig.anno3_custom_background_colour|int == 0 %}selected{%endif%}>Disabled</option>
                     <option value="1" {% if raspiconfig.anno3_custom_background_colour|int == 1 %}selected{%endif%}>Enabled</option>                
-                    {# {{ render.make_options(options_ac_en, 'anno3_custom_background_colour')}} #}
                 </select>
             </div>
         </div>
@@ -203,15 +195,12 @@
                 <div class="row">
                     <div class="col">
                         <input class="form-control form-control-sm " id="at_y" type="number" value="{{raspiconfig.anno3_custom_background_Y}}">
-                        {# {{ render.make_input('at_y', null, 'anno3_custom_background_Y')}} #}
                     </div>:
                     <div class="col">
                         <input class="form-control form-control-sm " id="at_u" type="number" value="{{raspiconfig.anno3_custom_background_U}}">
-                        {# {{ render.make_input('at_u', null, 'anno3_custom_background_U')}} #}
                     </div>:
                     <div class="col">
                         <input class="form-control form-control-sm " id="at_v" type="number" value="{{raspiconfig.anno3_custom_background_V}}">
-                        {# {{ render.make_input('at_v', null, 'anno3_custom_background_V')}} #}
                     </div>
                     <div class="col"><button class="btn btn-sm btn-outline-secondary" alue="OK" onclick="set_ac();">OK</button></div>
                 </div>
@@ -234,7 +223,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="video_buffer" type="number" value="{{raspiconfig.video_buffer}}">
-                    {# {{ render.make_input('video_buffer', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('bu ' + $('#video_buffer').val())">OK</button>
                 </div>
             </div>
@@ -244,7 +232,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="sharpness" type="number" value="{{raspiconfig.sharpness}}">
-                    {# {{ render.make_input('sharpness', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('sh ' + $('#sharpness').val())">OK</button>
                 </div>
             </div>
@@ -254,7 +241,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="contrast" type="number" value="{{raspiconfig.contrast}}">
-                    {# {{ render.make_input('contrast', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('co ' + $('#contrast').val())">OK</button>
                 </div>
             </div>
@@ -264,7 +250,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="brightness" type="number" value="{{raspiconfig.brightness}}">
-                    {# {{ render.make_input('brightness', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('br ' + $('#brightness').val())">OK</button>
                 </div>
             </div>
@@ -274,7 +259,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="saturation" type="number" value="{{raspiconfig.saturation}}">
-                    {# {{ render.make_input('saturation', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('sa ' + $('#saturation').val())">OK</button>
                 </div>
             </div>
@@ -284,7 +268,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="iso" type="number" value="{{raspiconfig.iso}}">
-                    {# {{ render.make_input('iso', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('is ' + $('#iso').val())">OK</button>
                 </div>                    
             </div>
@@ -298,8 +281,6 @@
                     <option value="spot" {% if raspiconfig.metering_mode == "spot" %}selected{%endif%}>Spot</option>
                     <option value="backlit" {% if raspiconfig.metering_mode == "backlit" %}selected{%endif%}>Backlit</option>
                     <option value="matrix" {% if raspiconfig.metering_mode == "matrix" %}selected{%endif%}>Matrix</option>                    
-
-                    {# {{ render.make_options(options_mm, 'metering_mode')}} #}
                 </select>
             </div>
         </div>
@@ -309,7 +290,6 @@
                 <select class="form-select form-select-sm"onchange="send_cmd('vs ' + this.value)">
                     <option value="0" {% if raspiconfig.video_stabilisation|int == 0 %}selected{%endif%}>Off</option>
                     <option value="1" {% if raspiconfig.video_stabilisation|int == 1 %}selected{%endif%}>On</option>
-                    {# {{ render.make_options(options_vs, 'video_stabilisation')}} #}
                 </select>
             </div>
         </div>
@@ -318,7 +298,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="exposure_compensation" type="number" value="{{raspiconfig.exposure_compensation}}">
-                    {# {{ render.make_input('exposure_compensation', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('ec ' + $('#exposure_compensation').val())">OK</button>
                 </div>
             </div>
@@ -338,7 +317,6 @@
                     <option value="beach" {% if raspiconfig.exposure_mode == "beach" %}selected{%endif%}>Beach</option>
                     <option value="verylong" {% if raspiconfig.exposure_mode == "verylong" %}selected{%endif%}>Verylong</option>
                     <option value="fixedfps" {% if raspiconfig.exposure_mode == "fixedfps" %}selected{%endif%}>Fixedfps</option>
-                    {# {{ render.make_options(options_em, 'exposure_mode')}} #}
                 </select>
             </div>
         </div>
@@ -357,7 +335,6 @@
                     <option value="flash" {% if raspiconfig.white_balance == "flash" %}selected{%endif%}>Flash</option>
                     <option value="horizon" {% if raspiconfig.white_balance == "horizon" %}selected{%endif%}>Horizon</option>
                     <option value="greyworld" {% if raspiconfig.white_balance == "greyworld" %}selected{%endif%}>Greyworld</option>
-                    {# {{ render.make_options(options_wb, 'white_balance')}} #}
                 </select>
             </div>
         </div>
@@ -369,14 +346,12 @@
                     <div class="input-group input-group-sm mb-3">
                         <span class="input-group-text">gain_r</span>
                         <input class="form-control form-control-sm " id="ag_r" type="number" value="{{raspiconfig.autowbgain_r}}">
-                        {# {{ render.make_input('ag_r', null, 'autowbgain_r', 'number')}} #}
                     </div>
                 </div>
                 <div class="col-5">
                     <div class="input-group input-group-sm mb-3">
                         <span class="input-group-text">gain_by</span>
                         <input class="form-control form-control-sm " id="ag_b" type="number" value="{{raspiconfig.autowbgain_b}}">
-                        {# {{ render.make_input('ag_b', null, 'autowbgain_b', 'number')}} #}
                     </div>
                 </div>
                 <div class="col-2">            
@@ -409,7 +384,6 @@
                     <option value="washedout" {% if raspiconfig.image_effect == "washedout" %}selected{%endif%}>Washedout</option>     
                     <option value="posterise" {% if raspiconfig.image_effect == "posterise" %}selected{%endif%}>Posterise</option>     
                     <option value="cartoon" {% if raspiconfig.image_effect == "cartoon" %}selected{%endif%}>Cartoon</option>     
-                    {# {{ render.make_options(options_ie, 'image_effect')}}                    #}
                 </select>
             </div>
         </div>
@@ -419,7 +393,6 @@
                 <select class="form-select form-select-sm" id="ce_en">
                     <option value="0" {% if raspiconfig.colour_effect_en|int == 0 %}selected{%endif%}>Disabled</option>
                     <option value="1" {% if raspiconfig.colour_effect_en|int == 1 %}selected{%endif%}>Enabled</option>                
-                    {# {{ render.make_options(options_ce_en, 'colour_effect_en')}} #}
                 </select>
             </div>
         </div>
@@ -429,7 +402,6 @@
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="ce_u" type="number" value="{{raspiconfig.colour_effect_u}}">:
                     <input class="form-control form-control-sm " id="ce_v" type="number" value="{{raspiconfig.colour_effect_v}}">
-                    {# {{ render.make_input('ce_u', null, 'colour_effect_u')}}:{{ render.make_input('ce_v', null, 'colour_effect_v')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="set_ce();">OK</button>
                 </div>                    
             </div>
@@ -440,7 +412,6 @@
                 <select class="form-select form-select-sm"onchange="send_cmd('st ' + this.value)">
                     <option value="0" {% if raspiconfig.stat_pass|int == 0 %}selected{%endif%}>Off</option>
                     <option value="1" {% if raspiconfig.stat_pass|int == 1 %}selected{%endif%}>On</option>
-                    {# {{ render.make_options(options_st, 'stat_pass')}} #}
                 </select>
             </div>
         </div>
@@ -452,7 +423,6 @@
                     <option value="90" {% if raspiconfig.rotation|int == 90 %}selected{%endif%}>Rotate 90°</option>                
                     <option value="180" {% if raspiconfig.rotation|int == 180 %}selected{%endif%}>Rotate 180°</option>                
                     <option value="270" {% if raspiconfig.rotation|int == 270 %}selected{%endif%}>Rotate 270°</option>                
-                    {# {{ render.make_options(options_ro, 'rotation')}} #}
                 </select>
             </div>
         </div>
@@ -464,7 +434,6 @@
                     <option value="1" {% if raspiconfig.flip == 1 %}selected{%endif%}>Horizontal</option>                
                     <option value="2" {% if raspiconfig.flip == 2 %}selected{%endif%}>Vertical</option>                
                     <option value="3" {% if raspiconfig.flip == 3 %}selected{%endif%}>Both</option>                
-                    {# {{ render.make_options(options_fl, 'flip')}} #}
                 </select>
             </div>
         </div>
@@ -476,28 +445,24 @@
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">x</span>
                     <input class="form-control form-control-sm " id="roi_x" type="number" value="{{raspiconfig.sensor_region_x}}">
-                    {# {{ render.make_input('roi_x', null, 'sensor_region_x', 'number')}} #}
                 </div>
             </div>
             <div class="col-3">
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">y</span>
                     <input class="form-control form-control-sm " id="roi_y" type="number" value="{{raspiconfig.sensor_region_y}}">
-                    {# {{ render.make_input('roi_y', null, 'sensor_region_y', 'number')}} #}
                 </div>
             </div>
             <div class="col-3">
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">w</span>
                     <input class="form-control form-control-sm " id="roi_w" type="number" value="{{raspiconfig.sensor_region_w}}">
-                    {# {{ render.make_input('roi_w', null, 'sensor_region_w', 'number')}} #}
                 </div>
             </div>
             <div class="col-2">
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">h</span>
                     <input class="form-control form-control-sm " id="roi_h" type="number" value="{{raspiconfig.sensor_region_h}}">
-                    {# {{ render.make_input('roi_h', null, 'sensor_region_h', 'number')}} #}
                 </div>
             </div>
             <div class="col-1"><button class="btn btn-sm btn-outline-secondary" onclick="set_roi();">OK</button></div>
@@ -507,7 +472,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="shutter_speed" type="number" value="{{raspiconfig.shutter_speed}}">
-                    {# {{ render.make_input('shutter_speed', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('ss ' + $('#shutter_speed').val())">OK</button>
                 </div>
             </div>
@@ -517,7 +481,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="image_quality" type="number" value="{{raspiconfig.image_quality}}">
-                    {# {{ render.make_input('image_quality', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('qu ' + $('#image_quality').val())">OK</button>
                 </div>
             </div>
@@ -532,21 +495,18 @@
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">Quality</span>
                     <input class="form-control form-control-sm " id="quality" type="number" value="{{raspiconfig.quality}}">
-                    {# {{ render.make_input('quality')}} #}
                 </div>
             </div>
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">Width</span>
                     <input class="form-control form-control-sm " id="width" type="number" value="{{raspiconfig.width}}">
-                    {# {{ render.make_input('width')}} #}
                 </div>
             </div>
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">Divider</span>
                     <input class="form-control form-control-sm " id="divider" type="number" value="{{raspiconfig.divider}}">
-                    {# {{ render.make_input('divider')}} #}
                 </div>
             </div>
             <div class="col"><button class="btn btn-sm btn-outline-secondary" onclick="set_preview();">OK</button></div>
@@ -557,7 +517,6 @@
                 <select class="form-select form-select-sm"onchange="send_cmd('rl ' + this.value)">
                     <option value="0" {% if raspiconfig.raw_layer|int == 0 %}selected{%endif%}>Off</option>
                     <option value="1" {% if raspiconfig.raw_layer|int == 1 %}selected{%endif%}>On</option>
-                    {# {{ render.make_options(options_rl, 'raw_layer')}} #}
                 </select>
             </div>
         </div>
@@ -566,7 +525,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="video_bitrate" type="number" value="{{raspiconfig.video_bitrate}}">
-                    {# {{ render.make_input('video_bitrate', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('bi ' + $('#video_bitrate').val())">OK</button>
                 </div>
             </div>
@@ -581,21 +539,18 @@
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">Frag</span>
                     <input class="form-control form-control-sm " id="minimise_frag" type="number" value="{{raspiconfig.minimise_frag}}">
-                    {# {{ render.make_input('minimise_frag', null, null, 'number')}} #}
                 </div>
             </div>
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">Quant</span>
                     <input class="form-control form-control-sm " id="initial_quant" type="number" value="{{raspiconfig.initial_quant}}">
-                    {# {{ render.make_input('initial_quant', null, null, 'number')}} #}
                 </div>
             </div>
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <span class="input-group-text">QP</span>
                     <input class="form-control form-control-sm " id="encode_qp" type="number" value="{{raspiconfig.encode_qp}}">
-                    {# {{ render.make_input('encode_qp', null, null, 'number')}} #}
                 </div>
             </div>
             <div class="col"><button class="btn btn-sm btn-outline-secondary" onclick="set_encoding();">OK</button></div>
@@ -637,7 +592,6 @@
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="log_size" type="number" value="{{raspiconfig.log_size}}">
-                    {# {{ render.make_input('log_size', null, null, 'number')}} #}
                     <button class="btn btn-sm btn-outline-secondary" onclick="send_cmd('ls ' + $('#log_size').val())">OK</button>
                 </div>
             </div>
@@ -648,7 +602,6 @@
                 <select class="form-select form-select-sm" onchange="send_cmd('hp ' + this.value)">
                     <option value="0" {% if raspiconfig.hdmi_preview|int == 0 %}selected{%endif%}>Off</option>
                     <option value="1" {% if raspiconfig.hdmi_preview|int == 1 %}selected{%endif%}>On</option>
-                    {# {{ render.make_options(options_hp, 'hdmi_preview')}} #}
                 </select>
             </div>
         </div>
