@@ -13,7 +13,7 @@ main > .container, main > .container-fluid {
   position: absolute;
   left: 0;
   width: auto;
-  height: calc(100vh -120px);
+  height: calc(100vh - 120px);
   z-index: 1040;
   right:0;
   margin: auto;
