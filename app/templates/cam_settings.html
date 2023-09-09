@@ -139,7 +139,7 @@
                 </select>
             </div>            
         </div>
-        <div class="row row-col-2 g-3">
+        <div class="row row-col-4 g-3">
             <label class="col col-form-label">Annotation size(0-99):</label> 
             <div class="col">
                 <div class="input-group mb-3">
@@ -148,63 +148,23 @@
                 </div>
             </div>
         </div>
-        <div class="row row-col-2 g-3">
-            <label class="col col-form-label">Custom text color:</label>
-            <div class="col">
-                <select class="form-select form-select-sm" id="at_en">
-                    <option value="0" {% if raspiconfig.anno3_custom_text_colour|int == 0 %}selected{%endif%}>Disabled</option>
-                    <option value="1" {% if raspiconfig.anno3_custom_text_colour|int == 1 %}selected{%endif%}>Enabled</option>
-                </select>
-            </div>
-        </div>
-        <div class="row row-cols-4 g-3 mb-3">
-            <div class="col-auto">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">y</span>
-                    <input class="form-control form-control-sm " id="at_y" type="number" value="{{raspiconfig.anno3_custom_text_Y}}">
-                </div>
-            </div>
-            <div class="col-auto">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">u</span>
-                    <input class="form-control form-control-sm " id="at_y" type="number" value="{{raspiconfig.anno3_custom_text_U}}">
-                </div>
-            </div>
-            <div class="col-auto">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">v</span>
-                    <input class="form-control form-control-sm " id="at_y" type="number" value="{{raspiconfig.anno3_custom_text_V}}">
-                </div>
-            </div>                                        
-            <div class="col-auto">
-                <button class="btn btn-sm btn-outline-secondary" alue="OK" onclick="set_at();">OK</button>
-            </div>
+        <div class="row row-cols-4 g-3">
+            <label class="col-6 col-form-label">Custom text color:</label>
+            <div class="col-6">
+                <input id="at_yuv" class="form-control form-control-sm " type="color" onchange="set_at(this.value)">
+                <input id="at_y" type="hidden" name="at_y" value="{{raspiconfig.anno3_custom_text_Y}}">
+                <input id="at_u" type="hidden" name="at_u" value="{{raspiconfig.anno3_custom_text_U}}">
+                <input id="at_v" type="hidden" name="at_v" value="{{raspiconfig.anno3_custom_text_V}}">
+            </div>                                     
         </div>
         <div class="row row-col-2 g-3">
-            <label class="col col-form-label">Custom background color:</label>
-            <div class="col">
-                <select class="form-select form-select-sm"id="ac_en">
-                    <option value="0" {% if raspiconfig.anno3_custom_background_colour|int == 0 %}selected{%endif%}>Disabled</option>
-                    <option value="1" {% if raspiconfig.anno3_custom_background_colour|int == 1 %}selected{%endif%}>Enabled</option>                
-                </select>
-            </div>
-        </div>
-        <div class="row row-col-2 g-3">
-            <label class="col col-form-label text-end">y:u:v</label> 
-            <div class="col">
-                <div class="row">
-                    <div class="col">
-                        <input class="form-control form-control-sm " id="at_y" type="number" value="{{raspiconfig.anno3_custom_background_Y}}">
-                    </div>:
-                    <div class="col">
-                        <input class="form-control form-control-sm " id="at_u" type="number" value="{{raspiconfig.anno3_custom_background_U}}">
-                    </div>:
-                    <div class="col">
-                        <input class="form-control form-control-sm " id="at_v" type="number" value="{{raspiconfig.anno3_custom_background_V}}">
-                    </div>
-                    <div class="col"><button class="btn btn-sm btn-outline-secondary" alue="OK" onclick="set_ac();">OK</button></div>
-                </div>
-            </div>
+            <label class="col-6 col-form-label">Custom background color:</label>
+            <div class="col-6">
+                <input id="ac_yuv" class="form-control form-control-sm " type="color" onchange="set_ac(this.value)">
+                <input id="ac_y" type="hidden" name="ac_y" value="{{raspiconfig.anno3_custom_background_Y}}">
+                <input id="ac_u" type="hidden" name="ac_u" value="{{raspiconfig.anno3_custom_background_U}}">
+                <input id="ac_v" type="hidden" name="ac_v" value="{{raspiconfig.anno3_custom_background_V}}">
+            </div>   
         </div>
         {% if file_exists("pilight_on") %}
         <div class="row row-col-2 g-3">
@@ -342,24 +302,22 @@
             <label class="col col-form-label">White Balance Gains (x100):</label>
             <div class="col">
                 <div class="row row-col-3 g-3">
-                <div class="col-5">
-                    <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text">gain_r</span>
-                        <input class="form-control form-control-sm " id="ag_r" type="number" value="{{raspiconfig.autowbgain_r}}">
+                    <div class="col-5">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text">gain_r</span>
+                            <input class="form-control form-control-sm " id="ag_r" type="number" value="{{raspiconfig.autowbgain_r}}">
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text">gain_by</span>
+                            <input class="form-control form-control-sm " id="ag_b" type="number" value="{{raspiconfig.autowbgain_b}}">
+                        </div>
+                    </div>
+                    <div class="col-2">            
+                        <button class="btn btn-sm btn-outline-secondary" onclick="set_ag();">OK</button>
                     </div>
                 </div>
-                <div class="col-5">
-                    <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text">gain_by</span>
-                        <input class="form-control form-control-sm " id="ag_b" type="number" value="{{raspiconfig.autowbgain_b}}">
-                    </div>
-                </div>
-                <div class="col-2">            
-                    <button class="btn btn-sm btn-outline-secondary" onclick="set_ag();">OK</button>
-                </div>
-
-                </div>
-
             </div>
         </div>
         <div class="row row-col-2 g-3">
@@ -397,13 +355,24 @@
             </div>
         </div>
         <div class="row row-col-2 g-3">
-            <label class="offset-1 col col-form-label text-end">u:v</label>
-            <div class="col">
-                <div class="input-group input-group-sm mb-3">
-                    <input class="form-control form-control-sm " id="ce_u" type="number" value="{{raspiconfig.colour_effect_u}}">:
-                    <input class="form-control form-control-sm " id="ce_v" type="number" value="{{raspiconfig.colour_effect_v}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="set_ce();">OK</button>
-                </div>                    
+            <div class="offset-6 col-6">
+                <div class="row row-col-3 g-3">
+                    <div class="col-5">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text">u</span>
+                            <input class="form-control form-control-sm " id="ce_u" type="number" value="{{raspiconfig.colour_effect_u}}">
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text">v</span>
+                            <input class="form-control form-control-sm " id="ce_v" type="number" value="{{raspiconfig.colour_effect_v}}">
+                        </div>
+                    </div>
+                    <div class="col-2">            
+                        <button class="btn btn-sm btn-outline-secondary" onclick="set_ce();">OK</button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row row-col-2 g-3">
@@ -611,6 +580,11 @@
 {% block extrascripts%}
 <script language="javascript">
 
+$(function() {
+    at_yuv = [$('#at_y').val() , $('#at_u').val(), $('#at_v').val()]
+    $('#at_uyv').val(colorconv.RGB2HEX(colorconv.YUV2RGB(at_yuv)));
+});
+
 function set_preset(value) {
   var values = value.split(" ");
   $("#video_width").val(values[0]);
@@ -635,44 +609,52 @@ function set_motion_external(value){
 }
 
 function set_res() {
-  send_cmd("px " + $("#video_width").val() + " " + $("#video_height").val() + " " + $("#video_fps").val() + " " + $("#MP4Box_fps").val() + " " + $("#image_width").val() + " " + $("#image_height").val() + " " + $("#fps_divider").val());
-  update_preview_delay();
-  updatePreview(true);
+    send_cmd("px " + $("#video_width").val() + " " + $("#video_height").val() + " " + $("#video_fps").val() + " " + $("#MP4Box_fps").val() + " " + $("#image_width").val() + " " + $("#image_height").val() + " " + $("#fps_divider").val());
+    update_preview_delay();
+    updatePreview(true);
 }
 
 function set_ce() {
-  send_cmd("ce " + $("#ce_en").val() + " " + $("#ce_u").val() + " " + $("#ce_v").val());
+    send_cmd("ce " + $("#ce_en").val() + " " + $("#ce_u").val() + " " + $("#ce_v").val());
 }
 
 function set_preview() {
-  send_cmd("pv " + $("#quality").val() + " " + $("#width").val() + " " + $("#divider").val());
-  update_preview_delay();
+    send_cmd("pv " + $("#quality").val() + " " + $("#width").val() + " " + $("#divider").val());
+    update_preview_delay();
 }
 
 function set_encoding() {
-  send_cmd("qp " + $("#minimise_frag").val() + " " + $("#initial_quant").val() + " " + $("#encode_qp").val());
+    send_cmd("qp " + $("#minimise_frag").val() + " " + $("#initial_quant").val() + " " + $("#encode_qp").val());
 }
 
 function set_roi() {
-  send_cmd("ri " + $("#roi_x").val() + " " + $("#roi_y").val() + " " + $("#roi_w").val() + " " + $("#roi_h").val());
+    send_cmd("ri " + $("#roi_x").val() + " " + $("#roi_y").val() + " " + $("#roi_w").val() + " " + $("#roi_h").val());
 }
 
-function set_at() {
-  send_cmd("at " + $("#at_en").val() + " " + $("#at_y").val() + " " + $("#at_u").val() + " " + $("#at_v").val());
+function set_at(value) {
+    let enable = 0
+    let yuv = colorconv.RGB2YUV(colorconv.HEX2RGB(value))
+    if (value != "#ffffff")
+        enable = 1
+    send_cmd("at " + enable + " " + yuv[0] + " " + yuv[1] + " " + yuv[2]);
 }
 
 function set_ac() {
-  send_cmd("ac " + $("#ac_en").val() + " " + $("#ac_y").val() + " " + $("#ac_u").val() + " " + $("#ac_v").val());
+    let enable = 0
+    let yuv = colorconv.RGB2YUV(colorconv.HEX2RGB(value))
+    if (value != "#ffffff")
+        enable = 1    
+    send_cmd("ac " + enable + " " + yuv[0] + " " + yuv[1] + " " + yuv[2]);
 }
 
 function set_ag() {
-  send_cmd("ag " + $("#ag_r").val() + " " + $("#ag_b").val());
+    send_cmd("ag " + $("#ag_r").val() + " " + $("#ag_b").val());
 }
 
 function update_preview_delay() {
-   var video_fps = parseInt($("#video_fps").val());
-   var divider = parseInt($("#divider").val());
-   preview_delay = Math.floor(divider / Math.max(video_fps,1) * 1000);
+    var video_fps = parseInt($("#video_fps").val());
+    var divider = parseInt($("#divider").val());
+    preview_delay = Math.floor(divider / Math.max(video_fps,1) * 1000);
 }
 
 </script>

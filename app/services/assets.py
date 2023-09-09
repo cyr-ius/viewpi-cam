@@ -47,9 +47,12 @@ js_main = Bundle(
     output="js/main.js",
 )
 
-js_pipan = Bundle("../app/ressources/js/pipan.js", filters="rjsmin", output="js/pipan.js")
+js_pipan = Bundle(
+    "../app/ressources/js/pipan.js", filters="rjsmin", output="js/pipan.js"
+)
 
 js_custom = Bundle(
+    "../app/ressources/js/colorconverter.js",
     "../app/ressources/js/color_modes.js",
     "../app/ressources/js/custom.js",
     filters="rjsmin",

@@ -18,10 +18,12 @@
   </head>
   {% block body %}  
   <body>
+    <!-- Scripts -->
+    {% assets "js_main" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
     <!-- Content -->
-    {% if config["DEBUG"] == True %}
+    {# {% if config["DEBUG"] == True %}
       {% debug %}
-    {%endif%}
+    {%endif%} #}
     <!-- Header -->
     {%block header%}
     <header>
@@ -42,7 +44,6 @@
     {% endblock %}
     <!-- Scripts -->
     {% block scripts %}
-    {% assets "js_main" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
     {% assets "js_custom" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
     {% endblock %}
     <!-- Extra scripts -->
