@@ -52,7 +52,7 @@ def cam_pic_new():
         "Content-type": "multipart/x-mixed-replace; boundary=PIderman",
         "Cache-Control": "no-cache",
         "Pragma": "no-cache",
-        "Connection": "close",
+        "Connection": "keep-alive",
     }
     return Response(_gather_img(preview_path, delay), headers=headers)
 
