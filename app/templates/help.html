@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<div class='container-fluid text-center'>
-<div class='panel-group' id='accordion'>
-<div class='panel panel-default'>
-    <table class='settingsTable'>
+<div class="container-fluid overflow-auto">
+    <table>
         <tr><th>Command</th><th>Parameters</th><th>Description</th></tr>
         <tr><td>md</td><td>0/1</td><td>0/1 stop/start motion detection</td></tr>
         <tr><td>ca c [t]</td><td>0/1</td><td>c=0/1 stop/start video capture; t=capture secs if present</td></tr>
