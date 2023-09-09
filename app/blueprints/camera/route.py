@@ -14,7 +14,7 @@ bp = Blueprint("camera", __name__, url_prefix="/cam")
 @auth_required
 @token_accept
 def cam_pic():
-    delay = float(request.args.get("pDelay", 1.0)) / 1000000
+    delay = float(request.args.get("delay", 1.0)) / 1000000
     cam_jpg = _get_shm_cam()
     time.sleep(delay)
     headers = {"Access-Control-Allow-Origin": "*", "Content-Type": "image/jpeg"}
@@ -46,7 +46,7 @@ def cam_get():
 @auth_required
 @token_accept
 def cam_pic_new():
-    delay = float(request.args.get("pDelay", 1.0)) / 100
+    delay = float(request.args.get("delay", 1.0)) / 100
     preview_path = current_app.raspiconfig.preview_path
     headers = {
         "Content-type": "multipart/x-mixed-replace; boundary=PIderman",

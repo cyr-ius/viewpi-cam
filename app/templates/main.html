@@ -116,7 +116,7 @@
     function reload_img () {
         let time = new Date().getTime()
         if(!halted) {
-            mjpeg_img.src=`{{url_for('camera.cam_pic')}}?time=${time}&pDelay=${preview_delay}`;
+            mjpeg_img.src=`{{url_for('camera.cam_pic')}}?time=${time}&delay=${preview_delay}`;
         } else { setTimeout("reload_img()", 500);}
     }
 
@@ -287,12 +287,12 @@
         if (mjpegmode) {
             if (cycle !== undefined && cycle == true) {
                 mjpeg_img.src = "{{ url_for('static', filename='img/updating.jpg') }}";
-                setTimeout(`mjpeg_img.src="{{ url_for('camera.cam_pic_new') }}?time=${time}&pDelay=${preview_delay}";`, 1000);
+                setTimeout(`mjpeg_img.src="{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}";`, 1000);
                 return;
             }
             if (previous_halted != halted) {
                 if(!halted) {
-                    mjpeg_img.src = `{{ url_for('camera.cam_pic_new') }}?time=${time}&pDelay=${preview_delay}`;			
+                    mjpeg_img.src = `{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}`;			
                 } else {
                     mjpeg_img.src = "{{ url_for('static', filename='img/unavailable.jpg') }}";
                 }
