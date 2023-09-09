@@ -77,7 +77,7 @@
     let halted = 0;
     let previous_halted = 99;
     let mjpeg_mode = {{mjpegmode}};
-    let preview_delay = 0;
+    let preview_delay = 4000;
     let btn_class_p = "btn btn-primary"
     let btn_class_a = "btn btn-warning"
     let elem = document.documentElement;
@@ -126,7 +126,7 @@
         mjpeg_img = document.getElementById("mjpeg_dest");
         hashHandler();
         window.onhashchange = hashHandler;
-        preview_delay = Math.floor(divider / Math.max(video_fps,1) * 1000000);
+        preview_delay = Math.floor(divider / Math.max(video_fps,1) * 1000);
         if (mjpeg == 1) {
             mjpegmode = 1;
         } else {

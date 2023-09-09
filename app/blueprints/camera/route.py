@@ -3,7 +3,7 @@ import glob
 import os
 import time
 
-from flask import Blueprint, Response, current_app, request
+from flask import Blueprint, Response, current_app, request, app
 
 from app.helpers.decorator import auth_required, token_accept
 
@@ -14,7 +14,7 @@ bp = Blueprint("camera", __name__, url_prefix="/cam")
 @auth_required
 @token_accept
 def cam_pic():
-    delay = float(request.args.get("delay", 1.0)) / 1000000
+    delay = float(request.args.get("delay", 100)) / 1000  # Unit (ms)
     cam_jpg = _get_shm_cam()
     time.sleep(delay)
     headers = {"Access-Control-Allow-Origin": "*", "Content-Type": "image/jpeg"}
@@ -46,15 +46,12 @@ def cam_get():
 @auth_required
 @token_accept
 def cam_pic_new():
-    delay = float(request.args.get("delay", 1.0)) / 100
+    delay = float(request.args.get("delay", 100)) / 1000  # Unit (ms)
     preview_path = current_app.raspiconfig.preview_path
-    headers = {
-        "Content-type": "multipart/x-mixed-replace; boundary=PIderman",
-        "Cache-Control": "no-cache",
-        "Pragma": "no-cache",
-        "Connection": "keep-alive",
-    }
-    return Response(_gather_img(preview_path, delay), headers=headers)
+    return Response(
+        _gather_img(preview_path, delay),
+        mimetype="multipart/x-mixed-replace; boundary=PIderman",
+    )
 
 
 @bp.route("/status_mjpeg", methods=["GET"])
@@ -81,7 +78,11 @@ def _get_shm_cam(preview_path=None):
         current_app.raspiconfig.preview_path if preview_path is None else preview_path
     )
     if os.path.isfile(preview_path):
-        return open(preview_path, "rb").read()
+        with open(preview_path, "rb") as file:
+            return file.read()
+    else:
+        with open("app/ressources/img/unavailable.jpg", "rb") as file:
+            return file.read()
 
 
 def _gather_img(preview_path, delay=0.1):
