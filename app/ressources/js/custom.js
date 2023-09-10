@@ -1,53 +1,6 @@
 function send_cmd(cmd, callbackSuccess, callbackError) {
   cmd.replace(/&/g, "%26").replace(/#/g, "%23").replace(/\+/g, "%2B");
-  $.ajax({
-    method: "POST",
-    url:"/pipe_cmd",
-    data: JSON.stringify({"cmd":cmd}),
-    dataType:"json",
-    contentType:"application/json; charset=utf-8",        
-    success: function(data){
-      if (data["type"] == "error") $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
-      $('#toast .toast-body').html(data["message"])
-      if (callbackSuccess) callbackSuccess(data)
-    },
-    error: function(data){
-      $("#toast .toast-body").html(data["message"])
-      if (callbackError) callbackError(data)
-    },  
-  });
-}
-
-function queryData(method="POST", url, data, callbackSuccess,callbackError){
-  if (method == "POST") {
-    data = JSON.stringify(data)
-  }
-  $.ajax({
-      method: method,
-      url: url,
-      data: data,
-      // dataType:"json",
-      contentType:"application/json; charset=utf-8",            
-      success: function(data){
-          if (data["type"] == "error") $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
-          $("#toast .toast-body").html(data["message"])
-          if (callbackSuccess) callbackSuccess(data)
-      },
-      error: function(data){
-          $("#toast .toast-body").html(data["message"])
-          if (callbackError) callbackError(data)
-      },
-  })  
-}
-
-var filterFloat = function (value) {
-  if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value))
-    return Number(value);
-  return NaN;
-};
-
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  $.queryData({"url":"/pipe_cmd", "data":{"cmd": cmd}})
 }
 
 (function() {
@@ -94,6 +47,42 @@ function capitalize(string) {
   // Start observing the target node for configured mutations
   observer.observe(targetNode, config);
 
+  $.queryData = function(options){
+    var o = $.extend({
+      method: "POST", 
+      url: null, 
+      data: null, 
+      callbackSuccess: null,
+      callbackError: null,
+      convertJson: true,
+    }, options || {});
+
+    $.ajax({
+      method: o.method,
+      url: o.url,
+      data: o.convertJson && o.data != "" ? JSON.stringify(o.data) : o.data,
+      contentType: "application/json; charset=utf-8",            
+      success: function(data){
+          if (data["type"] == "error") $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
+          $("#toast .toast-body").html(data["message"])
+          if (o.callbackSuccess) return o.callbackSuccess(data)
+      },
+      error: function(data){
+          $("#toast .toast-body").html(data["message"])
+          if (o.callbackError) return o.callbackError(data)
+      },
+    })
+  };
+
+  $.capitalize = function(value){
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+  $.filterFloat = function(value){
+      if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value))
+        return Number(value);
+      return NaN;   
+  }
 
   $.fn.serialize = function (options) {
     return $.param(this.serializeArray(options));
@@ -149,7 +138,7 @@ function capitalize(string) {
     return this.serializeArray({checkboxesAsBools: o.checkboxesAsBools})
     .reduce(function(obj, item) {
       var name = item["name"]
-      var check_value = filterFloat(item["value"]) || item["value"];
+      var check_value = $.filterFloat(item["value"]) || item["value"];
       if (check_value == "0") check_value = 0;
       if (! obj.hasOwnProperty(name) ) {
         obj[name] = check_value;
@@ -164,4 +153,7 @@ function capitalize(string) {
       return obj
     }, {})
   }
+
+
+
 })()

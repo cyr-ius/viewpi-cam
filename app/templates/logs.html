@@ -40,8 +40,8 @@ $('#log button').click(function(){
             }
         });
     } else {
-        callback = function(data) {location.reload();}
-        queryData("POST", "{{url_for('main.log')}}", {'action': $(this).val()}, callback)
+        callbackSuccess = function(data) {location.reload();}
+        $.queryData({"url":"{{url_for('main.log')}}", "data":{'action': $(this).val()},"callbackSuccess":callbackSuccess})
     }
     
 });

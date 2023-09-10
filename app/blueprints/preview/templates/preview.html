@@ -163,7 +163,7 @@ $('#form_gallery button[name="delete"], #display button[name="delete"').unbind()
 $('#form_gallery button[name="delete"], #display button[name="delete"').click(function(){
     if (confirm('Are you sure you want to delete this file?')) {
         callback = function(data) {location.reload();}
-        queryData("POST", "{{url_for('preview.index')}}", {"action":"delete", "filename": $(this).val()}, callback)
+        $.queryData({"url":"{{url_for('preview.index')}}", "data":{"action":"delete", "filename": $(this).val()}, "callbackSuccess":callback})
     }
 })
 
@@ -175,7 +175,7 @@ $('#form_gallery button[name="updateSize"]').click(function(){
 $('#time_filter, #show_types, #sort_order').on('change', function() {
     data = $('#form_gallery').serializeObject()
     callback = function(data) {location.reload();}
-    queryData("POST", "{{url_for('preview.index')}}", data, callback)
+    $.queryData({"url":"{{url_for('preview.index')}}", "data":data, "callbackSuccess":callback})
 })
 
 $('#selectNone').unbind();
@@ -196,7 +196,7 @@ $('#deleteSel, #lockSel, #unlockSel').click(function(){
     }
     data = $('#form_gallery').serializeObject();
     data.action = $(this).val()
-    queryData("POST", "{{url_for('preview.index')}}", data, callback)
+    $.queryData({"url":"{{url_for('preview.index')}}", "data":data, "callbackSuccess":callback})
 });
 
 $('#deleteAll').unbind();
@@ -258,7 +258,7 @@ $('#display button[name="download"]').click(function(){
 });
 
 $('#display button[name="convert"]').click(function(){
-    queryData("POST","{{url_for('preview.index')}}",{"action":"convert","filename": $(this).val()})
+    $.queryData({"url":"{{url_for('preview.index')}}", "data":{"action":"convert","filename": $(this).val()}})
 });
 
 

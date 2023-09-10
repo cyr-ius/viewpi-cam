@@ -258,11 +258,11 @@ $('#schedule button').click(function(){
                     $('.stopstart').val(next)
                     $('.stopstart').prop("id", next)
                     $('.stopstart').prop("name",next)
-                    $('.stopstart').html(capitalize(next))
+                    $('.stopstart').html($.capitalize(next))
                 }
             }
         }
-        queryData("POST", "{{ url_for('schedule.index')}}", data, callbackSuccess) 
+        $.queryData({"url":"{{ url_for('schedule.index')}}","data": data,"callbackSuccess": callbackSuccess}) 
     }
 
 });
@@ -282,7 +282,9 @@ $('#daymode').click(function(){
         $('#period').html(`Period: <b>${period}</b>`)
         $(line).css("background-color","LightGreen")
     }
-    queryData("GET", "{{ url_for('schedule.period')}}",{"daymode":mode} ,callbackSuccess) 
+
+    data = {"daymode":mode}
+    $.queryData({"url":"{{ url_for('schedule.period')}}", data:data, "callbackSuccess":callbackSuccess})
 
     $('.sun').addClass("d-none");
     $('.day').addClass("d-none");   

@@ -160,32 +160,31 @@
     $('#upreset').unbind()
     $('#upreset').on("change", function(event) {
         data = $(this).serializeObject({"checkboxesAsBools":true});
-        queryData("POST","{{ url_for('settings.index')}}",data);
+        $.queryData({"url":"{{ url_for('settings.index')}}","data":data});
     })
 
     $('#pilight, #pipan, #servo').unbind()
     $('#pilight, #pipan, #servo').on("change", function(event) {
         data = $(this).serializeObject({"checkboxesAsBools":true});
-        console.log(data)
-        queryData("POST","{{ url_for('settings.index')}}",data);
+        $.queryData({"url":"{{ url_for('settings.index')}}","data":data});
     })
 
     $('#copy').unbind();
     $('#copy').click(function () {
-        copyToClipboard('#token');
+        copyToClipboard('#token');$.
         event.preventDefault();
     });
 
     $('#generate').unbind();
     $('#generate').click(function () {
         callback = function(data){$('#token').val(data["token"])}
-        queryData("POST","{{ url_for('settings.index')}}",{"token":"generate"},callback);
+        $.queryData({"url":"{{ url_for('settings.index')}}","data":{"token":"generate"},"callbackSuccess":callback});
     });     
 
     $('#reset').unbind();
     $('#reset').click(function () {
         callback = function(data){$('#token').val('')}
-        queryData("DELETE","{{ url_for('settings.index')}}",{"token":"generate"},callback);
+        $.queryData({"url":"{{ url_for('settings.index')}}","data":{"token":"generate"},"callbackSuccess":callback});
     });    
 
     $('#users').on('click','.add_user', function() {
@@ -198,7 +197,7 @@
                 user.removeAttr('id')                
                 templ_user.insertAfter(user);
         }
-        queryData("POST","{{ url_for('settings.index')}}",data,callback);
+        $.queryData({"url":"{{ url_for('settings.index')}}","data":data, "callbackSuccess":callback});
 
     });
 
@@ -206,7 +205,7 @@
         user = $(this).parent().parent()
         data = $(user).find('input, select').serializeObject();
         callback = function(data){ user.remove() }
-        queryData("DELETE","{{ url_for('settings.index')}}",data,callback);
+        $.queryData({"method":"DELETE", "url":"{{ url_for('settings.index')}}","data":data, "callbackSuccess":callback});
     });
 
     $('#ubuttons').on('click','.add_button', function() {
@@ -218,14 +217,14 @@
                 button.removeAttr('id')                
                 templ_ubutton.insertAfter(button);
         }
-        queryData("POST","{{ url_for('settings.index')}}",data,callback);
+        $.queryData({"url":"{{ url_for('settings.index')}}","data":data, "callbackSuccess":callback});
     });
 
     $('#ubuttons').on('click','.del_button', function() {
         button = $(this).parent().parent();
         data = $(button).find('input').serializeObject();
         callback = function(data){ button.remove() }
-        queryData("DELETE","{{ url_for('settings.index')}}",data,callback);
+        $.queryData({"method":"DELETE", "url":"{{ url_for('settings.index')}}", "data":data, "callbackSuccess":callback});
     });
 
     function send_macroUpdate(i, macro) {
