@@ -1,5 +1,6 @@
 """Blueprint preview."""
 import os
+import shutil
 import time
 import zipfile
 from datetime import datetime as dt
@@ -244,8 +245,9 @@ def video_convert(filename: str):
             cmd = f"({rst} {media_path}/{video_file}; rm -rf {tmp};) >/dev/null 2>&1 &"
             write_log(f"start lapse convert: {cmd}")
             os.popen(cmd)
-            os.popen(
-                f"cp {media_path}/{filename} {media_path}/{video_file}.v{file_index}{current_app.config['THUMBNAIL_EXT']}"
+            shutil.copy(
+                src=f"{media_path}/{filename}",
+                dst=f"{media_path}/{video_file}.v{file_index}{current_app.config['THUMBNAIL_EXT']}",
             )
             write_log("Convert finished")
 
@@ -326,6 +328,7 @@ def draw_files(filesnames: list):
             file_timestamp = os.path.getmtime(f"{media_path}/{real_file}")
             try:
                 file_right = os.access(f"{media_path}/{real_file}", os.W_OK)
+                current_app.logger.debug("File Right {file_right}")
             except UnboundLocalError:
                 file_right = 0
             if file_type == "v":
@@ -351,6 +354,7 @@ def draw_files(filesnames: list):
                 }
             )
 
+    current_app.logger.debug("Thumbnails: {thumbnails}")
     return thumbnails
 
 
