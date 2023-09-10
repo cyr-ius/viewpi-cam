@@ -143,9 +143,9 @@ def sys_cmd(cmd):
 @auth_required
 def send_cmd():
     """Send command to control fifo."""
-    if (cmd := request.json.get("cmd")) and (values := request.json.get("values", [])):
-        values = " ".join(values)
-        full_cmd = f"{cmd} {values}"
+    if (cmd := request.json.get("cmd")) and (params := request.json.get("params", [])):
+        params = " ".join(params)
+        full_cmd = f"{cmd} {params}"
         msg = send_pipe(current_app.raspiconfig.control_file, full_cmd)
         return msg
     return {

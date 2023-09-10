@@ -1,4 +1,5 @@
-(function() {
+// Main functions
+$(document).ready(function(){
   'use strict'
 
   // Fetch all the forms we want to apply custom Bootstrap validation styles to
@@ -81,11 +82,13 @@
 
   $.sendCmd = function(options){
     var o = $.extend({
-      url: "/command", data:null, callbackSuccess: null, callbackError: null,
+      url: "/command", cmd:null, params:null, callbackSuccess: null, callbackError: null,
     }, options || {});
-    // o.data.replace(/&/g, "%26").replace(/#/g, "%23").replace(/\+/g, "%2B");
+    if (typeof o.params === 'string' || o.params instanceof String) {
+       o.params=[o.params]
+    }   
     $.queryData(
-      {"url":o.url, "data":o.data,"callbackSuccess":o.callbackSuccess,"callbackError":o.callbackError}
+      {"url":o.url, "data":{"cmd":o.cmd,"params":o.params},"callbackSuccess":o.callbackSuccess,"callbackError":o.callbackError}
     )    
   }
 
@@ -158,7 +161,4 @@
       return obj
     }, {})
   }
-
-
-
-})()
+});

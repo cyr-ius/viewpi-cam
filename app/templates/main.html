@@ -61,7 +61,7 @@
         <div class="container-fluid text-center">
         {% for button in user_buttons%}
             {% if button['display'] == 1 %}
-            <button id="{{button['name']}}" class="btn btn-sm {{button['class']}}" type="button" onclick=f"$.sendCmd({'data':{'cmd':'sy','values':[{{button['macro']}}]}});" style="{{button['style']}}"  {{button['others']}}>{{button['name']}}</button>
+            <button id="{{button['name']}}" class="btn btn-sm {{button['class']}}" type="button" onclick=f"$.sendCmd({'cmd':'sy','params':{{button['macro']}}});" style="{{button['style']}}"  {{button['others']}}>{{button['name']}}</button>
             {%endif%}
         {%endfor%}
         </div>
@@ -88,7 +88,7 @@
 
     $('#main-buttons button').unbind();
     $('#main-buttons button').click(function(){
-        $.sendCmd({'data':{'cmd':$(this).attr("aria-viewpicam-cmd"),'values':[$(this).attr("aria-viewpicam-values")]}})
+        $.sendCmd({'cmd':$(this).attr("aria-viewpicam-cmd"),'params':$(this).attr("aria-viewpicam-values")})
     });
 
 
