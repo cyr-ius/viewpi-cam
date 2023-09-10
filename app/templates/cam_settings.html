@@ -583,6 +583,11 @@
 $(function() {
     at_yuv = [$('#at_y').val() , $('#at_u').val(), $('#at_v').val()]
     $('#at_uyv').val(colorconv.RGB2HEX(colorconv.YUV2RGB(at_yuv)));
+
+    ac_yuv = [$('#ac_y').val() , $('#ac_u').val(), $('#ac_v').val()]
+    $('#ac_uyv').val(colorconv.RGB2HEX(colorconv.YUV2RGB(ac_yuv)));
+
+
 });
 
 function set_preset(value) {
