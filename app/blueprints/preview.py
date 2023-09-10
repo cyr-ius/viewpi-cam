@@ -328,7 +328,7 @@ def draw_files(filesnames: list):
             file_timestamp = os.path.getmtime(f"{media_path}/{real_file}")
             try:
                 file_right = os.access(f"{media_path}/{real_file}", os.W_OK)
-                current_app.logger.debug("File Right {file_right}")
+                current_app.logger.debug(f"File Right {file_right}")
             except UnboundLocalError:
                 file_right = 0
             if file_type == "v":
@@ -354,7 +354,7 @@ def draw_files(filesnames: list):
                 }
             )
 
-    current_app.logger.debug("Thumbnails: {thumbnails}")
+    current_app.logger.debug(f"Thumbnails: {thumbnails}")
     return thumbnails
 
 
