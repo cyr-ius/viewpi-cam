@@ -22,7 +22,7 @@ RUN /bin/bash -c ./buildme
 
 
 FROM python:3.11-alpine
-
+ARG VERSION
 WORKDIR /app
 
 # set version label
@@ -74,8 +74,6 @@ VOLUME /app/system
 
 ENV VIRTUAL_ENV /env
 ENV PATH $PATH:/env/bin
-
-ARG VERSION
 ENV VERSION ${VERSION}
 
 EXPOSE 8000
