@@ -60,8 +60,8 @@
         {% if user_buttons|length > 0 %}
         <div class="container-fluid text-center">
         {% for button in user_buttons%}
-            {% if button['display'] == 1 %}
-            <button id="{{button['name']}}" class="btn btn-sm {{button['class']}}" type="button" onclick=f"$.sendCmd({'cmd':'sy','params':{{button['macro']}}});" style="{{button['style']}}"  {{button['others']}}>{{button['name']}}</button>
+            {% if button.display == 1 %}
+            <button id="{{button.name}}" class="btn btn-sm {{button.css_class}}" type="button" onclick="$.sendCmd({'cmd':'sy','params':'{{button.macro}}'});" style="{{button.style}}" {{button.other}}>{{button.name}}</button>
             {%endif%}
         {%endfor%}
         </div>
