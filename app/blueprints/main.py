@@ -139,17 +139,6 @@ def sys_cmd(cmd):
         raise ViewPiCamException(f"System command failed ({error})") from error
 
 
-@bp.route("/pipe_cmd", methods=["POST"])
-@auth_required
-def pipe_cmd():
-    """Send command to control fifo."""
-    if cmd := request.json.get("cmd"):
-        print(f"OLD-->{cmd}")
-        msg = send_pipe(current_app.raspiconfig.control_file, cmd)
-        return msg
-    return {"type": "error", "message": "Command not found"}
-
-
 @bp.route("/command", methods=["POST"])
 @auth_required
 def send_cmd():
@@ -157,7 +146,6 @@ def send_cmd():
     if (cmd := request.json.get("cmd")) and (values := request.json.get("values", [])):
         values = " ".join(values)
         full_cmd = f"{cmd} {values}"
-        print(f"NEW-->{full_cmd}")
         msg = send_pipe(current_app.raspiconfig.control_file, full_cmd)
         return msg
     return {
