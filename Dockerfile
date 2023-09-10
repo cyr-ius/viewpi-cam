@@ -26,10 +26,6 @@ FROM python:3.11-alpine
 WORKDIR /app
 
 # set version label
-ARG BUILD_DATE
-ARG VERSION
-ARG TARGETPLATFORM
-LABEL build_version="version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 LABEL org.opencontainers.image.source https://github.com/cyr-ius/viewpi-cam
 LABEL org.opencontainers.image.description ViewPI Cam (inspired Rpi Cam Interface)
 LABEL org.opencontainers.image.licenses MIT
@@ -67,7 +63,7 @@ COPY --from=gpac_builder /app/gpac-master/bin/gcc/MP4Box /usr/bin
 COPY --from=gpac_builder /app/gpac-master/bin/gcc/gpac /usr/bin
 COPY --from=userland_builder /app/userland/build/bin /usr/bin
 COPY --from=userland_builder /app/userland/build/lib /usr/lib
-
+ 
 ADD app ./app/
 
 VOLUME /app/static
@@ -78,6 +74,7 @@ VOLUME /app/system
 
 ENV VIRTUAL_ENV /env
 ENV PATH $PATH:/env/bin
+ENV VERSION ${DOCKER_METADATA_OUTPUT_VERSION}
 
 EXPOSE 8000
 
