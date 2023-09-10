@@ -13,6 +13,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from .blueprints.auth import bp as auth_bp
 from .blueprints.camera import bp as cam_bp
 from .blueprints.main import bp as main_bp
+from .blueprints.motion import bp as motion_bp
 from .blueprints.preview import bp as pview_bp
 from .blueprints.schedule import bp as sch_bp, launch_schedule
 from .blueprints.settings import bp as sets_bp
@@ -86,24 +87,25 @@ def create_app(config=None):
     assets.init_app(app)
     babel.init_app(app)
 
-    # Important ordering
+    # !!! Important ordering !!!
     raspiconfig.init_app(app)
     settings.init_app(app)
 
     # Register Assets
-    assets.register("css_main", css_main)
-    assets.register("js_main", js_main)
     assets.register("css_custom", css_custom)
+    assets.register("css_main", css_main)
     assets.register("js_custom", js_custom)
+    assets.register("js_main", js_main)
     assets.register("js_pipan", js_pipan)
 
     # Create app blueprints
-    app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(cam_bp)
+    app.register_blueprint(main_bp)
+    app.register_blueprint(motion_bp)
+    app.register_blueprint(pview_bp)
     app.register_blueprint(sch_bp)
     app.register_blueprint(sets_bp)
-    app.register_blueprint(pview_bp)
-    app.register_blueprint(cam_bp)
 
     # Register error handler
     app.register_error_handler(400, handle_bad_request)
