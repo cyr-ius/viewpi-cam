@@ -324,7 +324,10 @@ def draw_files(filesnames: list):
         if os.path.isfile(f"{media_path}/{real_file}"):
             file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
             file_timestamp = os.path.getmtime(f"{media_path}/{real_file}")
-            file_right = os.access(f"{media_path}/{real_file}", os.W_OK)
+            try:
+                file_right = os.access(f"{media_path}/{real_file}", os.W_OK)
+            except UnboundLocalError:
+                file_right = 0
             if file_type == "v":
                 duration = os.path.getmtime(f"{media_path}/{file}") - file_timestamp
         else:
