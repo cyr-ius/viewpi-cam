@@ -601,9 +601,9 @@ function set_preset(value) {
 function set_motion_external(value){
     callbackSuccess = function(data) { 
         if (data.type != "error") {
-            if (value == 0) 
+            if (value == "0") 
                 $('#motion_mode').prop("href","#motionSetting")
-            if (value == 1)
+            if (value == "1")
                 $('#motion_mode').prop("href","#motionExternal")
         }
     }
