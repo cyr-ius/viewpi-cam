@@ -144,9 +144,26 @@ def sys_cmd(cmd):
 def pipe_cmd():
     """Send command to control fifo."""
     if cmd := request.json.get("cmd"):
+        print(f"OLD-->{cmd}")
         msg = send_pipe(current_app.raspiconfig.control_file, cmd)
         return msg
     return {"type": "error", "message": "Command not found"}
+
+
+@bp.route("/command", methods=["POST"])
+@auth_required
+def send_cmd():
+    """Send command to control fifo."""
+    if (cmd := request.json.get("cmd")) and (values := request.json.get("values", [])):
+        values = " ".join(values)
+        full_cmd = f"{cmd} {values}"
+        print(f"NEW-->{full_cmd}")
+        msg = send_pipe(current_app.raspiconfig.control_file, full_cmd)
+        return msg
+    return {
+        "type": "error",
+        "message": "Command not found, {'cmd':'xxx', values:['xx','yy']}",
+    }
 
 
 @bp.route("/pipan", methods=["GET"])

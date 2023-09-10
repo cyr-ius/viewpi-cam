@@ -84,6 +84,16 @@ function send_cmd(cmd, callbackSuccess, callbackError) {
       return NaN;   
   }
 
+  $.sendCmd = function(options){
+    var o = $.extend({
+      url: "/command", data:null, callbackSuccess: null, callbackError: null,
+    }, options || {});
+    // o.data.replace(/&/g, "%26").replace(/#/g, "%23").replace(/\+/g, "%2B");
+    $.queryData(
+      {"url":o.url, "data":o.data,"callbackSuccess":o.callbackSuccess,"callbackError":o.callbackError}
+    )    
+  }
+
   $.fn.serialize = function (options) {
     return $.param(this.serializeArray(options));
   };

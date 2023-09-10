@@ -61,7 +61,8 @@
         <div class="container-fluid text-center">
         {% for button in user_buttons%}
             {% if button['display'] == 1 %}
-            <button id="{{button['name']}}" class="btn btn-sm {{button['class']}}" type="button" onclick="send_cmd('sy {{button['macro']}}');" style="{{button['style']}}"  {{button['others']}}>{{button['name']}}</button>
+            {# <button id="{{button['name']}}" class="btn btn-sm {{button['class']}}" type="button" onclick="send_cmd('sy {{button['macro']}}');" style="{{button['style']}}"  {{button['others']}}>{{button['name']}}</button> #}
+            <button id="{{button['name']}}" class="btn btn-sm {{button['class']}}" type="button" onclick=f"$.sendCmd({'data':{'cmd':'sy','values':[{{button['macro']}}]}});" style="{{button['style']}}"  {{button['others']}}>{{button['name']}}</button>
             {%endif%}
         {%endfor%}
         </div>

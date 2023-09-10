@@ -78,7 +78,13 @@
             <li class="nav-item"><a class="dropdown-item" href="#" onclick="app_restart();">Restart application</a></li>
             <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_restart();">Restart system</a></li>
             <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_shutdown();">Shutdown system</a></li>            
-            <li class="nav-item"><a class="dropdown-item" href="#" onclick="if(confirm('Are you sure to reset the settings to the default values?')) {send_cmd('rs 1');setTimeout(function(){location.reload(true);}, 1000);}">Reset settings</a></li>
+            {# <li class="nav-item"><a class="dropdown-item" href="#" onclick="if(confirm('Are you sure to reset the settings to the default values?')) {send_cmd('rs 1');setTimeout(function(){location.reload(true);}, 1000);}">Reset settings</a></li> #}
+            <li class="nav-item">
+              <a class="dropdown-item" href="#" 
+                onclick="if(confirm('Are you sure to reset the settings to the default values?')) {$.sendCmd({'data':{'cmd':'rs', 'values':['1']}});setTimeout(function(){location.reload(true);}, 1000);}">
+                Reset settings
+              </a>
+            </li>
             <li><hr class="dropdown-divider"></li>
             <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">Show Log</a></li>
             <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.debugcmd') }}">Debug</a></li>

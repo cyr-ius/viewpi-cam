@@ -232,7 +232,8 @@
         if(! $("#"+macro+"_chk").prop("checked")) {
             macrovalue = "-" + macrovalue;
         }
-        send_cmd("um " + i + " " + macrovalue);
+        {# send_cmd("um " + i + " " + macrovalue); #}
+        $.sendCmd({'data':{'cmd':'um', 'values':[i + " " + macrovalue]}})
     }    
 
 </script>
