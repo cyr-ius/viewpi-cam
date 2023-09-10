@@ -22,6 +22,7 @@ main > .container, main > .container-fluid {
 
 .standard {
   width:100%;
+  height: calc(100vh - 182px);
 }
 
 .form-signin {
