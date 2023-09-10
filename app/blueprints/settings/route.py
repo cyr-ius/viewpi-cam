@@ -29,7 +29,7 @@ def index():
                 msg.update({"token": token})
             if "macro" in json.keys():
                 current_app.settings.ubuttons.append(json)
-                current_app.settings.update(**current_app.settings.ubuttons)
+                current_app.settings.update(ubuttons=current_app.settings.ubuttons)
             if "user_id" in json.keys():
                 current_app.settings.set_user(**json)
 
@@ -38,7 +38,7 @@ def index():
                 del current_app.settings.token
             if "macro" in json.keys():
                 current_app.settings.ubuttons.remove(json)
-                current_app.settings.update(**current_app.settings.ubuttons)
+                current_app.settings.update(ubuttons=current_app.settings.ubuttons)
             if "user_id" in json.keys():
                 current_app.settings.del_user(json["user_id"])
     except SettingsException as error:
