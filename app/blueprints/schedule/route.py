@@ -105,7 +105,7 @@ def index():
         )
 
 
-@bp.route("/period", methods=["GET"])
+@bp.route("/period", methods=["POST"])
 def period():
     offset = get_time_offset(current_app.settings.gmt_offset)
     sunrise = get_sunrise(
@@ -120,7 +120,7 @@ def period():
             local_time=local_time,
             sunrise=sunrise,
             sunset=sunset,
-            day_mode=int(request.args.get("daymode")),
+            day_mode=int(request.json.get("daymode")),
             daw=current_app.settings.dawnstart_minutes,
             day_start=current_app.settings.daystart_minutes,
             dusk=current_app.settings.duskend_minutes,
