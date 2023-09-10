@@ -581,11 +581,11 @@
 <script language="javascript">
 
 $(function() {
-    at_yuv = [$('#at_y').val() , $('#at_u').val(), $('#at_v').val()]
-    $('#at_uyv').val(colorconv.RGB2HEX(colorconv.YUV2RGB(at_yuv)));
+    let at_yuv = [parseInt($('#at_y').val()),parseInt($('#at_u').val()),parseInt($('#at_v').val())]
+    $('#at_yuv').val(colorconv.RGB2HEX(colorconv.YUV2RGB(at_yuv)));
 
-    ac_yuv = [$('#ac_y').val() , $('#ac_u').val(), $('#ac_v').val()]
-    $('#ac_uyv').val(colorconv.RGB2HEX(colorconv.YUV2RGB(ac_yuv)));
+    let ac_yuv = [parseInt($('#ac_y').val()),parseInt($('#ac_u').val()),parseInt($('#ac_v').val())]
+    $('#ac_yuv').val(colorconv.RGB2HEX(colorconv.YUV2RGB(ac_yuv)));
 
 
 });
