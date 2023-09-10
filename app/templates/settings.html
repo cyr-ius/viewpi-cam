@@ -8,7 +8,12 @@
         <div class="p-0 mt-1">Users buttons</div>
         <div id="ubuttons" class="row">
             {%for ubutton in settings.ubuttons%}
-            <div class="row row-cols-6 row-cols-md-6 g-1 ms-2">
+            <div class="row row-cols-7 row-cols-md-7 g-1 ms-2 uchange">
+                <div class="col-auto">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" name="display" type="checkbox" {% if ubutton.display == 1 %}checked{%endif%}>
+                    </div>       
+                </div>     
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value="{{ubutton.name}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value="{{ubutton.macro}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value="{{ubutton.css_class}}"></div>
@@ -17,7 +22,8 @@
                 <div class="col" id="btn_del_button"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
             {% endfor%}
-            <div id="ubuttons-ref" class="row row-cols-6 row-cols-md-6 g-1 ms-2">
+            <div id="ubuttons-ref" class="row row-cols-7 row-cols-md-7 g-1 ms-2">
+                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="display" type="checkbox"></div></div>               
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value=""></div>
                 <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value=""></div>
                 <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value=""></div>
@@ -151,8 +157,6 @@
         $temp.remove();
     }
 
-
-
     $(function () {
         $('#main').addClass("d-none")
     }); 
@@ -190,7 +194,6 @@
     $('#users').on('click','.add_user', function() {
         user = $(this).parent().parent()
         data = $(user).find('input, select').serializeObject()
-
         callback = function(data){
                 user.find('#btn_add_user').addClass('d-none');
                 user.find('#btn_del_user').removeClass('d-none');
@@ -210,7 +213,7 @@
 
     $('#ubuttons').on('click','.add_button', function() {
         button = $(this).parent().parent();
-        data = $(button).find('input').serializeObject();
+        data = $(button).find('input').serializeObject({"checkboxesAsBools":true});
         callback = function(data){
                 button.find('#btn_add_button').addClass('d-none');
                 button.find('#btn_del_button').removeClass('d-none');
@@ -222,9 +225,14 @@
 
     $('#ubuttons').on('click','.del_button', function() {
         button = $(this).parent().parent();
-        data = $(button).find('input').serializeObject();
+        data = $(button).find('input').serializeObject({"checkboxesAsBools":true});
         callback = function(data){ button.remove() }
         $.queryData({"method":"DELETE", "url":"{{ url_for('settings.index')}}", "data":data, "callbackSuccess":callback});
+    });
+
+    $('#ubuttons').on('change','.uchange', function(){
+        let data = $(this).find('input').serializeObject({"checkboxesAsBools":true});
+        $.queryData({"method":"PUT", "url":"{{ url_for('settings.index')}}", "data":data});        
     });
 
     function send_macroUpdate(i, macro) {
@@ -232,8 +240,7 @@
         if(! $("#"+macro+"_chk").prop("checked")) {
             macrovalue = "-" + macrovalue;
         }
-        $.sendCmd({'data':{'cmd':'um', 'values':[i.toString(),macrovalue]}})
+        $.sendCmd({'cmd':'um', 'params':[i.toString(),macrovalue]})
     }    
-
 </script>
 {%endblock%}
