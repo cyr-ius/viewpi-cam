@@ -11,9 +11,9 @@ from flask import Blueprint, current_app, render_template, request
 from flask.cli import with_appcontext
 from suntime import Sun
 
-from app.const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
-from app.helpers.decorator import auth_required
-from app.helpers.filer import (
+from ..const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
+from ..helpers.decorator import auth_required
+from ..helpers.filer import (
     delete_log,
     delete_mediafiles,
     get_file_type,
@@ -23,7 +23,7 @@ from app.helpers.filer import (
     send_pipe,
     write_log,
 )
-from app.helpers.raspiconfig import RaspiConfigError
+from ..helpers.raspiconfig import RaspiConfigError
 
 bp = Blueprint(
     "schedule",
@@ -81,7 +81,7 @@ def index():
 
         local_time = get_current_local_time(offset=offset)
 
-        period = day_period(
+        int_period = day_period(
             local_time=local_time,
             sunrise=sunrise,
             sunset=sunset,
@@ -97,7 +97,7 @@ def index():
             "schedule.html",
             settings=current_app.settings,
             schedule_pid=get_pid("scheduler"),
-            day_period=period,
+            period=int_period,
             offset=offset,
             sunrise=sunrise.strftime("%H:%M"),
             sunset=sunset.strftime("%H:%M"),
@@ -255,7 +255,7 @@ def scheduler():
                                 fifo=ctrl_fifo,
                                 str_cmd=current_app.settings.modes[new_day_period],
                                 days=current_app.settings.days,
-                                period=new_day_period,
+                                bool_period=new_day_period,
                             )
                             last_day_period = new_day_period
                             # lastDay = newDay
@@ -349,21 +349,21 @@ def day_period(
     match day_mode:
         case 0:
             if local_time < (sunrise + td(minutes=daw)).replace(tzinfo=None):
-                period = 1
+                d_period = 1
             elif local_time < (sunrise + td(minutes=day_start)).replace(tzinfo=None):
-                period = 2
+                d_period = 2
             elif local_time > (sunset + td(minutes=dusk)).replace(tzinfo=None):
-                period = 1
+                d_period = 1
             elif local_time > (sunset + td(minutes=day_end)).replace(tzinfo=None):
-                period = 4
+                d_period = 4
             else:
-                period = 3
+                d_period = 3
         case 1:
-            period = 0
+            d_period = 0
         case 2:
-            period = find_fixed_time_period(times, local_time)
+            d_period = find_fixed_time_period(times, local_time)
 
-    return period
+    return d_period
 
 
 def get_current_local_time(minute: bool = False, offset: td = None) -> dt | int:
@@ -404,7 +404,7 @@ def get_time_offset(offset: int | float | str = 0) -> td:
 
 
 def find_fixed_time_period(times, c_mins: dt) -> int:
-    period = len(times) - 1
+    int_period = len(times) - 1
     max_less_v = -1
     for str_time in times:
         f_mins = dt.strptime(str_time, "%H:%M")
@@ -413,9 +413,9 @@ def find_fixed_time_period(times, c_mins: dt) -> int:
             and (f_mins.hour * 60 + f_mins.minute) > max_less_v
         ):
             max_less_v = f_mins.hour * 60 + f_mins.minute
-            period = times.index(str_time)
+            int_period = times.index(str_time)
 
-    return period + 5
+    return int_period + 5
 
 
 def purge_files(
@@ -513,10 +513,13 @@ def open_pipe(pipename: str):
 
 
 def send_cmds(
-    fifo: str, str_cmd: str, days: dict[str, any] | None = None, period: bool = False
+    fifo: str,
+    str_cmd: str,
+    days: dict[str, any] | None = None,
+    bool_period: bool = False,
 ):
     """Send multiple commands to FIFO."""
-    if str_cmd and (period is False or is_day_active(days, period)):
+    if str_cmd and (bool_period is False or is_day_active(days, bool_period)):
         cmds = str_cmd.split(";")
         for cmd in cmds:
             if cmd != "":
@@ -537,8 +540,8 @@ def get_sorted_files(folder: str, ascending: bool = True) -> list:
     return sorted(files, reverse=ascending is False)
 
 
-def is_day_active(days, period: int) -> bool:
+def is_day_active(days, bool_period: int) -> bool:
     if days:
         day = int(dt.now().strftime("%w"))
-        return days[str(period)][day] == 1
+        return days[str(bool_period)][day] == 1
     return False

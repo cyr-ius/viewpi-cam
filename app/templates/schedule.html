@@ -3,7 +3,6 @@
 {% set lbl_periods = ['AllDay','Night','Dawn','Day','Dusk'] %}
 <div class="container-fluid overflow-auto px-5 py-2">
     <form id="form_schedule" class="row needs-validation" action="{{ url_for('schedule.index')}}" method="POST" novalidate>
-        {% if day_period < 5%}{% set period = lbl_periods[day_period]%}{%else%}{%set period = settings.times[day_period - 5]%}{%endif%}
         <div class="row"><h4 class="p-0">Scheduler</h3></div>
         <hr class="p-0 ">          
         <div class="row row-cols-1 row-cols-md-5 text-center mb-2 gy-1 gx-2 border">
@@ -11,7 +10,7 @@
             <span class="col">Sunrise: <b>{{sunrise}}</b></span>
             <span class="col">Sunset: <b>{{sunset}}</b></span>
             <span class="col">Current: <b>{{current_time}}</b></span>
-            <span id="period" class="col">Period: <b>{{period}}</b></span>
+            <span id="period" class="col">Period: <b>{% if period < 5%}{{ lbl_periods[period]}}{%else%}{{settings.times[period - 5]}}{%endif%}</b></span>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Motion - Fifo In</label></div>
@@ -185,7 +184,7 @@
             {% for d_mode in ["Night","Dawn","Day","Dusk"]%}
             {% set index = loop.index0 + 1 %}
             <div class="row sun d-none row-cols-5 row-cols-md-5 gy-1 gx-2">
-                <div class="col" {%if day_period == index  %}style="background-color: LightGreen;"{%endif%}><label class="col-form-label-sm">{{d_mode}}</label></div>
+                <div class="col" {%if period == index  %}style="background-color: LightGreen;"{%endif%}><label class="col-form-label-sm">{{d_mode}}</label></div>
                 <div class="col text-center">
                     {% for i in range(0,7)%}    
                     <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}]" value="{{i}}" {%if settings.days[index|string][i] %} checked="checked" {%endif%}>
@@ -199,7 +198,7 @@
             {% for time in  settings.times %}
             {% set index = loop.index0 + 5  %}
             <div class="row fixed d-none row-cols-5 row-cols-md-5 gy-1 gx-2">
-                <div class="col" {%if day_period == index %}style="background-color: LightGreen;"{%endif%}><input class="form-control form-control-sm" type="text" autocomplete="off" name="times" value="{{time}}"></div>
+                <div class="col" {%if period == index %}style="background-color: LightGreen;"{%endif%}><input class="form-control form-control-sm" type="text" autocomplete="off" name="times" value="{{time}}"></div>
                 <div class="col text-center">
                     {% for i in range(0,7)%}                           
                     <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}]" value="{{i}}" {%if settings.days[(index)|string][i] %} checked="checked" {%endif%}>

@@ -10,13 +10,12 @@ from flask_babel import Babel
 # from flask_swagger import swagger
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from .blueprints.auth.route import bp as auth_bp
-from .blueprints.camera.route import bp as cam_bp
-from .blueprints.main.route import bp as main_bp
-from .blueprints.preview.route import bp as pview_bp
-from .blueprints.schedule.route import bp as sch_bp
-from .blueprints.schedule.route import launch_schedule
-from .blueprints.settings.route import bp as sets_bp
+from .blueprints.auth import bp as auth_bp
+from .blueprints.camera import bp as cam_bp
+from .blueprints.main import bp as main_bp
+from .blueprints.preview import bp as pview_bp
+from .blueprints.schedule import bp as sch_bp, launch_schedule
+from .blueprints.settings import bp as sets_bp
 from .helpers.filer import get_pid
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings

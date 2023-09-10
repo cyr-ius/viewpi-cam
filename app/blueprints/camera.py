@@ -3,9 +3,9 @@ import glob
 import os
 import time
 
-from flask import Blueprint, Response, current_app, request, app
+from flask import Blueprint, Response, current_app, request
 
-from app.helpers.decorator import auth_required, token_accept
+from ..helpers.decorator import auth_required, token_accept
 
 bp = Blueprint("camera", __name__, url_prefix="/cam")
 

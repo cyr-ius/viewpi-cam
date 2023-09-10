@@ -11,8 +11,8 @@ from flask import (
     url_for,
 )
 
-from app.helpers.decorator import auth_required
-from app.helpers.settings import SettingsException
+from ..helpers.decorator import auth_required
+from ..helpers.settings import SettingsException
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 

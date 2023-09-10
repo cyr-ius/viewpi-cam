@@ -1,9 +1,10 @@
+"""Blueprint Settings."""
 import random
 
 from flask import Blueprint, current_app, render_template, request
 
-from ...helpers.decorator import auth_required
-from ...helpers.settings import SettingsException
+from ..helpers.decorator import auth_required
+from ..helpers.settings import SettingsException
 
 bp = Blueprint(
     "settings", __name__, template_folder="templates", url_prefix="/settings"

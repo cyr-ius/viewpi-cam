@@ -14,8 +14,8 @@ from flask import (
     send_file,
 )
 
-from app.helpers.decorator import auth_required
-from app.helpers.filer import (
+from ..helpers.decorator import auth_required
+from ..helpers.filer import (
     data_file_ext,
     data_filename,
     delete_mediafiles,

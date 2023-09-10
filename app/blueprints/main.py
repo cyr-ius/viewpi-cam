@@ -14,10 +14,10 @@ from flask import (
     json,
 )
 
-from app.const import PRESETS
-from app.helpers.decorator import auth_required, ViewPiCamException
-from app.helpers.filer import send_pipe, write_log, delete_log
-from ..camera.route import status_mjpeg
+from ..const import PRESETS
+from ..helpers.decorator import auth_required, ViewPiCamException
+from ..helpers.filer import send_pipe, write_log, delete_log
+from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
 
