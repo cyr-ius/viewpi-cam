@@ -13,29 +13,26 @@
     <div class="collapse navbar-collapse" id="navbarToggler">
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
     <ul class="navbar-nav" id="main">
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">Camera Settings</a></li>    
-        {% if g.motion_external == 1%}
-        <li class="nav-item"><a id="motion_mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionExternal">Motion settings</a></li>
-        {% else %}
-        <li class="nav-item"><a id="motion_code" class="nav-link" data-bs-toggle="offcanvas" href="#motionSetting">Motion Settings</a></li>    
-        {% endif %}
+      {% set motion_href="#motionExternal" if g.motion_external == 1 else "#motionSetting"%}
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">Camera Settings</a></li>    
+      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="{{motion_href}}">Motion Settings</a></li>    
     </ul> 
     {%endif%}
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
     <ul class="navbar-nav d-none" id="schedule">
-        {% set action="start" if schedule_pid == 0  else "stop"%}
-        <div class="container-fluid justify-content-start mt-2">
-        <button id="sch_save" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="save">Save Settings</button>
-        <button id="backup" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="backup">Backup</button>
-        <button id="restore" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="restore">Restore</button>
-        <button id="{{action}}" class="btn btn-sm btn-outline-secondary stopstart" type="button" name="action" value="{{action}}">{{action|capitalize}}</button>
-        </div>
+      {% set action="start" if schedule_pid == 0  else "stop"%}
+      <div class="container-fluid justify-content-start mt-2">
+      <button id="sch_save" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="save">Save Settings</button>
+      <button id="backup" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="backup">Backup</button>
+      <button id="restore" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="restore">Restore</button>
+      <button id="{{action}}" class="btn btn-sm btn-outline-secondary stopstart" type="button" name="action" value="{{action}}">{{action|capitalize}}</button>
+      </div>
     </ul>
     {%endif%}
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
     <ul class="navbar-nav d-none" id="log">
-        <li class="nav-item pe-1"><button id="downlog" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="downloadlog">Download Log</button></li>
-        <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="clearlog">Clear Log</button></li>
+      <li class="nav-item pe-1"><button id="downlog" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="downloadlog">Download Log</button></li>
+      <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="clearlog">Clear Log</button></li>
     </ul>
     {%endif%}    
     {% if session["user_level"] >= config['USERLEVEL_MINP'] %}
@@ -59,45 +56,45 @@
     </ul>
     {%endif%}        
     <ul class="navbar-nav ms-md-auto" id="nav-right">
-        {% if session["user_level"] >= config['USERLEVEL_MINP']%}
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('preview.index') }}">Gallery</a></li> 
-        {% endif %}    
-        {% if session["user_level"] >= config['USERLEVEL_MAX']%}        
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">System</a>
-          <ul class="dropdown-menu">
-            {% if request.path == url_for('main.index') %}
-            {% set mjpegmode = 1 if mjpegmode == 0 else 0%}
-            {% set label_stream = "MJPEG-Stream" if mjpegmode == 1 else "Default-Stream"%}
-            <li><button id="toggle_stream" class="dropdown-item" onclick="set_stream_mode(this.value);" value="{{mjpegmode}}">{{label_stream}}</button></li>
-            {% set display_mode = "Off" if display_mode == "On" else "On"%}
-            <li><button id="display_mode" class="dropdown-item" onclick="set_display(this.value);" value="{{display_mode}}">Display {{display_mode}}</button></li>
-            <li><hr class="dropdown-divider"></li>
-            {%endif%}
-            <div id="system">
-            <li class="nav-item"><a class="dropdown-item" href="{{url_for('settings.index')}}">Settings</a></li>
-            <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">Schedule</a></li>
-            <li><hr class="dropdown-divider"></li>
-            </div>
-            <li class="nav-item"><a class="dropdown-item" href="#" onclick="app_restart();">Restart application</a></li>
-            <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_restart();">Restart system</a></li>
-            <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_shutdown();">Shutdown system</a></li>            
-            <li class="nav-item">
-              <a class="dropdown-item" href="#" 
-                onclick="if(confirm('Are you sure to reset the settings to the default values?')) {$.sendCmd({'cmd':'rs', 'params':1});setTimeout(function(){location.reload(true);}, 1000);}">
-                Reset settings
-              </a>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">Show Log</a></li>
-            <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.debugcmd') }}">Debug</a></li>
-            <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.helpcmd') }}">Help</a></li>  
-          </ul>
-        </li>
-        {% endif %}
-        {% if g.user %}
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Deconnexion</a></li>  
-        {% endif %}        
+      {% if session["user_level"] >= config['USERLEVEL_MINP']%}
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('preview.index') }}">Gallery</a></li> 
+      {% endif %}    
+      {% if session["user_level"] >= config['USERLEVEL_MAX']%}        
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">System</a>
+        <ul class="dropdown-menu">
+          {% if request.path == url_for('main.index') %}
+          {% set mjpegmode = 1 if mjpegmode == 0 else 0%}
+          {% set label_stream = "MJPEG-Stream" if mjpegmode == 1 else "Default-Stream"%}
+          <li><button id="toggle_stream" class="dropdown-item" onclick="set_stream_mode(this.value);" value="{{mjpegmode}}">{{label_stream}}</button></li>
+          {% set display_mode = "Off" if display_mode == "On" else "On"%}
+          <li><button id="display_mode" class="dropdown-item" onclick="set_display(this.value);" value="{{display_mode}}">Display {{display_mode}}</button></li>
+          <li><hr class="dropdown-divider"></li>
+          {%endif%}
+          <div id="system">
+          <li class="nav-item"><a class="dropdown-item" href="{{url_for('settings.index')}}">Settings</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">Schedule</a></li>
+          <li><hr class="dropdown-divider"></li>
+          </div>
+          <li class="nav-item"><a class="dropdown-item" href="#" onclick="app_restart();">Restart application</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_restart();">Restart system</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_shutdown();">Shutdown system</a></li>            
+          <li class="nav-item">
+            <a class="dropdown-item" href="#" 
+              onclick="if(confirm('Are you sure to reset the settings to the default values?')) {$.sendCmd({'cmd':'rs', 'params':1});setTimeout(function(){location.reload(true);}, 1000);}">
+              Reset settings
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">Show Log</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.debugcmd') }}">Debug</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.helpcmd') }}">Help</a></li>  
+        </ul>
+      </li>
+      {% endif %}
+      {% if g.user %}
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Deconnexion</a></li>  
+      {% endif %}        
     </ul> 
     </div>
 </nav>
