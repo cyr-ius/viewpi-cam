@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container-fluid overflow-auto px-5 py-2">
-        <div class="row">
-            <h4 class="p-0">Settings</h3>
+    <div class="row">
+        <div class="row"><h4 class="p-0">Settings</h3>
         </div>
         <hr class="p-0 ">
-        <div class="p-0 mt-1">Users buttons</div>
+        <div class="row">Users buttons</div>
         <div id="ubuttons" class="row">
             {%for ubutton in settings.ubuttons%}
             <div class="row row-cols-7 row-cols-md-7 g-1 ms-2 uchange">
@@ -34,7 +34,7 @@
             </div>
         </div>
         <hr class="mt-3">
-        <div class="p-0 m-0">Users</div>
+        <div class="row">Users</div>
         <div id="users" class="row">
             {%for user in settings.users%}
             <div class="row row-cols-4 row-cols-md-4 g-1 ms-2">                
@@ -67,8 +67,9 @@
             </div>                
         </div>
         <hr class="mt-3">
-        <div class="p-0 m-0">Token camera<p class="text-body-secondary">The generation of the token allows it to be
-                passed as a parameter of the pages to avoid authentication. ex: {url}/?token=B123456</p>
+        <div class="rows">
+            Token camera<p class="text-body-secondary">The generation of the token allows it to be
+            passed as a parameter of the pages to avoid authentication. ex: {url}/?token=B123456</p>
         </div>
         <div class="row">
             <div class="row row-cols-1 row-cols-md-1 g-1 ms-2">
@@ -140,7 +141,7 @@
             <div class="col"><button class="btn btn-sm btn-outline-secondary" type="button" onclick="send_macroUpdate({{loop.index0}},'{{macro}}');">OK</button></div>
         </div>
         {%endfor%}
-
+    </div>
 </div>
 {% endblock %}
 
