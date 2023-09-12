@@ -13,9 +13,13 @@
     <div class="collapse navbar-collapse" id="navbarToggler">
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
     <ul class="navbar-nav" id="main">
-      {% set motion_href="#motionExternal" if g.motion_external == 1 else "#motionSetting"%}
+      
       <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">Camera Settings</a></li>    
-      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="{{motion_href}}">Motion Settings</a></li>    
+      {% if g.motion_external == 1 %}      
+      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionExternal">Motion Settings</a></li>    
+      {%else%}
+      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionSetting">Motion Settings</a></li>    
+      {%endif%}
     </ul> 
     {%endif%}
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
