@@ -334,7 +334,7 @@ function load_preview(thumbnail) {
 		if (fileExtension(mediaURL) == 'jpg') {
 			var media_content = `<a href="${mediaURL}" target="_blank"><img src="${mediaURL}" style="width:${previewWidth}px;"></a>`;
 		} else {
-			var media_content = `<video style="width:${previewWidth}px;" controls><source src="${mediaURL}" type="video/mp4">Your browser does not support the video tag.</video>`;
+			var media_content = `<video class="video" controls><source src="${mediaURL}" type="video/mp4">Your browser does not support the video tag.</video>`;
 		}
         $('#media').html(media_content);
 	}
