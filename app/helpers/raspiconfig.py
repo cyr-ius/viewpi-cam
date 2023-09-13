@@ -80,9 +80,9 @@ class RaspiConfig:
         """Execute binary file."""
         if os.path.isfile(self.bin):
             # Create FIFO
-            if not stat.S_ISFIFO(os.stat(self.control_file).st_mode):
+            if not os.path.isfile(self.control_file):
                 os.mkfifo(self.control_file, mode=0o600)
-            if not stat.S_ISFIFO(os.stat(self.motion_pipe).st_mode):
+            if not os.path.isfile(self.motion_pipe):
                 os.mkfifo(self.motion_pipe, mode=0o600)
             # Execute binary
             Popen(self.bin)
