@@ -6,7 +6,6 @@ from flask import (
     Blueprint,
     Response,
     current_app,
-    g,
     render_template,
     request,
     send_file,
@@ -20,17 +19,6 @@ from ..helpers.filer import send_pipe, write_log, delete_log
 from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
-
-
-@bp.before_app_request
-def before_app_request():
-    g.motion_pipe = current_app.raspiconfig.motion_pipe
-    g.control_file = current_app.raspiconfig.control_file
-    g.macros = {
-        item: getattr(current_app.raspiconfig, item)
-        for item in current_app.config["MACROS"]
-    }
-    g.motion_external = current_app.raspiconfig.motion_external
 
 
 @bp.route("/", methods=["GET"])

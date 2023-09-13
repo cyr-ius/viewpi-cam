@@ -129,11 +129,11 @@
             <div class="col">Macro:{{macro}}</div>
             <div class="col col-md-2 text-center">
                 <input class="form-control-checkbox" type="checkbox" id="{{macro}}_chk"
-                {% if g.macros[macro][:1] == "-" %}
-                    {% set value=g.macros[macro][1:] %}
+                {% if macros[macro][:1] == "-" %}
+                    {% set value=macros[macro][1:] %}
                     checked=""
                 {%else%}
-                    {% set value=g.macros[macro] %}
+                    {% set value=macros[macro] %}
                     checked="checked"
                 {%endif%}
                 ></div>

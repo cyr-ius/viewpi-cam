@@ -102,6 +102,8 @@ def index():
             sunrise=sunrise.strftime("%H:%M"),
             sunset=sunset.strftime("%H:%M"),
             current_time=local_time.strftime("%H:%M"),
+            motion_pipe=current_app.raspiconfig.motion_pipe,
+            control_file=current_app.raspiconfig.control_file,
         )
 
 

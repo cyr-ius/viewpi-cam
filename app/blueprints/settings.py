@@ -16,7 +16,11 @@ bp = Blueprint(
 def index():
     msg = {"type": "success", "message": "Save data"}
     if request.method == "GET":
-        return render_template("settings.html", settings=current_app.settings)
+        macros = {
+            item: getattr(current_app.raspiconfig, item)
+            for item in current_app.config["MACROS"]
+        }
+        return render_template("settings.html", settings=current_app.settings, macros=macros)
 
     try:
         if request.method == "POST" and (json := request.json):
