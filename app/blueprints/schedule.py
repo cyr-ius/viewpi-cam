@@ -48,7 +48,7 @@ def index():
                     msg.update({"message": "Start scheduler"})
                 case "stop":
                     pid = get_pid("scheduler")
-                    os.popen(f"kill {pid}")
+                    Popen(f"kill {pid}")
                     msg.update({"message": "Stop scheduler"})
                 case "save":
                     write_log("Saved schedule settings")
@@ -137,7 +137,7 @@ def period():
 def stop_scheduler() -> int | None:
     """Stop scheduler."""
     pid = get_pid("scheduler")
-    os.popen(f"kill {pid}")
+    Popen(f"kill {pid}")
 
 
 @bp.cli.command("start", short_help="Start scheduler task")
@@ -502,8 +502,8 @@ def check_motion(pipe):
 def open_pipe(pipename: str):
     if not os.path.exists(pipename):
         write_log(f"Making Pipe to receive capture commands {pipename}")
-        os.popen(f"mkfifo {pipename}")
-        os.popen(f"chmod 666 {pipename}")
+        Popen(f"mkfifo {pipename}")
+        Popen(f"chmod 666 {pipename}")
     else:
         write_log(f"Capture Pipe already exists ({pipename})")
 

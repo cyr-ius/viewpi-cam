@@ -5,6 +5,7 @@ import time
 import zipfile
 from datetime import datetime as dt
 from io import BytesIO
+from subprocess import PIPE, Popen
 
 from flask import (
     Blueprint,
@@ -177,17 +178,17 @@ def lock_file(filename: str, lock: bool):
         #  For time lapse lock all from this batch
         files = find_lapse_files(filename)
         for file in files:
-            os.popen(f"chmod {attr} {file}")
+            Popen(f"chmod {attr} {file}")
     else:
         thumb_file = data_filename(filename)
         if os.path.isfile(f"{media_path}/{thumb_file}"):
-            os.popen(f"chmod {attr} {media_path}/{thumb_file}")
+            Popen(f"chmod {attr} {media_path}/{thumb_file}")
         if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.dat"):
-            os.popen(f"chmod {attr} {media_path}/{thumb_file}.dat")
+            Popen(f"chmod {attr} {media_path}/{thumb_file}.dat")
         if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.h264"):
-            os.popen(f"chmod {attr} {media_path}/{thumb_file}.h264")
+            Popen(f"chmod {attr} {media_path}/{thumb_file}.h264")
 
-    os.popen(f"chmod {attr} {media_path}/{filename}")
+    Popen(f"chmod {attr} {media_path}/{filename}")
 
 
 def get_zip(files: list):
@@ -244,7 +245,7 @@ def video_convert(filename: str):
             rst = cmd.replace(f"i_{i:05d}", f"tmp/i_{i:05d}")
             cmd = f"({rst} {media_path}/{video_file}; rm -rf {tmp};) >/dev/null 2>&1 &"
             write_log(f"start lapse convert: {cmd}")
-            os.popen(cmd)
+            Popen(cmd, stdout=PIPE)
             shutil.copy(
                 src=f"{media_path}/{filename}",
                 dst=f"{media_path}/{video_file}.v{file_index}{current_app.config['THUMBNAIL_EXT']}",
