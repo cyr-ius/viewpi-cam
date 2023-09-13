@@ -24,7 +24,7 @@ class RaspiConfig:
         self.logging = app.logger
         self._load()
         app.raspiconfig = self
-        Thread(target=self.observer, args=(self,)).start()
+        Thread(target=self.observer).start()
 
     def refresh(self) -> None:
         """Reload configuration file."""
@@ -102,14 +102,14 @@ class RaspiConfig:
 
         return msg
 
-    def observer(self, obj) -> None:
+    def observer(self) -> None:
         """Check change."""
         last_modified_user_config = os.path.getmtime(self.user_config)
         while True:
             if os.path.getmtime(self.user_config) == last_modified_user_config:
                 time.sleep(0.3)
             else:
-                obj.refresh()
+                self.refresh()
                 last_modified_user_config = os.path.getmtime(self.user_config)
                 time.sleep(0.3)
 
