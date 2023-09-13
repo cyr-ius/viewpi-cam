@@ -1,6 +1,9 @@
 """Class for raspimjpeg file."""
 import os
+import stat
+import time
 from subprocess import Popen
+from threading import Thread
 
 
 # pylint: disable=E1101
@@ -21,6 +24,7 @@ class RaspiConfig:
         self.logging = app.logger
         self._load()
         app.raspiconfig = self
+        Thread(target=self.observer, args=(self,)).start()
 
     def refresh(self) -> None:
         """Reload configuration file."""
@@ -76,15 +80,38 @@ class RaspiConfig:
         """Execute binary file."""
         if os.path.isfile(self.bin):
             # Create FIFO
-            if not os.path.isfile(self.control_file):
+            if not stat.S_ISFIFO(os.stat(self.control_file).st_mode):
                 os.mkfifo(self.control_file, mode=0o600)
-            if not os.path.isfile(self.motion_pipe):
+            if not stat.S_ISFIFO(os.stat(self.motion_pipe).st_mode):
                 os.mkfifo(self.motion_pipe, mode=0o600)
             # Execute binary
             Popen(self.bin)
             self.logging.info("Start raspimjpeg")
         else:
             self.logging.error(f"Error: File not found ({self.bin})")
+
+    def send(self, cmd: str) -> None:
+        """Send command to pipe."""
+        try:
+            pipe = os.open(self.motion_pipe, os.O_WRONLY | os.O_NONBLOCK)
+            os.write(pipe, f"{cmd}\n".encode("utf-8"))
+            os.close(pipe)
+            msg = {"type": "success", "message": f"Send {cmd} successful"}
+        except Exception as error:  # pylint: disable=W0718
+            msg = {"type": "error", "message": f"{error}"}
+
+        return msg
+
+    def observer(self, obj) -> None:
+        """Check change."""
+        last_modified_user_config = os.path.getmtime(self.user_config)
+        while True:
+            if os.path.getmtime(self.user_config) == last_modified_user_config:
+                time.sleep(0.3)
+            else:
+                obj.refresh()
+                last_modified_user_config = os.path.getmtime(self.user_config)
+                time.sleep(0.3)
 
 
 class RaspiConfigError(Exception):
