@@ -24,7 +24,7 @@ class RaspiConfig:
         self.logging = app.logger
         self._load()
         app.raspiconfig = self
-        Thread(target=self.observer).start()
+        # Thread(target=self.observer).start()
 
     def refresh(self) -> None:
         """Reload configuration file."""
