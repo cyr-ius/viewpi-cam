@@ -1,7 +1,7 @@
 """Blueprint Main."""
 import os
 import time
-
+from subprocess import Popen, PIPE
 from flask import (
     Blueprint,
     Response,
@@ -24,7 +24,7 @@ bp = Blueprint("main", __name__, template_folder="templates")
 @bp.route("/", methods=["GET"])
 @auth_required
 def index():
-    write_log(f"Logged in user: {session['user_id']}:")
+    write_log(f"Logged in user: {session['user_id']}")
     write_log(f"UserLevel {session['user_level']}")
     display_mode = request.cookies.get("display_mode", "On")
     mjpegmode = int(request.cookies.get("mjpegmode", 0))
@@ -116,13 +116,13 @@ def sys_cmd(cmd):
     """Execute system command."""
     try:
         if cmd == "restart":
-            os.popen("echo b > /proc/sysrq-trigger")
+            Popen("echo b > /proc/sysrq-trigger", stdout=PIPE)
         if cmd == "shutdown":
-            os.popen("echo o > /proc/sysrq-trigger")
+            Popen("echo o > /proc/sysrq-trigger", stdout=PIPE)
         if cmd == "restart_app":
-            os.popen("killall gunicorn")
+            Popen("killall gunicorn", stdout=PIPE)
         if cmd == "settime" and (timestr := request.args.get("timestr")):
-            os.popen(f'sudo date -s "{timestr}')
+            Popen(f'date -s "{timestr}"', stdout=PIPE)
     except Exception as error:
         raise ViewPiCamException(f"System command failed ({error})") from error
 
