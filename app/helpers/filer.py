@@ -1,5 +1,6 @@
 """Helper functions."""
 import os
+import time
 import shutil
 from datetime import datetime as dt
 from functools import reduce
@@ -217,7 +218,9 @@ def send_pipe(pipename: str, cmd: str) -> None:
         write_log(str(error))
         current_app.raspiconfig.refresh()
         msg = {"type": "error", "message": f"{error}"}
-    
+
+    os.sync()
+    time.sleep(0.1)
     current_app.raspiconfig.refresh()
 
     return msg
