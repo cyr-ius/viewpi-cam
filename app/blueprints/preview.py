@@ -170,9 +170,9 @@ def lock_file(filename: str, lock: bool):
     """Lock file (remove w via chmod)."""
     media_path = current_app.raspiconfig.media_path
     if lock == 1:
-        attr = "0o444"
+        attr = 0o444
     else:
-        attr = "0o644"
+        attr = 0o644
     file_type = get_file_type(filename)
     if file_type == "t":
         #  For time lapse lock all from this batch
