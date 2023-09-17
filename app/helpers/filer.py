@@ -164,7 +164,7 @@ def file_add_content(filename: str, data: str) -> None:
 
 
 def execute_cmd(cmd):
-    return Popen(cmd, stdout=PIPE)
+    return Popen(cmd, stdout=PIPE, shell=True)
 
 
 def write_log(msg: str) -> None:

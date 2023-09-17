@@ -116,15 +116,15 @@ def sys_cmd(cmd):
     """Execute system command."""
     try:
         if cmd == "restart":
-            os.system("echo s > /proc/sysrq-trigger")
-            os.system("echo b > /proc/sysrq-trigger")
+            Popen("echo s > /proc/sysrq-trigger", shell=True)
+            Popen("echo b > /proc/sysrq-trigger", shell=True)
         if cmd == "shutdown":
-            os.system("echo s > /proc/sysrq-trigger")
-            os.system("echo o > /proc/sysrq-trigger")
+            Popen("echo s > /proc/sysrq-trigger", shell=True)
+            Popen("echo o > /proc/sysrq-trigger", shell=True)
         if cmd == "restart_app":
-            Popen("killall gunicorn", stdout=PIPE)
+            Popen(["killall", "gunicorn"], stdout=PIPE, shell=True)
         if cmd == "settime" and (timestr := request.args.get("timestr")):
-            Popen(f'date -s "{timestr}"', stdout=PIPE)
+            Popen(f'date -s "{timestr}"', stdout=PIPE, shell=True)
     except Exception as error:
         raise ViewPiCamException(f"System command failed ({error})") from error
 

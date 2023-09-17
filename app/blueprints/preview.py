@@ -178,17 +178,17 @@ def lock_file(filename: str, lock: bool):
         #  For time lapse lock all from this batch
         files = find_lapse_files(filename)
         for file in files:
-            Popen(f"chmod {attr} {file}")
+            Popen(["chmod", attr, file], shell=True)
     else:
         thumb_file = data_filename(filename)
         if os.path.isfile(f"{media_path}/{thumb_file}"):
-            Popen(f"chmod {attr} {media_path}/{thumb_file}")
+            Popen(["chmod", attr, f"{media_path}/{thumb_file}"], shell=True)
         if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.dat"):
-            Popen(f"chmod {attr} {media_path}/{thumb_file}.dat")
+            Popen(["chmod", attr, f"{media_path}/{thumb_file}.dat"], shell=True)
         if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.h264"):
-            Popen(f"chmod {attr} {media_path}/{thumb_file}.h264")
+            Popen(["chmod", attr, f"{media_path}/{thumb_file}.h264"], shell=True)
 
-    Popen(f"chmod {attr} {media_path}/{filename}")
+    Popen(["chmod", attr, f"{media_path}/{filename}"], shell=True)
 
 
 def get_zip(files: list):
@@ -245,7 +245,7 @@ def video_convert(filename: str):
             rst = cmd.replace(f"i_{i:05d}", f"tmp/i_{i:05d}")
             cmd = f"({rst} {media_path}/{video_file}; rm -rf {tmp};) >/dev/null 2>&1 &"
             write_log(f"start lapse convert: {cmd}")
-            Popen(cmd, stdout=PIPE)
+            Popen(cmd, stdout=PIPE, shell=True)
             shutil.copy(
                 src=f"{media_path}/{filename}",
                 dst=f"{media_path}/{video_file}.v{file_index}{current_app.config['THUMBNAIL_EXT']}",
