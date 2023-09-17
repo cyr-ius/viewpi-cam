@@ -170,25 +170,25 @@ def lock_file(filename: str, lock: bool):
     """Lock file (remove w via chmod)."""
     media_path = current_app.raspiconfig.media_path
     if lock == 1:
-        attr = "0444"
+        attr = "0o444"
     else:
-        attr = "0644"
+        attr = "0o644"
     file_type = get_file_type(filename)
     if file_type == "t":
         #  For time lapse lock all from this batch
         files = find_lapse_files(filename)
         for file in files:
-            Popen(["chmod", attr, file], shell=True)
+            os.chmod(file, attr)
     else:
         thumb_file = data_filename(filename)
         if os.path.isfile(f"{media_path}/{thumb_file}"):
-            Popen(["chmod", attr, f"{media_path}/{thumb_file}"], shell=True)
+            os.chmod(f"{media_path}/{thumb_file}", attr)
         if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.dat"):
-            Popen(["chmod", attr, f"{media_path}/{thumb_file}.dat"], shell=True)
+            os.chmod(f"{media_path}/{thumb_file}.dat", attr)
         if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.h264"):
-            Popen(["chmod", attr, f"{media_path}/{thumb_file}.h264"], shell=True)
+            os.chmod(f"{media_path}/{thumb_file}.h264", attr)
 
-    Popen(["chmod", attr, f"{media_path}/{filename}"], shell=True)
+    os.chmod(f"{media_path}/{filename}", attr)
 
 
 def get_zip(files: list):
