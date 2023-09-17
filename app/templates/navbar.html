@@ -12,7 +12,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarToggler">
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
-    <ul class="navbar-nav" id="main">
+    <ul class="navbar-nav d-none" id="main">
       <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">Camera Settings</a></li>    
       {% if raspiconfig is defined and raspiconfig.motion_external == 1 %}      
       <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionExternal">Motion Settings</a></li>    

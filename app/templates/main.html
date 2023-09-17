@@ -26,7 +26,7 @@
             class="img-fluid standard" onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.jpg') }}">
     </div>
     
-    <div id="main-buttons" class="my-2 {% if display_mode == "Off" %}invisible{%endif%}">
+    <div id="main-buttons" class="my-2 {% if display_mode == "Off" %}d-none{%endif%}">
         {% if session["user_level"] >= config['USERLEVEL_MEDIUM']%}
         <button id="video_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
         <button id="image_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
@@ -84,6 +84,7 @@
     let time = new Date().getTime();
 
     $(function(){   
+        $('#main').removeClass("d-none")
         setTimeout('init({{mjpegmode}},{{raspiconfig.video_fps}}, {{raspiconfig.divider}});', 100);
     });
 
@@ -304,11 +305,11 @@
         d.setTime(d.getTime() + (365*24*60*60*1000));
         let expires = "expires="+d.toUTCString();
          if (value == "On") {
-            $('#main-buttons').removeClass("invisible")
+            $('#main-buttons').removeClass("d-none")
             $('#display_mode').val("Off")
             $('#display_mode').html("Display Off")
         } else {
-            $('#main-buttons').addClass("invisible")
+            $('#main-buttons').addClass("d-none")
             $('#display_mode').val("On")
             $('#display_mode').html("Display On")
         }
