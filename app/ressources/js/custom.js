@@ -59,11 +59,16 @@ $(function(){
       data: o.convertJson && o.data != "" ? JSON.stringify(o.data) : o.data,
       contentType: "application/json; charset=utf-8",            
       success: function(data){
-          if (data["type"] == "error") $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
+          if (data["type"] == "error") {
+            $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
+          } else {
+            $('#toast').addClass("text-bg-primary").removeClass("text-bg-danger")
+          }
           $("#toast .toast-body").html(data["message"])
           if (o.callbackSuccess) return o.callbackSuccess(data)
       },
       error: function(data){
+          $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
           $("#toast .toast-body").html(data["message"])
           if (o.callbackError) return o.callbackError(data)
       },
