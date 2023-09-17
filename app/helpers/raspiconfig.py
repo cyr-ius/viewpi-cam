@@ -1,9 +1,7 @@
 """Class for raspimjpeg file."""
 import os
-import stat
 import time
 from subprocess import Popen
-from threading import Thread
 
 
 # pylint: disable=E1101
@@ -24,7 +22,6 @@ class RaspiConfig:
         self.logging = app.logger
         self._load()
         app.raspiconfig = self
-        # Thread(target=self.observer).start()
 
     def refresh(self) -> None:
         """Reload configuration file."""
@@ -100,18 +97,11 @@ class RaspiConfig:
         except Exception as error:  # pylint: disable=W0718
             msg = {"type": "error", "message": f"{error}"}
 
-        return msg
+        os.sync()
+        time.sleep(0.1)
+        self.refresh()
 
-    def observer(self) -> None:
-        """Check change."""
-        last_modified_user_config = os.path.getmtime(self.user_config)
-        while True:
-            if os.path.getmtime(self.user_config) == last_modified_user_config:
-                time.sleep(0.3)
-            else:
-                self.refresh()
-                last_modified_user_config = os.path.getmtime(self.user_config)
-                time.sleep(0.3)
+        return msg
 
 
 class RaspiConfigError(Exception):
