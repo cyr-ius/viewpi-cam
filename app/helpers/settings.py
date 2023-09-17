@@ -18,10 +18,8 @@ class Settings(JsonDB):
         app.settings = self
 
     def has_user(self, user_id):
-        for user in self.users:
-            if user.get("user_id") == user_id:
-                return True
-        return False
+        """Return user exist."""
+        return self.users.get(user_id) is not None
 
     def check_password(self, user_id: str, password: str) -> bool:
         if self.has_user(user_id):
@@ -32,26 +30,23 @@ class Settings(JsonDB):
             return hashed.hex() == self.get_user(user_id).get("password")
         return False
 
-    def get_user(self, user_id):
-        for user in self.users:
-            if user.get("user_id") == user_id:
-                return user
+    def get_user(self, user_id: str) -> dict[str, any]:
+        """Return user infos."""
+        return self.users.get(user_id)
 
     def del_user(self, user_id: str) -> None:
-        user = self.get_user(user_id)
-        self.users.remove(user)
+        """Delete user."""
+        self.users.pop(user_id, None)
         return self.update(users=self.users)
 
     def set_user(self, **kwargs):
-        user_list = self.get_user(kwargs.get("user_id"))
-        if user_list:
-            self.users.remove(user_list)
-        if user_list and kwargs["password"] == "":
-            kwargs["password"] = user_list["password"]
+        """Set user."""
+        uid = kwargs.pop("user_id", None)
+        if self.users.get(uid) is not None and kwargs["password"] == "":
+            kwargs["password"] = self.users.get(uid)["password"]
         else:
             kwargs["password"] = self._hash_password(kwargs["password"])
-
-        self.users.append(kwargs)
+        self.users.update({uid: kwargs})
         return self.update(users=self.users)
 
     @staticmethod

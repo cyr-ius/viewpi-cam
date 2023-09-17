@@ -7,14 +7,14 @@
         <hr class="p-0 ">
         <div class="row">Users buttons</div>
         <div id="ubuttons" class="row">
-            {%for ubutton in settings.ubuttons%}
+            {%for name, ubutton in settings.ubuttons.items()%}
             <div class="row row-cols-7 row-cols-md-7 g-1 ms-2 uchange">
                 <div class="col-auto">
                     <div class="form-check form-switch">
                         <input class="form-check-input" name="display" type="checkbox" {% if ubutton.display == 1 %}checked{%endif%}>
                     </div>       
                 </div>     
-                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value="{{ubutton.name}}"></div>
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value="{{name}}" readonly></div>
                 <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value="{{ubutton.macro}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value="{{ubutton.css_class}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text" value="{{ubutton.style}}"></div>
@@ -36,12 +36,12 @@
         <hr class="mt-3">
         <div class="row">Users</div>
         <div id="users" class="row">
-            {%for user in settings.users%}
-            <div class="row row-cols-4 row-cols-md-4 g-1 ms-2">                
-                <div class="col"><input class="form-control form-control-sm" name="user_id" placeholder="Username" required="" type="text" value="{{user.user_id}}"></div>
+            {%for user_id, user in settings.users.items()%}
+            <div class="row row-cols-4 row-cols-md-4 g-1 ms-2 uchange">                
+                <div class="col"><input class="form-control form-control-sm" name="user_id" placeholder="Username" required="" type="text" value="{{user_id}}" readonly></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" value=""></div>
                 <div class="col">
-                    <select class="form-select form-select-sm" id="users-0-rights" name="rights" onchange="$(this).trigger('submit');" required="">
+                    <select class="form-select form-select-sm" id="users-0-rights" name="rights" required="">
                         <option {% if user.rights == 1 %}selected{%endif%} value="1">Minimum</option>
                         <option {% if user.rights == 2 %}selected{%endif%} value="2">Minimum+</option>
                         <option {% if user.rights == 4 %}selected{%endif%} value="4">Medium</option>
@@ -147,17 +147,6 @@
 
 {%block extrascripts%}
 <script language="javascript">
-    var templ_user = $('#users-ref').clone();
-    var templ_ubutton = $('#ubuttons-ref').clone();
-
-    function copyToClipboard(element) {
-        var $temp = $("<input>");
-        $("body").append($temp);
-        $temp.val($(element).val()).select();
-        document.execCommand("copy");
-        $temp.remove();
-    }
-
     $(function () {
         $('#main').addClass("d-none")
     }); 
@@ -193,12 +182,15 @@
     });    
 
     $('#users').on('click','.add_user', function() {
-        user = $(this).parent().parent()
-        data = $(user).find('input, select').serializeObject()
+        user = $(this).parent().parent();
+        data = $(user).find('input, select').serializeObject();
+        let templ_user = $('#users-ref').clone();
         callback = function(data){
                 user.find('#btn_add_user').addClass('d-none');
                 user.find('#btn_del_user').removeClass('d-none');
-                user.removeAttr('id')                
+                user.removeAttr('id');
+                $(user).find('input[name="user_id"]').attr("readonly","readonly");
+                $(templ_user).find('input').val('');   
                 templ_user.insertAfter(user);
         }
         $.queryData({"url":"{{ url_for('settings.index')}}","data":data, "callbackSuccess":callback});
@@ -215,10 +207,13 @@
     $('#ubuttons').on('click','.add_button', function() {
         button = $(this).parent().parent();
         data = $(button).find('input').serializeObject({"checkboxesAsBools":true});
+        let templ_ubutton = $('#ubuttons-ref').clone();
         callback = function(data){
                 button.find('#btn_add_button').addClass('d-none');
                 button.find('#btn_del_button').removeClass('d-none');
-                button.removeAttr('id')                
+                button.removeAttr('id');
+                $(button).find('input[name="name"]').attr("readonly","readonly");
+                $(templ_ubutton).find('input').val('');
                 templ_ubutton.insertAfter(button);
         }
         $.queryData({"url":"{{ url_for('settings.index')}}","data":data, "callbackSuccess":callback});
@@ -231,9 +226,9 @@
         $.queryData({"method":"DELETE", "url":"{{ url_for('settings.index')}}", "data":data, "callbackSuccess":callback});
     });
 
-    $('#ubuttons').on('change','.uchange', function(){
-        let data = $(this).find('input').serializeObject({"checkboxesAsBools":true});
-        $.queryData({"method":"PUT", "url":"{{ url_for('settings.index')}}", "data":data});        
+    $('#ubuttons, #users').on('change','.uchange', function(){
+        let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+        $.queryData({"method":"POST", "url":"{{ url_for('settings.index')}}", "data":data});        
     });
 
     function send_macroUpdate(i, macro) {
@@ -243,5 +238,14 @@
         }
         $.sendCmd({'cmd':'um', 'params':[i.toString(),macrovalue]})
     }    
+
+    function copyToClipboard(element) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).val()).select();
+        document.execCommand("copy");
+        $temp.remove();
+    }
+
 </script>
 {%endblock%}

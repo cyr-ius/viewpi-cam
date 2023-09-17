@@ -20,7 +20,9 @@ def index():
             item: getattr(current_app.raspiconfig, item)
             for item in current_app.config["MACROS"]
         }
-        return render_template("settings.html", settings=current_app.settings, macros=macros)
+        return render_template(
+            "settings.html", settings=current_app.settings, macros=macros
+        )
 
     try:
         if request.method == "POST" and (json := request.json):
@@ -33,7 +35,8 @@ def index():
                 current_app.settings.update(token=token)
                 msg.update({"token": token})
             if "macro" in json.keys():
-                current_app.settings.ubuttons.append(json)
+                uname = json.pop("name")
+                current_app.settings.ubuttons.update({uname: json})
                 current_app.settings.update(ubuttons=current_app.settings.ubuttons)
             if "user_id" in json.keys():
                 current_app.settings.set_user(**json)
@@ -42,7 +45,7 @@ def index():
             if "token" in json.keys():
                 del current_app.settings.token
             if "macro" in json.keys():
-                current_app.settings.ubuttons.remove(json)
+                current_app.settings.ubuttons.pop(json.get("name"), None)
                 current_app.settings.update(ubuttons=current_app.settings.ubuttons)
             if "user_id" in json.keys():
                 current_app.settings.del_user(json["user_id"])
