@@ -116,9 +116,11 @@ def sys_cmd(cmd):
     """Execute system command."""
     try:
         if cmd == "restart":
-            Popen("echo b > /proc/sysrq-trigger", stdout=PIPE)
+            os.system("echo s > /proc/sysrq-trigger")
+            os.system("echo b > /proc/sysrq-trigger")
         if cmd == "shutdown":
-            Popen("echo o > /proc/sysrq-trigger", stdout=PIPE)
+            os.system("echo s > /proc/sysrq-trigger")
+            os.system("echo o > /proc/sysrq-trigger")
         if cmd == "restart_app":
             Popen("killall gunicorn", stdout=PIPE)
         if cmd == "settime" and (timestr := request.args.get("timestr")):
