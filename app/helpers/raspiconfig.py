@@ -1,8 +1,8 @@
 """Class for raspimjpeg file."""
 import os
-import stat
 import time
 from subprocess import Popen
+from .filer import write_log
 
 
 # pylint: disable=E1101
@@ -91,11 +91,13 @@ class RaspiConfig:
     def send(self, cmd: str) -> None:
         """Send command to pipe."""
         try:
-            pipe = os.open(self.motion_pipe, os.O_WRONLY | os.O_NONBLOCK)
+            pipe = os.open(self.control_file, os.O_WRONLY | os.O_NONBLOCK)
             os.write(pipe, f"{cmd}\n".encode("utf-8"))
             os.close(pipe)
+            write_log(f"CONTROL - Send {cmd}")
             msg = {"type": "success", "message": f"Send {cmd} successful"}
         except Exception as error:  # pylint: disable=W0718
+            write_log(f"CONTROL - Send {error}")
             msg = {"type": "error", "message": f"{error}"}
         finally:
             os.sync()
