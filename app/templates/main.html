@@ -273,7 +273,7 @@
         })
     }
 
-    function setButtonState(btn_id, disabled, value, cmd=null, values=null) {
+    function setButtonState(btn_id, disabled, value, cmd, values) {
         let btn =$('#'+btn_id);
         btn.prop('disabled', disabled)
         btn.attr("aria-viewpicam-cmd",cmd);
