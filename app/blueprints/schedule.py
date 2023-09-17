@@ -38,32 +38,32 @@ bp.cli.short_help = "Stop/Start scheduler"
 @auth_required
 def index():
     """Index page."""
-    msg = {"type": "success"}
     if request.method == "POST" and (action := request.json.pop("action", None)):
         try:
             match action:
                 case "start":
                     launch_schedule()
-                    msg.update({"message": "Start scheduler"})
+                    message = "Start scheduler"
                 case "stop":
                     pid = get_pid("scheduler")
                     Popen(f"kill {pid}")
-                    msg.update({"message": "Stop scheduler"})
+                    message = "Stop scheduler"
                 case "save":
-                    write_log("Saved schedule settings")
+                    message = "Saved schedule settings"
                     current_app.settings.update(**request.json)
-                    write_log("Send Schedule reset")
-                    current_app.raspiconfig.send(SCHEDULE_RESET)
-                    msg.update({"message": "Save data"})
+                    send_motion(SCHEDULE_RESET)
                 case "backup":
-                    write_log("Backed up schedule settings")
+                    message = "Backed up schedule settings"
                     current_app.settings.backup()
-                    msg.update({"message": "Backup file settings"})
                 case "restore":
-                    write_log("Restored up schedule settings")
+                    message = "Restored up schedule settings"
                     current_app.settings.restore()
-                    msg.update({"message": "Restore file settings"})
+
+            write_log(message)
+            msg = {"type": "success", "message": message}
+
         except RaspiConfigError as error:
+            write_log(str(error))
             msg = {"type": "error", "message": str(error)}
 
         return msg
@@ -508,6 +508,17 @@ def open_pipe(pipename: str):
         return pipe
     except OSError as error:
         write_log(f"Error open pipe {pipename} {str(error)}")
+
+
+def send_motion(cmd: str) -> None:
+    """Send command to pipe."""
+    try:
+        pipe = os.open(current_app.raspiconfig.motion_pipe, os.O_WRONLY | os.O_NONBLOCK)
+        os.write(pipe, f"{cmd}\n".encode("utf-8"))
+        os.close(pipe)
+        write_log(f"Motion - Send {cmd}")
+    except Exception as error:  # pylint: disable=W0718
+        write_log(str(error))
 
 
 def send_cmds(
