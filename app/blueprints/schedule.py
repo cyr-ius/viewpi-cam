@@ -51,9 +51,14 @@ def index():
                     message = "Stop scheduler"
                 case "save":
                     message = "Saved schedule settings"
+                    cur_gmt = current_app.settings.gmt_offset
                     current_app.settings.update(**request.json)
-                    if timezone := current_app.settings.gmt_offset:
-                        Popen(f"ln -fs /usr/share/zoneinfo/{timezone} /etc/localtime")
+                    if (timezone := current_app.settings.gmt_offset) != cur_gmt:
+                        write_log(f"Set timezone {timezone}")
+                        Popen(
+                            f"ln -fs /usr/share/zoneinfo/{timezone} /etc/localtime",
+                            shell=True,
+                        )
                     send_motion(SCHEDULE_RESET)
                 case "backup":
                     message = "Backed up schedule settings"
