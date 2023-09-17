@@ -1,5 +1,6 @@
 """Class for raspimjpeg file."""
 import os
+import stat
 import time
 from subprocess import Popen
 
@@ -77,9 +78,9 @@ class RaspiConfig:
         """Execute binary file."""
         if os.path.isfile(self.bin):
             # Create FIFO
-            if not os.path.isfile(self.control_file):
+            if not stat.S_ISFIFO(os.stat(self.control_file).st_mode):
                 os.mkfifo(self.control_file, mode=0o600)
-            if not os.path.isfile(self.motion_pipe):
+            if not stat.S_ISFIFO(os.stat(self.motion_pipe).st_mode):
                 os.mkfifo(self.motion_pipe, mode=0o600)
             # Execute binary
             Popen(self.bin)
@@ -96,10 +97,10 @@ class RaspiConfig:
             msg = {"type": "success", "message": f"Send {cmd} successful"}
         except Exception as error:  # pylint: disable=W0718
             msg = {"type": "error", "message": f"{error}"}
-
-        os.sync()
-        time.sleep(0.1)
-        self.refresh()
+        finally:
+            os.sync()
+            time.sleep(0.1)
+            self.refresh()
 
         return msg
 
