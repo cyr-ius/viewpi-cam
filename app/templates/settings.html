@@ -162,8 +162,8 @@
         $('#main').addClass("d-none")
     }); 
 
-    $('#upreset, #timezone').unbind()
-    $('#upreset, #timezone').on("change", function(event) {
+    $('#upreset, #gmt_offset').unbind()
+    $('#upreset, #gmt_offset').on("change", function(event) {
         data = $(this).serializeObject({"checkboxesAsBools":true});
         $.queryData({"url":"{{ url_for('settings.index')}}","data":data});
     })
