@@ -139,9 +139,10 @@ def create_app(config=None):
     if (boxing := app.raspiconfig.boxing_path) != "":
         os.makedirs(boxing, exist_ok=True)
 
-    execute_cmd(
-        f"ln -sf /usr/share/zoneinfo/{app.settings.gmt_offset} /etc/localtime"
-    )
+    if getattr(app.settings, "gmt_offset"):
+        execute_cmd(
+            f"ln -sf /usr/share/zoneinfo/{app.settings.gmt_offset} /etc/localtime"
+        )
 
     # Create /dev/shm/mjpeg/status-file
     if not os.path.isfile(app.raspiconfig.status_file):
@@ -150,7 +151,7 @@ def create_app(config=None):
 
     # Start Raspimjpeg
     if "NO_RASPIMJPEG" not in os.environ and not get_pid(app.config["RASPI_BINARY"]):
-        app.raspiconfig.run()
+        app.raspiconfig.start()
 
     # Start scheduler
     if "NO_SCHEDULER" not in os.environ:

@@ -2,7 +2,7 @@
 import os
 import time
 from subprocess import Popen
-from .filer import write_log
+from .filer import write_log, get_pid
 
 
 # pylint: disable=E1101
@@ -74,7 +74,7 @@ class RaspiConfig:
 
         self._load()
 
-    def run(self) -> None:
+    def start(self) -> None:
         """Execute binary file."""
         if os.path.isfile(self.bin):
             # Create FIFO
@@ -105,6 +105,9 @@ class RaspiConfig:
             self.refresh()
 
         return msg
+
+    def stop(self) -> None:
+        Popen(["killall", "raspimjeg"], shell=True)
 
 
 class RaspiConfigError(Exception):
