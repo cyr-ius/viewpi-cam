@@ -97,7 +97,7 @@ class RaspiConfig:
             write_log(f"CONTROL - Send {cmd}")
             msg = {"type": "success", "message": f"Send {cmd} successful"}
         except Exception as error:  # pylint: disable=W0718
-            write_log(f"CONTROL - Send {error}")
+            write_log(f"CONTROL - {error}")
             msg = {"type": "error", "message": f"{error}"}
         finally:
             os.sync()
