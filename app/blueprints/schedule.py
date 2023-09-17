@@ -489,7 +489,7 @@ def check_motion(pipe):
     if isinstance(pipe, bool):
         return ""
     try:
-        ret = os.read(pipe, 1).decode("utf-8").replace("\n", "")
+        ret = os.read(pipe).decode("utf-8").replace("\n", "")
     except Exception:  # pylint: disable=W0718
         ret = ""
     return ret
