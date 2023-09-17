@@ -17,7 +17,7 @@ from .blueprints.motion import bp as motion_bp
 from .blueprints.preview import bp as pview_bp
 from .blueprints.schedule import bp as sch_bp, launch_schedule
 from .blueprints.settings import bp as sets_bp
-from .helpers.filer import get_pid
+from .helpers.filer import get_pid, execute_cmd
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
 from .services.assets import css_custom, css_main, js_custom, js_main, js_pipan
@@ -138,6 +138,10 @@ def create_app(config=None):
         os.makedirs(macros, exist_ok=True)
     if (boxing := app.raspiconfig.boxing_path) != "":
         os.makedirs(boxing, exist_ok=True)
+
+    execute_cmd(
+        f"ln -sf /usr/share/zoneinfo/{app.settings.gmt_offset} /etc/localtime"
+    )
 
     # Create /dev/shm/mjpeg/status-file
     if not os.path.isfile(app.raspiconfig.status_file):
