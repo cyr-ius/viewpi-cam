@@ -107,25 +107,18 @@
 <script language="javascript">
   function sys_shutdown() {
     if(confirm('Are you sure to shutdown this host?')) {
-      $.get("system/shutdown")
+      $.get('{{url_for("main.sys_cmd",cmd="shutdown")}}')
     }
   }
 
   function sys_restart() {
     if(confirm('Are you sure to restart this host?')) {
-      $.get("system/restart")
+      $.get('{{url_for("main.sys_cmd",cmd="restart")}}')
     }    
   }
 
-  function sys_settime() {
-    var strDate = $("#timestr").val();
-    if(strDate.indexOf("-") < 0) {
-      $.get("system/settime?timestr=" + $("#timestr").val())
-    }
-  }
-
   function app_restart() {
-      $.get("system/restart_app")
+    $.get('{{url_for("main.sys_cmd",cmd="restart_app")}}')
   }
 
 </script>
