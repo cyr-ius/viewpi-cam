@@ -2,7 +2,7 @@
 import os
 import time
 from subprocess import Popen
-from .filer import write_log, get_pid
+from .filer import write_log
 
 
 # pylint: disable=E1101
