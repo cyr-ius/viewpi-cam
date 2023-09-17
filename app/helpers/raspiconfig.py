@@ -94,10 +94,10 @@ class RaspiConfig:
             pipe = os.open(self.control_file, os.O_WRONLY | os.O_NONBLOCK)
             os.write(pipe, f"{cmd}\n".encode("utf-8"))
             os.close(pipe)
-            write_log(f"CONTROL - Send {cmd}")
+            write_log(f"Control - Send {cmd}")
             msg = {"type": "success", "message": f"Send {cmd} successful"}
         except Exception as error:  # pylint: disable=W0718
-            write_log(f"CONTROL - {error}")
+            write_log(f"Control - {error}")
             msg = {"type": "error", "message": f"{error}"}
         finally:
             os.sync()
