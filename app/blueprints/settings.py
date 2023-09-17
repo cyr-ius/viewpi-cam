@@ -35,10 +35,10 @@ def index():
                 key in json.keys() for key in ("pilight", "pipan", "servo", "upreset")
             ):
                 current_app.settings.update(**json)
-            if "timezone" in json.keys():
+            if "gmt_offset" in json.keys():
                 current_app.settings.update(**json)
                 execute_cmd(
-                    f'ln -fs /usr/share/zoneinfo/{json.get("timezone","Etc/UTC")} /etc/localtime'
+                    f'ln -fs /usr/share/zoneinfo/{json.get("gmt_offset","Etc/UTC")} /etc/localtime'
                 )
             if "token" in json.keys():
                 token = f"B{random.getrandbits(256)}"
