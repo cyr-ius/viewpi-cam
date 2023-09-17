@@ -1,12 +1,10 @@
 """Blueprint Settings."""
 import random
-import zoneinfo
 
 from flask import Blueprint, current_app, render_template, request
 
 from ..helpers.decorator import auth_required
 from ..helpers.settings import SettingsException
-from ..helpers.filer import execute_cmd
 
 bp = Blueprint(
     "settings", __name__, template_folder="templates", url_prefix="/settings"
@@ -23,10 +21,7 @@ def index():
             for item in current_app.config["MACROS"]
         }
         return render_template(
-            "settings.html",
-            settings=current_app.settings,
-            macros=macros,
-            timezones=zoneinfo.available_timezones(),
+            "settings.html", settings=current_app.settings, macros=macros
         )
 
     try:
@@ -35,11 +30,6 @@ def index():
                 key in json.keys() for key in ("pilight", "pipan", "servo", "upreset")
             ):
                 current_app.settings.update(**json)
-            if "gmt_offset" in json.keys():
-                current_app.settings.update(**json)
-                execute_cmd(
-                    f'ln -fs /usr/share/zoneinfo/{json.get("gmt_offset","Etc/UTC")} /etc/localtime'
-                )
             if "token" in json.keys():
                 token = f"B{random.getrandbits(256)}"
                 current_app.settings.update(token=token)
