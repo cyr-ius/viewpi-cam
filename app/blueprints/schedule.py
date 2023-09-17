@@ -2,6 +2,7 @@
 import os
 import shutil
 import time
+import zoneinfo
 from datetime import datetime as dt
 from datetime import timedelta as td
 from subprocess import PIPE, Popen
@@ -51,6 +52,8 @@ def index():
                 case "save":
                     message = "Saved schedule settings"
                     current_app.settings.update(**request.json)
+                    if timezone := current_app.settings.gmt_offset:
+                        Popen(f"ln -fs /usr/share/zoneinfo/{timezone} /etc/localtime")
                     send_motion(SCHEDULE_RESET)
                 case "backup":
                     message = "Backed up schedule settings"
@@ -94,15 +97,16 @@ def index():
 
         return render_template(
             "schedule.html",
-            settings=current_app.settings,
-            schedule_pid=get_pid("scheduler"),
-            period=int_period,
-            offset=offset,
-            sunrise=sunrise.strftime("%H:%M"),
-            sunset=sunset.strftime("%H:%M"),
+            control_file=current_app.raspiconfig.control_file,
             current_time=local_time.strftime("%H:%M"),
             motion_pipe=current_app.raspiconfig.motion_pipe,
-            control_file=current_app.raspiconfig.control_file,
+            offset=offset,
+            period=int_period,
+            schedule_pid=get_pid("scheduler"),
+            settings=current_app.settings,
+            sunrise=sunrise.strftime("%H:%M"),
+            sunset=sunset.strftime("%H:%M"),
+            timezones=zoneinfo.available_timezones(),
         )
 
 

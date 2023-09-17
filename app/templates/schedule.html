@@ -94,7 +94,11 @@
             </div>        
             <div class="col"><label class="col-form-label-sm">GMT offset</label></div>
             <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" name="gmt_offset" value="{{ settings.gmt_offset}}">
+                <select class="form-select form-select-sm" id="gmt_offset" name="gmt_offset">
+                    {%- for timezone in timezones|sort %}
+                    <option {% if settings.gmt_offset == timezone %}selected{%endif%} value="{{timezone}}">{{timezone}}</option>
+                    {%endfor%}
+                </select>
             </div>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
