@@ -19,7 +19,7 @@ bs_icons = (
         "cssrewrite",
         replace=lambda url: re.sub(
             r"./fonts/",
-            "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/fonts/",
+            "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/fonts/",
             url,
         ),
     ),
@@ -28,9 +28,9 @@ bs_icons = (
 css_main = Bundle(
     "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic",
     "https://fonts.googleapis.com/css?family=Roboto+Mono:400,300,700",
-    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
+    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
     Bundle(
-        "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.min.css",
+        "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.min.css",
         filters=bs_icons,
     ),
     output="css/main.css",
@@ -42,8 +42,8 @@ css_custom = Bundle(
 
 
 js_main = Bundle(
-    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js",
+    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js",
     output="js/main.js",
 )
 
