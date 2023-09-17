@@ -83,7 +83,7 @@ def delete_mediafiles(filename, delete=True):
     size = 0
     type_file = get_file_type(filename)
 
-    def compute_delete_file(file_name, size, delete=True):
+    def compute_delete_file(file_name, size, delete):
         if os.path.isfile(file_name):
             size += get_file_size(file_name)
             if delete:
@@ -93,10 +93,10 @@ def delete_mediafiles(filename, delete=True):
         #  For time lapse try to delete all from this batch
         files = find_lapse_files(filename)
         for file in files:
-            compute_delete_file(file, size)
+            compute_delete_file(file, size, delete)
     else:
         thumb_file = data_filename(filename)
-        compute_delete_file(f"{media_path}/{thumb_file}", size)
+        compute_delete_file(f"{media_path}/{thumb_file}", size, delete)
 
         if type_file == "v":
             raw_file = thumb_file[: thumb_file.find(".")]
@@ -106,9 +106,9 @@ def delete_mediafiles(filename, delete=True):
                 f"{media_path}/{raw_file}.h264.bad",
                 f"{media_path}/{raw_file}.h264.log",
             ):
-                compute_delete_file(file, size)
+                compute_delete_file(file, size, delete)
 
-    compute_delete_file(f"{media_path}/{filename}", size)
+    compute_delete_file(f"{media_path}/{filename}", size, delete)
 
     return size / 1024
 
