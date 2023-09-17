@@ -20,7 +20,6 @@ from ..helpers.filer import (
     get_pid,
     is_thumbnail,
     list_folder_files,
-    send_pipe,
     write_log,
 )
 from ..helpers.raspiconfig import RaspiConfigError
@@ -54,7 +53,7 @@ def index():
                     write_log("Saved schedule settings")
                     current_app.settings.update(**request.json)
                     write_log("Send Schedule reset")
-                    send_pipe(current_app.raspiconfig.motion_pipe, SCHEDULE_RESET)
+                    current_app.raspiconfig.send(SCHEDULE_RESET)
                     msg.update({"message": "Save data"})
                 case "backup":
                     write_log("Backed up schedule settings")
@@ -166,7 +165,6 @@ def scheduler():
 
     write_log("RaspiCam support started")
 
-    ctrl_fifo = current_app.raspiconfig.control_file
     motion_fifo_in = open_pipe(current_app.raspiconfig.motion_pipe)
 
     capture_start = 0
@@ -199,7 +197,7 @@ def scheduler():
                     write_log("Stop capture requested")
                     send = current_app.settings.commands_off[last_on_cmd]
                     if send:
-                        send_cmds(fifo=ctrl_fifo, str_cmd=send, days=last_day_period)
+                        send_cmds(str_cmd=send, days=last_day_period)
                         last_on_cmd = -1
                 else:
                     write_log("Stop capture request ignored, already stopped")
@@ -213,7 +211,7 @@ def scheduler():
 
                     send = current_app.settings.commands_on[last_day_period]
                     if send:
-                        send_cmds(fifo=ctrl_fifo, str_cmd=send, days=last_day_period)
+                        send_cmds(str_cmd=send, days=last_day_period)
                         last_on_cmd = last_day_period
                         capture_start = dt.timestamp(dt_now())
                 else:
@@ -239,8 +237,7 @@ def scheduler():
                         ) >= current_app.settings.max_capture:
                             write_log("Maximum Capture reached. Sending off command")
                             send_cmds(
-                                fifo=ctrl_fifo,
-                                str_cmd=current_app.settings.commands_off[last_on_cmd],
+                                str_cmd=current_app.settings.commands_off[last_on_cmd]
                             )
                             last_on_cmd = -1
                             autocapture = 0
@@ -254,7 +251,6 @@ def scheduler():
                         if new_day_period != last_day_period:
                             write_log(f"New period detected {new_day_period}")
                             send_cmds(
-                                fifo=ctrl_fifo,
                                 str_cmd=current_app.settings.modes[new_day_period],
                                 days=current_app.settings.days,
                                 bool_period=new_day_period,
@@ -276,7 +272,7 @@ def scheduler():
                     cmd = current_app.settings.management_command
                     if cmd != "":
                         write_log(f"exec_macro: {cmd}")
-                        send_cmds(fifo=ctrl_fifo, str_cmd=f"sy {cmd}")
+                        send_cmds(str_cmd=f"sy {cmd}")
                     delete_log(int(current_app.raspiconfig.log_size))
                 if autocapturetime > 0 and (timenow > autocapturetime):
                     autocapturetime = (
@@ -298,13 +294,13 @@ def scheduler():
                     if content == "halted":
                         if mod_time > last_status_time:
                             write_log("Autocamera startup")
-                            send_cmds(fifo=ctrl_fifo, str_cmd="ru 1")
+                            send_cmds(str_cmd="ru 1")
                     else:
                         if (
                             timenow - mod_time
                         ) > current_app.settings.autocamera_interval:
                             write_log("Autocamera shutdown")
-                            send_cmds(fifo=ctrl_fifo, str_cmd="md 0;ru 0")
+                            send_cmds(str_cmd="md 0;ru 0")
                             last_status_time = timenow + 5
                         else:
                             last_status_time = timenow
@@ -515,10 +511,7 @@ def open_pipe(pipename: str):
 
 
 def send_cmds(
-    fifo: str,
-    str_cmd: str,
-    days: dict[str, any] | None = None,
-    bool_period: bool = False,
+    str_cmd: str, days: dict[str, any] | None = None, bool_period: bool = False
 ):
     """Send multiple commands to FIFO."""
     if str_cmd and (bool_period is False or is_day_active(days, bool_period)):
@@ -526,7 +519,7 @@ def send_cmds(
         for cmd in cmds:
             if cmd != "":
                 cmd = cmd.strip()
-                send_pipe(fifo, cmd)
+                current_app.raspiconfig.send(cmd)
                 time.sleep(0.2)
 
 

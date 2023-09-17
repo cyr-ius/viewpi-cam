@@ -15,7 +15,7 @@ from flask import (
 
 from ..const import PRESETS
 from ..helpers.decorator import auth_required, ViewPiCamException
-from ..helpers.filer import send_pipe, write_log, delete_log
+from ..helpers.filer import write_log, delete_log
 from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
@@ -133,9 +133,7 @@ def send_cmd():
     """Send command to control fifo."""
     if (cmd := request.json.get("cmd")) and (params := request.json.get("params", [])):
         params = " ".join(params)
-        full_cmd = f"{cmd} {params}"
-        msg = send_pipe(current_app.raspiconfig.control_file, full_cmd)
-        return msg
+        return current_app.raspiconfig.send(f"{cmd} {params}")
     return {
         "type": "error",
         "message": "Command not found, {'cmd':'xxx', values:['xx','yy']}",

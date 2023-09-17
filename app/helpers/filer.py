@@ -1,6 +1,5 @@
 """Helper functions."""
 import os
-import time
 import shutil
 from datetime import datetime as dt
 from functools import reduce
@@ -164,8 +163,8 @@ def file_add_content(filename: str, data: str) -> None:
         file.write(data)
 
 
-# def execute_cmd(cmd):
-#     return os.popen(cmd)
+def execute_cmd(cmd):
+    return Popen(cmd, stdout=PIPE)
 
 
 def write_log(msg: str) -> None:
@@ -204,26 +203,6 @@ def list_folder_files(path: str, ext=None) -> list:
             if os.path.isfile(os.path.join(path, f)) and f".{ext}" in f
         ]
     return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-
-
-def send_pipe(pipename: str, cmd: str) -> None:
-    """Send command to pipe."""
-    try:
-        pipe = os.open(pipename, os.O_WRONLY | os.O_NONBLOCK)
-        os.write(pipe, f"{cmd}\n".encode("utf-8"))
-        os.close(pipe)
-        write_log(f"{pipename} - send {cmd}")
-        msg = {"type": "success", "message": f"Send {cmd} successful"}
-    except Exception as error:  # pylint: disable=W0718
-        write_log(str(error))
-        current_app.raspiconfig.refresh()
-        msg = {"type": "error", "message": f"{error}"}
-
-    os.sync()
-    time.sleep(0.1)
-    current_app.raspiconfig.refresh()
-
-    return msg
 
 
 def disk_usage() -> tuple[int, int, int, int, str]:
