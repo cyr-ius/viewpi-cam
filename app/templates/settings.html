@@ -167,22 +167,11 @@
         $.queryData({"url":"{{ url_for('settings.index')}}","data":data});
     })
 
-    $('#pilight, #pipan, #servo').unbind()
-    $('#pilight, #pipan, #servo').on("change", function(event) {
+    $('#pilight, #pipan, #servo, #loglevel').unbind()
+    $('#pilight, #pipan, #servo, #loglevel').on("change", function(event) {
         data = $(this).serializeObject({"checkboxesAsBools":true});
         $.queryData({"url":"{{ url_for('settings.index')}}","data":data});
     })
-
-    $('#loglevel').unbind()
-    $('#loglevel').on("change", function(event) {
-        callback = function(){
-            if (confirm('Do you want to restart the application ?')) {
-                app_restart();
-            }
-        }
-        data = $(this).serializeObject({"checkboxesAsBools":true});
-        $.queryData({"url":"{{ url_for('settings.index')}}","data":data, "callbackSuccess":callback});
-    })    
 
     $('#copy').unbind();
     $('#copy').click(function () {

@@ -57,6 +57,19 @@ def create_app(config=None):
         dirs_exist_ok=True,
     )
 
+    # Set log level
+    log_level = logging.getLevelName(os.environ.get("LOG_LEVEL", "INFO").upper())
+    logging.basicConfig(
+        level=log_level,
+        format="[%(asctime)s] [%(filename)s:%(lineno)d] %(levelname)s - %(message)s",
+    )
+
+    # If we use Docker + Gunicorn, adjust the log handler
+    if "GUNICORN_LOGLEVEL" in os.environ:
+        gunicorn_logger = logging.getLogger("gunicorn.error")
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+
     # Proxy
     app.wsgi_app = ProxyFix(app.wsgi_app)
 
@@ -76,18 +89,9 @@ def create_app(config=None):
     raspiconfig.init_app(app)
     settings.init_app(app)
 
-    # Set log level
-    log_level = logging.getLevelName(os.environ.get("LOG_LEVEL", settings.loglevel).upper())
-    logging.basicConfig(
-        level=log_level,
-        format="[%(asctime)s] [%(filename)s:%(lineno)d] %(levelname)s - %(message)s",
-    )
-
-    # If we use Docker + Gunicorn, adjust the log handler
-    if "GUNICORN_LOGLEVEL" in os.environ:
-        gunicorn_logger = logging.getLogger("gunicorn.error")
-        app.logger.handlers = gunicorn_logger.handlers
-        app.logger.setLevel(gunicorn_logger.level)
+    # Custom log level
+    if getattr(settings, "loglevel"):
+        app.logger.setLevel(settings.loglevel.upper())
 
     # Register Assets
     assets.register("css_custom", css_custom)

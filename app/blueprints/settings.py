@@ -31,6 +31,8 @@ def index():
                 for key in ("pilight", "pipan", "servo", "upreset", "loglevel")
             ):
                 current_app.settings.update(**json)
+                if loglevel := json.get("loglevel"):
+                    current_app.logger.setLevel(loglevel.upper())
             if "token" in json.keys():
                 token = f"B{random.getrandbits(256)}"
                 current_app.settings.update(token=token)
