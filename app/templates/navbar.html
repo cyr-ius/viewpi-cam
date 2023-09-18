@@ -90,7 +90,9 @@
           </li>
           <li><hr class="dropdown-divider"></li>
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">Show Log</a></li>
+          {% if g.loglevel == 'DEBUG' %}
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.debugcmd') }}">Debug</a></li>
+          {%endif%}
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.helpcmd') }}">Help</a></li>  
         </ul>
       </li>

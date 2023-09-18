@@ -11,6 +11,7 @@ from flask import (
     send_file,
     session,
     json,
+    g,
 )
 
 from ..const import PRESETS
@@ -19,6 +20,11 @@ from ..helpers.filer import write_log, delete_log
 from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
+
+
+@bp.before_app_request
+def before_app_request():
+    g.loglevel = current_app.settings.loglevel
 
 
 @bp.route("/", methods=["GET"])
