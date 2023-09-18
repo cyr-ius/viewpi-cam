@@ -16,7 +16,7 @@ class AttrDict(dict):
         try:
             return self[attr]
         except KeyError as exception:
-            raise AttributeError(f"AttrDict has no key {attr!r}") from exception
+            raise AttributeError(f"AttrDict has no key {attr}") from exception
 
     def __setattr__(self, attr: str, value: Any) -> None:
         """Set attribut and call save to json file."""
@@ -29,7 +29,7 @@ class AttrDict(dict):
         try:
             del self[attr]
         except KeyError as exception:
-            raise AttributeError(f"AttrDict has no key {attr!r}") from exception
+            raise AttributeError(f"AttrDict has no key {attr}") from exception
 
 
 class JsonDB(AttrDict, object):
