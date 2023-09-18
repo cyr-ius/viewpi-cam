@@ -40,15 +40,16 @@ def get_crdatetime(path) -> dt:
 def find_lapse_files(filename):
     """Return lapse files."""
     media_path = current_app.raspiconfig.media_path
+    files = {}
+    lapsefiles = []
 
     batch = get_file_index(filename)
     padlen = len(batch)
     fullname = f"{media_path}/{data_filename(filename)}"
-    path = f"{media_path}"
+    if not os.path.isfile(fullname):
+        return lapsefiles
     start = os.path.getmtime(fullname)
-    files = {}
     scanfiles = list_folder_files(f"{media_path}")
-    lapsefiles = []
     for file in scanfiles:
         if file.find(batch):
             if (
@@ -63,7 +64,7 @@ def find_lapse_files(filename):
     lapse_count = 1
     for key in sorted(files):
         if key[int(str(lapse_count).zfill(padlen)) :]:  # noqa: E203
-            lapsefiles.append(f"{path}/{key}")
+            lapsefiles.append(f"{media_path}/{key}")
             lapse_count += 1
         else:
             break
