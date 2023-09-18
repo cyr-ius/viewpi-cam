@@ -1,8 +1,7 @@
-{% extends "base.html" %}
-{% block title %}{{ SITE_NAME }} - Error{% endblock %}
+{% extends "errors/model.html" %}
 {% block content %}
 <!-- Main content -->
-<section class="content">
+<section class="content d-flex justify-content-center align-items-center vh-100">
     <div class="error-page">
         <h2 class="headline text-yellow">400</h2>
         <div class="error-content">
@@ -15,7 +14,7 @@
                 {% else %}
                   The server refused to process your request and return a 400 error.
                 {% endif %}
-                <br/>You may <a href="{{ url_for('main.index') }}">return to the dashboard</a>.
+                <br/>You may <a href="{{ url_for('main.index') }}">return to the main</a>.
             </p>
         </div>
     </div>
