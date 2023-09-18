@@ -27,7 +27,8 @@ def index():
     try:
         if request.method == "POST" and (json := request.json):
             if any(
-                key in json.keys() for key in ("pilight", "pipan", "servo", "upreset")
+                key in json.keys()
+                for key in ("pilight", "pipan", "servo", "upreset", "loglevel")
             ):
                 current_app.settings.update(**json)
             if "token" in json.keys():
