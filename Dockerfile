@@ -39,7 +39,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
 RUN apk add --no-cache libstdc++
-RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja git
+RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja git rust
 
 # Install pip requirements
 ADD requirements.txt /tmp/
