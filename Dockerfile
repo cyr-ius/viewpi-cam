@@ -1,4 +1,4 @@
-FROM alpine:3.18 AS gpac_builder
+OuiFROM alpine:3.18 AS gpac_builder
 
 WORKDIR /app
 
@@ -39,7 +39,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
 RUN apk add --no-cache libstdc++
-RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja git rust
+RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja git rust cargo
 
 # Install pip requirements
 ADD requirements.txt /tmp/
