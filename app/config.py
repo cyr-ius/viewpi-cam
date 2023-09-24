@@ -96,6 +96,12 @@ MACROS = [
     "startstop",
 ]
 
+# API Swagger documentation
+SWAGGER_UI_DOC_EXPANSION = "list"
+SWAGGER_UI_OPERATION_ID = True
+SWAGGER_UI_REQUEST_DURATION = True
+RESTX_MASK_SWAGGER = False
+
 # Default settings
 DEFAULT_INIT = {
     ATTR_USERS: {},

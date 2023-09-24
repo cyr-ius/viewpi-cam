@@ -10,14 +10,17 @@ from flask_babel import Babel
 # from flask_swagger import swagger
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+
+from .apis import bp as api_bp
 from .blueprints.auth import bp as auth_bp
 from .blueprints.camera import bp as cam_bp
 from .blueprints.main import bp as main_bp
 from .blueprints.motion import bp as motion_bp
 from .blueprints.preview import bp as pview_bp
-from .blueprints.schedule import bp as sch_bp, launch_schedule
+from .blueprints.schedule import bp as sch_bp
+from .blueprints.schedule import launch_schedule
 from .blueprints.settings import bp as sets_bp
-from .helpers.filer import get_pid, execute_cmd
+from .helpers.filer import execute_cmd, get_pid
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
 from .services.assets import css_custom, css_main, js_custom, js_main, js_pipan
@@ -90,7 +93,7 @@ def create_app(config=None):
     settings.init_app(app)
 
     # Custom log level
-    if loglevel := settings.get('loglevel'):
+    if loglevel := settings.get("loglevel"):
         app.logger.setLevel(loglevel.upper())
 
     # Register Assets
@@ -108,6 +111,7 @@ def create_app(config=None):
     app.register_blueprint(pview_bp)
     app.register_blueprint(sch_bp)
     app.register_blueprint(sets_bp)
+    app.register_blueprint(api_bp)
 
     # Register error handler
     app.register_error_handler(400, handle_bad_request)
