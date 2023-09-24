@@ -1,4 +1,4 @@
-OuiFROM alpine:3.18 AS gpac_builder
+FROM alpine:3.18 AS gpac_builder
 
 WORKDIR /app
 
