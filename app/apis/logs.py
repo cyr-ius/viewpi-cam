@@ -3,12 +3,14 @@ import os
 
 from flask import current_app as ca
 from flask import request
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource
 
 from ..helpers.decorator import token_required
+from .error_handler import error_m
+
 
 api = Namespace("Logs")
-error_m = api.model("Error", {"message": fields.String(required=True)})
+error_m = api.model("Error", error_m)
 
 
 @api.response(422, "Error", error_m)

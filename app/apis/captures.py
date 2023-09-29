@@ -3,10 +3,10 @@ from flask import current_app as ca
 from flask_restx import Namespace, Resource, fields
 
 from ..helpers.decorator import token_required
+from .error_handler import error_m
 
 api = Namespace("Captures")
-error_m = api.model("Error", {"message": fields.String(required=True)})
-
+error_m = api.model("Error", error_m)
 action_m = api.model(
     "Action",
     {"action": fields.Boolean(required=True, description="Stop or Start action")},

@@ -5,9 +5,10 @@ from flask import current_app as cp
 from flask_restx import Namespace, Resource, fields
 
 from ..helpers.decorator import token_required
+from .error_handler import error_m
 
 api = Namespace("Users")
-
+error_m = api.model("Error", error_m)
 user_m = api.model(
     "User",
     {
@@ -17,7 +18,6 @@ user_m = api.model(
         ),
     },
 )
-
 users_m = api.model(
     "Users",
     {
@@ -26,8 +26,6 @@ users_m = api.model(
         "rights": fields.Integer(required=True, description="The user rights"),
     },
 )
-
-error_m = api.model("Error", {"message": fields.String(required=True)})
 
 
 @api.response(422, "Error", error_m)

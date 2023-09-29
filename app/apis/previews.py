@@ -5,9 +5,10 @@ from flask_restx import Namespace, Resource, fields
 from ..blueprints.preview import draw_files, get_thumbnails, lock_file
 from ..helpers.decorator import token_required
 from ..helpers.filer import delete_mediafiles
+from .error_handler import error_m
 
 api = Namespace("Previews")
-error_m = api.model("Error", {"message": fields.String(required=True)})
+error_m = api.model("Error", error_m)
 
 
 class PathURI(fields.Raw):
