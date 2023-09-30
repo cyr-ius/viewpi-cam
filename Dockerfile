@@ -44,9 +44,9 @@ RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-hea
 # Install pip requirements
 ADD requirements.txt /tmp/
 RUN python3 -m venv --system-site-packages /env 
-RUN /env/bin/pip3 install --upgrade pip \
-    && /env/bin/pip3 install --no-cache-dir -r /tmp/requirements.txt \
-    && rm -f /tmp/requirements.txt
+RUN /env/bin/pip3 install --upgrade pip
+RUN /env/bin/pip3 install --no-cache-dir -r /tmp/requirements.txt
+RUN rm -f /tmp/requirements.txt
 
 # clean content
 RUN apk del build
