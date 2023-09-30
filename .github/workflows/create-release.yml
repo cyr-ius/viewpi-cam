@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - "v*.*.*" # Push events to matching i.e. 1.0.0, 4.0.1
+  workflow_call:
+  workflow_dispatch:
 jobs:
   release:
     runs-on: ubuntu-latest
