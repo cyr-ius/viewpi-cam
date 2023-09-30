@@ -16,9 +16,15 @@ from suntime import Sun
 
 from ..const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
 from ..helpers.decorator import auth_required
-from ..helpers.filer import (delete_log, delete_mediafiles, get_file_type,
-                             get_pid, is_thumbnail, list_folder_files,
-                             write_log)
+from ..helpers.filer import (
+    delete_log,
+    delete_mediafiles,
+    get_file_type,
+    get_pid,
+    is_thumbnail,
+    list_folder_files,
+    write_log,
+)
 from ..helpers.raspiconfig import RaspiConfigError
 
 bp = Blueprint(
@@ -192,6 +198,7 @@ def scheduler():
                 if last_on_cmd >= 0:
                     write_log("Stop capture requested")
                     send = ca.settings.commands_off[last_on_cmd]
+                    ca.settings.update(last_detection_stop=dt_now())
                     if send:
                         send_cmds(str_cmd=send, days=last_day_period)
                         last_on_cmd = -1
@@ -204,6 +211,7 @@ def scheduler():
                         write_log("Start triggered by autocapture")
                     else:
                         write_log("Start capture requested from Pipe")
+                        ca.settings.update(last_detection_start=dt_now())
 
                     send = ca.settings.commands_on[last_day_period]
                     if send:
