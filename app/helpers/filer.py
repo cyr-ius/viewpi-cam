@@ -2,8 +2,8 @@
 import os
 import shutil
 from datetime import datetime as dt
-from functools import reduce
 from subprocess import PIPE, Popen
+
 from flask import current_app
 from psutil import process_iter
 
@@ -19,24 +19,6 @@ def get_pid(pid_type):
     return 0
 
 
-def getr(data, keys, default: any = None) -> any:
-    """Return value of dict from get recursive key."""
-    return reduce(
-        lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
-        keys.split("."),
-        data,
-    )
-
-
-def get_crdatetime(path) -> dt:
-    """Return created date."""
-    stat = Popen(["stat", "-c", "%w", path], stdout=PIPE)
-    output = stat.communicate()[0].decode().replace("\n", "").split(" ")
-    str_field = f"{output[0]} {output[1].split('.')[0]}.{output[1].split('.')[1][:6]} {output[2]}"
-    return dt.strptime(str_field, "%Y-%m-%d %H:%M:%S.%f %z")
-
-
-# functions to find and delete data files
 def find_lapse_files(filename):
     """Return lapse files."""
     media_path = current_app.raspiconfig.media_path
@@ -45,7 +27,7 @@ def find_lapse_files(filename):
 
     batch = get_file_index(filename)
     padlen = len(batch)
-    fullname = f"{media_path}/{data_filename(filename)}"
+    fullname = f"{media_path}/{data_file_name(filename)}"
     if not os.path.isfile(fullname):
         return lapsefiles
     start = os.path.getmtime(fullname)
@@ -71,13 +53,6 @@ def find_lapse_files(filename):
     return lapsefiles
 
 
-def get_file_size(path):
-    """Return file size."""
-    if current_app.config["FILESIZE_METHOD"] == 0:
-        return os.path.getsize(path)
-    return f"stat -c%s {path}".strip()
-
-
 def delete_mediafiles(filename, delete=True):
     """Delete all files associated with a thumb name."""
     media_path = current_app.raspiconfig.media_path
@@ -96,7 +71,7 @@ def delete_mediafiles(filename, delete=True):
         for file in files:
             compute_delete_file(file, size, delete)
     else:
-        thumb_file = data_filename(filename)
+        thumb_file = data_file_name(filename)
         compute_delete_file(f"{media_path}/{thumb_file}", size, delete)
 
         if type_file == "v":
@@ -114,8 +89,8 @@ def delete_mediafiles(filename, delete=True):
     return size / 1024
 
 
-def data_filename(file):
-    """Get name file."""
+def data_file_name(file):
+    """Return real filename."""
     subdir_char = current_app.raspiconfig.subdir_char
     i = file.rfind(".", 0, len(file) - 8)
     if i > 0:
@@ -124,21 +99,28 @@ def data_filename(file):
 
 
 def data_file_ext(file: str):
-    """Return real filename."""
-    file = data_filename(file)
+    """Return real filename extension."""
+    file = data_file_name(file)
     return get_file_ext(file)
-
-
-def get_file_ext(file: str):
-    """Return extension file."""
-    _, ext = os.path.splitext(file)
-    return ext[1:]
 
 
 # Support naming functions
 def is_thumbnail(file: str) -> bool:
     """Return is thumbnail file."""
     return file[-7:] == current_app.config["THUMBNAIL_EXT"]
+
+
+def get_file_size(path):
+    """Return file size."""
+    if current_app.config["FILESIZE_METHOD"] == 0:
+        return os.path.getsize(path)
+    return f"stat -c%s {path}".strip()
+
+
+def get_file_ext(file: str):
+    """Return extension file."""
+    _, ext = os.path.splitext(file)
+    return ext[1:]
 
 
 def get_file_type(file: str):
@@ -157,14 +139,8 @@ def get_file_index(file: str):
     return ""
 
 
-def file_add_content(filename: str, data: str) -> None:
-    """Add data in file , create if not exist."""
-    mode = "w" if not os.path.isfile(filename) else "a"
-    with open(filename, mode=mode, encoding="utf-8") as file:
-        file.write(data)
-
-
 def execute_cmd(cmd):
+    """Execute shell command."""
     return Popen(cmd, stdout=PIPE, shell=True)
 
 
@@ -173,7 +149,10 @@ def write_log(msg: str) -> None:
     log_file = current_app.raspiconfig.log_file
     str_now = dt.now().strftime("%Y/%m/%d %H:%M:%S")
     current_app.logger.info(msg)
-    file_add_content(log_file, f"{{{str_now}}} {msg}\n")
+
+    mode = "w" if not os.path.isfile(log_file) else "a"
+    with open(log_file, mode=mode, encoding="utf-8") as file:
+        file.write(f"{{{str_now}}} {msg}\n")
 
 
 def delete_log(log_size: int) -> None:
@@ -185,14 +164,6 @@ def delete_log(log_size: int) -> None:
             with open(log_file, mode="w", encoding="utf-8") as file:
                 file.write(log_lines[:log_size])
                 file.close()
-
-
-def write_debug_log(msg: str) -> None:
-    """Write debug log."""
-    log_file = current_app.config["LOGFILE_DEBUG"]
-    str_now = dt.now().strftime("%Y/%m/%d %H:%M:%S")
-    current_app.logger.debug(msg)
-    file_add_content(log_file, f"{str_now} {msg}\n")
 
 
 def list_folder_files(path: str, ext=None) -> list:

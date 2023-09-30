@@ -8,21 +8,17 @@ from datetime import timedelta as td
 from subprocess import PIPE, Popen
 
 import pytz
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint
+from flask import current_app as ca
+from flask import render_template, request
 from flask.cli import with_appcontext
 from suntime import Sun
 
 from ..const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
 from ..helpers.decorator import auth_required
-from ..helpers.filer import (
-    delete_log,
-    delete_mediafiles,
-    get_file_type,
-    get_pid,
-    is_thumbnail,
-    list_folder_files,
-    write_log,
-)
+from ..helpers.filer import (delete_log, delete_mediafiles, get_file_type,
+                             get_pid, is_thumbnail, list_folder_files,
+                             write_log)
 from ..helpers.raspiconfig import RaspiConfigError
 
 bp = Blueprint(
@@ -51,9 +47,9 @@ def index():
                     message = "Stop scheduler"
                 case "save":
                     message = "Saved schedule settings"
-                    cur_gmt = current_app.settings.gmt_offset
-                    current_app.settings.update(**request.json)
-                    if (timezone := current_app.settings.gmt_offset) != cur_gmt:
+                    cur_gmt = ca.settings.gmt_offset
+                    ca.settings.update(**request.json)
+                    if (timezone := ca.settings.gmt_offset) != cur_gmt:
                         write_log(f"Set timezone {timezone}")
                         Popen(
                             f"ln -fs /usr/share/zoneinfo/{timezone} /etc/localtime",
@@ -62,10 +58,10 @@ def index():
                     send_motion(SCHEDULE_RESET)
                 case "backup":
                     message = "Backed up schedule settings"
-                    current_app.settings.backup()
+                    ca.settings.backup()
                 case "restore":
                     message = "Restored up schedule settings"
-                    current_app.settings.restore()
+                    ca.settings.restore()
 
             write_log(message)
             msg = {"type": "success", "message": message}
@@ -77,14 +73,10 @@ def index():
         return msg
 
     if request.method == "GET":
-        offset = get_time_offset(current_app.settings.gmt_offset)
+        offset = get_time_offset(ca.settings.gmt_offset)
 
-        sunrise = get_sunrise(
-            current_app.settings.latitude, current_app.settings.longitude, offset
-        )
-        sunset = get_sunset(
-            current_app.settings.latitude, current_app.settings.longitude, offset
-        )
+        sunrise = get_sunrise(ca.settings.latitude, ca.settings.longitude, offset)
+        sunset = get_sunset(ca.settings.latitude, ca.settings.longitude, offset)
 
         local_time = get_current_local_time(offset=offset)
 
@@ -92,23 +84,23 @@ def index():
             local_time=local_time,
             sunrise=sunrise,
             sunset=sunset,
-            day_mode=current_app.settings.daymode,
-            daw=current_app.settings.dawnstart_minutes,
-            day_start=current_app.settings.daystart_minutes,
-            dusk=current_app.settings.duskend_minutes,
-            day_end=current_app.settings.dayend_minutes,
-            times=current_app.settings.times,
+            day_mode=ca.settings.daymode,
+            daw=ca.settings.dawnstart_minutes,
+            day_start=ca.settings.daystart_minutes,
+            dusk=ca.settings.duskend_minutes,
+            day_end=ca.settings.dayend_minutes,
+            times=ca.settings.times,
         )
 
         return render_template(
             "schedule.html",
-            control_file=current_app.raspiconfig.control_file,
+            control_file=ca.raspiconfig.control_file,
             current_time=local_time.strftime("%H:%M"),
-            motion_pipe=current_app.raspiconfig.motion_pipe,
+            motion_pipe=ca.raspiconfig.motion_pipe,
             offset=offset,
             period=int_period,
             schedule_pid=get_pid("scheduler"),
-            settings=current_app.settings,
+            settings=ca.settings,
             sunrise=sunrise.strftime("%H:%M"),
             sunset=sunset.strftime("%H:%M"),
             timezones=zoneinfo.available_timezones(),
@@ -117,13 +109,9 @@ def index():
 
 @bp.route("/period", methods=["POST"])
 def period():
-    offset = get_time_offset(current_app.settings.gmt_offset)
-    sunrise = get_sunrise(
-        current_app.settings.latitude, current_app.settings.longitude, offset
-    )
-    sunset = get_sunset(
-        current_app.settings.latitude, current_app.settings.longitude, offset
-    )
+    offset = get_time_offset(ca.settings.gmt_offset)
+    sunrise = get_sunrise(ca.settings.latitude, ca.settings.longitude, offset)
+    sunset = get_sunset(ca.settings.latitude, ca.settings.longitude, offset)
     local_time = get_current_local_time(offset=offset)
     return {
         "period": day_period(
@@ -131,11 +119,11 @@ def period():
             sunrise=sunrise,
             sunset=sunset,
             day_mode=int(request.json.get("daymode")),
-            daw=current_app.settings.dawnstart_minutes,
-            day_start=current_app.settings.daystart_minutes,
-            dusk=current_app.settings.duskend_minutes,
-            day_end=current_app.settings.dayend_minutes,
-            times=current_app.settings.times,
+            daw=ca.settings.dawnstart_minutes,
+            day_start=ca.settings.daystart_minutes,
+            dusk=ca.settings.duskend_minutes,
+            day_end=ca.settings.dayend_minutes,
+            times=ca.settings.times,
         )
     }
 
@@ -165,16 +153,16 @@ def scheduler():
     """Scheduler."""
 
     def dt_now():
-        offset = get_time_offset(current_app.settings.gmt_offset)
+        offset = get_time_offset(ca.settings.gmt_offset)
         return get_current_local_time(offset=offset)
 
-    if not os.path.isfile(current_app.raspiconfig.status_file):
+    if not os.path.isfile(ca.raspiconfig.status_file):
         write_log("Status mjpeg not found")
         return
 
     write_log("RaspiCam support started")
 
-    motion_fifo_in = open_pipe(current_app.raspiconfig.motion_pipe)
+    motion_fifo_in = open_pipe(ca.raspiconfig.motion_pipe)
 
     capture_start = 0
     timeout = 0
@@ -183,28 +171,27 @@ def scheduler():
         write_log("Scheduler loop is started")
         last_on_cmd = -1
         last_day_period = -1
-        # lastDay = -1
-        poll_time = current_app.settings.cmd_poll
+        poll_time = ca.settings.cmd_poll
         slow_poll = 0
         managechecktime = dt.timestamp(dt_now())
         autocameratime = managechecktime
         modechecktime = managechecktime
 
-        if current_app.settings.autocapture_interval > current_app.settings.max_capture:
+        if ca.settings.autocapture_interval > ca.settings.max_capture:
             autocapturetime = managechecktime
             autocapture = 2
         else:
             autocapturetime = 0
             autocapture = 0
 
-        last_status_time = os.path.getmtime(current_app.raspiconfig.status_file)
+        last_status_time = os.path.getmtime(ca.raspiconfig.status_file)
         while timeout_max == 0 or timeout < timeout_max:
             time.sleep(poll_time)
             cmd = check_motion(motion_fifo_in)
             if cmd == SCHEDULE_STOP and autocapture == 0:
                 if last_on_cmd >= 0:
                     write_log("Stop capture requested")
-                    send = current_app.settings.commands_off[last_on_cmd]
+                    send = ca.settings.commands_off[last_on_cmd]
                     if send:
                         send_cmds(str_cmd=send, days=last_day_period)
                         last_on_cmd = -1
@@ -218,7 +205,7 @@ def scheduler():
                     else:
                         write_log("Start capture requested from Pipe")
 
-                    send = current_app.settings.commands_on[last_day_period]
+                    send = ca.settings.commands_on[last_day_period]
                     if send:
                         send_cmds(str_cmd=send, days=last_day_period)
                         last_on_cmd = last_day_period
@@ -229,7 +216,6 @@ def scheduler():
                     )
             elif cmd == SCHEDULE_RESET:
                 write_log("Reload parameters command requested")
-                # current_app.settings.refresh()
                 break
             elif cmd != "":
                 write_log(f"Ignore FIFO char {cmd}")
@@ -240,63 +226,52 @@ def scheduler():
                 timenow = dt.timestamp(dt_now())
                 force_period_check = 0
                 if last_on_cmd >= 0:
-                    if current_app.settings.max_capture > 0:
-                        if (
-                            timenow - capture_start
-                        ) >= current_app.settings.max_capture:
+                    if ca.settings.max_capture > 0:
+                        if (timenow - capture_start) >= ca.settings.max_capture:
                             write_log("Maximum Capture reached. Sending off command")
-                            send_cmds(
-                                str_cmd=current_app.settings.commands_off[last_on_cmd]
-                            )
+                            send_cmds(str_cmd=ca.settings.commands_off[last_on_cmd])
                             last_on_cmd = -1
                             autocapture = 0
                             force_period_check = 1
                 if timenow > modechecktime or force_period_check == 1:
-                    modechecktime = timenow + current_app.settings.mode_poll
+                    modechecktime = timenow + ca.settings.mode_poll
                     force_period_check = 0
                     if last_on_cmd < 0:
                         new_day_period = wrap_day_period()
-                        # newDay = dt.now().strftime("%w")
                         if new_day_period != last_day_period:
                             write_log(f"New period detected {new_day_period}")
                             send_cmds(
-                                str_cmd=current_app.settings.modes[new_day_period],
-                                days=current_app.settings.days,
+                                str_cmd=ca.settings.modes[new_day_period],
+                                days=ca.settings.days,
                                 bool_period=new_day_period,
                             )
                             last_day_period = new_day_period
-                            # lastDay = newDay
                 if timenow > managechecktime:
-                    managechecktime = timenow + current_app.settings.management_interval
+                    managechecktime = timenow + ca.settings.management_interval
                     write_log(
                         f"Scheduled management tasks. Next at {time.ctime(managechecktime)}"
                     )
                     purge_files(
-                        current_app.settings.purgevideo_hours,
-                        current_app.settings.purgeimage_hours,
-                        current_app.settings.purgelapse_hours,
-                        current_app.settings.purgespace_level,
-                        current_app.settings.purgespace_modeex,
+                        ca.settings.purgevideo_hours,
+                        ca.settings.purgeimage_hours,
+                        ca.settings.purgelapse_hours,
+                        ca.settings.purgespace_level,
+                        ca.settings.purgespace_modeex,
                     )
-                    cmd = current_app.settings.management_command
+                    cmd = ca.settings.management_command
                     if cmd != "":
                         write_log(f"exec_macro: {cmd}")
                         send_cmds(str_cmd=f"sy {cmd}")
-                    delete_log(int(current_app.raspiconfig.log_size))
+                    delete_log(int(ca.raspiconfig.log_size))
                 if autocapturetime > 0 and (timenow > autocapturetime):
-                    autocapturetime = (
-                        timenow + current_app.settings.autocapture_interval
-                    )
+                    autocapturetime = timenow + ca.settings.autocapture_interval
                     write_log("Autocapture request.")
                     autocapture = 1
-                if (
-                    current_app.settings.autocamera_interval > 0
-                    and timenow > autocameratime
-                ):
+                if ca.settings.autocamera_interval > 0 and timenow > autocameratime:
                     autocameratime = timenow + 2
-                    mod_time = os.path.getmtime(current_app.raspiconfig.status_file)
+                    mod_time = os.path.getmtime(ca.raspiconfig.status_file)
                     with open(
-                        current_app.raspiconfig.status_file, mode="r", encoding="utf-8"
+                        ca.raspiconfig.status_file, mode="r", encoding="utf-8"
                     ) as file:
                         content = file.read()
                         file.close()
@@ -305,9 +280,7 @@ def scheduler():
                             write_log("Autocamera startup")
                             send_cmds(str_cmd="ru 1")
                     else:
-                        if (
-                            timenow - mod_time
-                        ) > current_app.settings.autocamera_interval:
+                        if (timenow - mod_time) > ca.settings.autocamera_interval:
                             write_log("Autocamera shutdown")
                             send_cmds(str_cmd="md 0;ru 0")
                             last_status_time = timenow + 5
@@ -317,14 +290,10 @@ def scheduler():
 
 def wrap_day_period():
     """Wrap day period."""
-    offset = get_time_offset(current_app.settings.gmt_offset)
+    offset = get_time_offset(ca.settings.gmt_offset)
 
-    sunrise = get_sunrise(
-        current_app.settings.latitude, current_app.settings.longitude, offset
-    )
-    sunset = get_sunset(
-        current_app.settings.latitude, current_app.settings.longitude, offset
-    )
+    sunrise = get_sunrise(ca.settings.latitude, ca.settings.longitude, offset)
+    sunset = get_sunset(ca.settings.latitude, ca.settings.longitude, offset)
 
     local_time = get_current_local_time(offset=offset)
 
@@ -332,12 +301,12 @@ def wrap_day_period():
         local_time=local_time,
         sunrise=sunrise,
         sunset=sunset,
-        day_mode=current_app.settings.daymode,
-        daw=current_app.settings.dawnstart_minutes,
-        day_start=current_app.settings.daystart_minutes,
-        dusk=current_app.settings.duskend_minutes,
-        day_end=current_app.settings.dayend_minutes,
-        times=current_app.settings.times,
+        day_mode=ca.settings.daymode,
+        daw=ca.settings.dawnstart_minutes,
+        day_start=ca.settings.daystart_minutes,
+        dusk=ca.settings.duskend_minutes,
+        day_end=ca.settings.dayend_minutes,
+        times=ca.settings.times,
     )
 
 
@@ -433,7 +402,7 @@ def purge_files(
     sch_purgespacemode: int,
 ):
     """Purge files."""
-    media_path = current_app.raspiconfig.media_path
+    media_path = ca.raspiconfig.media_path
     purge_count = 0
     if sch_purgevideohours > 0 or sch_purgeimagehours > 0 or sch_purgelapsehours > 0:
         files = list_folder_files(media_path)
@@ -522,7 +491,7 @@ def open_pipe(pipename: str):
 def send_motion(cmd: str) -> None:
     """Send command to pipe."""
     try:
-        pipe = os.open(current_app.raspiconfig.motion_pipe, os.O_WRONLY | os.O_NONBLOCK)
+        pipe = os.open(ca.raspiconfig.motion_pipe, os.O_WRONLY | os.O_NONBLOCK)
         os.write(pipe, f"{cmd}\n".encode("utf-8"))
         os.close(pipe)
         write_log(f"Motion - Send {cmd}")
@@ -539,7 +508,7 @@ def send_cmds(
         for cmd in cmds:
             if cmd != "":
                 cmd = cmd.strip()
-                current_app.raspiconfig.send(cmd)
+                ca.raspiconfig.send(cmd)
                 time.sleep(0.2)
 
 
