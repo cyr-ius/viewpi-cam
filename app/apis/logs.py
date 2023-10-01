@@ -25,15 +25,7 @@ class Content(Resource):
     def get(self):
         """List log."""
         reverse = request.args.get("reverse", True) is True
-        log_file = ca.raspiconfig.log_file
-        logs = []
-        if os.path.isfile(log_file):
-            with open(log_file, mode="r", encoding="utf-8") as file:
-                lines = file.readlines()
-                lines.sort(reverse=reverse)
-                for line in lines:
-                    logs.append(line.replace("\n", ""))
-        return logs
+        return get_logs(reverse)
 
     @token_required
     def delete(self):
@@ -42,3 +34,16 @@ class Content(Resource):
             delete_log(1)
         except Exception as error:  # pylint: disable=W0718
             abort(422, error)
+
+
+def get_logs(reverse: bool) -> list[str]:
+    """Get log."""
+    log_file = ca.raspiconfig.log_file
+    logs = []
+    if os.path.isfile(log_file):
+        with open(log_file, mode="r", encoding="utf-8") as file:
+            lines = file.readlines()
+            lines.sort(reverse=reverse)
+            for line in lines:
+                logs.append(line.replace("\n", ""))
+    return logs
