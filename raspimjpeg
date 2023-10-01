@@ -110,7 +110,7 @@ motion_image
 motion_initframes 0
 motion_startframes 3
 motion_stopframes 150
-motion_pipe /dev/raspimjepg/FIFO1
+motion_pipe /dev/raspimjpeg/FIFO1
 motion_file 0
 
 #
@@ -127,7 +127,7 @@ image_path im_%i_%Y%M%D_%h%m%s.jpg
 lapse_path tl_%i_%t_%Y%M%D_%h%m%s.jpg
 video_path vi_%v_%Y%M%D_%h%m%s.mp4
 status_file /dev/shm/mjpeg/status_mjpeg
-control_file /dev/raspimjepg/FIFO
+control_file /dev/raspimjpeg/FIFO
 media_path /app/media
 macros_path /app/macros
 user_annotate /dev/shm/mjpeg/user_annotate
