@@ -4,7 +4,7 @@ import shutil
 from datetime import datetime as dt
 from subprocess import PIPE, Popen
 
-from flask import current_app
+from flask import current_app as ca
 from psutil import process_iter
 
 
@@ -26,9 +26,9 @@ def execute_cmd(cmd):
 
 def write_log(msg: str) -> None:
     """Write log."""
-    log_file = current_app.raspiconfig.log_file
+    log_file = ca.raspiconfig.log_file
     str_now = dt.now().strftime("%Y/%m/%d %H:%M:%S")
-    current_app.logger.info(msg)
+    ca.logger.info(msg)
 
     mode = "w" if not os.path.isfile(log_file) else "a"
     with open(log_file, mode=mode, encoding="utf-8") as file:
@@ -37,7 +37,7 @@ def write_log(msg: str) -> None:
 
 def delete_log(log_size: int) -> None:
     """Delete log."""
-    log_file = current_app.raspiconfig.log_file
+    log_file = ca.raspiconfig.log_file
     if os.path.isfile(log_file):
         log_lines = open(log_file, mode="r", encoding="utf-8").readlines()
         if len(log_lines) > log_size:
@@ -48,7 +48,7 @@ def delete_log(log_size: int) -> None:
 
 def disk_usage() -> tuple[int, int, int, int, str]:
     """Disk usage."""
-    media_path = current_app.raspiconfig.media_path
+    media_path = ca.raspiconfig.media_path
     total, used, free = shutil.disk_usage(f"{media_path}")
     percent_used = round(used / total * 100)
     if percent_used > 98:
