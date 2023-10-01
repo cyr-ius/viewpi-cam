@@ -47,7 +47,7 @@ class System(Resource):
                 execute_cmd("echo o > /proc/sysrq-trigger")
             if request.endpoint == "api.system_restart_app":
                 execute_cmd("killall gunicorn")
-        except Exception as error:
+        except Exception as error:  # pylint: disable=W0718
             abort(422, error)
         return {}, 200
 
