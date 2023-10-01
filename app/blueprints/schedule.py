@@ -16,9 +16,11 @@ from suntime import Sun
 
 from ..const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
 from ..helpers.decorator import auth_required
+from ..helpers.fifo import check_motion, open_pipe, send_motion
 from ..helpers.filer import (
     delete_mediafiles,
     get_file_type,
+    get_sorted_files,
     is_thumbnail,
     list_folder_files,
 )
@@ -448,42 +450,6 @@ def purge_files(
         write_log("Purged purge_count Files")
 
 
-def check_motion(pipe):
-    if isinstance(pipe, bool):
-        return ""
-    try:
-        ret = os.read(pipe, 1).decode("utf-8").replace("\n", "")
-    except Exception:  # pylint: disable=W0718
-        ret = ""
-    return ret
-
-
-def open_pipe(pipename: str):
-    if not os.path.exists(pipename):
-        write_log(f"Making Pipe to receive capture commands {pipename}")
-        Popen(f"mkfifo {pipename}", shell=True)
-        Popen(f"chmod 666 {pipename}", shell=True)
-    else:
-        write_log(f"Capture Pipe already exists ({pipename})")
-
-    try:
-        pipe = os.open(pipename, os.O_RDONLY | os.O_NONBLOCK)
-        return pipe
-    except OSError as error:
-        write_log(f"Error open pipe {pipename} {str(error)}")
-
-
-def send_motion(cmd: str) -> None:
-    """Send command to pipe."""
-    try:
-        pipe = os.open(ca.raspiconfig.motion_pipe, os.O_WRONLY | os.O_NONBLOCK)
-        os.write(pipe, f"{cmd}\n".encode("utf-8"))
-        os.close(pipe)
-        write_log(f"Motion - Send {cmd}")
-    except Exception as error:  # pylint: disable=W0718
-        write_log(str(error))
-
-
 def send_cmds(
     str_cmd: str, days: dict[str, any] | None = None, bool_period: bool = False
 ):
@@ -495,18 +461,6 @@ def send_cmds(
                 cmd = cmd.strip()
                 ca.raspiconfig.send(cmd)
                 time.sleep(0.2)
-
-
-# functions to find and delete data files
-def get_sorted_files(folder: str, ascending: bool = True) -> list:
-    scanfiles = list_folder_files(folder)
-    files = {}
-    for file in scanfiles:
-        if file != "." and file != ".." and is_thumbnail(file):
-            f_date = os.path.getmtime(f"{folder}/{file}")
-            files[file] = f_date
-
-    return sorted(files, reverse=ascending is False)
 
 
 def is_day_active(days, bool_period: int) -> bool:
