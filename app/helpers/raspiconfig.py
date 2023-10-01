@@ -81,10 +81,8 @@ class RaspiConfig:
             try:
                 if not os.path.exists(self.control_file):
                     os.mkfifo(self.control_file, mode=0o600)
-                    write_log(f"Create fifo {self.control_file}")
                 if not os.path.exists(self.motion_pipe):
                     os.mkfifo(self.motion_pipe, mode=0o600)
-                    write_log(f"Create fifo {self.motion_pipe}")
             except Exception as error:
                 raise RaspiConfigError(
                     f"Error while fifo creating ({error})"
