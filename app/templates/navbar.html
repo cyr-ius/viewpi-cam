@@ -34,8 +34,8 @@
     {%endif%}
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
     <ul class="navbar-nav d-none" id="log">
-      <li class="nav-item pe-1"><button id="downlog" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="downloadlog">Download Log</button></li>
-      <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="clearlog">Clear Log</button></li>
+      <li class="nav-item pe-1"><button id="downlog" class="btn btn-sm btn-outline-secondary" type="button" name="downloadlog">Download Log</button></li>
+      <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button" name="clearlog">Clear Log</button></li>
     </ul>
     {%endif%}    
     {% if session["user_level"] >= config['USERLEVEL_MINP'] %}
