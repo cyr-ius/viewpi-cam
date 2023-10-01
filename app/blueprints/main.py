@@ -16,7 +16,7 @@ from flask import (
 
 from ..const import PRESETS
 from ..helpers.decorator import auth_required, ViewPiCamException
-from ..helpers.utils import write_log, delete_log
+from ..helpers.utils import write_log
 from ..apis.logs import get_logs
 from .camera import status_mjpeg
 
@@ -65,8 +65,7 @@ def index():
 @auth_required
 def log():
     if request.method == "POST":
-        filename = current_app.raspiconfig.log_file
-        return send_file(filename, as_attachment=True)
+        return send_file(current_app.raspiconfig.log_file, as_attachment=True)
 
     return render_template("logs.html", log=get_logs(True))
 
