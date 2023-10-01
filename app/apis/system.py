@@ -32,7 +32,7 @@ command_m = api.model(
     endpoint="system_restart_app",
     doc={"description": "Restart application"},
 )
-class System(Resource):
+class Actions(Resource):
     """Get log."""
 
     @token_required
