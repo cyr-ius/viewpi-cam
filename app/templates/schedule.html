@@ -221,14 +221,14 @@
 {% block extrascripts %}
 <script language="javascript">
 
-$( document ).ready(function(){
+$(function(){
     $("#main").addClass("d-none")
     $("#schedule").removeClass("d-none")
     $("#daymode").trigger("click");
 })
 
-$('#schedule button').unbind();
-$('#schedule button').click(function(){
+$('#sch_save').unbind();
+$('#sch_save').click(function(){
     if (!document.getElementById('form_schedule').checkValidity()) {
         $("#form_schedule").addClass('was-validated')
     } else {
@@ -247,31 +247,43 @@ $('#schedule button').click(function(){
             }        
         }
         data.days = days 
-        let action = $(this).val()
+        $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data,"callbackSuccess": callbackSuccess}) 
+    }
+});
 
-        // Post data
-        let callbackSuccess;
-        if (action == "restore")
-            callbackSuccess = function(e){location.reload();}
+$('#backup').unbind();
+$('#backup').click(function(){
+    $.queryData({"url":"{{ url_for('api.schedule_backup') }}"}) 
+});
 
-        if (action == "stop" || action == "start") {
-            next = action == "stop" ? "start" : "stop"
-            callbackSuccess = function(response) {
-                if (response.type == "success") {               
-                    $('.stopstart').val(next)
-                    $('.stopstart').prop("id", next)
-                    $('.stopstart').prop("name",next)
-                    $('.stopstart').html($.capitalize(next))
-                }
-            }
-        }
-        if (action == "save") {
-            $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data,"callbackSuccess": callbackSuccess}) 
-        } else {
-            $.queryData({"url":`{{ url_for('api.schedule_actions')}}/${action}`,"callbackSuccess": callbackSuccess}) 
+$('#restore').unbind();
+$('#restore').click(function(){
+    callbackSuccess = function(e){location.reload();}
+    $.queryData({"url":"{{ url_for('api.schedule_restore')}}","callbackSuccess": callbackSuccess}) 
+});
+
+$('#schedule').on('click','#start', function(){
+    callbackSuccess = function(response) {
+        if (response.type == "success") {               
+            $('.stopstart').val('stop')
+            $('.stopstart').prop("id", 'stop')
+            $('.stopstart').prop("name",'stop')
+            $('.stopstart').html('Stop')
         }
     }
+    $.queryData({"url":"{{ url_for('api.schedule_actions')}}/start","callbackSuccess": callbackSuccess}) 
+});
 
+$('#schedule').on('click','#stop', function(){
+    callbackSuccess = function(response) {
+        if (response.type == "success") {               
+            $('.stopstart').val('start')
+            $('.stopstart').prop("id", 'start')
+            $('.stopstart').prop("name",'start')
+            $('.stopstart').html('Start')
+        }
+    }
+    $.queryData({"url":"{{ url_for('api.schedule_actions')}}/stop","callbackSuccess": callbackSuccess}) 
 });
 
 $('#daymode').unbind();
