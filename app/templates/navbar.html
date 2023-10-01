@@ -79,15 +79,10 @@
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">Schedule</a></li>
           <li><hr class="dropdown-divider"></li>
           </div>
-          <li class="nav-item"><a class="dropdown-item" href="#" onclick="app_restart();">Restart application</a></li>
-          <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_restart();">Restart system</a></li>
-          <li class="nav-item"><a class="dropdown-item" href="#" onclick="sys_shutdown();">Shutdown system</a></li>            
-          <li class="nav-item">
-            <a class="dropdown-item" href="#" 
-              onclick="if(confirm('Are you sure to reset the settings to the default values?')) {$.sendCmd({'cmd':'rs', 'params':1});setTimeout(function(){location.reload(true);}, 1000);}">
-              Reset settings
-            </a>
-          </li>
+          <li class="nav-item"><a id="restart_app" class="dropdown-item" href="#">Restart application</a></li>
+          <li class="nav-item"><a id="restart" class="dropdown-item" href="#">Restart system</a></li>
+          <li class="nav-item"><a id="shutdown" class="dropdown-item" href="#">Shutdown system</a></li>            
+          <li class="nav-item"><a id="reset" class="dropdown-item" href="#">Reset settings</a></li>
           <li><hr class="dropdown-divider"></li>
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">Show Log</a></li>
           {% if g.loglevel == 'DEBUG' %}
@@ -108,21 +103,26 @@
 {%endif%}
 {% block extrascripts%}
 <script language="javascript">
-  function sys_shutdown() {
-    if(confirm('Are you sure to shutdown this host?')) {
-      $.get('{{url_for("main.sys_cmd",cmd="shutdown")}}')
-    }
-  }
+$('#restart_app, #restart, #shutdown, #reset').unbind();
 
-  function sys_restart() {
-    if(confirm('Are you sure to restart this host?')) {
-      $.get('{{url_for("main.sys_cmd",cmd="restart")}}')
-    }    
+$('#restart_app').click(function(){
+  $.queryData({"url":"{{url_for('api.system_restart_app')}}"})
+});
+$('#restart').click(function(){
+  if(confirm('Are you sure to restart this host?')) {
+    $.queryData({"url":"{{url_for('api.system_restart')}}"})
+  } 
+});
+$('#shutdown').click(function(){
+  if(confirm('Are you sure to shutdown this host?')) {
+    $.queryData({"url":"{{url_for('api.system_shutown')}}"})
   }
-
-  function app_restart() {
-    $.get('{{url_for("main.sys_cmd",cmd="restart_app")}}')
+});
+$('#reset').click(function(){
+  let callbackSuccess = function(e){setTimeout(function(){location.reload(true);}, 1000);}
+  if(confirm('Are you sure to reset the settings to the default values?')) {
+    $.queryData({"url":"{{url_for('api.system_command')}}","data":{"cmd":"rs","params":"1"},"callbackSuccess": callbackSuccess})
   }
-
+});
 </script>
 {%endblock%}
