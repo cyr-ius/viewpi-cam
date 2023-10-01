@@ -16,8 +16,8 @@ $(function(){
     stream()
 });
 
-$('#log button[name="downloadlog"]').unbind();
-$('#log button[name="downloadlog"]').click(function(){
+$('#downloadlog').unbind();
+$('#downloadlog').click(function(){
     $.ajax({
         url: '{{url_for('main.log')}}',
         method: 'POST',
@@ -39,8 +39,8 @@ $('#log button[name="downloadlog"]').click(function(){
     });
 });
 
-$('#log button[name="clearlog"]').unbind();
-$('#log button[name="clearlog"]').click(function(){
+$('#clearlog').unbind();
+$('#clearlog').click(function(){
     callbackSuccess = function(data) {location.reload();}
     $.queryData({"method":"delete","url":"{{url_for('api.logs_content')}}","callbackSuccess":callbackSuccess})
 });
