@@ -132,3 +132,13 @@ def list_folder_files(path: str, ext=None) -> list:
             if os.path.isfile(os.path.join(path, f)) and f".{ext}" in f
         ]
     return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+
+
+def get_sorted_files(folder: str, ascending: bool = True) -> list:
+    """Ordering files."""
+    files = {}
+    for file in list_folder_files(folder):
+        if file != "." and file != ".." and is_thumbnail(file):
+            files[file] = os.path.getmtime(f"{folder}/{file}")
+
+    return sorted(files, reverse=ascending is False)
