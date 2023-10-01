@@ -5,10 +5,10 @@ from flask import current_app as cp
 from flask_restx import Namespace, Resource, fields
 
 from ..helpers.decorator import token_required
-from .models import error_m
+from .models import message
 
 api = Namespace("users")
-api.add_model("Error", error_m)
+api.add_model("Error", message)
 
 user_m = api.model(
     "User",
@@ -29,8 +29,8 @@ users_m = api.model(
 )
 
 
-@api.response(422, "Error", error_m)
-@api.response(403, "Forbidden", error_m)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
 @api.route("/users")
 class Users(Resource):
     """List users."""
@@ -59,8 +59,8 @@ class Users(Resource):
         return "", 204
 
 
-@api.response(422, "Error", error_m)
-@api.response(403, "Forbidden", error_m)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
 @api.route("/users/<string:uid>")
 @api.param("uid", "Username")
 class User(Resource):

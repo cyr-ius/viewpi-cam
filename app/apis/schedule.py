@@ -14,10 +14,10 @@ from ..const import SCHEDULE_RESET
 from ..helpers.decorator import token_required
 from ..helpers.fifo import send_motion
 from ..helpers.utils import execute_cmd, get_pid, write_log
-from .models import error_m
+from .models import message
 
 api = Namespace("schedule")
-api.add_model("Error", error_m)
+api.add_model("Error", message)
 
 wild = fields.Wildcard(fields.List(fields.Integer()))
 day = api.model("Day", {"*": wild})
@@ -69,8 +69,8 @@ schedule = api.model(
 )
 
 
-@api.response(422, "Error", error_m)
-@api.response(403, "Forbidden", error_m)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
 @api.route("/schedule")
 class Settings(Resource):
     """Schedule."""
@@ -95,8 +95,9 @@ class Settings(Resource):
         return ca.settings
 
 
-@api.response(422, "Error", error_m)
-@api.response(403, "Forbidden", error_m)
+@api.response(200, "Success", message)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
 @api.route("/schedule/actions", doc=False)
 @api.route("/schedule/actions/stop", endpoint="schedule_stop")
 @api.route("/schedule/actions/start", endpoint="schedule_start")
@@ -106,23 +107,24 @@ class Actions(Resource):
     """Actions."""
 
     @token_required
+    @api.marshal_with(message)
     def post(self):
         """Post action."""
         match request.endpoint:
             case "api.schedule_start":
                 if not get_pid("scheduler"):
                     Popen(["flask", "scheduler", "start"], stdout=PIPE)
-                return "", 200
+                return {"message": "Start successful"}
             case "api.schedule_stop":
                 pid = get_pid("scheduler")
                 execute_cmd(f"kill {pid}")
-                return "", 200
+                return {"message": "Stop successful"}
             case "api.schedule_backup":
                 ca.settings.backup()
-                return "", 200
+                return {"message": "Backup successful"}
             case "api.schedule_restore":
                 ca.settings.restore()
-                return "", 200
+                return {"message": "Restore successful"}
         return "Action not found", 422
 
 

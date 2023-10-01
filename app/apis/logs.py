@@ -7,15 +7,15 @@ from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import token_required
 from ..helpers.utils import delete_log
-from .models import error_m
+from .models import message
 
 
 api = Namespace("logs")
-api.add_model("Error", error_m)
+api.add_model("Error", message)
 
 
-@api.response(422, "Error", error_m)
-@api.response(403, "Forbidden", error_m)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
 @api.route("/logs")
 class Content(Resource):
     """Get log."""
@@ -32,6 +32,7 @@ class Content(Resource):
         """Delete log."""
         try:
             delete_log(1)
+            return {"message": "Delete successful"}
         except Exception as error:  # pylint: disable=W0718
             abort(422, error)
 

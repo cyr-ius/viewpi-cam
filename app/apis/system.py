@@ -5,10 +5,10 @@ from flask_restx import Namespace, Resource, abort, fields
 
 from ..helpers.decorator import token_required
 from ..helpers.utils import execute_cmd
-from .models import error_m
+from .models import message
 
 api = Namespace("system")
-api.add_model("Error", error_m)
+api.add_model("Error", message)
 
 command_m = api.model(
     "Command",
@@ -21,8 +21,8 @@ command_m = api.model(
 )
 
 
-@api.response(422, "Error", error_m)
-@api.response(403, "Forbidden", error_m)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
 @api.route(
     "/system/restart", endpoint="system_restart", doc={"description": "Restart host"}
 )
@@ -54,9 +54,9 @@ class Actions(Resource):
         return {}, 200
 
 
-@api.response(422, "Error", error_m)
-@api.response(403, "Forbidden", error_m)
-@api.route("/commands")
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
+@api.route("/command")
 class Command(Resource):
     """FIFO Command."""
 

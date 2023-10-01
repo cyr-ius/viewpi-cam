@@ -5,10 +5,10 @@ from flask_restx import Namespace, Resource, fields
 from ..blueprints.preview import draw_files, get_thumbnails, lock_file
 from ..helpers.decorator import token_required
 from ..helpers.filer import delete_mediafiles
-from .models import error_m
+from .models import message
 
 api = Namespace("previews")
-api.add_model("Error", error_m)
+api.add_model("Error", message)
 
 
 class PathURI(fields.Raw):
@@ -51,8 +51,8 @@ files = api.model(
 )
 
 
-@api.response(422, "Error", error_m)
-@api.response(403, "Forbidden", error_m)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
 @api.route("/previews")
 class Previews(Resource):
     """Previews."""
@@ -81,8 +81,8 @@ class Previews(Resource):
         return "", 204
 
 
-@api.response(422, "Error", error_m)
-@api.response(403, "Forbidden", error_m)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
 @api.route("/previews/<string:id>")
 class Preview(Resource):
     """Preview."""
