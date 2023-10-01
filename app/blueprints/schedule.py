@@ -4,19 +4,17 @@ import shutil
 import time
 import zoneinfo
 from datetime import datetime as dt
-from datetime import timedelta as td
 from subprocess import PIPE, Popen
 
-import pytz
 from flask import Blueprint
 from flask import current_app as ca
 from flask import render_template, request
 from flask.cli import with_appcontext
-from suntime import Sun
 
+from ..apis.schedule import dt_now, period, sun_info, time_offset
 from ..const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
 from ..helpers.decorator import auth_required
-from ..helpers.fifo import check_motion, open_pipe, send_motion
+from ..helpers.fifo import check_motion, open_pipe
 from ..helpers.filer import (
     delete_mediafiles,
     get_file_type,
@@ -24,7 +22,6 @@ from ..helpers.filer import (
     is_thumbnail,
     list_folder_files,
 )
-from ..helpers.raspiconfig import RaspiConfigError
 from ..helpers.utils import delete_log, get_pid, write_log
 
 bp = Blueprint(
@@ -41,74 +38,18 @@ bp.cli.short_help = "Stop/Start scheduler"
 @auth_required
 def index():
     """Index page."""
-    if request.method == "POST" and (action := request.json.pop("action", None)):
-        try:
-            match action:
-                case "start":
-                    launch_schedule()
-                    message = "Start scheduler"
-                case "stop":
-                    pid = get_pid("scheduler")
-                    Popen(f"kill {pid}", shell=True)
-                    message = "Stop scheduler"
-                case "save":
-                    message = "Saved schedule settings"
-                    cur_gmt = ca.settings.gmt_offset
-                    ca.settings.update(**request.json)
-                    if (timezone := ca.settings.gmt_offset) != cur_gmt:
-                        write_log(f"Set timezone {timezone}")
-                        Popen(
-                            f"ln -fs /usr/share/zoneinfo/{timezone} /etc/localtime",
-                            shell=True,
-                        )
-                    send_motion(SCHEDULE_RESET)
-                case "backup":
-                    message = "Backed up schedule settings"
-                    ca.settings.backup()
-                case "restore":
-                    message = "Restored up schedule settings"
-                    ca.settings.restore()
-
-            write_log(message)
-            msg = {"type": "success", "message": message}
-
-        except RaspiConfigError as error:
-            write_log(str(error))
-            msg = {"type": "error", "message": str(error)}
-
-        return msg
-
     if request.method == "GET":
-        offset = get_time_offset(ca.settings.gmt_offset)
-
-        sunrise = get_sunrise(ca.settings.latitude, ca.settings.longitude, offset)
-        sunset = get_sunset(ca.settings.latitude, ca.settings.longitude, offset)
-
-        local_time = get_current_local_time(offset=offset)
-
-        int_period = day_period(
-            local_time=local_time,
-            sunrise=sunrise,
-            sunset=sunset,
-            day_mode=ca.settings.daymode,
-            daw=ca.settings.dawnstart_minutes,
-            day_start=ca.settings.daystart_minutes,
-            dusk=ca.settings.duskend_minutes,
-            day_end=ca.settings.dayend_minutes,
-            times=ca.settings.times,
-        )
-
         return render_template(
             "schedule.html",
             control_file=ca.raspiconfig.control_file,
-            current_time=local_time.strftime("%H:%M"),
+            current_time=dt_now().strftime("%H:%M"),
             motion_pipe=ca.raspiconfig.motion_pipe,
-            offset=offset,
-            period=int_period,
+            offset=time_offset(ca.settings.gmt_offset),
+            period=period(ca.settings.daymode),
             schedule_pid=get_pid("scheduler"),
             settings=ca.settings,
-            sunrise=sunrise.strftime("%H:%M"),
-            sunset=sunset.strftime("%H:%M"),
+            sunrise=sun_info("sunrise").strftime("%H:%M"),
+            sunset=sun_info("sunset").strftime("%H:%M"),
             timezones=zoneinfo.available_timezones(),
         )
 
@@ -128,19 +69,8 @@ def start_scheduler() -> int | None:
     scheduler()
 
 
-def launch_schedule():
-    """Run scheduler."""
-    if not get_pid("scheduler"):
-        Popen(["flask", "scheduler", "start"], stdout=PIPE)
-
-
 def scheduler():
     """Scheduler."""
-
-    def dt_now():
-        offset = get_time_offset(ca.settings.gmt_offset)
-        return get_current_local_time(offset=offset)
-
     if not os.path.isfile(ca.raspiconfig.status_file):
         write_log("Status mjpeg not found")
         return
@@ -224,7 +154,8 @@ def scheduler():
                     modechecktime = timenow + ca.settings.mode_poll
                     force_period_check = 0
                     if last_on_cmd < 0:
-                        new_day_period = wrap_day_period()
+                        # new_day_period = wrap_day_period()
+                        new_day_period = period(ca.settings.daymode)
                         if new_day_period != last_day_period:
                             write_log(f"New period detected {new_day_period}")
                             send_cmds(
@@ -273,112 +204,6 @@ def scheduler():
                             last_status_time = timenow + 5
                         else:
                             last_status_time = timenow
-
-
-def wrap_day_period():
-    """Wrap day period."""
-    offset = get_time_offset(ca.settings.gmt_offset)
-
-    sunrise = get_sunrise(ca.settings.latitude, ca.settings.longitude, offset)
-    sunset = get_sunset(ca.settings.latitude, ca.settings.longitude, offset)
-
-    local_time = get_current_local_time(offset=offset)
-
-    return day_period(
-        local_time=local_time,
-        sunrise=sunrise,
-        sunset=sunset,
-        day_mode=ca.settings.daymode,
-        daw=ca.settings.dawnstart_minutes,
-        day_start=ca.settings.daystart_minutes,
-        dusk=ca.settings.duskend_minutes,
-        day_end=ca.settings.dayend_minutes,
-        times=ca.settings.times,
-    )
-
-
-def day_period(
-    local_time: dt,
-    sunrise: dt,
-    sunset: dt,
-    day_mode: int | float,
-    daw: int | float,
-    day_start: int | float,
-    dusk: int | float,
-    day_end: int | float,
-    times,
-):
-    """Get day period."""
-    match day_mode:
-        case 0:
-            if local_time < (sunrise + td(minutes=daw)).replace(tzinfo=None):
-                d_period = 1
-            elif local_time < (sunrise + td(minutes=day_start)).replace(tzinfo=None):
-                d_period = 2
-            elif local_time > (sunset + td(minutes=dusk)).replace(tzinfo=None):
-                d_period = 1
-            elif local_time > (sunset + td(minutes=day_end)).replace(tzinfo=None):
-                d_period = 4
-            else:
-                d_period = 3
-        case 1:
-            d_period = 0
-        case 2:
-            d_period = find_fixed_time_period(times, local_time)
-
-    return d_period
-
-
-def get_current_local_time(minute: bool = False, offset: td = None) -> dt | int:
-    """Get current local time."""
-    now = dt.utcnow()
-    if offset:
-        now = now + offset
-    if minute:
-        return now.hour * 60 + now.minute
-    return now
-
-
-def get_sunrise(latitude, longitude, offset: td) -> dt:
-    """Get sunrise time."""
-    sun = Sun(latitude, longitude)
-    day_sunrise: dt = sun.get_sunrise_time()
-    return day_sunrise + offset
-
-
-def get_sunset(latitude, longitude, offset: td) -> dt:
-    """Get sunset time."""
-    sun = Sun(latitude, longitude)
-    day_sunset: dt = sun.get_sunset_time()
-    return day_sunset + offset
-
-
-def get_time_offset(offset: int | float | str = 0) -> td:
-    """Get time offset."""
-    if isinstance(offset, (int, float)):
-        offset = td(hours=offset)
-    else:
-        try:
-            gmt_time = dt.now(pytz.timezone(offset))
-            offset = gmt_time.utcoffset()
-        except pytz.UnknownTimeZoneError:
-            offset = td(hours=0)
-    return offset
-
-
-def find_fixed_time_period(times, c_mins: dt) -> int:
-    int_period = len(times) - 1
-    max_less_v = -1
-    for str_time in times:
-        f_mins = dt.strptime(str_time, "%H:%M")
-        if (
-            f_mins.time() < c_mins.time()
-            and (f_mins.hour * 60 + f_mins.minute) > max_less_v
-        ):
-            max_less_v = f_mins.hour * 60 + f_mins.minute
-            int_period = times.index(str_time)
-
-    return int_period + 5
 
 
 def purge_files(
@@ -465,6 +290,12 @@ def send_cmds(
 
 def is_day_active(days, bool_period: int) -> bool:
     if days:
-        day = int(dt.now().strftime("%w"))
+        day = int(dt_now().strftime("%w"))
         return days[str(bool_period)][day] == 1
     return False
+
+
+def launch_schedule():
+    """Run scheduler."""
+    if not get_pid("scheduler"):
+        Popen(["flask", "scheduler", "start"], stdout=PIPE)

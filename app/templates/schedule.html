@@ -247,15 +247,15 @@ $('#schedule button').click(function(){
             }        
         }
         data.days = days 
-        data.action = $(this).val()
+        let action = $(this).val()
 
         // Post data
         let callbackSuccess;
-        if (data.action == "restore")
+        if (action == "restore")
             callbackSuccess = function(){location.reload();}
 
-        if (data.action == "stop" || data.action == "start") {
-            next = data.action == "stop" ? "start" : "stop"
+        if (action == "stop" || action == "start") {
+            next = action == "stop" ? "start" : "stop"
             callbackSuccess = function(response) {
                 if (response.type == "success") {               
                     $('.stopstart').val(next)
@@ -265,7 +265,11 @@ $('#schedule button').click(function(){
                 }
             }
         }
-        $.queryData({"url":"{{ url_for('schedule.index')}}","data": data,"callbackSuccess": callbackSuccess}) 
+        if (action == "save") {
+            $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data,"callbackSuccess": callbackSuccess}) 
+        } else {
+            $.queryData({"url":`{{ url_for('api.schedule_actions')}}/${action}`,"callbackSuccess": callbackSuccess}) 
+        }
     }
 
 });
@@ -287,7 +291,7 @@ $('#daymode').click(function(){
     }
 
     data = {"daymode":mode}
-    $.queryData({"url":"{{ url_for('schedule.period')}}", data:data, "callbackSuccess":callbackSuccess})
+    $.queryData({"url":"{{ url_for('api.schedule_period')}}", data:data, "callbackSuccess":callbackSuccess})
 
     $('.sun').addClass("d-none");
     $('.day').addClass("d-none");   

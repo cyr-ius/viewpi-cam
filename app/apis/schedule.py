@@ -97,6 +97,7 @@ class Settings(Resource):
 
 @api.response(422, "Error", error_m)
 @api.response(403, "Forbidden", error_m)
+@api.route("/schedule/actions", doc=False)
 @api.route("/schedule/actions/stop", endpoint="schedule_stop")
 @api.route("/schedule/actions/start", endpoint="schedule_start")
 @api.route("/schedule/actions/backup", endpoint="schedule_backup")
@@ -137,39 +138,7 @@ class Period(Resource):
     )
     def post(self):
         """Post day mode and return period."""
-        now = local_time()
-        sunrise = dt.strptime(Sunrise().get().get("datetime"), "%Y-%m-%dT%H:%M:%S%z")
-        sunset = dt.strptime(Sunset().get().get("datetime"), "%Y-%m-%dT%H:%M:%S%z")
-
-        match ca.settings.daymode:
-            case 0:
-                if now < (sunrise + td(minutes=ca.settings.dawnstart_minutes)):
-                    period = 1
-                elif now < (sunrise + td(minutes=ca.settings.daystart_minutes)):
-                    period = 2
-                elif now > (sunset + td(minutes=ca.settings.duskend_minutes)):
-                    period = 1
-                elif now > (sunset + td(minutes=ca.settings.dayend_minutes)):
-                    period = 4
-                else:
-                    period = 3
-            case 1:
-                period = 0
-            case 2:
-                int_period = len(ca.settings.times) - 1
-                max_less_v = -1
-                for str_time in ca.settings.times:
-                    f_mins = dt.strptime(str_time, "%H:%M")
-                    if (
-                        f_mins.time() < now.time()
-                        and (f_mins.hour * 60 + f_mins.minute) > max_less_v
-                    ):
-                        max_less_v = f_mins.hour * 60 + f_mins.minute
-                        int_period = ca.settings.times.index(str_time)
-
-                period = int_period + 5
-
-        return {"period": period}
+        return {"period": period(ca.settings.daymode)}
 
 
 @api.route("/sun/sunrise")
@@ -181,11 +150,7 @@ class Sunrise(Resource):
     )
     def get(self):
         """Get sunrise datetime."""
-        offset = get_time_offset(ca.settings.gmt_offset)
-        sun = Sun(ca.settings.latitude, ca.settings.longitude)
-        day_sunrise = sun.get_sunrise_time()
-        day_sunrise = day_sunrise.replace(tzinfo=utc_offset(offset.seconds))
-        return {"datetime": day_sunrise + offset}
+        return {"datetime": sun_info("sunrise")}
 
 
 @api.route("/sun/sunset")
@@ -197,14 +162,10 @@ class Sunset(Resource):
     )
     def get(self):
         """Get sunset datetime."""
-        offset = get_time_offset(ca.settings.gmt_offset)
-        sun = Sun(ca.settings.latitude, ca.settings.longitude)
-        day_sunset = sun.get_sunset_time()
-        day_sunset = day_sunset.replace(tzinfo=utc_offset(offset.seconds))
-        return {"datetime": day_sunset + offset}
+        return {"datetime": sun_info("sunset")}
 
 
-def get_time_offset(offset: int | float | str = 0) -> td:
+def time_offset(offset: int | float | str = 0) -> td:
     """Get time offset."""
     if isinstance(offset, (int, float)):
         offset = td(hours=offset)
@@ -221,12 +182,60 @@ def utc_offset(offset) -> timezone:
     return timezone(td(seconds=offset))
 
 
-def local_time(minute: bool = False, offset: td = None) -> dt | int:
+def dt_now(minute: bool = False) -> dt | int:
     """Get current local time."""
     now = dt.utcnow()
     if ca.settings.gmt_offset:
-        offset = get_time_offset(ca.settings.gmt_offset)
+        offset = time_offset(ca.settings.gmt_offset)
         now = (now + offset).replace(tzinfo=utc_offset(offset.seconds))
     if minute:
         return now.hour * 60 + now.minute
     return now
+
+
+def sun_info(mode):
+    """Return sunset or sunrise datetime."""
+    offset = time_offset(ca.settings.gmt_offset)
+    sun = Sun(ca.settings.latitude, ca.settings.longitude)
+    if mode.lower() == "sunset":
+        sun_time = sun.get_sunset_time()
+    else:
+        sun_time = sun.get_sunrise_time()
+    return sun_time.replace(tzinfo=utc_offset(offset.seconds)) + offset
+
+
+def period(daymode):
+    """Get period."""
+    now = dt_now()
+    sunrise = sun_info("sunrise")
+    sunset = sun_info("sunset")
+
+    match daymode:
+        case 0:
+            if now < (sunrise + td(minutes=ca.settings.dawnstart_minutes)):
+                int_period = 1
+            elif now < (sunrise + td(minutes=ca.settings.daystart_minutes)):
+                int_period = 2
+            elif now > (sunset + td(minutes=ca.settings.duskend_minutes)):
+                int_period = 1
+            elif now > (sunset + td(minutes=ca.settings.dayend_minutes)):
+                int_period = 4
+            else:
+                int_period = 3
+        case 1:
+            int_period = 0
+        case 2:
+            int_period = len(ca.settings.times) - 1
+            max_less_v = -1
+            for str_time in ca.settings.times:
+                f_mins = dt.strptime(str_time, "%H:%M")
+                if (
+                    f_mins.time() < now.time()
+                    and (f_mins.hour * 60 + f_mins.minute) > max_less_v
+                ):
+                    max_less_v = f_mins.hour * 60 + f_mins.minute
+                    int_period = ca.settings.times.index(str_time)
+
+            int_period = int_period + 5
+
+    return int_period
