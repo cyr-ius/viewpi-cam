@@ -69,8 +69,9 @@ $(function(){
       },
       error: function(data){
           $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
-          $("#toast .toast-body").html(data["message"])
-          $("#toast .toast-body").html(data.responseJSON["message"])
+          $("#toast .toast-body").html(data.status + ' - ' +data["message"])
+          if (data.responseJSON)
+            $("#toast .toast-body").html(data.responseJSON["message"])
           if (o.callbackError) return o.callbackError(data)
       },
     })
