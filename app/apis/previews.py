@@ -2,13 +2,14 @@
 from flask import request, url_for
 from flask_restx import Namespace, Resource, fields
 
-from ..blueprints.preview import draw_files, get_thumbnails, lock_file
+from ..blueprints.preview import draw_files, get_thumbnails, lock_file, video_convert
 from ..helpers.decorator import token_required
 from ..helpers.filer import delete_mediafiles
-from .models import message
+from .models import message, forbidden
 
 api = Namespace("previews")
 api.add_model("Error", message)
+api.add_model("Forbidden", forbidden)
 
 
 class PathURI(fields.Raw):
@@ -52,7 +53,7 @@ files = api.model(
 
 
 @api.response(422, "Error", message)
-@api.response(403, "Forbidden", message)
+@api.response(403, "Forbidden", forbidden)
 @api.route("/previews")
 class Previews(Resource):
     """Previews."""
@@ -63,11 +64,7 @@ class Previews(Resource):
     def get(self):
         """Get all media files."""
         sort_order = request.args.get("sort_order", True) is True
-        thumb_filenames = get_thumbnails(
-            sort_order=sort_order, show_types=True, time_filter=1, time_filter_max=8
-        )
-
-        return draw_files(thumb_filenames)
+        return thumbs(sort_order)
 
     @api.response(204, "Delete successful")
     @api.expect(
@@ -81,9 +78,9 @@ class Previews(Resource):
         return "", 204
 
 
-@api.response(422, "Error", message)
-@api.response(403, "Forbidden", message)
 @api.route("/previews/<string:id>")
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", forbidden)
 class Preview(Resource):
     """Preview."""
 
@@ -91,8 +88,7 @@ class Preview(Resource):
     @api.marshal_with(files)
     def get(self, id):
         """Get file information."""
-        thumbs = Previews().get()
-        for thumb in thumbs:
+        for thumb in thumbs():
             if id == thumb["id"]:
                 return thumb
 
@@ -100,8 +96,7 @@ class Preview(Resource):
     @api.doc(description="Delete file")
     def delete(self, id):
         """Delete file."""
-        thumbs = Previews().get()
-        for thumb in thumbs:
+        for thumb in thumbs():
             if id == thumb["id"]:
                 delete_mediafiles(thumb["file_name"])
                 break
@@ -117,15 +112,36 @@ class Preview(Resource):
     endpoint="preview_unlock",
     doc={"description": "Unlock file"},
 )
+@api.route(
+    "/previews/<string:id>/convert",
+    endpoint="preview_convert",
+    doc={"description": "Convert timelapse file to mp4"},
+)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", forbidden)
 class Actions(Resource):
     """Actions."""
 
     @token_required
     def post(self, id):
         """Post action."""
-        thumbs = Previews().get()
-        for thumb in thumbs:
-            if id == thumb["id"]:
-                lock_file(thumb["file_name"], request.endpoint == "api.preview_lock")
-                break
-        return {}
+        if request.endpoint in ["api.preview_lock", "api.preview_unlock"]:
+            for thumb in thumbs():
+                if id == thumb["id"]:
+                    lock_file(
+                        thumb["file_name"], request.endpoint == "api.preview_lock"
+                    )
+                    break
+
+        if request.endpoint == "preview_convert":
+            for thumb in thumbs():
+                if id == thumb["id"]:
+                    video_convert(thumb["file_name"])
+                    break
+
+
+def thumbs(sort_order=False):
+    thumb_filenames = get_thumbnails(
+        sort_order=sort_order, show_types=True, time_filter=1, time_filter_max=8
+    )
+    return draw_files(thumb_filenames)

@@ -7,15 +7,16 @@ from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import token_required
 from ..helpers.utils import delete_log
-from .models import message
+from .models import message, forbidden
 
 
 api = Namespace("logs")
 api.add_model("Error", message)
+api.add_model("Forbidden", forbidden)
 
 
 @api.response(422, "Error", message)
-@api.response(403, "Forbidden", message)
+@api.response(403, "Forbidden", forbidden)
 @api.route("/logs")
 class Content(Resource):
     """Get log."""

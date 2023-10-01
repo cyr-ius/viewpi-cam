@@ -7,17 +7,19 @@ from subprocess import PIPE, Popen
 import pytz
 from flask import current_app as ca
 from flask import request
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource, fields, abort
 from suntime import Sun
 
 from ..const import SCHEDULE_RESET
 from ..helpers.decorator import token_required
 from ..helpers.fifo import send_motion
 from ..helpers.utils import execute_cmd, get_pid, write_log
-from .models import message
+from .models import message, forbidden, date_time
 
 api = Namespace("schedule")
 api.add_model("Error", message)
+api.add_model("Forbidden", forbidden)
+api.add_model("Datetime", date_time)
 
 wild = fields.Wildcard(fields.List(fields.Integer()))
 day = api.model("Day", {"*": wild})
@@ -69,9 +71,9 @@ schedule = api.model(
 )
 
 
-@api.response(422, "Error", message)
-@api.response(403, "Forbidden", message)
 @api.route("/schedule")
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", forbidden)
 class Settings(Resource):
     """Schedule."""
 
@@ -95,14 +97,14 @@ class Settings(Resource):
         return {"message": "Save successful"}
 
 
-@api.response(200, "Success", message)
-@api.response(422, "Error", message)
-@api.response(403, "Forbidden", message)
 @api.route("/schedule/actions", doc=False)
 @api.route("/schedule/actions/stop", endpoint="schedule_stop")
 @api.route("/schedule/actions/start", endpoint="schedule_start")
 @api.route("/schedule/actions/backup", endpoint="schedule_backup")
 @api.route("/schedule/actions/restore", endpoint="schedule_restore")
+@api.response(200, "Success", message)
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", forbidden)
 class Actions(Resource):
     """Actions."""
 
@@ -125,10 +127,12 @@ class Actions(Resource):
             case "api.schedule_restore":
                 ca.settings.restore()
                 return {"message": "Restore successful"}
-        return "Action not found", 422
+        abort(422, message="Action not found")
 
 
 @api.route("/schedule/period")
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", forbidden)
 class Period(Resource):
     """Sunrise."""
 
@@ -144,24 +148,24 @@ class Period(Resource):
 
 
 @api.route("/sun/sunrise")
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", forbidden)
 class Sunrise(Resource):
     """Sunrise."""
 
-    @api.marshal_with(
-        api.model("Datetime", {"datetime": fields.DateTime(dt_format="iso8601")})
-    )
+    @api.marshal_with(date_time)
     def get(self):
         """Get sunrise datetime."""
         return {"datetime": sun_info("sunrise")}
 
 
 @api.route("/sun/sunset")
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", forbidden)
 class Sunset(Resource):
     """Sunset."""
 
-    @api.marshal_with(
-        api.model("Datetime", {"datetime": fields.DateTime(dt_format="iso8601")})
-    )
+    @api.marshal_with(date_time)
     def get(self):
         """Get sunset datetime."""
         return {"datetime": sun_info("sunset")}

@@ -3,10 +3,11 @@ from flask import current_app as ca
 from flask_restx import Namespace, Resource, fields
 
 from ..helpers.decorator import token_required
-from .models import message
+from .models import message, forbidden
 
 api = Namespace("captures")
 api.add_model("Error", message)
+api.add_model("Forbidden", forbidden)
 
 action_m = api.model(
     "Action",
@@ -16,7 +17,7 @@ action_m = api.model(
 
 @api.response(204, "Action execute")
 @api.response(422, "Error", message)
-@api.response(403, "Forbidden", message)
+@api.response(403, "Forbidden", forbidden)
 @api.route("/captures/video")
 class Camera(Resource):
     """Camera."""
@@ -34,7 +35,7 @@ class Camera(Resource):
 
 @api.response(204, "Action execute")
 @api.response(422, "Error", message)
-@api.response(403, "Forbidden", message)
+@api.response(403, "Forbidden", forbidden)
 @api.route("/captures/image")
 class Image(Resource):
     """Image."""
@@ -48,7 +49,7 @@ class Image(Resource):
 
 @api.response(204, "Action execute")
 @api.response(422, "Error", message)
-@api.response(403, "Forbidden", message)
+@api.response(403, "Forbidden", forbidden)
 @api.route("/captures/timelapse")
 class Timelapse(Resource):
     """Timelapse."""
