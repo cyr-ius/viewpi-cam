@@ -82,7 +82,7 @@ class Settings(Resource):
         return ca.settings
 
     @api.expect(schedule)
-    @api.marshal_with(schedule)
+    @api.marshal_with(message)
     @token_required
     def put(self):
         """Set settings."""
@@ -92,7 +92,7 @@ class Settings(Resource):
             write_log(f"Set timezone {new_tz}")
             execute_cmd(f"ln -fs /usr/share/zoneinfo/{new_tz} /etc/localtime")
         send_motion(SCHEDULE_RESET)
-        return ca.settings
+        return {"message": "Save successful"}
 
 
 @api.response(200, "Success", message)
