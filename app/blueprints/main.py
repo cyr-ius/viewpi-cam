@@ -17,6 +17,7 @@ from flask import (
 from ..const import PRESETS
 from ..helpers.decorator import auth_required, ViewPiCamException
 from ..helpers.utils import write_log, delete_log
+from ..apis.logs import get_logs
 from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
@@ -63,25 +64,11 @@ def index():
 @bp.route("/log", methods=["GET", "POST"])
 @auth_required
 def log():
-    if request.method == "POST" and (action := request.json.get("action")):
-        match action:
-            case "downloadlog":
-                filename = current_app.raspiconfig.log_file
-                return send_file(filename, as_attachment=True)
-            case "clearlog":
-                filename = current_app.raspiconfig.log_file
-                delete_log(1)
+    if request.method == "POST":
+        filename = current_app.raspiconfig.log_file
+        return send_file(filename, as_attachment=True)
 
-    log_file = current_app.raspiconfig.log_file
-    logs = []
-    if os.path.isfile(log_file):
-        with open(log_file, mode="r", encoding="utf-8") as file:
-            lines = file.readlines()
-            lines.sort(reverse=True)
-            for line in lines:
-                logs.append(line.replace("\n", ""))
-
-    return render_template("logs.html", log=logs)
+    return render_template("logs.html", log=get_logs(True))
 
 
 @bp.route("/streamlog", methods=["GET"])
