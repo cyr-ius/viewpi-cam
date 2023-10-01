@@ -252,7 +252,7 @@ $('#schedule button').click(function(){
         // Post data
         let callbackSuccess;
         if (action == "restore")
-            callbackSuccess = function(){location.reload();}
+            callbackSuccess = function(e){location.reload();}
 
         if (action == "stop" || action == "start") {
             next = action == "stop" ? "start" : "stop"
