@@ -246,7 +246,7 @@
         if(! $("#"+macro+"_chk").prop("checked")) {
             macrovalue = "-" + macrovalue;
         }
-        $.sendCmd({'cmd':'um', 'params':[i.toString(),macrovalue]})
+        $.sendCmd({'cmd':'um', 'params':[i.toString(), macrovalue]})
     }    
 
     function copyToClipboard(element) {
