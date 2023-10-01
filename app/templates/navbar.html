@@ -25,37 +25,37 @@
     <ul class="navbar-nav d-none" id="schedule">
       {% set action="start" if schedule_pid == 0  else "stop"%}
       <div class="container-fluid justify-content-start mt-2">
-      <button id="sch_save" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="save">Save Settings</button>
-      <button id="backup" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="backup">Backup</button>
-      <button id="restore" class="btn btn-sm btn-outline-secondary" type="button" name="action" value="restore">Restore</button>
-      <button id="{{action}}" class="btn btn-sm btn-outline-secondary stopstart" type="button" name="action" value="{{action}}">{{action|capitalize}}</button>
+      <button id="sch_save" class="btn btn-sm btn-outline-secondary" type="button">Save Settings</button>
+      <button id="backup" class="btn btn-sm btn-outline-secondary" type="button">Backup</button>
+      <button id="restore" class="btn btn-sm btn-outline-secondary" type="button">Restore</button>
+      <button id="{{action}}" class="btn btn-sm btn-outline-secondary" type="button">{{action|capitalize}}</button>
       </div>
     </ul>
     {%endif%}
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
     <ul class="navbar-nav d-none" id="log">
-      <li class="nav-item pe-1"><button id="downlog" class="btn btn-sm btn-outline-secondary" type="button" name="downloadlog">Download Log</button></li>
-      <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button" name="clearlog">Clear Log</button></li>
+      <li class="nav-item pe-1"><button id="downloadlog" class="btn btn-sm btn-outline-secondary" type="button">Download Log</button></li>
+      <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button">Clear Log</button></li>
     </ul>
     {%endif%}    
     {% if session["user_level"] >= config['USERLEVEL_MINP'] %}
     <ul class="navbar-nav d-none" id="gallery">
-      <li class="nav-item pe-1"><button id="selectNone" class='btn btn-sm btn-outline-secondary' type='button' name='action' value='selectNone'>Deselect</button></li>
-      <li class="nav-item pe-1"><button id="selectAll" class='btn btn-sm btn-outline-secondary' type='button' name='action' value='selectAll'>Select All</button></li>
-      <li class="nav-item pe-1"><button id="zipSel" class='btn btn-sm btn-primary' type='button' name='action' value='zipSel'>Download Zip</button></li>
-      <li class="nav-item pe-1"><button id="deleteSel" class='btn btn-sm btn-warning' type='button' name='action' value='deleteSel'>Delete Selected</button></li>
-      <li class="nav-item pe-1"><button id="deleteAll" class='btn btn-sm btn-danger' type='button' name='action' value='deleteAll'>Delete All</button></li>
-      <li class="nav-item pe-1"><button id="lockSel" class='btn btn-sm btn-primary' type='button' name='action' value='lockSel'>Lock</button></li>
-      <li class="nav-item pe-1"><button id="unlockSel" class='btn btn-sm btn-primary' type='button' name='action' value='unlockSel'>Unlock</button></li>
+      <li class="nav-item pe-1"><button id="selectNone" class="btn btn-sm btn-outline-secondary" type="button">Deselect</button></li>
+      <li class="nav-item pe-1"><button id="selectAll" class="btn btn-sm btn-outline-secondary" type="button">Select All</button></li>
+      <li class="nav-item pe-1"><button id="zipSel" class="btn btn-sm btn-primary" type="button">Download Zip</button></li>
+      <li class="nav-item pe-1"><button id="deleteSel" class="btn btn-sm btn-warning" type="button">Delete Selected</button></li>
+      <li class="nav-item pe-1"><button id="deleteAll" class="btn btn-sm btn-danger" type="button">Delete All</button></li>
+      <li class="nav-item pe-1"><button id="lockSel" class="btn btn-sm btn-primary" type="button">Lock</button></li>
+      <li class="nav-item pe-1"><button id="unlockSel" class="btn btn-sm btn-primary" type="button">Unlock</button></li>
     </ul>
     {%endif%}      
     {% if session["user_level"] >= config['USERLEVEL_MINP'] %}
     <ul class="navbar-nav d-none" id="display">
-      <li class="nav-item pe-1"><button id="prev" class="btn btn-sm btn-outline-secondary" type="button" name='prev' value='&larr;'><i class="bi bi-arrow-left"></i></button></li>
-      <li class="nav-item pe-1"><button id="next" class="btn btn-sm btn-outline-secondary" type="button" name='next' value='&rarr;'><i class="bi bi-arrow-right"></i></button></li>
-      <li class="nav-item pe-1"><button id="download" class='btn btn-sm btn-primary' type='button' name='download'>Download</button></li>
-      <li class="nav-item pe-1"><button id="delete" class='btn btn-sm btn-danger' type='button' name='delete' onclick='return confirm("Are you sure you want to delete this file?");'>Delete</button></li>
-      <li class="nav-item pe-1"><button id="convert" class='btn btn-sm btn-primary' type='button' name='convert'>Start Convert</button></li>
+      <li class="nav-item pe-1"><button id="prev" class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-arrow-left"></i></button></li>
+      <li class="nav-item pe-1"><button id="next" class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-arrow-right"></i></button></li>
+      <li class="nav-item pe-1"><button id="download" class='btn btn-sm btn-primary' type='button'>Download</button></li>
+      <li class="nav-item pe-1"><button id="delete" class='btn btn-sm btn-danger' type='button'>Delete</button></li>
+      <li class="nav-item pe-1"><button id="convert" class='btn btn-sm btn-primary' type='button'>Start Convert</button></li>
     </ul>
     {%endif%}        
     <ul class="navbar-nav ms-md-auto" id="nav-right">
@@ -69,9 +69,9 @@
           {% if request.path == url_for('main.index') %}
           {% set mjpegmode = 1 if mjpegmode == 0 else 0%}
           {% set label_stream = "MJPEG-Stream" if mjpegmode == 1 else "Default-Stream"%}
-          <li><button id="toggle_stream" class="dropdown-item" onclick="set_stream_mode(this.value);" value="{{mjpegmode}}">{{label_stream}}</button></li>
+          <li class="nav-item"><button id="toggle_stream" class="dropdown-item" value="{{mjpegmode}}">{{label_stream}}</button></li>
           {% set display_mode = "Off" if display_mode == "On" else "On"%}
-          <li><button id="display_mode" class="dropdown-item" onclick="set_display(this.value);" value="{{display_mode}}">Display {{display_mode}}</button></li>
+          <li class="nav-item"><button id="display_mode" class="dropdown-item" value="{{display_mode}}">Display {{display_mode}}</button></li>
           <li><hr class="dropdown-divider"></li>
           {%endif%}
           <div id="system">
@@ -79,10 +79,10 @@
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">Schedule</a></li>
           <li><hr class="dropdown-divider"></li>
           </div>
-          <li class="nav-item"><a id="restart_app" class="dropdown-item" href="#">Restart application</a></li>
-          <li class="nav-item"><a id="restart" class="dropdown-item" href="#">Restart system</a></li>
-          <li class="nav-item"><a id="shutdown" class="dropdown-item" href="#">Shutdown system</a></li>            
-          <li class="nav-item"><a id="reset" class="dropdown-item" href="#">Reset settings</a></li>
+          <li class="nav-item"><button id="restart_app" class="dropdown-item">Restart application</button></li>
+          <li class="nav-item"><button id="restart" class="dropdown-item">Restart system</button></li>
+          <li class="nav-item"><button id="shutdown" class="dropdown-item">Shutdown system</button></li>            
+          <li class="nav-item"><button id="reset" class="dropdown-item">Reset settings</button></li>
           <li><hr class="dropdown-divider"></li>
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">Show Log</a></li>
           {% if g.loglevel == 'DEBUG' %}
@@ -124,5 +124,12 @@ $('#reset').click(function(){
     $.sendCmd({"cmd":"rs","params":"1","callbackSuccess":callbackSuccess})
   }
 });
+$('#toggle_stream').click(function(){
+  set_stream_mode(this.value);
+});
+$('#display_mode').click(function(){
+  set_display(this.value);
+});
+
 </script>
 {%endblock%}
