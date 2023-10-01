@@ -1,7 +1,6 @@
 """Blueprint Main."""
 import os
 import time
-from subprocess import Popen, PIPE
 from flask import (
     Blueprint,
     Response,
@@ -15,7 +14,7 @@ from flask import (
 )
 
 from ..const import PRESETS
-from ..helpers.decorator import auth_required, ViewPiCamException
+from ..helpers.decorator import auth_required
 from ..helpers.utils import write_log
 from ..apis.logs import get_logs
 from .camera import status_mjpeg
@@ -100,23 +99,6 @@ def helpcmd():
 @auth_required
 def minview():
     return render_template("min.html")
-
-
-@bp.route("/system/<cmd>", methods=["GET"])
-@auth_required
-def sys_cmd(cmd):
-    """Execute system command."""
-    try:
-        if cmd == "restart":
-            Popen("echo s > /proc/sysrq-trigger", shell=True)
-            Popen("echo b > /proc/sysrq-trigger", shell=True)
-        if cmd == "shutdown":
-            Popen("echo s > /proc/sysrq-trigger", shell=True)
-            Popen("echo o > /proc/sysrq-trigger", shell=True)
-        if cmd == "restart_app":
-            Popen("killall gunicorn", stdout=PIPE, shell=True)
-    except Exception as error:
-        raise ViewPiCamException(f"System command failed ({error})") from error
 
 
 @bp.route("/command", methods=["POST"])
