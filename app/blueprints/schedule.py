@@ -8,7 +8,7 @@ from subprocess import PIPE, Popen
 
 from flask import Blueprint
 from flask import current_app as ca
-from flask import render_template, request
+from flask import render_template
 from flask.cli import with_appcontext
 
 from ..apis.schedule import dt_now, period, sun_info, time_offset
@@ -34,24 +34,23 @@ bp = Blueprint(
 bp.cli.short_help = "Stop/Start scheduler"
 
 
-@bp.route("/", methods=["GET", "POST"])
+@bp.route("/", methods=["GET"])
 @auth_required
 def index():
     """Index page."""
-    if request.method == "GET":
-        return render_template(
-            "schedule.html",
-            control_file=ca.raspiconfig.control_file,
-            current_time=dt_now().strftime("%H:%M"),
-            motion_pipe=ca.raspiconfig.motion_pipe,
-            offset=time_offset(ca.settings.gmt_offset),
-            period=period(ca.settings.daymode),
-            schedule_pid=get_pid("scheduler"),
-            settings=ca.settings,
-            sunrise=sun_info("sunrise").strftime("%H:%M"),
-            sunset=sun_info("sunset").strftime("%H:%M"),
-            timezones=zoneinfo.available_timezones(),
-        )
+    return render_template(
+        "schedule.html",
+        control_file=ca.raspiconfig.control_file,
+        current_time=dt_now().strftime("%H:%M"),
+        motion_pipe=ca.raspiconfig.motion_pipe,
+        offset=time_offset(ca.settings.gmt_offset),
+        period=period(ca.settings.daymode),
+        schedule_pid=get_pid("scheduler"),
+        settings=ca.settings,
+        sunrise=sun_info("sunrise").strftime("%H:%M"),
+        sunset=sun_info("sunset").strftime("%H:%M"),
+        timezones=zoneinfo.available_timezones(),
+    )
 
 
 @bp.cli.command("stop", short_help="Stop scheduler task")
