@@ -14,7 +14,9 @@ command_m = api.model(
     "Command",
     {
         "cmd": fields.String(description="Command", required=True),
-        "params": fields.String(description="Parameters", required=False),
+        "params": fields.List(
+            fields.String(), description="Parameters", required=False
+        ),
     },
 )
 
