@@ -8,7 +8,7 @@ RUN git clone https://github.com/gpac/gpac.git gpac-master
 WORKDIR gpac-master
 
 RUN ./configure --static-bin --use-zlib=no --prefix=/usr/bin
-RUN make
+RUN make -j`nproc`
 
 FROM alpine:3.18 AS userland_builder
 
