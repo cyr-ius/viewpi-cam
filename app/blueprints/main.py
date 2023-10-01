@@ -101,18 +101,6 @@ def minview():
     return render_template("min.html")
 
 
-@bp.route("/command", methods=["POST"])
-@auth_required
-def send_cmd():
-    """Send command to control fifo."""
-    if cmd := request.json.get("cmd"):
-        if params := request.json.get("params"):
-            params = " ".join(params)
-            return current_app.raspiconfig.send(f"{cmd} {params}")
-        return current_app.raspiconfig.send(f"{cmd}")
-    return {"type": "error", "message": f"Command not found {cmd}"}
-
-
 @bp.route("/pipan", methods=["GET"])
 @auth_required
 def pipan():

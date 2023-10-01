@@ -59,12 +59,10 @@ $(function(){
       data: o.convertJson && o.data != "" ? JSON.stringify(o.data) : o.data,
       contentType: "application/json; charset=utf-8",            
       success: function(data){
-          if (data["type"] == "error") {
-            $('#toast').removeClass("text-bg-primary").addClass("text-bg-danger")
-          } else {
-            $('#toast').addClass("text-bg-primary").removeClass("text-bg-danger")
-          }
+          $('#toast').addClass("text-bg-primary")
           $("#toast .toast-body").html(data["message"])
+          if (data.responseJSON)
+            $("#toast .toast-body").html(data.responseJSON["message"])          
           if (o.callbackSuccess) return o.callbackSuccess(data)
       },
       error: function(data){
@@ -89,7 +87,7 @@ $(function(){
 
   $.sendCmd = function(options){
     var o = $.extend({
-      url: "/command", cmd:null, params:null, callbackSuccess: null, callbackError: null,
+      url: "/api/command", cmd:null, params:null, callbackSuccess: null, callbackError: null,
     }, options || {});
     if (typeof o.params === 'string' || o.params instanceof String) {
        o.params=[o.params]
