@@ -2,7 +2,7 @@
 import os
 import time
 from subprocess import Popen
-from .filer import write_log
+from .utils import write_log, execute_cmd
 
 
 # pylint: disable=E1101
@@ -78,10 +78,22 @@ class RaspiConfig:
         """Execute binary file."""
         if os.path.isfile(self.bin):
             # Create FIFO
-            if not os.path.exists(self.control_file):
-                os.mkfifo(self.control_file, mode=0o600)
-            if not os.path.exists(self.motion_pipe):
-                os.mkfifo(self.motion_pipe, mode=0o600)
+            try:
+                if not os.path.exists(self.control_file):
+                    os.mkfifo(self.control_file, mode=0o600)
+                    write_log(f"Create fifo {self.control_file}")
+                if not os.path.exists(self.motion_pipe):
+                    os.mkfifo(self.motion_pipe, mode=0o600)
+                    write_log(f"Create fifo {self.motion_pipe}")
+            except Exception as error:
+                raise RaspiConfigError(
+                    f"Error while fifo creating ({error})"
+                ) from error
+
+            # Create /dev/shm/mjpeg/status_mjpeg
+            if not os.path.isfile(self.status_file):
+                execute_cmd(f"touch {self.status_file}")
+
             # Execute binary
             Popen(self.bin)
             self.logging.info("Start raspimjpeg")
@@ -107,7 +119,7 @@ class RaspiConfig:
         return msg
 
     def stop(self) -> None:
-        Popen(["killall", "raspimjeg"], shell=True)
+        execute_cmd("killall raspimjpeg")
 
 
 class RaspiConfigError(Exception):

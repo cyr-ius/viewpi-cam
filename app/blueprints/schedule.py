@@ -17,15 +17,13 @@ from suntime import Sun
 from ..const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
 from ..helpers.decorator import auth_required
 from ..helpers.filer import (
-    delete_log,
     delete_mediafiles,
     get_file_type,
-    get_pid,
     is_thumbnail,
     list_folder_files,
-    write_log,
 )
 from ..helpers.raspiconfig import RaspiConfigError
+from ..helpers.utils import delete_log, get_pid, write_log
 
 bp = Blueprint(
     "schedule",
@@ -111,27 +109,6 @@ def index():
             sunset=sunset.strftime("%H:%M"),
             timezones=zoneinfo.available_timezones(),
         )
-
-
-@bp.route("/period", methods=["POST"])
-def period():
-    offset = get_time_offset(ca.settings.gmt_offset)
-    sunrise = get_sunrise(ca.settings.latitude, ca.settings.longitude, offset)
-    sunset = get_sunset(ca.settings.latitude, ca.settings.longitude, offset)
-    local_time = get_current_local_time(offset=offset)
-    return {
-        "period": day_period(
-            local_time=local_time,
-            sunrise=sunrise,
-            sunset=sunset,
-            day_mode=int(request.json.get("daymode")),
-            daw=ca.settings.dawnstart_minutes,
-            day_start=ca.settings.daystart_minutes,
-            dusk=ca.settings.duskend_minutes,
-            day_end=ca.settings.dayend_minutes,
-            times=ca.settings.times,
-        )
-    }
 
 
 @bp.cli.command("stop", short_help="Stop scheduler task")

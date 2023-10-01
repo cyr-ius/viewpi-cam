@@ -6,10 +6,7 @@ import shutil
 from flask import Flask
 from flask_assets import Environment
 from flask_babel import Babel
-
-# from flask_swagger import swagger
 from werkzeug.middleware.proxy_fix import ProxyFix
-
 
 from .apis import bp as api_bp
 from .blueprints.auth import bp as auth_bp
@@ -20,7 +17,7 @@ from .blueprints.preview import bp as pview_bp
 from .blueprints.schedule import bp as sch_bp
 from .blueprints.schedule import launch_schedule
 from .blueprints.settings import bp as sets_bp
-from .helpers.filer import execute_cmd, get_pid
+from .helpers.utils import execute_cmd, get_pid
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
 from .services.assets import css_custom, css_main, js_custom, js_main, js_pipan
@@ -93,8 +90,10 @@ def create_app(config=None):
     settings.init_app(app)
 
     # Custom log level
-    if loglevel := settings.get("loglevel"):
-        app.logger.setLevel(loglevel.upper())
+    if custom_level := settings.get("loglevel"):
+        app.logger.setLevel(custom_level.upper())
+    else:
+        settings["loglevel"] = custom_level.upper()
 
     # Register Assets
     assets.register("css_custom", css_custom)
@@ -123,13 +122,6 @@ def create_app(config=None):
     app.jinja_env.add_extension("jinja2.ext.debug")
     app.jinja_env.add_extension("jinja2.ext.i18n")
 
-    @app.context_processor
-    def inject_path_exists():
-        def file_exists(path):
-            return os.path.exists(f"{app.config.root_path}/{path}")
-
-        return {"file_exists": file_exists}
-
     # Create files & folders
     os.makedirs(os.path.dirname(app.raspiconfig.status_file), exist_ok=True)
     os.makedirs(os.path.dirname(app.raspiconfig.control_file), exist_ok=True)
@@ -145,22 +137,23 @@ def create_app(config=None):
     if (boxing := app.raspiconfig.boxing_path) != "":
         os.makedirs(boxing, exist_ok=True)
 
-    if getattr(app.settings, "gmt_offset"):
-        execute_cmd(
-            f"ln -sf /usr/share/zoneinfo/{app.settings.gmt_offset} /etc/localtime"
-        )
+    # Set timezone
+    if offset := settings.get("gmt_offset"):
+        execute_cmd(f"ln -sf /usr/share/zoneinfo/{offset} /etc/localtime")
 
-    # Create /dev/shm/mjpeg/status-file
-    if not os.path.isfile(app.raspiconfig.status_file):
-        status_file = open(app.raspiconfig.status_file, mode="a", encoding="utf-8")
-        status_file.close()
-
-    # Start Raspimjpeg
+    # Start raspimjpeg
     if "NO_RASPIMJPEG" not in os.environ and not get_pid(app.config["RASPI_BINARY"]):
         app.raspiconfig.start()
 
     # Start scheduler
     if "NO_SCHEDULER" not in os.environ:
         launch_schedule()
+
+    @app.context_processor
+    def inject_path_exists():
+        def file_exists(path):
+            return os.path.exists(f"{app.config.root_path}/{path}")
+
+        return {"file_exists": file_exists}
 
     return app
