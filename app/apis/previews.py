@@ -1,11 +1,12 @@
-"""Api camera."""
+"""Api gallery."""
+from flask import current_app as ca
 from flask import request, url_for
 from flask_restx import Namespace, Resource, fields
 
 from ..blueprints.preview import draw_files, get_thumbnails, lock_file, video_convert
 from ..helpers.decorator import token_required
-from ..helpers.filer import delete_mediafiles
-from .models import message, forbidden
+from ..helpers.filer import delete_mediafiles, maintain_folders
+from .models import forbidden, message
 
 api = Namespace("previews")
 api.add_model("Error", message)
@@ -19,17 +20,10 @@ class PathURI(fields.Raw):
         return url_for("static", filename=value)
 
 
-class Id(fields.Raw):
-    """Id."""
-
-    def format(self, value):
-        base = value.split(".")[0]
-        return base.replace("_", "")
-
-
 files = api.model(
     "Files",
     {
+        "id": fields.String(required=True, description="Id"),
         "file_name": fields.String(required=True, description="File name"),
         "file_type": fields.String(required=True, description="I/T/V"),
         "file_size": fields.Integer(required=True, description="Size"),
@@ -47,7 +41,6 @@ files = api.model(
             required=False, description="image numbers of timelapse"
         ),
         "uri": PathURI(attribute="file_name", example="string"),
-        "id": Id(attribute="file_name", example="string"),
     },
 )
 
@@ -73,9 +66,8 @@ class Previews(Resource):
     @token_required
     def delete(self):
         """Delete multiple media files (id)."""
-        for file in api.payload.get("ids", []):
-            delete_mediafiles(file)
-        return "", 204
+        maintain_folders(ca.raspiconfig.media_path, True, True)
+        return {"message": "Delete successful"}
 
 
 @api.route("/previews/<string:id>")
@@ -99,22 +91,23 @@ class Preview(Resource):
         for thumb in thumbs():
             if id == thumb["id"]:
                 delete_mediafiles(thumb["file_name"])
-                break
+                maintain_folders(ca.raspiconfig.media_path, False, False)
+                return {"message": "Delete successful"}
 
 
 @api.route(
     "/previews/<string:id>/lock",
-    endpoint="preview_lock",
+    endpoint="previews_lock",
     doc={"description": "Lock file"},
 )
 @api.route(
     "/previews/<string:id>/unlock",
-    endpoint="preview_unlock",
+    endpoint="previews_unlock",
     doc={"description": "Unlock file"},
 )
 @api.route(
     "/previews/<string:id>/convert",
-    endpoint="preview_convert",
+    endpoint="previews_convert",
     doc={"description": "Convert timelapse file to mp4"},
 )
 @api.response(422, "Error", message)
