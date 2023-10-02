@@ -93,7 +93,7 @@ def create_app(config=None):
     if custom_level := settings.get("loglevel"):
         app.logger.setLevel(custom_level.upper())
     else:
-        settings["loglevel"] = custom_level.upper()
+        settings["loglevel"] = os.environ.get("LOG_LEVEL", "INFO").upper()
 
     # Register Assets
     assets.register("css_custom", css_custom)
