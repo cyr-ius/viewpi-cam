@@ -5,6 +5,7 @@ from flask_restx import Namespace, Resource, abort, fields
 
 from ..helpers.decorator import token_required
 from ..helpers.utils import execute_cmd
+from ..helpers.raspiconfig import RaspiConfigError
 from .models import message
 
 api = Namespace("system")
@@ -65,8 +66,11 @@ class Command(Resource):
     def post(self):
         """Send command to control fifo."""
         if cmd := api.payload.get("cmd"):
-            if params := api.payload.get("params"):
-                params = " ".join(params)
-                return ca.raspiconfig.send(f"{cmd} {params}")
-            return ca.raspiconfig.send(f"{cmd}")
+            try:
+                if params := api.payload.get("params"):
+                    params = " ".join(params)
+                    return ca.raspiconfig.send(f"{cmd} {params}")
+                return ca.raspiconfig.send(f"{cmd}")
+            except RaspiConfigError as error:
+                abort(422, str(error))
         abort(422, f"Command not found {cmd}")
