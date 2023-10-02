@@ -67,9 +67,6 @@ class Command(Resource):
         if cmd := api.payload.get("cmd"):
             if params := api.payload.get("params"):
                 params = " ".join(params)
-                rslt = ca.raspiconfig.send(f"{cmd} {params}")
-            rslt = ca.raspiconfig.send(f"{cmd}")
-            if rslt.get("type") == "error":
-                abort(422, **rslt)
-            return rslt
+                return ca.raspiconfig.send(f"{cmd} {params}")
+            return ca.raspiconfig.send(f"{cmd}")
         abort(422, f"Command not found {cmd}")
