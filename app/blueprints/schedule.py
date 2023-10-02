@@ -22,6 +22,7 @@ from ..helpers.filer import (
     is_thumbnail,
     list_folder_files,
 )
+from ..helpers.raspiconfig import RaspiConfigError
 from ..helpers.utils import delete_log, get_pid, write_log
 
 bp = Blueprint(
@@ -283,7 +284,10 @@ def send_cmds(
         for cmd in cmds:
             if cmd != "":
                 cmd = cmd.strip()
-                ca.raspiconfig.send(cmd)
+                try:
+                    ca.raspiconfig.send(cmd)
+                except RaspiConfigError as error:
+                    pass      
                 time.sleep(0.2)
 
 
