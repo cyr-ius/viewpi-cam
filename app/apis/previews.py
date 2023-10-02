@@ -3,9 +3,9 @@ from flask import current_app as ca
 from flask import request, url_for
 from flask_restx import Namespace, Resource, fields
 
-from ..blueprints.preview import draw_files, get_thumbnails, lock_file, video_convert
+from ..blueprints.preview import draw_files, get_thumbnails, video_convert
 from ..helpers.decorator import token_required
-from ..helpers.filer import delete_mediafiles, maintain_folders
+from ..helpers.filer import delete_mediafiles, maintain_folders, lock_file
 from .models import forbidden, message
 
 api = Namespace("previews")
