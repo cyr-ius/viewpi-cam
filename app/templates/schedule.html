@@ -247,6 +247,7 @@ $('#sch_save').click(function(){
             }        
         }
         data.days = days 
+        let callbackSuccess = function(e){$("#daymode").trigger("click");}
         $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data,"callbackSuccess": callbackSuccess}) 
     }
 });
@@ -258,12 +259,12 @@ $('#backup').click(function(){
 
 $('#restore').unbind();
 $('#restore').click(function(){
-    callbackSuccess = function(e){location.reload();}
+    let callbackSuccess = function(e){location.reload();}
     $.queryData({"url":"{{ url_for('api.schedule_restore')}}","callbackSuccess": callbackSuccess}) 
 });
 
 $('#schedule').on('click','#start', function(){
-    callbackSuccess = function(response) {
+    let callbackSuccess = function(response) {
         if (response.type == "success") {               
             $('.stopstart').val('stop')
             $('.stopstart').prop("id", 'stop')
@@ -275,7 +276,7 @@ $('#schedule').on('click','#start', function(){
 });
 
 $('#schedule').on('click','#stop', function(){
-    callbackSuccess = function(response) {
+    let callbackSuccess = function(response) {
         if (response.type == "success") {               
             $('.stopstart').val('start')
             $('.stopstart').prop("id", 'start')
@@ -288,8 +289,8 @@ $('#schedule').on('click','#stop', function(){
 
 $('#daymode').unbind();
 $('#daymode').click(function(){
-    mode = $("#daymode").val();
-    callbackSuccess = function(data) {
+    let mode = $("#daymode").val();
+    let callbackSuccess = function(data) {
         let periods = ['AllDay','Night','Dawn','Day','Dusk']
         let day_period = data["period"]
         let line = $('#period_scheduler').children()[data["period"]+1].children[0]
@@ -301,9 +302,7 @@ $('#daymode').click(function(){
         $('#period').html(`Period: <b>${period}</b>`)
         $(line).css("background-color","LightGreen")
     }
-
-    data = {"daymode":mode}
-    $.queryData({"url":"{{ url_for('api.schedule_period')}}", data:data, "callbackSuccess":callbackSuccess})
+    $.queryData({"url":"{{ url_for('api.schedule_period')}}", "data":{"daymode":mode}, "callbackSuccess":callbackSuccess})
 
     $('.sun').addClass("d-none");
     $('.day').addClass("d-none");   
