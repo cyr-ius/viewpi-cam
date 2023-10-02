@@ -205,7 +205,7 @@
                 <div class="col" {%if period == index %}style="background-color: LightGreen;"{%endif%}><input class="form-control form-control-sm" type="text" autocomplete="off" name="times" value="{{time}}"></div>
                 <div class="col text-center">
                     {% for i in range(0,7)%}                           
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}]" value="{{i}}" {%if settings.days[(index)|string][i] %} checked="checked" {%endif%}>
+                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}]" value="{{i}}" {%if settings.days[index|string][i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
                 <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="commands_on" value="{{settings.commands_on[index]}}"></div>
