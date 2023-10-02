@@ -1,12 +1,12 @@
 """Files functions."""
 import os
 
-from flask import current_app
+from flask import current_app as ca
 
 
 def find_lapse_files(filename):
     """Return lapse files."""
-    media_path = current_app.raspiconfig.media_path
+    media_path = ca.raspiconfig.media_path
     files = {}
     lapsefiles = []
 
@@ -40,7 +40,7 @@ def find_lapse_files(filename):
 
 def delete_mediafiles(filename, delete=True):
     """Delete all files associated with a thumb name."""
-    media_path = current_app.raspiconfig.media_path
+    media_path = ca.raspiconfig.media_path
     size = 0
     type_file = get_file_type(filename)
 
@@ -76,7 +76,7 @@ def delete_mediafiles(filename, delete=True):
 
 def data_file_name(file):
     """Return real filename."""
-    subdir_char = current_app.raspiconfig.subdir_char
+    subdir_char = ca.raspiconfig.subdir_char
     i = file.rfind(".", 0, len(file) - 8)
     if i > 0:
         return file[:i].replace(subdir_char, "/")
@@ -91,12 +91,12 @@ def data_file_ext(file: str):
 
 def is_thumbnail(file: str) -> bool:
     """Return is thumbnail file."""
-    return file[-7:] == current_app.config["THUMBNAIL_EXT"]
+    return file[-7:] == ca.config["THUMBNAIL_EXT"]
 
 
 def get_file_size(path):
     """Return file size."""
-    if current_app.config["FILESIZE_METHOD"] == 0:
+    if ca.config["FILESIZE_METHOD"] == 0:
         return os.path.getsize(path)
     return f"stat -c%s {path}".strip()
 
@@ -142,3 +142,43 @@ def get_sorted_files(folder: str, ascending: bool = True) -> list:
             files[file] = os.path.getmtime(f"{folder}/{file}")
 
     return sorted(files, reverse=ascending is False)
+
+
+def maintain_folders(path, delete_main_files, delete_sub_files, root: bool = True):
+    """Sanatize media folders."""
+    empty = True
+    for folder in list_folder_files(path):
+        if os.path.isdir(folder):
+            if not maintain_folders(folder, delete_main_files, delete_sub_files, False):
+                empty = False
+        else:
+            if (delete_sub_files and not root) or (delete_main_files and root):
+                os.remove(folder)
+            else:
+                empty = False
+    return empty and not root and os.rmdir(path)
+
+
+def lock_file(filename: str, lock: bool):
+    """Lock file (remove w via chmod)."""
+    media_path = ca.raspiconfig.media_path
+    if lock == 1:
+        attr = 0o444
+    else:
+        attr = 0o644
+    file_type = get_file_type(filename)
+    if file_type == "t":
+        #  For time lapse lock all from this batch
+        files = find_lapse_files(filename)
+        for file in files:
+            os.chmod(file, attr)
+    else:
+        thumb_file = data_file_name(filename)
+        if os.path.isfile(f"{media_path}/{thumb_file}"):
+            os.chmod(f"{media_path}/{thumb_file}", attr)
+        if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.dat"):
+            os.chmod(f"{media_path}/{thumb_file}.dat", attr)
+        if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.h264"):
+            os.chmod(f"{media_path}/{thumb_file}.h264", attr)
+
+    os.chmod(f"{media_path}/{filename}", attr)
