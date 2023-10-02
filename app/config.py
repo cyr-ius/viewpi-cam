@@ -114,7 +114,9 @@ DEFAULT_INIT = {
     ATTR_DAWNSTARTMINUTES: -180,
     ATTR_DAYENDMINUTES: 0,
     ATTR_DAYMODE: ATTR_MODE_ALLDAY,
-    ATTR_DAYS: {i: [1, 1, 1, 1, 1, 1, 1] for i in range(0, SCHEDULE_TIMES_MAX + 5)},
+    ATTR_DAYS: {
+        f"{i}": [1, 1, 1, 1, 1, 1, 1] for i in range(0, SCHEDULE_TIMES_MAX + 5)
+    },
     ATTR_DAYSTARTMINUTES: 0,
     ATTR_DUSKENDMINUTES: 180,
     ATTR_GMTOFFSET: "Etc/UTC",
