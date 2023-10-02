@@ -21,6 +21,8 @@ from ..helpers.filer import (
     get_file_size,
     get_file_type,
     list_folder_files,
+    lock_file,
+    maintain_folders,
 )
 from ..helpers.utils import disk_usage, write_log
 
@@ -159,31 +161,6 @@ def index():
     return response
 
 
-def lock_file(filename: str, lock: bool):
-    """Lock file (remove w via chmod)."""
-    media_path = ca.raspiconfig.media_path
-    if lock == 1:
-        attr = 0o444
-    else:
-        attr = 0o644
-    file_type = get_file_type(filename)
-    if file_type == "t":
-        #  For time lapse lock all from this batch
-        files = find_lapse_files(filename)
-        for file in files:
-            os.chmod(file, attr)
-    else:
-        thumb_file = data_file_name(filename)
-        if os.path.isfile(f"{media_path}/{thumb_file}"):
-            os.chmod(f"{media_path}/{thumb_file}", attr)
-        if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.dat"):
-            os.chmod(f"{media_path}/{thumb_file}.dat", attr)
-        if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.h264"):
-            os.chmod(f"{media_path}/{thumb_file}.h264", attr)
-
-    os.chmod(f"{media_path}/{filename}", attr)
-
-
 def get_zip(files: list):
     """Zip files."""
     media_path = ca.raspiconfig.media_path
@@ -245,21 +222,6 @@ def video_convert(filename: str):
             write_log("Convert finished")
 
 
-def maintain_folders(path, delete_main_files, delete_sub_files, root: bool = True):
-    """Sanatize media folders."""
-    empty = True
-    for folder in list_folder_files(path):
-        if os.path.isdir(folder):
-            if not maintain_folders(folder, delete_main_files, delete_sub_files, False):
-                empty = False
-        else:
-            if (delete_sub_files and not root) or (delete_main_files and root):
-                os.remove(folder)
-            else:
-                empty = False
-    return empty and not root and os.rmdir(path)
-
-
 def get_thumbnails(sort_order, show_types, time_filter, time_filter_max):
     """Return files."""
     media_path = ca.raspiconfig.media_path
@@ -317,7 +279,7 @@ def draw_files(filesnames: list):
                 file_icon = "bi-camera"
         duration = 0
         file_size = 0
-        file_right = 0
+        file_right = 1
         if os.path.isfile(f"{media_path}/{real_file}"):
             file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
             file_timestamp = os.path.getmtime(f"{media_path}/{real_file}")
@@ -327,24 +289,26 @@ def draw_files(filesnames: list):
             except UnboundLocalError:
                 file_right = 0
             if file_type == "v":
-                duration = os.path.getmtime(f"{media_path}/{file}") - file_timestamp
+                duration = round(
+                    os.path.getmtime(f"{media_path}/{file}") - file_timestamp
+                )
         else:
             file_timestamp = os.path.getmtime(f"{media_path}/{file}")
 
         if file_type:
-            file_datetime = dt.fromtimestamp(file_timestamp)
             thumbnails.append(
                 {
+                    "id": real_file[:-4].replace("_", ""),
                     "file_name": file,
                     "file_type": file_type,
                     "file_size": file_size,
                     "file_icon": file_icon,
-                    "file_datetime": file_datetime,
+                    "file_datetime": dt.fromtimestamp(file_timestamp),
                     "file_right": file_right,
                     "real_file": real_file,
                     "file_number": f_number,
                     "lapse_count": lapse_count,
-                    "duration": round(duration),
+                    "duration": duration,
                 }
             )
 
