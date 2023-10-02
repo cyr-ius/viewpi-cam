@@ -313,7 +313,7 @@ function load_preview(id) {
         $('#prev').click(function(){load_preview(prev);});	
         prev_info = search_media(prev)
         if (fileExtension(imageFromThumbnail(prev_info.file_name)) == 'jpg') {
-            reloadImage(mediaBase + imageFromThumbnail(prev_info.file_name));
+            preloadImage(mediaBase + imageFromThumbnail(prev_info.file_name));
         }
 	} else {
         prev = null;
