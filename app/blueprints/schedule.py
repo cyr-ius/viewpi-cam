@@ -106,7 +106,7 @@ def scheduler():
                 if last_on_cmd >= 0:
                     write_log("Stop capture requested")
                     send = ca.settings.commands_off[last_on_cmd]
-                    ca.settings.update(last_detection_stop=dt_now())
+                    # ca.settings.update(last_detection_stop=dt_now())
                     if send:
                         send_cmds(str_cmd=send, days=last_day_period)
                         last_on_cmd = -1
@@ -119,7 +119,7 @@ def scheduler():
                         write_log("Start triggered by autocapture")
                     else:
                         write_log("Start capture requested from Pipe")
-                        ca.settings.update(last_detection_start=dt_now())
+                        # ca.settings.update(last_detection_start=dt_now())
 
                     send = ca.settings.commands_on[last_day_period]
                     if send:
