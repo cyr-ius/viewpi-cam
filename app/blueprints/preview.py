@@ -42,7 +42,7 @@ def index():
     sort_order = int(request.cookies.get("sort_order", 1))
     show_types = int(request.cookies.get("show_types", 1))
     time_filter = int(request.cookies.get("time_filter", 1))
-    preview_file = request.args.get("preview", "")
+    preview_id = request.args.get("preview", "")
 
     if request.method == "POST":
         time_filter = int(request.json.get("time_filter", time_filter))
@@ -145,7 +145,7 @@ def index():
             show_types=show_types,
             time_filter=time_filter,
             time_filter_max=time_filter_max,
-            preview_file=preview_file,
+            preview_id=preview_id,
             thumbnails=thumbnails,
             select_all=select_all,
         )

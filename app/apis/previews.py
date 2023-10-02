@@ -53,7 +53,7 @@ class Previews(Resource):
 
     @token_required
     @api.marshal_list_with(files)
-    @api.param("order", "Ordrering thumbnail (True/False)")
+    @api.param("order", "Ordering thumbnail (True/False)")
     def get(self):
         """Get all media files."""
         sort_order = request.args.get("sort_order", True) is True
@@ -65,7 +65,7 @@ class Previews(Resource):
     )
     @token_required
     def delete(self):
-        """Delete multiple media files (id)."""
+        """Delete all media files."""
         maintain_folders(ca.raspiconfig.media_path, True, True)
         return {"message": "Delete successful"}
 
@@ -110,6 +110,7 @@ class Preview(Resource):
     endpoint="previews_convert",
     doc={"description": "Convert timelapse file to mp4"},
 )
+@api.response(200, "Success")
 @api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
 class Actions(Resource):
@@ -118,19 +119,18 @@ class Actions(Resource):
     @token_required
     def post(self, id):
         """Post action."""
-        if request.endpoint in ["api.preview_lock", "api.preview_unlock"]:
+        if request.endpoint in ["api.previews_lock", "api.previews_unlock"]:
             for thumb in thumbs():
                 if id == thumb["id"]:
                     lock_file(
-                        thumb["file_name"], request.endpoint == "api.preview_lock"
+                        thumb["file_name"], request.endpoint == "api.previews_lock"
                     )
-                    break
-
-        if request.endpoint == "preview_convert":
+                    return {}, 200
+        if request.endpoint == "previews_convert":
             for thumb in thumbs():
                 if id == thumb["id"]:
                     video_convert(thumb["file_name"])
-                    break
+                    return {}, 200
 
 
 def thumbs(sort_order=False):

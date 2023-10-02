@@ -11,29 +11,6 @@
     <form id="form_gallery" action="{{ url_for('preview.index') }}" method="POST">
         {% if thumbnails is iterable %}        
         <div class="row g-3 my-1">
-            {# <div class="col-auto">
-                <div class="row">
-                    <div class="col-2 px-1">
-                        <label class="col-form-label-sm">Preview</label>
-                    </div>
-                    <div class="col-auto">
-                        <input class="form-control form-control-sm" type="number" name="preview_size" value="{{preview_size}}">
-                    </div>
-                </div>
-            </div>      
-            <div class="col-auto">
-                <div class="row">
-                    <div class="col-3 px-1">
-                        <label class="col-form-label-sm">Thumbnail</label>
-                    </div>
-                    <div class="col-auto">
-                        <input class="form-control form-control-sm" type="number" name="thumb_size" value="{{thumb_size}}">
-                    </div>
-                </div>         
-            </div>                                                 
-            <div class="col-auto">
-                <button class="btn btn-sm btn-primary" type="button" name="updateSize" value="updateSizeOrder">Update Size</button>
-            </div> #}
             <div class="col-auto">
                 <div class="row">
                     <div class="col-3 px-1">
@@ -80,10 +57,10 @@
         </div>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-6 row-cols-xxl-8 g-3 my-1">
             {% for thumbnail in thumbnails%}
-            <div class="col">
+            <div id="{{thumbnail.id}}" class="col">
                 <div class='card shadow-sm'>
                     {% if thumbnail.file_size > 0 %}
-                    <a id="load_preview" title="{{thumbnail.real_file}}" href="#" onclick="load_preview('{{thumbnail.file_name}}');">
+                    <a id="load_preview" title="{{thumbnail.real_file}}" href="#" onclick="load_preview('{{thumbnail.id}}');">
                     {% endif%}
                     <img class="mx-auto d-block card-img-top" src="{{ url_for('static', filename=config['MEDIA']+'/'+thumbnail.file_name) }}"/>
                     {% if thumbnail.file_size > 0 %}
@@ -91,17 +68,15 @@
                     {%endif%}
                     <div class="card-img-overlay" style="height:5px;">
                         <i class="float-start {{thumbnail.file_icon}}" style="font-size: 16px;color: white;"></i>
-                        {% if not thumbnail.file_right %}
-                        <i class="float-start bi bi-lock-fill" style="font-size: 16px;color: rgb(209, 182, 28);position: absolute;right: 5px;"></i>
-                        {% endif %}
+                        <i id="icon_lock" class="float-start bi bi-lock-fill {% if thumbnail.file_right %}d-none{% endif %}" style="font-size: 16px;color: rgb(209, 182, 28);position: absolute;right: 5px;"></i>
                     </div>
                     <div class="card-body">                  
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="btn-check-{{loop.index}}" name="check_list" {{select_all}} value="{{thumbnail.file_name}}">
-                            <label class="form-check-label" for="{{thumbnail.file_name}}">Created {{ thumbnail.file_datetime.strftime('%Y-%m-%d') }} at {{thumbnail.file_datetime.strftime('%H:%M:%S') }}</label>
+                            <input class="form-check-input" type="checkbox" role="switch" id="btn-check-{{loop.index}}" name="check_list" {{select_all}} value="{{thumbnail.id}}">
+                            <label class="form-check-label" for="{{thumbnail.id}}">Created {{ thumbnail.file_datetime.strftime('%Y-%m-%d') }} at {{thumbnail.file_datetime.strftime('%H:%M:%S') }}</label>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-2">
-                             <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumbnail.file_name}}" {% if not thumbnail.file_right %}disabled{%endif%}><i class="bi bi-trash"></i>Delete</button>
+                            <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumbnail.id}}" {% if not thumbnail.file_right %}disabled{%endif%}><i class="bi bi-trash"></i>Delete</button>
                             {% if thumbnail.file_size > 0%}
                             <small class="text-body-secondary">
                             {% if thumbnail.file_size > 1024 %}{{ (thumbnail.file_size/1024) | round(2) }} MB {%else%} {{thumbnail.file_size}} KB {%endif%}
@@ -128,11 +103,11 @@ let subdir_char = '{{raspiconfig.subdir_char}}';
 let next, prev;
 let dict_thumbnails = {{thumbnails|tojson}};
 let thumbnails = [];
-$.each( dict_thumbnails, function( index, value ){ thumbnails[index]=value['file_name'];});
+$.each( dict_thumbnails, function( index, value ){ thumbnails[index]=value['id'];});
 let linksBase = '{{url_for('preview.index')}}?preview=';
 let mediaBase = "/static/{{config['MEDIA']}}/";
 let previewWidth = {{preview_size}};
-let preview_file = '{{preview_file}}';
+let preview_id = '{{preview_id}}';
 
 (function() {
 	document.onkeyup = function () {
@@ -154,8 +129,8 @@ let preview_file = '{{preview_file}}';
 $(function(){
     $('#main').addClass("d-none")
     $('#gallery').removeClass("d-none")
-    if (preview_file != ''){
-        load_preview(preview_file);
+    if (preview_id != ''){
+        load_preview(preview_id);
     }
 });
 
@@ -163,13 +138,9 @@ $('#form_gallery button[name="delete"], #delete').unbind()
 $('#form_gallery button[name="delete"], #delete').click(function(){
     if (confirm('Are you sure you want to delete this file?')) {
         callback = function(data) {location.reload();}
-        $.queryData({"url":"{{url_for('preview.index')}}", "data":{"action":"delete", "filename": $(this).val()}, "callbackSuccess":callback})
+        let id = $(this).val();
+        $.queryData({"method":"delete", "url":`{{url_for('api.previews_previews')}}/${id}`, "callbackSuccess":callback})
     }
-})
-
-$('#form_gallery button[name="updateSize"]').unbind()
-$('#form_gallery button[name="updateSize"]').click(function(){
-    confirm('Update Size'+this);
 })
 
 $('#time_filter, #show_types, #sort_order').on('change', function() {
@@ -180,23 +151,46 @@ $('#time_filter, #show_types, #sort_order').on('change', function() {
 
 $('#selectNone').unbind();
 $('#selectNone').click(function(){
-    $('#form_gallery input:checkbox').removeAttr('checked');
+    $('#form_gallery input:checkbox').prop('checked','')
 });
 
 $('#selectAll').unbind();
 $('#selectAll').click(function(){
-    $('#form_gallery input:checkbox').attr('checked','checked');
+    $('#form_gallery input:checkbox').prop('checked','checked')
 });
 
-$('#deleteSel, #lockSel, #unlockSel').unbind();
-$('#deleteSel, #lockSel, #unlockSel').click(function(){
-    callback = function(data) {
-        $('#form_gallery input:checkbox').prop('checked',false);   
-        location.reload();
-    }
-    data = $('#form_gallery').serializeObject();
-    data.action = $(this).val()
-    $.queryData({"url":"{{url_for('preview.index')}}", "data":data, "callbackSuccess":callback})
+$('#deleteSel').unbind();
+$('#deleteSel').click(function(){
+    let data = $('#form_gallery').serializeObject();
+    if (typeof data.check_list === 'string' || data.check_list instanceof String) 
+        data.check_list = [data.check_list]    
+    data.check_list.forEach(function(item){
+        callback = function(data) { $(`#${item}`).remove();}
+        $.queryData({"method":"delete", "url":`{{url_for('api.previews_previews')}}/${item}`, "callbackSuccess":callback})
+    });
+});
+
+$('#lockSel, #unlockSel').unbind();
+$('#lockSel, #unlockSel').click(function(){
+    let data = $('#form_gallery').serializeObject();
+    let action = $(this).prop('id') == "lockSel" ?"lock" : "unlock";
+    if (typeof data.check_list === 'string' || data.check_list instanceof String) 
+        data.check_list = [data.check_list]
+
+    data.check_list.forEach(function(item){
+        callback = function(data) {
+            $(`#${item} input:checkbox`).prop('checked','')
+            if (action=="unlock") {
+                $(`#${item} #icon_lock`).addClass('d-none');
+                $(`#${item} button[name="delete"]`).prop('disabled', '');
+            } else {
+                $(`#${item} #icon_lock`).removeClass('d-none');
+                $(`#${item} button[name="delete"]`).prop('disabled', 'disabled');
+            }
+        }        
+        $.queryData({"url":`{{url_for('api.previews_previews')}}/${item}/${action}`, "callbackSuccess":callback})
+    });
+    
 });
 
 $('#deleteAll').unbind();
@@ -259,7 +253,8 @@ $('#download').click(function(){
 
 $('#convert').unbind();
 $('#convert').click(function(){
-    $.queryData({"url":"{{url_for('preview.index')}}", "data":{"action":"convert","filename": $(this).val()}})
+    let id = $(this).val();
+    $.queryData({"url":`{{url_for('api.previews_previews')}}/${id}/convert`})
 });
 
 
@@ -268,7 +263,7 @@ function fileTitle(thumbnailName) {
 }
 
 function fileType(fileName) {
-	var suffix = fileName.substr(-suffixLength(fileName));
+	let suffix = fileName.substr(-suffixLength(fileName));
 	return suffix.substr(1, 1);
 }
 
@@ -281,52 +276,62 @@ function suffixLength(thumbnail) {
 }
 
 function imageFromThumbnail(thumbnailName) {
-	var temp = thumbnailName.substr(0, thumbnailName.length - suffixLength(thumbnailName));
+	let temp = thumbnailName.substr(0, thumbnailName.length - suffixLength(thumbnailName));
    return temp.split(subdir_char).join("/");
 }
 
 function preloadImage(url) {
-    var _img = new Image();
+    let _img = new Image();
     _img.src = url;
 }
 
-function load_preview(thumbnail) {
-	history.pushState(null, null, linksBase + thumbnail);
+function search_media(id) {
+    for (let item of dict_thumbnails) {
+        if (item.id == id)
+        return item
+    }
+}
 
-	$("#gallery").addClass("d-none");
-	$("#display").removeClass("d-none");
-	$("#preview").removeClass("d-none");
-	$('#media-title').html(fileTitle(thumbnail));
+function load_preview(id) {
+    let info = search_media(id);
+    let thumbnail = info.file_name;
+    history.pushState(null, null, linksBase + id);
+    $("#gallery").addClass("d-none");
+    $("#display").removeClass("d-none");
+    $("#preview").removeClass("d-none");
+    $('#media-title').html(fileTitle(thumbnail));
     $('#download').val(thumbnail);
-    $('#delete').val(thumbnail);
+    $('#delete').val(id);
 
-	var imageIndex = thumbnails.indexOf(thumbnail);
+	var imageIndex = thumbnails.indexOf(id);
 
 	// Previous 
 	if (imageIndex > 0) {
-		prev = thumbnails[imageIndex-1];
+        prev = thumbnails[imageIndex-1];
         $('#prev').prop('disabled', false);
         $('#prev').unbind();
         $('#prev').click(function(){load_preview(prev);});	
-        if (fileExtension(imageFromThumbnail(prev)) == 'jpg') {
-			preloadImage(mediaBase + imageFromThumbnail(prev));
-		}
+        prev_info = search_media(prev)
+        if (fileExtension(imageFromThumbnail(prev_info.file_name)) == 'jpg') {
+            reloadImage(mediaBase + imageFromThumbnail(prev_info.file_name));
+        }
 	} else {
-		prev = null;
+        prev = null;
         $('#prev').prop('disabled', true);
 	}
 
 	// Next
 	if (imageIndex >= 0 && imageIndex < thumbnails.length - 1) {
-		next = thumbnails[imageIndex+1];
+        next = thumbnails[imageIndex+1];
         $('#next').prop('disabled', false);
         $('#next').unbind();
         $('#next').click(function(){load_preview(next);});
-        if (fileExtension(imageFromThumbnail(next)) == 'jpg') {
-			preloadImage(mediaBase + imageFromThumbnail(next));
-		}
+        next_info = search_media(next)
+        if (fileExtension(imageFromThumbnail(next_info.file_name)) == 'jpg') {
+            preloadImage(mediaBase + imageFromThumbnail(next_info.file_name));
+        }
 	} else {
-		next = null;
+        next = null;
         $('#next').prop('disabled', true);
 	}
 
@@ -348,6 +353,5 @@ function load_preview(thumbnail) {
 		$('#convert').val();
 	}
 }
-
 </script>
 {% endblock%}
