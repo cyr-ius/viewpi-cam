@@ -113,8 +113,6 @@ class RaspiConfig:
             time.sleep(0.1)
             self.refresh()
 
-        return msg
-
     def stop(self) -> None:
         execute_cmd("killall raspimjpeg")
 
