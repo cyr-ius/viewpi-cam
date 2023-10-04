@@ -1,10 +1,11 @@
 """Files functions."""
 import os
+from typing import Any
 
 from flask import current_app as ca
 
 
-def find_lapse_files(filename):
+def find_lapse_files(filename: str) -> list[str]:
     """Return lapse files."""
     media_path = ca.raspiconfig.media_path
     files = {}
@@ -38,7 +39,7 @@ def find_lapse_files(filename):
     return lapsefiles
 
 
-def delete_mediafiles(filename, delete=True):
+def delete_mediafiles(filename: str, delete: bool = True) -> int:
     """Delete all files associated with a thumb name."""
     media_path = ca.raspiconfig.media_path
     size = 0
@@ -74,7 +75,7 @@ def delete_mediafiles(filename, delete=True):
     return size / 1024
 
 
-def data_file_name(file):
+def data_file_name(file: str) -> str:
     """Return real filename."""
     subdir_char = ca.raspiconfig.subdir_char
     i = file.rfind(".", 0, len(file) - 8)
@@ -83,7 +84,7 @@ def data_file_name(file):
     return ""
 
 
-def data_file_ext(file: str):
+def data_file_ext(file: str) -> str:
     """Return real filename extension."""
     file = data_file_name(file)
     return get_file_ext(file)
@@ -94,20 +95,20 @@ def is_thumbnail(file: str) -> bool:
     return file[-7:] == ca.config["THUMBNAIL_EXT"]
 
 
-def get_file_size(path):
+def get_file_size(path) -> str:
     """Return file size."""
     if ca.config["FILESIZE_METHOD"] == 0:
         return os.path.getsize(path)
     return f"stat -c%s {path}".strip()
 
 
-def get_file_ext(file: str):
+def get_file_ext(file: str) -> str:
     """Return extension file."""
     _, ext = os.path.splitext(file)
     return ext[1:]
 
 
-def get_file_type(file: str):
+def get_file_type(file: str) -> str:
     """Return type file."""
     i = file.rfind(".", 0, len(file) - 8)
     if i > 0:
@@ -115,7 +116,7 @@ def get_file_type(file: str):
     return ""
 
 
-def get_file_index(file: str):
+def get_file_index(file: str) -> str:
     """Return index file."""
     i = file.rfind(".", 0, len(file) - 8)
     if i > 0:
@@ -123,7 +124,7 @@ def get_file_index(file: str):
     return ""
 
 
-def list_folder_files(path: str, ext=None) -> list:
+def list_folder_files(path: str, ext=None) -> list[str]:
     """List files in folder path."""
     if ext:
         return [
@@ -134,7 +135,7 @@ def list_folder_files(path: str, ext=None) -> list:
     return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
 
 
-def get_sorted_files(folder: str, ascending: bool = True) -> list:
+def get_sorted_files(folder: str, ascending: bool = True) -> list[str]:
     """Ordering files."""
     files = {}
     for file in list_folder_files(folder):
@@ -144,7 +145,9 @@ def get_sorted_files(folder: str, ascending: bool = True) -> list:
     return sorted(files, reverse=ascending is False)
 
 
-def maintain_folders(path, delete_main_files, delete_sub_files, root: bool = True):
+def maintain_folders(
+    path, delete_main_files, delete_sub_files, root: bool = True
+) -> bool:
     """Sanatize media folders."""
     empty = True
     for folder in list_folder_files(path):
@@ -159,13 +162,19 @@ def maintain_folders(path, delete_main_files, delete_sub_files, root: bool = Tru
     return empty and not root and os.rmdir(path)
 
 
-def lock_file(filename: str, lock: bool):
+def lock_file(thumb: dict[str, Any], lock: bool) -> None:
     """Lock file (remove w via chmod)."""
     media_path = ca.raspiconfig.media_path
+    lock_files = ca.settings.get("lock_files", [])
     if lock == 1:
         attr = 0o444
+        lock_files.append(thumb["id"])
     else:
         attr = 0o644
+        if thumb["id"] in lock_files:
+            lock_files.remove(thumb["id"])
+    ca.settings.update(lock_files=lock_files)
+    filename = thumb["file_name"]
     file_type = get_file_type(filename)
     if file_type == "t":
         #  For time lapse lock all from this batch
