@@ -1,11 +1,13 @@
 """Api gallery."""
+from typing import Any
+
 from flask import current_app as ca
 from flask import request, url_for
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource, abort, fields
 
 from ..blueprints.preview import draw_files, get_thumbnails, video_convert
 from ..helpers.decorator import token_required
-from ..helpers.filer import delete_mediafiles, maintain_folders, lock_file
+from ..helpers.filer import delete_mediafiles, lock_file, maintain_folders
 from .models import forbidden, message
 
 api = Namespace("previews")
@@ -54,20 +56,21 @@ class Previews(Resource):
     @token_required
     @api.marshal_list_with(files)
     @api.param("order", "Ordering thumbnail (True/False)")
+    @api.response(200, "Success")
     def get(self):
         """Get all media files."""
         sort_order = request.args.get("sort_order", True) is True
         return thumbs(sort_order)
 
-    @api.response(204, "Delete successful")
     @api.expect(
         api.model("Deletes", {"ids": fields.List(fields.String(description="id"))})
     )
     @token_required
+    @api.response(204, "Action is successful")
     def delete(self):
         """Delete all media files."""
         maintain_folders(ca.raspiconfig.media_path, True, True)
-        return {"message": "Delete successful"}
+        return "", 204
 
 
 @api.route("/previews/<string:id>")
@@ -78,21 +81,21 @@ class Preview(Resource):
 
     @token_required
     @api.marshal_with(files)
+    @api.response(200, "Success")
     def get(self, id):
         """Get file information."""
-        for thumb in thumbs():
-            if id == thumb["id"]:
-                return thumb
+        return get_thumbinfo(id)
 
     @token_required
     @api.doc(description="Delete file")
+    @api.response(204, "Action is successful")
     def delete(self, id):
         """Delete file."""
-        for thumb in thumbs():
-            if id == thumb["id"]:
-                delete_mediafiles(thumb["file_name"])
-                maintain_folders(ca.raspiconfig.media_path, False, False)
-                return {"message": "Delete successful"}
+        if thumb := get_thumbinfo(id):
+            delete_mediafiles(thumb["file_name"])
+            maintain_folders(ca.raspiconfig.media_path, False, False)
+            return "", 204
+        abort(422, f"Thumb not found ({id})")
 
 
 @api.route(
@@ -110,7 +113,7 @@ class Preview(Resource):
     endpoint="previews_convert",
     doc={"description": "Convert timelapse file to mp4"},
 )
-@api.response(200, "Success")
+@api.response(204, "Action is successful")
 @api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
 class Actions(Resource):
@@ -120,21 +123,34 @@ class Actions(Resource):
     def post(self, id):
         """Post action."""
         if request.endpoint in ["api.previews_lock", "api.previews_unlock"]:
-            for thumb in thumbs():
-                if id == thumb["id"]:
-                    lock_file(
-                        thumb["file_name"], request.endpoint == "api.previews_lock"
-                    )
-                    return {}, 200
+            if thumb := get_thumbinfo(id):
+                lock_file(thumb["file_name"], request.endpoint == "api.previews_lock")
+                return "", 204
+            abort(422, f"Thumb not found ({id})")
         if request.endpoint == "previews_convert":
-            for thumb in thumbs():
-                if id == thumb["id"]:
-                    video_convert(thumb["file_name"])
-                    return {}, 200
+            if thumb := get_thumbinfo(id):
+                video_convert(thumb["file_name"])
+                return "", 204
+            abort(422, f"Thumb not found ({id})")
 
 
-def thumbs(sort_order=False):
+def thumbs(
+    sort_order: bool = False,
+    show_types: bool = True,
+    time_filter: int = 1,
+    time_filter_max: int = 8,
+) -> dict[str, Any]:
     thumb_filenames = get_thumbnails(
-        sort_order=sort_order, show_types=True, time_filter=1, time_filter_max=8
+        sort_order=sort_order,
+        show_types=show_types,
+        time_filter=time_filter,
+        time_filter_max=time_filter_max,
     )
     return draw_files(thumb_filenames)
+
+
+def get_thumbinfo(uid: str) -> dict[str, Any] | None:
+    """Return filename."""
+    for thumb in thumbs():
+        if uid == thumb["id"]:
+            return thumb

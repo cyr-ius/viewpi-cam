@@ -15,16 +15,14 @@ from ..helpers.decorator import auth_required
 from ..helpers.filer import (
     data_file_ext,
     data_file_name,
-    delete_mediafiles,
     find_lapse_files,
     get_file_index,
     get_file_size,
     get_file_type,
     list_folder_files,
-    lock_file,
-    maintain_folders,
 )
 from ..helpers.utils import disk_usage, write_log
+from ..helpers.preview import get_thumbinfo, thumbs
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
@@ -49,90 +47,29 @@ def index():
         sort_order = int(request.json.get("sort_order", sort_order))
         show_types = int(request.json.get("show_types", show_types))
 
-        if action := request.json.get("action"):
-            match action:
-                case "delete":
-                    if (filename := request.json.get("filename")) and check_media_path(
-                        filename
-                    ):
-                        delete_mediafiles(filename)
-                        maintain_folders(media_path, False, False)
-                        return {"message": "Delete successful"}
-                case "download":
-                    if (filename := request.json.get("filename")) and check_media_path(
-                        filename
-                    ):
-                        if get_file_type(filename) != "t":
-                            dx_file = data_file_name(filename)
-                            if data_file_ext(filename) == "jpg":
-                                mimetype = "image/jpeg"
-                            else:
-                                mimetype = "video/mp4"
+        if (filename := request.json.get("filename")) and check_media_path(filename):
+            if get_file_type(filename) != "t":
+                dx_file = data_file_name(filename)
+                if data_file_ext(filename) == "jpg":
+                    mimetype = "image/jpeg"
+                else:
+                    mimetype = "video/mp4"
 
-                            return send_file(
-                                f"{media_path}/{dx_file}",
-                                mimetype=mimetype,
-                                as_attachment=True,
-                                download_name=dx_file,
-                            )
-                        else:
-                            return get_zip([filename])
-                case "deleteAll":
-                    maintain_folders(media_path, True, True)
-                    return {"message": "Delete successful"}
-                case "selectAll":
-                    select_all = "checked"
-                case "selectNone":
-                    select_all = ""
-                case "deleteSel":
-                    check_list = request.json.get("check_list", [])
-                    if isinstance(check_list, str):
-                        check_list = [request.json["check_list"]]
-                    for item in check_list:
-                        if check_media_path(item):
-                            delete_mediafiles(item)
-                    maintain_folders(media_path, False, False)
-                    return {"message": "Delete successful"}
-                case "lockSel":
-                    check_list = request.json.get("check_list", [])
-                    if isinstance(check_list, str):
-                        check_list = [request.json["check_list"]]
-                    for item in check_list:
-                        if check_media_path(item):
-                            lock_file(item, True)
-                    return {"message": "Lock successful"}
-                case "unlockSel":
-                    check_list = request.json.get("check_list", [])
-                    if isinstance(check_list, str):
-                        check_list = [request.json["check_list"]]
-                    for item in check_list:
-                        if check_media_path(item):
-                            lock_file(item, False)
-                    return {"message": "Unlock successful"}
-                case "updateSizeOrder":
-                    if preview_size := request.json.get("preview_size"):
-                        preview_size = max(int(preview_size), 100)
-                        preview_size = min(int(preview_size), 1920)
-                    if thumb_size := request.json.get("thumb_size"):
-                        thumb_size = max(int(thumb_size), 32)
-                        thumb_size = min(int(thumb_size), 320)
-                case "zipSel":
-                    check_list = request.json.get("check_list", [])
-                    if isinstance(check_list, str):
-                        check_list = [request.json["check_list"]]
-                    if check_list:
-                        return get_zip(check_list)
-                case "convert":
-                    video_convert(request.json.get("filename"))
+                return send_file(
+                    f"{media_path}/{dx_file}",
+                    mimetype=mimetype,
+                    as_attachment=True,
+                    download_name=dx_file,
+                )
+            else:
+                return get_zip([filename])
 
-    thumb_filenames = get_thumbnails(
+    thumbnails = thumbs(
         sort_order=sort_order,
         show_types=show_types,
         time_filter=time_filter,
         time_filter_max=time_filter_max,
     )
-
-    thumbnails = draw_files(thumb_filenames)
 
     response = make_response(
         render_template(
@@ -159,6 +96,22 @@ def index():
         response.set_cookie("thumb_size", str(thumb_size))
 
     return response
+
+
+@bp.route("/zipfile", methods=["POST"])
+@auth_required
+def zipdata():
+    """ZIP File."""
+    check_list = request.json.get("check_list", [])
+    if isinstance(check_list, str):
+        check_list = [request.json["check_list"]]
+    if check_list:
+        zip_list = []
+        for uid in check_list:
+            thumb = get_thumbinfo(uid)
+            zip_list.append(thumb["file_name"])
+
+        return get_zip(zip_list)
 
 
 def get_zip(files: list):

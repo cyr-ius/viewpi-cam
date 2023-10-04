@@ -205,7 +205,7 @@ $('#zipSel').click(function(){
     data = $('#form_gallery').serializeObject();
     data.action = $(this).val()
     $.ajax({
-        url: '{{url_for('preview.index')}}',
+        url: '{{url_for('preview.zipdata')}}',
         method: 'POST',
         contentType:"application/json; charset=utf-8",   
         data: JSON.stringify(data),
