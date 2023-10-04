@@ -6,6 +6,7 @@ import zipfile
 from datetime import datetime as dt
 from io import BytesIO
 from subprocess import PIPE, Popen
+from typing import Any
 
 from flask import Blueprint
 from flask import current_app as ca
@@ -22,7 +23,6 @@ from ..helpers.filer import (
     list_folder_files,
 )
 from ..helpers.utils import disk_usage, write_log
-from ..helpers.preview import get_thumbinfo, thumbs
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
@@ -276,3 +276,25 @@ def check_media_path(filename):
         os.path.dirname(f"{media_path}/{filename}")
     ) == os.path.realpath(media_path):
         return os.path.isfile(f"{media_path}/{filename}")
+
+
+def thumbs(
+    sort_order: bool = False,
+    show_types: bool = True,
+    time_filter: int = 1,
+    time_filter_max: int = 8,
+) -> dict[str, Any]:
+    thumb_filenames = get_thumbnails(
+        sort_order=sort_order,
+        show_types=show_types,
+        time_filter=time_filter,
+        time_filter_max=time_filter_max,
+    )
+    return draw_files(thumb_filenames)
+
+
+def get_thumbinfo(uid: str) -> dict[str, Any] | None:
+    """Return filename."""
+    for thumb in thumbs():
+        if uid == thumb["id"]:
+            return thumb

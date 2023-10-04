@@ -1,11 +1,9 @@
 """Api gallery."""
-from typing import Any
-
 from flask import current_app as ca
 from flask import request, url_for
 from flask_restx import Namespace, Resource, abort, fields
 
-from ..blueprints.preview import draw_files, get_thumbnails, video_convert
+from ..blueprints.preview import get_thumbinfo, thumbs, video_convert
 from ..helpers.decorator import token_required
 from ..helpers.filer import delete_mediafiles, lock_file, maintain_folders
 from .models import forbidden, message
@@ -132,25 +130,3 @@ class Actions(Resource):
                 video_convert(thumb["file_name"])
                 return "", 204
             abort(422, f"Thumb not found ({id})")
-
-
-def thumbs(
-    sort_order: bool = False,
-    show_types: bool = True,
-    time_filter: int = 1,
-    time_filter_max: int = 8,
-) -> dict[str, Any]:
-    thumb_filenames = get_thumbnails(
-        sort_order=sort_order,
-        show_types=show_types,
-        time_filter=time_filter,
-        time_filter_max=time_filter_max,
-    )
-    return draw_files(thumb_filenames)
-
-
-def get_thumbinfo(uid: str) -> dict[str, Any] | None:
-    """Return filename."""
-    for thumb in thumbs():
-        if uid == thumb["id"]:
-            return thumb
