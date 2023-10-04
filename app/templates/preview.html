@@ -68,7 +68,7 @@
                     {%endif%}
                     <div class="card-img-overlay" style="height:5px;">
                         <i class="float-start {{thumbnail.file_icon}}" style="font-size: 16px;color: white;"></i>
-                        <i id="icon_lock" class="float-start bi bi-lock-fill {% if thumbnail.file_right %}d-none{% endif %}" style="font-size: 16px;color: rgb(209, 182, 28);position: absolute;right: 5px;"></i>
+                        <i id="icon_lock" class="float-start bi bi-lock-fill {% if not thumbnail.file_lock %}d-none{% endif %}" style="font-size: 16px;color: rgb(209, 182, 28);position: absolute;right: 5px;"></i>
                     </div>
                     <div class="card-body">                  
                         <div class="form-check form-switch">
@@ -76,7 +76,7 @@
                             <label class="form-check-label" for="{{thumbnail.id}}">Created {{ thumbnail.file_datetime.strftime('%Y-%m-%d') }} at {{thumbnail.file_datetime.strftime('%H:%M:%S') }}</label>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-2">
-                            <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumbnail.id}}" {% if not thumbnail.file_right %}disabled{%endif%}><i class="bi bi-trash"></i>Delete</button>
+                            <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumbnail.id}}" {% if thumbnail.file_lock == true %}disabled{%endif%}><i class="bi bi-trash"></i>Delete</button>
                             {% if thumbnail.file_size > 0%}
                             <small class="text-body-secondary">
                             {% if thumbnail.file_size > 1024 %}{{ (thumbnail.file_size/1024) | round(2) }} MB {%else%} {{thumbnail.file_size}} KB {%endif%}

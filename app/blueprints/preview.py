@@ -143,9 +143,9 @@ def get_zip(files: list):
     )
 
 
-def video_convert(filename: str):
+def video_convert(thumb: dict[str, Any]) -> None:
     media_path = ca.raspiconfig.media_path
-
+    filename = thumb["file_name"]
     if check_media_path(filename):
         file_type = get_file_type(filename)
         file_index = get_file_index(filename)
@@ -218,8 +218,13 @@ def draw_files(filesnames: list):
     for file in filesnames:
         file_type = get_file_type(file)
         real_file = data_file_name(file)
-        f_number = get_file_index(file)
+        file_id = real_file[:-4].replace("_", "")
+        file_number = get_file_index(file)
+        file_lock = file_id in ca.settings.get("lock_files", [])
+        file_size = 0
         lapse_count = 0
+        duration = 0
+
         match file_type:
             case "v":
                 file_icon = "bi-camera-reels"
@@ -230,17 +235,9 @@ def draw_files(filesnames: list):
                 file_icon = "bi-camera"
             case _:
                 file_icon = "bi-camera"
-        duration = 0
-        file_size = 0
-        file_right = 1
         if os.path.isfile(f"{media_path}/{real_file}"):
             file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
             file_timestamp = os.path.getmtime(f"{media_path}/{real_file}")
-            try:
-                file_right = os.access(f"{media_path}/{real_file}", os.W_OK)
-                ca.logger.debug(f"File Right {file_right}")
-            except UnboundLocalError:
-                file_right = 0
             if file_type == "v":
                 duration = round(
                     os.path.getmtime(f"{media_path}/{file}") - file_timestamp
@@ -251,15 +248,15 @@ def draw_files(filesnames: list):
         if file_type:
             thumbnails.append(
                 {
-                    "id": real_file[:-4].replace("_", ""),
+                    "id": file_id,
                     "file_name": file,
                     "file_type": file_type,
                     "file_size": file_size,
                     "file_icon": file_icon,
                     "file_datetime": dt.fromtimestamp(file_timestamp),
-                    "file_right": file_right,
+                    "file_lock": file_lock,
                     "real_file": real_file,
-                    "file_number": f_number,
+                    "file_number": file_number,
                     "lapse_count": lapse_count,
                     "duration": duration,
                 }

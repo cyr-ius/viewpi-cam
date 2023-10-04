@@ -122,7 +122,7 @@ class Actions(Resource):
         """Post action."""
         if request.endpoint in ["api.previews_lock", "api.previews_unlock"]:
             if thumb := get_thumbinfo(id):
-                lock_file(thumb["file_name"], request.endpoint == "api.previews_lock")
+                lock_file(thumb, request.endpoint == "api.previews_lock")
                 return "", 204
             abort(422, f"Thumb not found ({id})")
         if request.endpoint == "previews_convert":
