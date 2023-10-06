@@ -108,7 +108,7 @@ def zipdata():
     if check_list:
         zip_list = []
         for uid in check_list:
-            thumb = get_thumbinfo(uid)
+            thumb = get_thumbnails_id(uid)
             zip_list.append(thumb["file_name"])
 
         return get_zip(zip_list)
@@ -281,6 +281,7 @@ def thumbs(
     time_filter: int = 1,
     time_filter_max: int = 8,
 ) -> dict[str, Any]:
+    """Get details files infos."""
     thumb_filenames = get_thumbnails(
         sort_order=sort_order,
         show_types=show_types,
@@ -290,8 +291,17 @@ def thumbs(
     return draw_files(thumb_filenames)
 
 
-def get_thumbinfo(uid: str) -> dict[str, Any] | None:
-    """Return filename."""
-    for thumb in thumbs():
-        if uid == thumb["id"]:
-            return thumb
+def get_thumbnails_id(uid: str = None) -> dict[str, Any]:
+    """Get file name and real name."""
+    media_path = ca.raspiconfig.media_path
+    files = list_folder_files(media_path)
+    thumbnails = []
+    for file in files:
+        real_file = data_file_name(file)
+        file_id = real_file[:-4].replace("_", "")
+        if real_file:
+            thumb = {"id": file_id, "real_file": real_file, "file_name": file}
+            if uid and uid == file_id:
+                return thumb
+            thumbnails.append(thumb)
+    return thumbnails

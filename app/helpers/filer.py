@@ -1,6 +1,5 @@
 """Files functions."""
 import os
-from typing import Any
 
 from flask import current_app as ca
 
@@ -162,19 +161,18 @@ def maintain_folders(
     return empty and not root and os.rmdir(path)
 
 
-def lock_file(thumb: dict[str, Any], lock: bool) -> None:
+def lock_file(filename: str, uid: str, lock: bool) -> None:
     """Lock file (remove w via chmod)."""
     media_path = ca.raspiconfig.media_path
     lock_files = ca.settings.get("lock_files", [])
     if lock == 1:
         attr = 0o444
-        lock_files.append(thumb["id"])
+        lock_files.append(uid)
     else:
         attr = 0o644
-        if thumb["id"] in lock_files:
-            lock_files.remove(thumb["id"])
+        if uid in lock_files:
+            lock_files.remove(uid)
     ca.settings.update(lock_files=lock_files)
-    filename = thumb["file_name"]
     file_type = get_file_type(filename)
     if file_type == "t":
         #  For time lapse lock all from this batch

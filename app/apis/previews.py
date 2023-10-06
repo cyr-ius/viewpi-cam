@@ -3,7 +3,7 @@ from flask import current_app as ca
 from flask import request, url_for
 from flask_restx import Namespace, Resource, abort, fields
 
-from ..blueprints.preview import get_thumbinfo, thumbs, video_convert
+from ..blueprints.preview import get_thumbnails_id, thumbs, video_convert
 from ..helpers.decorator import token_required
 from ..helpers.filer import delete_mediafiles, lock_file, maintain_folders
 from .models import forbidden, message
@@ -57,7 +57,9 @@ class Previews(Resource):
     @api.response(200, "Success")
     def get(self):
         """Get all media files."""
-        sort_order = request.args.get("sort_order", True) is True
+        sort_order = int(
+            1 if request.args.get("order", "true").lower() == "true" else 2
+        )
         return thumbs(sort_order)
 
     @api.expect(
@@ -82,14 +84,16 @@ class Preview(Resource):
     @api.response(200, "Success")
     def get(self, id):
         """Get file information."""
-        return get_thumbinfo(id)
+        for thumb in thumbs():
+            if thumb["id"] == id:
+                return thumb
 
     @token_required
     @api.doc(description="Delete file")
     @api.response(204, "Action is successful")
     def delete(self, id):
         """Delete file."""
-        if thumb := get_thumbinfo(id):
+        if thumb := get_thumbnails_id(id):
             delete_mediafiles(thumb["file_name"])
             maintain_folders(ca.raspiconfig.media_path, False, False)
             return "", 204
@@ -121,12 +125,16 @@ class Actions(Resource):
     def post(self, id):
         """Post action."""
         if request.endpoint in ["api.previews_lock", "api.previews_unlock"]:
-            if thumb := get_thumbinfo(id):
-                lock_file(thumb, request.endpoint == "api.previews_lock")
+            if thumb := get_thumbnails_id(id):
+                lock_file(
+                    thumb["file_name"],
+                    thumb["id"],
+                    request.endpoint == "api.previews_lock",
+                )
                 return "", 204
             abort(422, f"Thumb not found ({id})")
         if request.endpoint == "previews_convert":
-            if thumb := get_thumbinfo(id):
+            if thumb := get_thumbnails_id(id):
                 video_convert(thumb["file_name"])
                 return "", 204
             abort(422, f"Thumb not found ({id})")
