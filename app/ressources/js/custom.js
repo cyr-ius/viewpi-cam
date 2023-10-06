@@ -60,8 +60,6 @@ $(function(){
       contentType: "application/json; charset=utf-8",            
       success: function(data){
           $('#toast').addClass("text-bg-primary")
-          if (data && "message" in data)
-            $("#toast .toast-body").html(data["message"])
           if (data && data.responseJSON)
             $("#toast .toast-body").html(data.responseJSON["message"])          
           if (o.callbackSuccess) return o.callbackSuccess(data)
