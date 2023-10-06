@@ -144,18 +144,21 @@ $('#form_gallery button[name="delete"], #delete').click(function(){
 
 $('#time_filter, #show_types, #sort_order').on('change', function() {
     data = $('#form_gallery').serializeObject()
-    let callbackSuccess = function(data) {location.reload();}
+    let callbackSuccess = function(data) {
+        $('#form_gallery input:checkbox').prop('checked',false)
+        location.reload();
+    }
     $.queryData({"url":"{{url_for('preview.index')}}", "data":data, "callbackSuccess":callbackSuccess})
 })
 
 $('#selectNone').unbind();
 $('#selectNone').click(function(){
-    $('#form_gallery input:checkbox').prop('checked','')
+    $('#form_gallery input:checkbox').prop('checked',false)
 });
 
 $('#selectAll').unbind();
 $('#selectAll').click(function(){
-    $('#form_gallery input:checkbox').prop('checked','checked')
+    $('#form_gallery input:checkbox').prop('checked',true)
 });
 
 $('#deleteSel').unbind();
@@ -178,7 +181,7 @@ $('#lockSel, #unlockSel').click(function(){
 
     data.check_list.forEach(function(item){
         let callbackSuccess = function(data) {
-            $(`#${item} input:checkbox`).prop('checked','')
+            $(`#${item} input:checkbox`).prop('checked',false)
             if (action=="unlock") {
                 $(`#${item} #icon_lock`).addClass('d-none');
                 $(`#${item} button[name="delete"]`).prop('disabled', '');
