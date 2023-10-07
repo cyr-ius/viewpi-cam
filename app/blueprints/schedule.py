@@ -165,9 +165,7 @@ def scheduler():
                             last_day_period = new_day_period
                 if timenow > managechecktime:
                     managechecktime = timenow + ca.settings.management_interval
-                    write_log(
-                        f"Scheduled management tasks. Next at {time.ctime(managechecktime)}"
-                    )
+                    write_log(f"Scheduled tasks. Next at {time.ctime(managechecktime)}")
                     purge_files(
                         ca.settings.purgevideo_hours,
                         ca.settings.purgeimage_hours,

@@ -164,13 +164,14 @@ def video_convert(thumb: dict[str, Any]) -> None:
             i = 0
             video_file = f"{data_file_name(filename)[:-4]}.mp4"
             cmd = ca.config["CONVERT_CMD"]
+            ext = ca.config["THUMBNAIL_EXT"]
             rst = cmd.replace(f"i_{i:05d}", f"tmp/i_{i:05d}")
             cmd = f"({rst} {media_path}/{video_file}; rm -rf {tmp};) >/dev/null 2>&1 &"
             write_log(f"start lapse convert: {cmd}")
             Popen(cmd, stdout=PIPE, shell=True)
             shutil.copy(
                 src=f"{media_path}/{filename}",
-                dst=f"{media_path}/{video_file}.v{file_index}{ca.config['THUMBNAIL_EXT']}",
+                dst=f"{media_path}/{video_file}.v{file_index}{ext}",
             )
             write_log("Convert finished")
 

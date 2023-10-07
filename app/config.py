@@ -67,7 +67,7 @@ MEDIA = "media"
 THUMBNAIL_EXT = ".th.jpg"
 # File where a debug file is stored
 LOGFILE_DEBUG = "debug.log"
-# Control how filesize is extracted, 0 is fast and works for files up to 4GB, 1 is slower
+# Select size metho 0=python , 1=stats
 FILESIZE_METHOD = 0
 # File for settings
 FILE_SETTINGS = f"{basedir}/../system/settings.json"
