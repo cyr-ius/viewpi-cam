@@ -54,13 +54,15 @@ class Users(Resource):
     @users.response(204, "Actions is success")
     def post(self):
         """Create user."""
+        if ca.settings.has_username(users.payload["name"]):
+            abort(422, "User name is already exists, please change.")
         ids = [user["id"] for user in ca.settings.users]
         uid = max(ids) + 1
         users.payload["id"] = uid
         users.payload["password"] = hash_password(users.payload["password"])
         ca.settings.users.append(users.payload)
         ca.settings.update(users=ca.settings.users)
-        return "", 204
+        return users.payload
 
 
 @users.response(422, "Error", message)
@@ -88,6 +90,8 @@ class User(Resource):
     @users.marshal_with(user)
     def put(self, uid: int):
         """Set user."""
+        if ca.settings.has_username(users.payload["name"]):
+            abort(422, "User name is already exists, please change.")
         if dict_user := self.get_byid(uid):
             ca.settings.users.remove(dict_user)
             users.payload["id"] = uid
@@ -156,7 +160,7 @@ class Buttons(Resource):
         buttons.payload["id"] = uid
         ca.settings.ubuttons.append(buttons.payload)
         ca.settings.update(buttons=ca.settings.ubuttons)
-        return "", 204
+        return buttons.payload
 
 
 @buttons.response(422, "Error", message)
@@ -303,7 +307,7 @@ class Macros(Resource):
     def get(self):
         """Get macros."""
         list_macros = []
-        for key, value in Macros().get_config().items():    
+        for key, value in Macros().get_config().items():
             state = True
             if value[:1] == "-":
                 value = value[1:]
