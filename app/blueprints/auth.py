@@ -1,18 +1,12 @@
 """Blueprint Authentication."""
-from flask import (
-    Blueprint,
-    current_app,
-    flash,
-    g,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
+from typing import Any
+
+from flask import Blueprint
+from flask import current_app as ca
+from flask import flash, g, redirect, render_template, request, session, url_for
 
 from ..helpers.decorator import auth_required
-from ..helpers.settings import SettingsException
+from ..helpers.utils import hash_password
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -20,7 +14,7 @@ bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth"
 @bp.before_app_request
 def before_app_request():
     """Execute before request."""
-    if hasattr(current_app.settings, "users") and len(current_app.settings.users) == 0:
+    if hasattr(ca.settings, "users") and len(ca.settings.users) == 0:
         session.clear()
     g.user = session.get("user_id")
 
@@ -28,29 +22,31 @@ def before_app_request():
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     """Register page."""
-    if request.method == "POST" and len(current_app.settings.users) == 0:
-        if (pwd := request.form.get("password")) == request.form.get("password_2"):
+    if request.method == "POST" and (
+        ca.settings.get("users") is None or len(ca.settings.users) == 0
+    ):
+        if (password := request.form.get("password")) == request.form.get("password_2"):
             next_page = (
                 next_page
                 if (next_page := request.form.get("next"))
                 else url_for("main.index")
             )
-            try:
-                current_app.settings.set_user(
-                    user_id=request.form["user_id"],
-                    password=pwd,
-                    rights=current_app.config["USERLEVEL_MAX"],
-                )
+            if (username := request.form["user_id"]) and password:
+                first_user = {
+                    "id": 1,
+                    "name": username,
+                    "password": hash_password(password),
+                    "rights": ca.config["USERLEVEL_MAX"],
+                }
+                ca.settings.update(users=[first_user])
                 return redirect(next_page)
-            except SettingsException as error:
-                current_app.logger.error(error)
-                flash_msg = "Error while registering user (view log)"
+            flash_msg = "User or password is empty."
         else:
             flash_msg = "User or password invalid."
 
         flash(flash_msg)
 
-    has_registered = len(current_app.settings.users) == 0
+    has_registered = ca.settings.get("users") is None or len(ca.settings.users) == 0
     return render_template(
         "login.html", register=has_registered, next=request.args.get("next")
     )
@@ -59,15 +55,17 @@ def register():
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     """Login page."""
-    if not current_app.settings.users or len(current_app.settings.users) == 0:
+    if ca.settings.get("users") is None or len(ca.settings.users) == 0:
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
-        user = request.form.get("user_id")
-        pwd = request.form.get("password")
-        if current_app.settings.check_password(user, pwd):
+        username = request.form.get("user_id")
+        password = request.form.get("password")
+        if (user := get_user(username)) and (
+            hash_password(password) == user["password"]
+        ):
             session.clear()
-            session["user_id"] = user
-            session["user_level"] = current_app.settings.get_user(user).get("rights")
+            session["user_id"] = username
+            session["user_level"] = user.get("rights")
             next_page = (
                 next_page
                 if (next_page := request.form.get("next"))
@@ -86,3 +84,10 @@ def logout():
     """Logout  button."""
     session.clear()
     return redirect(url_for("auth.login"))
+
+
+def get_user(username: str) -> dict[str, Any]:
+    """Return user infos."""
+    for user in ca.settings.users:
+        if user["name"] == username:
+            return user

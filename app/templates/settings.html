@@ -7,14 +7,15 @@
         <hr class="p-0 ">
         <div class="row">Users buttons</div>
         <div id="ubuttons" class="row">
-            {%for name, ubutton in settings.ubuttons.items()%}
-            <div class="row row-cols-7 row-cols-md-7 g-1 ms-2 uchange">
+            {%for ubutton in settings.ubuttons%}
+            <div id="ubuttons-{{ubutton.id}}" class="row row-cols-7 row-cols-md-7 g-1 ms-2 uchange">
+                <input type="hidden" name="id" value="{{ubutton.id}}">
                 <div class="col-auto">
                     <div class="form-check form-switch">
                         <input class="form-check-input" name="display" type="checkbox" {% if ubutton.display == 1 %}checked{%endif%}>
                     </div>       
                 </div>     
-                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value="{{name}}" readonly></div>
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value="{{ubutton.name}}" readonly></div>
                 <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value="{{ubutton.macro}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value="{{ubutton.css_class}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text" value="{{ubutton.style}}"></div>
@@ -24,11 +25,11 @@
             {% endfor%}
             <div id="ubuttons-ref" class="row row-cols-7 row-cols-md-7 g-1 ms-2">
                 <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="display" type="checkbox"></div></div>               
-                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value=""></div>
-                <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value=""></div>
-                <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value=""></div>
-                <div class="col"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text" value=""></div>
-                <div class="col"><input class="form-control form-control-sm" name="other" placeholder="Other" type="text" value=""></div>
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text"></div>
+                <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text"></div>
+                <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text"></div>
+                <div class="col"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text"></div>
+                <div class="col"><input class="form-control form-control-sm" name="other" placeholder="Other" type="text"></div>
                 <div class="col" id="btn_add_button"><button class="btn btn-sm btn-success add_button" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
                 <div class="col d-none" id="btn_del_button"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
@@ -36,12 +37,13 @@
         <hr class="mt-3">
         <div class="row">Users</div>
         <div id="users" class="row">
-            {%for user_id, user in settings.users.items()%}
-            <div class="row row-cols-4 row-cols-md-4 g-1 ms-2 uchange">                
-                <div class="col"><input class="form-control form-control-sm" name="user_id" placeholder="Username" required="" type="text" value="{{user_id}}" readonly></div>
-                <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" value=""></div>
+            {%for user in settings.users%}
+            <div id="users-{{user.id}}" class="row row-cols-4 row-cols-md-4 g-1 ms-2 uchange">    
+                <input type="hidden" name="id" value="{{user.id}}">            
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" required="" type="text" value="{{user.name}}" readonly></div>
+                <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password"></div>
                 <div class="col">
-                    <select class="form-select form-select-sm" id="users-0-rights" name="rights" required="">
+                    <select class="form-select form-select-sm" name="rights" required>
                         <option {% if user.rights == 1 %}selected{%endif%} value="1">Minimum</option>
                         <option {% if user.rights == 2 %}selected{%endif%} value="2">Minimum+</option>
                         <option {% if user.rights == 4 %}selected{%endif%} value="4">Medium</option>
@@ -52,10 +54,10 @@
             </div>
             {%endfor%}
             <div id="users-ref" class="row row-cols-4 row-cols-md-4 g-1 ms-2">                
-                <div class="col"><input class="form-control form-control-sm" name="user_id" placeholder="Username" required type="text"></div>
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" type="text" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" required></div>
                 <div class="col">
-                    <select class="form-select form-select-sm" id="users-0-rights" name="rights" onchange="$(this).trigger('submit');" required>
+                    <select class="form-select form-select-sm" name="rights" onchange="$(this).trigger('submit');" required>
                         <option value="1">Minimum</option>
                         <option value="2">Minimum+</option>
                         <option value="4">Medium</option>
@@ -77,8 +79,8 @@
                     <div class="input-group">
                         <input class="form-control form-control-sm" disabled="disabled" id="token" name="token" type="text" value="{{settings.token}}">
                         <button class="btn btn-sm btn-outline-secondary" id="copy" name="copy" type="button"><i class="bi bi-clipboard"></i></button>
-                        <button class="btn btn-sm btn-outline-secondary" id="generate" name="generate" type="button">Generate</button>
-                        <button class="btn btn-sm btn-outline-secondary" id="reset" name="reset" type="button">Reset</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="get_token" name="generate" type="button">Generate</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="del_token" name="reset" type="button">Reset</button>
                     </div>
                 </div>
             </div>
@@ -124,23 +126,25 @@
             </div>
         </div>
         <hr class="mt-3"> 
-        {%for macro in config["MACROS"]%}
-        <div class="row row-cols-4 row-cols-md-4 g-1 mb-2">
-            <div class="col">Macro:{{macro}}</div>
-            <div class="col col-md-2 text-center">
-                <input class="form-control-checkbox" type="checkbox" id="{{macro}}_chk"
-                {% if macros[macro][:1] == "-" %}
-                    {% set value=macros[macro][1:] %}
-                    checked=""
-                {%else%}
-                    {% set value=macros[macro] %}
-                    checked="checked"
-                {%endif%}
-                ></div>
-            <div class="col col-md-4"><input class="form-control form-control-sm" type="text" id="{{macro|lower}}" value="{{value}}"></div>
-            <div class="col"><button class="btn btn-sm btn-outline-secondary" type="button" onclick="send_macroUpdate({{loop.index0}},'{{macro}}');">OK</button></div>
+        <div id="macros" class="row">
+            {%for macro in config["MACROS"]%}
+            <div class="row row-cols-4 row-cols-md-4 g-1 mb-2 uchange">
+                <input type="hidden" name="name" value="{{macro|lower}}">
+                <div class="col">Macro:{{macro}}</div>
+                <div class="col col-md-2 text-center">
+                    <input class="form-control-checkbox" type="checkbox" name="state"
+                    {% if macros[macro][:1] == "-" %}
+                        {% set value=macros[macro][1:] %}
+                    {%else%}
+                        {% set value=macros[macro] %}
+                        checked="checked"
+                    {%endif%}
+                    ></div>
+                <div class="col col-md-4"><input class="form-control form-control-sm" type="text" name="command" value="{{value}}"></div>
+                <div class="col"><button class="btn btn-sm btn-outline-secondary" type="button" onclick="send_macroUpdate({{loop.index0}},'{{macro}}');">Execute</button></div>
+            </div>
+            {%endfor%}
         </div>
-        {%endfor%}
         <hr class="mt-3"> 
         <div class="row row-cols-2 row-cols-md-2 g-1 ms-2">
             <div class="col col-md-5"><label class="form-check-label" for="loglevel">Logging verbose</label></div>
@@ -161,16 +165,10 @@
         $('#main').addClass("d-none")
     }); 
 
-    $('#upreset, #gmt_offset').unbind()
-    $('#upreset, #gmt_offset').on("change", function(event) {
+    $('#upreset, #pilight, #pipan, #servo, #loglevel').unbind()
+    $('#upreset, #pilight, #pipan, #servo, #loglevel').on("change", function(event) {
         data = $(this).serializeObject({"checkboxesAsBools":true});
-        $.queryData({"url":"{{ url_for('settings.index')}}","data":data});
-    })
-
-    $('#pilight, #pipan, #servo, #loglevel').unbind()
-    $('#pilight, #pipan, #servo, #loglevel').on("change", function(event) {
-        data = $(this).serializeObject({"checkboxesAsBools":true});
-        $.queryData({"url":"{{ url_for('settings.index')}}","data":data});
+        $.queryData({"url":"{{ url_for('api.settings_sets')}}","data":data});
     })
 
     $('#copy').unbind();
@@ -179,16 +177,16 @@
         event.preventDefault();
     });
 
-    $('#generate').unbind();
-    $('#generate').click(function () {
+    $('#get_token').unbind();
+    $('#get_token').click(function () {
         callback = function(data){$('#token').val(data["token"])}
-        $.queryData({"url":"{{ url_for('settings.index')}}","data":{"token":"generate"},"callbackSuccess":callback});
+        $.queryData({"url":"{{ url_for('api.settings_token')}}","callbackSuccess":callback});
     });     
 
-    $('#reset').unbind();
-    $('#reset').click(function () {
+    $('#del_token').unbind();
+    $('#del_token').click(function () {
         callback = function(data){$('#token').val('')}
-        $.queryData({"url":"{{ url_for('settings.index')}}","data":{"token":"generate"},"callbackSuccess":callback});
+        $.queryData({"method":"delete", "url":"{{ url_for('api.settings_token')}}","callbackSuccess":callback});
     });    
 
     $('#users').on('click','.add_user', function() {
@@ -203,7 +201,7 @@
                 $(templ_user).find('input').val('');   
                 templ_user.insertAfter(user);
         }
-        $.queryData({"url":"{{ url_for('settings.index')}}","data":data, "callbackSuccess":callback});
+        $.queryData({"url":"{{ url_for('api.users_users')}}","data":data, "callbackSuccess":callback});
 
     });
 
@@ -211,7 +209,12 @@
         user = $(this).parent().parent()
         data = $(user).find('input, select').serializeObject();
         callback = function(data){ user.remove() }
-        $.queryData({"method":"DELETE", "url":"{{ url_for('settings.index')}}","data":data, "callbackSuccess":callback});
+        $.queryData({"method":"delete", "url":`{{ url_for('api.users_users')}}/${data["id"]}`, "callbackSuccess":callback});
+    });
+
+    $('#users').on('change','.uchange', function(){
+        let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+        $.queryData({"method":"put", "url":`{{ url_for('api.users_users')}}/${data["id"]}`, "data":data});        
     });
 
     $('#ubuttons').on('click','.add_button', function() {
@@ -226,19 +229,25 @@
                 $(templ_ubutton).find('input').val('');
                 templ_ubutton.insertAfter(button);
         }
-        $.queryData({"url":"{{ url_for('settings.index')}}","data":data, "callbackSuccess":callback});
+        $.queryData({"url":"{{ url_for('api.buttons_buttons')}}","data":data, "callbackSuccess":callback});
     });
 
     $('#ubuttons').on('click','.del_button', function() {
         button = $(this).parent().parent();
         data = $(button).find('input').serializeObject({"checkboxesAsBools":true});
         callback = function(data){ button.remove() }
-        $.queryData({"method":"DELETE", "url":"{{ url_for('settings.index')}}", "data":data, "callbackSuccess":callback});
+        $.queryData({"method":"delete", "url":`{{ url_for('api.buttons_buttons')}}/${data["id"]}`, "callbackSuccess":callback});
     });
 
-    $('#ubuttons, #users').on('change','.uchange', function(){
+    $('#ubuttons').on('change','.uchange', function(){
         let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        $.queryData({"method":"POST", "url":"{{ url_for('settings.index')}}", "data":data});        
+        $.queryData({"method":"put", "url":`{{ url_for('api.buttons_buttons')}}/${data["id"]}`, "data":data});        
+    });
+
+    $('#macros').on('change','.uchange', function(){
+        let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+        console.log(data);
+        $.queryData({"method":"post", "url":"{{ url_for('api.settings_macros')}}", "data":data});      
     });
 
     function send_macroUpdate(i, macro) {
