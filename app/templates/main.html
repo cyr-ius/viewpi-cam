@@ -9,10 +9,10 @@
     </symbol>
     <symbol id="left" viewBox="0 0 16 16">
         <path d="M16 14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12zm-4.5-6.5H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H11.5a.5.5 0 0 0 0-1z"/>
-    </symbol>                    
+    </symbol>
     <symbol id="right" viewBox="0 0 16 16">
         <path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1z"/>
-    </symbol>    
+    </symbol>
     <symbol id="down" viewBox="0 0 16 16">
         <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z"/>
     </symbol>
@@ -20,12 +20,12 @@
 
 <div class="container text-center liveimage overflow-auto">
     <div>
-        <img id="mjpeg_dest"   
-            {% if raspiconfig.vector_preview == 1 %}style="width:{{raspiconfig.width}}px !important"{%endif%} 
+        <img id="mjpeg_dest"
+            {% if raspiconfig.vector_preview == 1 %}style="width:{{raspiconfig.width}}px !important"{%endif%}
             {% if mode == 1 %}onclick="ontouchstart=pipan_start();" {%endif%}
             class="img-fluid standard" onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.jpg') }}">
     </div>
-    
+
     <div id="main-buttons" class="my-2 {% if display_mode == "Off" %}d-none{%endif%}">
         {% if session["user_level"] >= config['USERLEVEL_MEDIUM']%}
         <button id="video_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
@@ -46,10 +46,10 @@
             </div>
             <div class="row justify-content-center">
                 <div alt="Left" id="arrowLeft" class="col-2" cmd="left">
-                    <svg width="64" height="64" fill="currentColor" class="bi bi-arrow-left-square-fill"><use href="#left"></use></svg>                    
-                </div> 
+                    <svg width="64" height="64" fill="currentColor" class="bi bi-arrow-left-square-fill"><use href="#left"></use></svg>
+                </div>
                 <div alt="Right" id="arrowRight" class="col-2" cmd="right">
-                    <svg  width="64" height="64" fill="currentColor" class="bi bi-arrow-right-square-fill"><use href="#right"></use></svg>    
+                    <svg  width="64" height="64" fill="currentColor" class="bi bi-arrow-right-square-fill"><use href="#right"></use></svg>
                 </div>
             </div>
             <div alt="Down" id="arrowDown" class="row" cmd="down">
@@ -67,8 +67,8 @@
         {%endfor%}
         </div>
         {%endif%}
-        
-    </div>    
+
+    </div>
 </div>
 {% endblock %}
 {% block extrascripts %}
@@ -83,7 +83,7 @@
     let elem = document.documentElement;
     let time = new Date().getTime();
 
-    $(function(){   
+    $(function(){
         $('#main').removeClass("d-none")
         setTimeout('init({{mjpegmode}},{{raspiconfig.video_fps}}, {{raspiconfig.divider}});', 100);
     });
@@ -267,7 +267,7 @@
             }
             else if(response.substr(0,5) == "Error") {
                 alert("Error in RaspiMJPEG: " + response.substr(7) + "\nRestart ViewPI Cam or the whole RPi.");
-            } 
+            }
             updatePreview();
             reload_ajax(response);
         })
@@ -290,7 +290,7 @@
             }
             if (previous_halted != halted) {
                 if(!halted) {
-                    mjpeg_img.src = `{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}`;			
+                    mjpeg_img.src = `{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}`;
                 } else {
                     mjpeg_img.src = "{{ url_for('static', filename='img/unavailable.jpg') }}";
                 }
@@ -313,7 +313,7 @@
             $('#display_mode').val("On")
             $('#display_mode').html("Display On")
         }
-        
+
         document.cookie="display_mode=" + value + "; " + expires;
     }
 
@@ -330,14 +330,14 @@
         }
         document.cookie="mjpegmode=" + value + "; " + expires;
         document.location.reload(true);
-    } 
+    }
 
     function openFullscreen() {
         if (elem.requestFullscreen) {
             elem.requestFullscreen();
         } else if (elem.webkitRequestFullscreen) { /* Safari */
             elem.webkitRequestFullscreen();
-        } 
+        }
     }
 
     function closeFullscreen() {
@@ -345,7 +345,7 @@
             document.exitFullscreen();
         } else if (document.webkitExitFullscreen) { /* Safari */
             document.webkitExitFullscreen();
-        } 
+        }
     }
 
     function toggle_fullscreen(event) {
@@ -356,7 +356,7 @@
             background.id = "background";
             document.body.appendChild(background);
         }
-        
+
         if(event.className == "fullscreen") {
             event.className = "img-fluid standard";
             background.style.display = "none";

@@ -1,11 +1,11 @@
 {% if session.get("user_level",0) >= config['USERLEVEL_MEDIUM'] %}
 {% block navbar %}
 <nav class="navbar navbar-expand-lg">
-    <a class="navbar-brand" href="{{ url_for('main.index') }}">        
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
         <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
         <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-      </svg>   
+      </svg>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -13,13 +13,13 @@
     <div class="collapse navbar-collapse" id="navbarToggler">
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
     <ul class="navbar-nav d-none" id="main">
-      <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">Camera Settings</a></li>    
-      {% if raspiconfig is defined and raspiconfig.motion_external == 1 %}      
-      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionExternal">Motion Settings</a></li>    
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">Camera Settings</a></li>
+      {% if raspiconfig is defined and raspiconfig.motion_external == 1 %}
+      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionExternal">Motion Settings</a></li>
       {%else%}
-      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionSetting">Motion Settings</a></li>    
+      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionSetting">Motion Settings</a></li>
       {%endif%}
-    </ul> 
+    </ul>
     {%endif%}
     {% if session["user_level"] >= config['USERLEVEL_MAX'] %}
     <ul class="navbar-nav d-none" id="schedule">
@@ -37,7 +37,7 @@
       <li class="nav-item pe-1"><button id="downloadlog" class="btn btn-sm btn-outline-secondary" type="button">Download Log</button></li>
       <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button">Clear Log</button></li>
     </ul>
-    {%endif%}    
+    {%endif%}
     {% if session["user_level"] >= config['USERLEVEL_MINP'] %}
     <ul class="navbar-nav d-none" id="gallery">
       <li class="nav-item pe-1"><button id="selectNone" class="btn btn-sm btn-outline-secondary" type="button">Deselect</button></li>
@@ -48,7 +48,7 @@
       <li class="nav-item pe-1"><button id="lockSel" class="btn btn-sm btn-primary" type="button">Lock</button></li>
       <li class="nav-item pe-1"><button id="unlockSel" class="btn btn-sm btn-primary" type="button">Unlock</button></li>
     </ul>
-    {%endif%}      
+    {%endif%}
     {% if session["user_level"] >= config['USERLEVEL_MINP'] %}
     <ul class="navbar-nav d-none" id="display">
       <li class="nav-item pe-1"><button id="prev" class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-arrow-left"></i></button></li>
@@ -57,12 +57,12 @@
       <li class="nav-item pe-1"><button id="delete" class="btn btn-sm btn-danger" type="button">Delete</button></li>
       <li class="nav-item pe-1"><button id="convert" class="btn btn-sm btn-primary" type="button">Start Convert</button></li>
     </ul>
-    {%endif%}        
+    {%endif%}
     <ul class="navbar-nav ms-md-auto" id="nav-right">
       {% if session["user_level"] >= config['USERLEVEL_MINP']%}
-      <li class="nav-item"><a class="nav-link" href="{{ url_for('preview.index') }}">Gallery</a></li> 
-      {% endif %}    
-      {% if session["user_level"] >= config['USERLEVEL_MAX']%}        
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('preview.index') }}">Gallery</a></li>
+      {% endif %}
+      {% if session["user_level"] >= config['USERLEVEL_MAX']%}
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">System</a>
         <ul class="dropdown-menu">
@@ -81,22 +81,22 @@
           </div>
           <li class="nav-item"><button id="restart_app" class="dropdown-item">Restart application</button></li>
           <li class="nav-item"><button id="restart" class="dropdown-item">Restart system</button></li>
-          <li class="nav-item"><button id="shutdown" class="dropdown-item">Shutdown system</button></li>            
+          <li class="nav-item"><button id="shutdown" class="dropdown-item">Shutdown system</button></li>
           <li class="nav-item"><button id="reset" class="dropdown-item">Reset settings</button></li>
           <li><hr class="dropdown-divider"></li>
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">Show Log</a></li>
           {% if g.loglevel == 'DEBUG' %}
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.debugcmd') }}">Debug</a></li>
           {%endif%}
-          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('api.doc') }}" target="_blank">API Docs</a></li>  
-          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.helpcmd') }}">Help</a></li>  
+          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('api.doc') }}" target="_blank">API Docs</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.helpcmd') }}">Help</a></li>
         </ul>
       </li>
       {% endif %}
       {% if g.user %}
-      <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Deconnexion</a></li>  
-      {% endif %}        
-    </ul> 
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Deconnexion</a></li>
+      {% endif %}
+    </ul>
     </div>
 </nav>
 {% endblock %}
@@ -111,7 +111,7 @@ $('#restart_app').click(function(){
 $('#restart').click(function(){
   if(confirm('Are you sure to restart this host?')) {
     $.queryData({"url":"{{url_for('api.system_restart')}}"})
-  } 
+  }
 });
 $('#shutdown').click(function(){
   if(confirm('Are you sure to shutdown this host?')) {

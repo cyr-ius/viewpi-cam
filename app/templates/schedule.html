@@ -4,7 +4,7 @@
 <div class="container-fluid overflow-auto px-5 py-2">
     <form id="form_schedule" class="row needs-validation" action="{{ url_for('schedule.index')}}" method="POST" novalidate>
         <div class="row"><h4 class="p-0">Scheduler</h3></div>
-        <hr class="p-0 ">          
+        <hr class="p-0 ">
         <div class="row row-cols-1 row-cols-md-5 text-center mb-2 gy-1 gx-2 border">
             <span class="col">Time Offset: <b>{{offset}}</b></span>
             <span class="col">Sunrise: <b>{{sunrise}}</b></span>
@@ -20,23 +20,23 @@
             <div class="col"><label class="col-form-label-sm">Control - Fifo Out</label></div>
             <div class="col">
                 <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{control_file}}">
-            </div>            
-        </div>    
+            </div>
+        </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">AutoCamera</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocamera_interval" value="{{ settings.autocamera_interval|default(0, true)}}" required>
                     <span class="input-group-text">seconds</span>
-                </div>               
+                </div>
             </div>
             <div class="col"><label class="col-form-label-sm">AutoCapture</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocapture_interval" value="{{ settings.autocapture_interval|default(0, true)}}" required>
                     <span class="input-group-text">seconds</span>
-                </div>               
-            </div>                    
+                </div>
+            </div>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Cmd Poll</label></div>
@@ -57,7 +57,7 @@
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm" type="number" autocomplete="off" name="dayend_minutes" value="{{ settings.dayend_minutes|default(0, true)}}" required>
                     <span class="input-group-text">minutes</span>
-                </div>            
+                </div>
             </div>
             <div class="col"><label class="col-form-label-sm">Day Mode</label></div>
             <div class="col">
@@ -67,22 +67,22 @@
                     <option value="2" {%if  settings.daymode == 2 %}selected="selected"{%endif%}>Fixed Times</option>
                 </select>
             </div>
-        </div>                
+        </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">DayStart</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm" type="number" autocomplete="off" name="daystart_minutes" value="{{ settings.daystart_minutes|default(0, true)}}" required>
                     <span class="input-group-text">minutes</span>
-                </div>                        
+                </div>
             </div>
             <div class="col"><label class="col-form-label-sm">DuskEnd</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm" type="number" autocomplete="off" name="duskend_minutes" value="{{ settings.duskend_minutes|default(0, true)}}" required>
                     <span class="input-group-text">minutes</span>
-                </div>              
-            </div>            
+                </div>
+            </div>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Purge Video</label></div>
@@ -90,8 +90,8 @@
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgevideo_hours" value="{{ settings.purgevideo_hours}}" required>
                     <span class="input-group-text">hours</span>
-                </div>              
-            </div>        
+                </div>
+            </div>
             <div class="col"><label class="col-form-label-sm">GMT offset</label></div>
             <div class="col">
                 <select class="form-select form-select-sm" id="gmt_offset" name="gmt_offset">
@@ -121,7 +121,7 @@
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm" type="number" autocomplete="off" name="management_interval" value="{{ settings.management_interval}}">
                     <span class="input-group-text">seconds</span>
-                </div>              
+                </div>
             </div>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
@@ -140,21 +140,21 @@
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgeimage_hours" value="{{ settings.purgeimage_hours}}" required>
                     <span class="input-group-text">hours</span>
-                </div>              
+                </div>
             </div>
             <div class="col"><label class="col-form-label-sm">Purge lapse</label></div>
             <div class="col">
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgelapse_hours" value="{{ settings.purgelapse_hours}}" required>
                     <span class="input-group-text">hours</span>
-                </div>              
+                </div>
             </div>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Purge space level</label></div>
             <div class="col">
                 <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgespace_level" value="{{ settings.purgespace_level}}" required>
-            </div>                   
+            </div>
             <div class="col"><label class="col-form-label-sm">PurgeSpace ModeEx</label></div>
             <div class="col">
                 <select id="PurgeSpace_ModeEx" class="form-select form-select-sm" name="purgespace_modeex" required>
@@ -167,17 +167,17 @@
             </div>
         </div>
         <div id="period_scheduler" class="row mx-auto mt-5">
-            <div class="row row-cols-5 row-cols-md-5 text-center p-1 ">           
+            <div class="row row-cols-5 row-cols-md-5 text-center p-1 ">
                 <span class="col-2">Period</span>
                 <span class="col-2">Days Su-Sa</span>
-                <span class="col-2">Motion Start</span>           
+                <span class="col-2">Motion Start</span>
                 <span class="col-2">Motion Stop</span>
                 <span class="col-2">Period Start</span>
             </div>
             <div class="row day d-none row-cols-5 row-cols-md-5 gy-1 gx-2">
                 <div class="col" style="background-color: LightGreen;"><label class="col-form-label-sm">All Days</label></div>
-                <div class="col text-center">      
-                    {% for i in range(0,7)%}      
+                <div class="col text-center">
+                    {% for i in range(0,7)%}
                     <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[0]" value="{{i}}" {%if settings.days['0'][i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
@@ -190,7 +190,7 @@
             <div class="row sun d-none row-cols-5 row-cols-md-5 gy-1 gx-2">
                 <div class="col" {%if period == index  %}style="background-color: LightGreen;"{%endif%}><label class="col-form-label-sm">{{d_mode}}</label></div>
                 <div class="col text-center">
-                    {% for i in range(0,7)%}    
+                    {% for i in range(0,7)%}
                     <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}]" value="{{i}}" {%if settings.days[index|string][i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
@@ -204,7 +204,7 @@
             <div class="row fixed d-none row-cols-5 row-cols-md-5 gy-1 gx-2">
                 <div class="col" {%if period == index %}style="background-color: LightGreen;"{%endif%}><input class="form-control form-control-sm" type="text" autocomplete="off" name="times" value="{{time}}"></div>
                 <div class="col text-center">
-                    {% for i in range(0,7)%}                           
+                    {% for i in range(0,7)%}
                     <input class="form-checkbox form-checkbox-sm" type="checkbox" name="days[{{index}}]" value="{{i}}" {%if settings.days[index|string][i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
@@ -237,54 +237,54 @@ $('#sch_save').click(function(){
 
         // Format days field
         var days = new Object();
-        const regexp = /days\[(.*)\]/g;    
+        const regexp = /days\[(.*)\]/g;
         keys = Object.keys(data)
         for (const key of keys) {
             const matchs = key.matchAll(regexp);
             for (const match of matchs) {
                 days[parseInt(match[1])] = data[key]
                 delete data[key]
-            }        
+            }
         }
-        data.days = days 
+        data.days = days
         let callbackSuccess = function(e){$("#daymode").trigger("click");}
-        $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data,"callbackSuccess": callbackSuccess}) 
+        $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data,"callbackSuccess": callbackSuccess})
     }
 });
 
 $('#backup').unbind();
 $('#backup').click(function(){
-    $.queryData({"url":"{{ url_for('api.schedule_backup') }}"}) 
+    $.queryData({"url":"{{ url_for('api.schedule_backup') }}"})
 });
 
 $('#restore').unbind();
 $('#restore').click(function(){
     let callbackSuccess = function(e){location.reload();}
-    $.queryData({"url":"{{ url_for('api.schedule_restore')}}","callbackSuccess": callbackSuccess}) 
+    $.queryData({"url":"{{ url_for('api.schedule_restore')}}","callbackSuccess": callbackSuccess})
 });
 
 $('#schedule').on('click','#start', function(){
     let callbackSuccess = function(response) {
-        if (response.type == "success") {               
+        if (response.type == "success") {
             $('.stopstart').val('stop')
             $('.stopstart').prop("id", 'stop')
             $('.stopstart').prop("name",'stop')
             $('.stopstart').html('Stop')
         }
     }
-    $.queryData({"url":"{{ url_for('api.schedule_actions')}}/start","callbackSuccess": callbackSuccess}) 
+    $.queryData({"url":"{{ url_for('api.schedule_actions')}}/start","callbackSuccess": callbackSuccess})
 });
 
 $('#schedule').on('click','#stop', function(){
     let callbackSuccess = function(response) {
-        if (response.type == "success") {               
+        if (response.type == "success") {
             $('.stopstart').val('start')
             $('.stopstart').prop("id", 'start')
             $('.stopstart').prop("name",'start')
             $('.stopstart').html('Start')
         }
     }
-    $.queryData({"url":"{{ url_for('api.schedule_actions')}}/stop","callbackSuccess": callbackSuccess}) 
+    $.queryData({"url":"{{ url_for('api.schedule_actions')}}/stop","callbackSuccess": callbackSuccess})
 });
 
 $('#daymode').unbind();
@@ -305,7 +305,7 @@ $('#daymode').click(function(){
     $.queryData({"url":"{{ url_for('api.schedule_period')}}", "data":{"daymode":mode}, "callbackSuccess":callbackSuccess})
 
     $('.sun').addClass("d-none");
-    $('.day').addClass("d-none");   
+    $('.day').addClass("d-none");
     $('.fixed').addClass("d-none");
 
     if (mode == 0) {
@@ -315,7 +315,7 @@ $('#daymode').click(function(){
         $('.day').removeClass("d-none");
     }
     if (mode == 2) {
-        $('.fixed').removeClass("d-none");        
+        $('.fixed').removeClass("d-none");
     }
 });
 </script>

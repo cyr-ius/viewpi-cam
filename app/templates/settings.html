@@ -13,8 +13,8 @@
                 <div class="col-auto">
                     <div class="form-check form-switch">
                         <input class="form-check-input" name="display" type="checkbox" {% if ubutton.display == 1 %}checked{%endif%}>
-                    </div>       
-                </div>     
+                    </div>
+                </div>
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" value="{{ubutton.name}}" readonly></div>
                 <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value="{{ubutton.macro}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value="{{ubutton.css_class}}"></div>
@@ -25,7 +25,7 @@
             {% endfor%}
             <div id="ubuttons-ref" class="row row-cols-7 row-cols-md-7 g-1 ms-2">
                 <input type="hidden" name="id">
-                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="display" type="checkbox"></div></div>               
+                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="display" type="checkbox"></div></div>
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text"></div>
                 <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text"></div>
                 <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text"></div>
@@ -39,8 +39,8 @@
         <div class="row">Users</div>
         <div id="users" class="row">
             {%for user in settings.users%}
-            <div id="users-{{user.id}}" class="row row-cols-4 row-cols-md-4 g-1 ms-2 uchange">    
-                <input type="hidden" name="id" value="{{user.id}}">            
+            <div id="users-{{user.id}}" class="row row-cols-4 row-cols-md-4 g-1 ms-2 uchange">
+                <input type="hidden" name="id" value="{{user.id}}">
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" required="" type="text" value="{{user.name}}" readonly></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password"></div>
                 <div class="col">
@@ -55,7 +55,7 @@
             </div>
             {%endfor%}
             <div id="users-ref" class="row row-cols-4 row-cols-md-4 g-1 ms-2">
-                <input type="hidden" name="id">                
+                <input type="hidden" name="id">
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" type="text" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" required></div>
                 <div class="col">
@@ -68,7 +68,7 @@
                 </div>
                 <div class="col" id="btn_add_user"><button class="btn btn-sm btn-success add_user" name="add_user" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
                 <div class="col d-none" id="btn_del_user"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
-            </div>                
+            </div>
         </div>
         <hr class="mt-3">
         <div class="rows">
@@ -127,7 +127,7 @@
                 </div>
             </div>
         </div>
-        <hr class="mt-3"> 
+        <hr class="mt-3">
         <div id="macros" class="row">
             {%for macro in config["MACROS"]%}
             <div class="row row-cols-4 row-cols-md-4 g-1 mb-2 uchange">
@@ -147,7 +147,7 @@
             </div>
             {%endfor%}
         </div>
-        <hr class="mt-3"> 
+        <hr class="mt-3">
         <div class="row row-cols-2 row-cols-md-2 g-1 ms-2">
             <div class="col col-md-5"><label class="form-check-label" for="loglevel">Logging verbose</label></div>
             <div class="col col-md-4">
@@ -165,7 +165,7 @@
 <script language="javascript">
     $(function () {
         $('#main').addClass("d-none")
-    }); 
+    });
 
     $('#upreset, #pilight, #pipan, #servo, #loglevel').unbind()
     $('#upreset, #pilight, #pipan, #servo, #loglevel').on("change", function(event) {
@@ -183,13 +183,13 @@
     $('#get_token').click(function () {
         callback = function(data){$('#token').val(data["token"])}
         $.queryData({"url":"{{ url_for('api.settings_token')}}","callbackSuccess":callback});
-    });     
+    });
 
     $('#del_token').unbind();
     $('#del_token').click(function () {
         callback = function(data){$('#token').val('')}
         $.queryData({"method":"delete", "url":"{{ url_for('api.settings_token')}}","callbackSuccess":callback});
-    });    
+    });
 
     $('#users').on('click','.add_user', function() {
         user = $(this).parent().parent();
@@ -202,7 +202,7 @@
                 user.addClass('uchange');
                 $(user).find('input[name="name"]').attr("readonly","readonly");
                 $(user).find('input[name="id"]').val(data["id"])
-                $(templ_user).find('input').val('');   
+                $(templ_user).find('input').val('');
                 templ_user.insertAfter(user);
         }
         $.queryData({"url":"{{ url_for('api.users_users')}}","data":data, "callbackSuccess":callback});
@@ -218,7 +218,7 @@
 
     $('#users').on('change','.uchange', function(){
         let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        $.queryData({"method":"put", "url":`{{ url_for('api.users_users')}}/${data["id"]}`, "data":data});        
+        $.queryData({"method":"put", "url":`{{ url_for('api.users_users')}}/${data["id"]}`, "data":data});
     });
 
     $('#ubuttons').on('click','.add_button', function() {
@@ -247,22 +247,22 @@
 
     $('#ubuttons').on('change','.uchange', function(){
         let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        $.queryData({"method":"put", "url":`{{ url_for('api.buttons_buttons')}}/${data["id"]}`, "data":data});        
+        $.queryData({"method":"put", "url":`{{ url_for('api.buttons_buttons')}}/${data["id"]}`, "data":data});
     });
 
     $('#macros').on('change','.uchange', function(){
         let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
         console.log(data);
-        $.queryData({"method":"post", "url":"{{ url_for('api.settings_macros')}}", "data":data});      
+        $.queryData({"method":"post", "url":"{{ url_for('api.settings_macros')}}", "data":data});
     });
 
     function send_macroUpdate(i, macro) {
-        var macrovalue = $('#'+macro).val();        
+        var macrovalue = $('#'+macro).val();
         if(! $("#"+macro+"_chk").prop("checked")) {
             macrovalue = "-" + macrovalue;
         }
         $.sendCmd({'cmd':'um', 'params':[i.toString(), macrovalue]})
-    }    
+    }
 
     function copyToClipboard(element) {
         var $temp = $("<input>");

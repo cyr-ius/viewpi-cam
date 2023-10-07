@@ -4,7 +4,7 @@
     {% for line in log %}
     <div class="row px-3">{{line}}</div>
     {%endfor%}
-    
+
 </div>
 {% endblock%}
 {% block extrascripts %}
@@ -22,7 +22,7 @@ $('#downloadlog').click(function(){
         url: '{{url_for('main.log')}}',
         method: 'POST',
         data: JSON.stringify({"action": "downloadlog"}),
-        contentType:"application/json; charset=utf-8", 
+        contentType:"application/json; charset=utf-8",
         xhrFields: {
             responseType: 'blob'
         },

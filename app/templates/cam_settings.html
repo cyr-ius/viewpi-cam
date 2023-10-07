@@ -33,8 +33,8 @@
                         <div class="input-group input-group-sm mb-3">
                             <input class="form-control form-control-sm" id="video_height" type="number" value="{{raspiconfig.video_height}}">
                             <span class="input-group-text">px</span>
-                        </div>       
-                    </div>             
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -52,8 +52,8 @@
                         <div class="input-group input-group-sm mb-3">
                             <input class="form-control form-control-sm" id="MP4Box_fps" type="number" value="{{raspiconfig.MP4Box_fps}}">
                             <span class="input-group-text">boxing</span>
-                        </div>       
-                    </div>             
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -77,8 +77,8 @@
                         <div class="input-group input-group-sm mb-3">
                             <input class="form-control form-control-sm" id="image_height" type="number" value="{{raspiconfig.image_height}}">
                             <span class="input-group-text">px</span>
-                        </div>       
-                    </div>             
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -89,7 +89,7 @@
             </div>
         </div>
         <hr>
-        {% if raspiconfig.camera_num|int > 0 %} 
+        {% if raspiconfig.camera_num|int > 0 %}
         <div class="row row-col-2 g-3">
             <span>Camera select (Compute module only)</span>
             <label class="col col-form-label">Use camera</label>
@@ -100,13 +100,13 @@
             </select>
             </div>
         </div>
-        {%endif%}   
+        {%endif%}
         <div class="row row-col-2 g-3">
             <label class="col col-form-label">Timelapse-Interval (0.1...3200):</label>
             <div class="col">
                 <div class="input-group mb-3">
                     <input class="form-control form-control-sm" id="tl_interval" type="number" value="{{ (raspiconfig.tl_interval|int /10)|int |default(3)}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'tv','params':(10 * $('#tl_interval').val()).toString()});">OK</button>       
+                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'tv','params':(10 * $('#tl_interval').val()).toString()});">OK</button>
                 </div>
             </div>
         </div>
@@ -128,19 +128,19 @@
                     <button class="btn btn-sm btn-outline-secondary" value="Default" onclick="$('#annotation').val('RPi Cam %Y.%M.%D_%h:%m:%s'); $.sendCmd({'cmd':'an','params':$('#annotation').val()});">Default</button>
                     <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'an','params':$('#annotation').val()});">OK</button>
                 </div>
-            </div>  
+            </div>
         </div>
         <div class="row row-col-2 g-3">
             <label class="col col-form-label">Background</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'ab','params':this.value});">
                     <option value="0" {% if raspiconfig.anno_background|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if raspiconfig.anno_background|int == 1 %}selected{%endif%}>On</option>                
+                    <option value="1" {% if raspiconfig.anno_background|int == 1 %}selected{%endif%}>On</option>
                 </select>
-            </div>            
+            </div>
         </div>
         <div class="row row-col-4 g-3">
-            <label class="col col-form-label">Annotation size(0-99):</label> 
+            <label class="col col-form-label">Annotation size(0-99):</label>
             <div class="col">
                 <div class="input-group mb-3">
                     <input class="form-control form-control-sm" id="anno_text_size" type="number" value="{{raspiconfig.anno_text_size}}">
@@ -155,7 +155,7 @@
                 <input id="at_y" type="hidden" name="at_y" value="{{raspiconfig.anno3_custom_text_Y}}">
                 <input id="at_u" type="hidden" name="at_u" value="{{raspiconfig.anno3_custom_text_U}}">
                 <input id="at_v" type="hidden" name="at_v" value="{{raspiconfig.anno3_custom_text_V}}">
-            </div>                                     
+            </div>
         </div>
         <div class="row row-col-2 g-3">
             <label class="col-6 col-form-label">Custom background color:</label>
@@ -164,7 +164,7 @@
                 <input id="ac_y" type="hidden" name="ac_y" value="{{raspiconfig.anno3_custom_background_Y}}">
                 <input id="ac_u" type="hidden" name="ac_u" value="{{raspiconfig.anno3_custom_background_U}}">
                 <input id="ac_v" type="hidden" name="ac_v" value="{{raspiconfig.anno3_custom_background_V}}">
-            </div>   
+            </div>
         </div>
         {% if file_exists("pilight_on") %}
         <div class="row row-col-2 g-3">
@@ -186,7 +186,7 @@
                     <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'bu','params':$('#video_buffer').val()});">OK</button>
                 </div>
             </div>
-        </div>                        
+        </div>
         <div class="row row-col-2 g-3">
             <label class="col col-form-label">Sharpness (-100...100), default 0:</label>
             <div class="col">
@@ -229,7 +229,7 @@
                 <div class="input-group input-group-sm mb-3">
                     <input class="form-control form-control-sm " id="iso" type="number" value="{{raspiconfig.iso}}">
                     <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'is','params':$('#iso').val()});">OK</button>
-                </div>                    
+                </div>
             </div>
         </div>
         <div class="row row-col-2 g-3">
@@ -239,7 +239,7 @@
                     <option value="average" {% if raspiconfig.metering_mode == "average" %}selected{%endif%}>Average</option>
                     <option value="spot" {% if raspiconfig.metering_mode == "spot" %}selected{%endif%}>Spot</option>
                     <option value="backlit" {% if raspiconfig.metering_mode == "backlit" %}selected{%endif%}>Backlit</option>
-                    <option value="matrix" {% if raspiconfig.metering_mode == "matrix" %}selected{%endif%}>Matrix</option>                    
+                    <option value="matrix" {% if raspiconfig.metering_mode == "matrix" %}selected{%endif%}>Matrix</option>
                 </select>
             </div>
         </div>
@@ -264,7 +264,7 @@
         <div class="row row-col-2 g-3">
             <label class="col col-form-label">Exposure Mode, default 'auto':</label>
             <div class="col">
-                <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'em','params':this.value});">                
+                <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'em','params':this.value});">
                     <option value="off" {% if raspiconfig.exposure_mode == "off" %}selected{%endif%}>Off</option>
                     <option value="auto" {% if raspiconfig.exposure_mode == "auto" %}selected{%endif%}>Auto</option>
                     <option value="night" {% if raspiconfig.exposure_mode == "night" %}selected{%endif%}>Night</option>
@@ -282,7 +282,7 @@
         <div class="row row-col-2 g-3">
             <label class="col col-form-label">White Balance, default 'auto':</label>
             <div class="col">
-                <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'wb','params':this.value});">   
+                <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'wb','params':this.value});">
                     <option value="off" {% if raspiconfig.white_balance == "off" %}selected{%endif%}>Off</option>
                     <option value="auto" {% if raspiconfig.white_balance == "auto" %}selected{%endif%}>Auto</option>
                     <option value="sun" {% if raspiconfig.white_balance == "sun" %}selected{%endif%}>Sun</option>
@@ -313,7 +313,7 @@
                             <input class="form-control form-control-sm " id="ag_b" type="number" value="{{raspiconfig.autowbgain_b}}">
                         </div>
                     </div>
-                    <div class="col-2">            
+                    <div class="col-2">
                         <button class="btn btn-sm btn-outline-secondary" onclick="set_ag();">OK</button>
                     </div>
                 </div>
@@ -322,25 +322,25 @@
         <div class="row row-col-2 g-3">
             <label class="col col-form-label">Image Effect, default 'none':</label>
             <div class="col">
-                <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'ie','params':this.value});">   
+                <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'ie','params':this.value});">
                     <option value="none" {% if raspiconfig.image_effect == "none" %}selected{%endif%}>None</option>
-                    <option value="negative" {% if raspiconfig.image_effect == "negative" %}selected{%endif%}>Negative</option>     
-                    <option value="solarise" {% if raspiconfig.image_effect == "solarise" %}selected{%endif%}>Solarise</option>     
-                    <option value="sketch" {% if raspiconfig.image_effect == "sketch" %}selected{%endif%}>Sketch</option>     
-                    <option value="denoise" {% if raspiconfig.image_effect == "denoise" %}selected{%endif%}>Denoise</option>     
-                    <option value="emboss" {% if raspiconfig.image_effect == "emboss" %}selected{%endif%}>Emboss</option>     
-                    <option value="oilpaint" {% if raspiconfig.image_effect == "oilpaint" %}selected{%endif%}>Oilpaint</option>     
-                    <option value="hatch" {% if raspiconfig.image_effect == "hatch" %}selected{%endif%}>Hatch</option>     
-                    <option value="gpen" {% if raspiconfig.image_effect == "gpen" %}selected{%endif%}>Gpen</option>     
-                    <option value="pastel" {% if raspiconfig.image_effect == "pastel" %}selected{%endif%}>Pastel</option>     
-                    <option value="watercolour" {% if raspiconfig.image_effect == "watercolour" %}selected{%endif%}>Watercolour</option>     
-                    <option value="film" {% if raspiconfig.image_effect == "film" %}selected{%endif%}>Film</option>     
-                    <option value="blur" {% if raspiconfig.image_effect == "blur" %}selected{%endif%}>Blur</option>     
-                    <option value="saturation" {% if raspiconfig.image_effect == "saturation" %}selected{%endif%}>Saturation</option>     
-                    <option value="colourswap" {% if raspiconfig.image_effect == "colourswap" %}selected{%endif%}>Colourswap</option>     
-                    <option value="washedout" {% if raspiconfig.image_effect == "washedout" %}selected{%endif%}>Washedout</option>     
-                    <option value="posterise" {% if raspiconfig.image_effect == "posterise" %}selected{%endif%}>Posterise</option>     
-                    <option value="cartoon" {% if raspiconfig.image_effect == "cartoon" %}selected{%endif%}>Cartoon</option>     
+                    <option value="negative" {% if raspiconfig.image_effect == "negative" %}selected{%endif%}>Negative</option>
+                    <option value="solarise" {% if raspiconfig.image_effect == "solarise" %}selected{%endif%}>Solarise</option>
+                    <option value="sketch" {% if raspiconfig.image_effect == "sketch" %}selected{%endif%}>Sketch</option>
+                    <option value="denoise" {% if raspiconfig.image_effect == "denoise" %}selected{%endif%}>Denoise</option>
+                    <option value="emboss" {% if raspiconfig.image_effect == "emboss" %}selected{%endif%}>Emboss</option>
+                    <option value="oilpaint" {% if raspiconfig.image_effect == "oilpaint" %}selected{%endif%}>Oilpaint</option>
+                    <option value="hatch" {% if raspiconfig.image_effect == "hatch" %}selected{%endif%}>Hatch</option>
+                    <option value="gpen" {% if raspiconfig.image_effect == "gpen" %}selected{%endif%}>Gpen</option>
+                    <option value="pastel" {% if raspiconfig.image_effect == "pastel" %}selected{%endif%}>Pastel</option>
+                    <option value="watercolour" {% if raspiconfig.image_effect == "watercolour" %}selected{%endif%}>Watercolour</option>
+                    <option value="film" {% if raspiconfig.image_effect == "film" %}selected{%endif%}>Film</option>
+                    <option value="blur" {% if raspiconfig.image_effect == "blur" %}selected{%endif%}>Blur</option>
+                    <option value="saturation" {% if raspiconfig.image_effect == "saturation" %}selected{%endif%}>Saturation</option>
+                    <option value="colourswap" {% if raspiconfig.image_effect == "colourswap" %}selected{%endif%}>Colourswap</option>
+                    <option value="washedout" {% if raspiconfig.image_effect == "washedout" %}selected{%endif%}>Washedout</option>
+                    <option value="posterise" {% if raspiconfig.image_effect == "posterise" %}selected{%endif%}>Posterise</option>
+                    <option value="cartoon" {% if raspiconfig.image_effect == "cartoon" %}selected{%endif%}>Cartoon</option>
                 </select>
             </div>
         </div>
@@ -349,7 +349,7 @@
             <div class="col">
                 <select class="form-select form-select-sm" id="ce_en">
                     <option value="0" {% if raspiconfig.colour_effect_en|int == 0 %}selected{%endif%}>Disabled</option>
-                    <option value="1" {% if raspiconfig.colour_effect_en|int == 1 %}selected{%endif%}>Enabled</option>                
+                    <option value="1" {% if raspiconfig.colour_effect_en|int == 1 %}selected{%endif%}>Enabled</option>
                 </select>
             </div>
         </div>
@@ -368,7 +368,7 @@
                             <input class="form-control form-control-sm " id="ce_v" type="number" value="{{raspiconfig.colour_effect_v}}">
                         </div>
                     </div>
-                    <div class="col-2">            
+                    <div class="col-2">
                         <button class="btn btn-sm btn-outline-secondary" onclick="set_ce();">OK</button>
                     </div>
                 </div>
@@ -388,9 +388,9 @@
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'ro','params':this.value});">
                     <option value="0" {% if raspiconfig.rotation|int == 0 %}selected{%endif%}>No rotate</option>
-                    <option value="90" {% if raspiconfig.rotation|int == 90 %}selected{%endif%}>Rotate 90°</option>                
-                    <option value="180" {% if raspiconfig.rotation|int == 180 %}selected{%endif%}>Rotate 180°</option>                
-                    <option value="270" {% if raspiconfig.rotation|int == 270 %}selected{%endif%}>Rotate 270°</option>                
+                    <option value="90" {% if raspiconfig.rotation|int == 90 %}selected{%endif%}>Rotate 90°</option>
+                    <option value="180" {% if raspiconfig.rotation|int == 180 %}selected{%endif%}>Rotate 180°</option>
+                    <option value="270" {% if raspiconfig.rotation|int == 270 %}selected{%endif%}>Rotate 270°</option>
                 </select>
             </div>
         </div>
@@ -399,9 +399,9 @@
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'fl','params':this.value});">
                     <option value="0" {% if raspiconfig.flip == 0 %}selected{%endif%}>None</option>
-                    <option value="1" {% if raspiconfig.flip == 1 %}selected{%endif%}>Horizontal</option>                
-                    <option value="2" {% if raspiconfig.flip == 2 %}selected{%endif%}>Vertical</option>                
-                    <option value="3" {% if raspiconfig.flip == 3 %}selected{%endif%}>Both</option>                
+                    <option value="1" {% if raspiconfig.flip == 1 %}selected{%endif%}>Horizontal</option>
+                    <option value="2" {% if raspiconfig.flip == 2 %}selected{%endif%}>Vertical</option>
+                    <option value="3" {% if raspiconfig.flip == 3 %}selected{%endif%}>Both</option>
                 </select>
             </div>
         </div>
@@ -501,7 +501,7 @@
                 <label class="col col-form-label">Minimise frag (0/1), default 0</label>
                 <label class="col col-form-label">Init Quantisation, default 25</label>
                 <label class="col col-form-label">Encoding qp, default 31</label>
-        </div>        
+        </div>
         <div class="row row-col-4 g-3 text-end">
             <div class="col">
                 <div class="input-group input-group-sm mb-3">
@@ -528,7 +528,7 @@
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'bo','params':this.value});">
                     <option value="0" {% if raspiconfig.MP4Box|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="2" {% if raspiconfig.MP4Box|int == 2 %}selected{%endif%}>Background</option>                
+                    <option value="2" {% if raspiconfig.MP4Box|int == 2 %}selected{%endif%}>Background</option>
                 </select>
             </div>
         </div>
@@ -551,8 +551,8 @@
             <div class="col">
                 <select class="form-select form-select-sm" onchange="set_motion_external(this.value)">
                     <option value="0" {% if raspiconfig.motion_external|int == 0 %}selected{%endif%}>Internal</option>
-                    <option value="1" {% if raspiconfig.motion_external|int == 1 %}selected{%endif%}>External</option>                
-                    <option value="2" {% if raspiconfig.motion_external|int == 2 %}selected{%endif%}>Monitor</option>                
+                    <option value="1" {% if raspiconfig.motion_external|int == 1 %}selected{%endif%}>External</option>
+                    <option value="2" {% if raspiconfig.motion_external|int == 2 %}selected{%endif%}>Monitor</option>
                 </select>
             </div>
         </div>
@@ -594,14 +594,14 @@ function set_preset(value) {
   $("#video_fps").val(values[2]);
   $("#MP4Box_fps").val(values[3]);
   $("#image_width").val(values[4]);
-  $("#image_height").val(values[5]); 
+  $("#image_height").val(values[5]);
   set_res();
 }
 
 function set_motion_external(value){
-    callbackSuccess = function(data) { 
+    callbackSuccess = function(data) {
         if (data.type != "error") {
-            if (value == "0") 
+            if (value == "0")
                 $('#motion-mode').prop("href","#motionSetting")
             if (value == "1")
                 $('#motion-mode').prop("href","#motionExternal")
@@ -624,18 +624,18 @@ function set_ce() {
 
 function set_preview() {
     params = [$("#quality").val(),$("#width").val(),$("#divider").val()]
-    $.sendCmd({"cmd":"pv","params":params});    
+    $.sendCmd({"cmd":"pv","params":params});
     update_preview_delay();
 }
 
 function set_encoding() {
     params = [$("#minimise_frag").val(),$("#initial_quant").val(),$("#encode_qp").val()]
-    $.sendCmd({"cmd":"qp","params":params});      
+    $.sendCmd({"cmd":"qp","params":params});
 }
 
 function set_roi() {
     params = [$("#roi_x").val(),$("#roi_y").val(),$("#roi_w").val(),$("#roi_h").val()]
-    $.sendCmd({"cmd":"ri","params":params});      
+    $.sendCmd({"cmd":"ri","params":params});
 }
 
 function set_at(value) {
@@ -644,21 +644,21 @@ function set_at(value) {
     if (value != "#ffffff")
         enable = "1"
     params = [enable,yuv[0].toString(),yuv[1].toString(),yuv[2].toString()]
-    $.sendCmd({"cmd":"at","params":params});         
+    $.sendCmd({"cmd":"at","params":params});
 }
 
 function set_ac(value) {
     let enable = "0"
     let yuv = colorconv.RGB2YUV(colorconv.HEX2RGB(value))
     if (value != "#000000")
-        enable = "1"    
+        enable = "1"
     params = [enable,yuv[0].toString(),yuv[1].toString(),yuv[2].toString()]
-    $.sendCmd({"cmd":"ac","params":params});      
+    $.sendCmd({"cmd":"ac","params":params});
 }
 
 function set_ag() {
     params = [$("#ag_r").val(),$("#ag_b").val()]
-    $.sendCmd({"cmd":"ag","params":params});     
+    $.sendCmd({"cmd":"ag","params":params});
 }
 
 function update_preview_delay() {

@@ -47,7 +47,7 @@
             <label class="col col-form-label">Mask Image:</label>
             <div class="col">
                 <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_image" type="text" value="{{raspiconfig.motion_image}}">                
+                    <input class="form-control form-control-sm" id="motion_image" type="text" value="{{raspiconfig.motion_image}}">
                     <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'mi','params':$('#motion_image').val()});">OK</button>
                 </div>
             </div>
@@ -56,7 +56,7 @@
             <label class="col col-form-label">Delay Frames to detect:</label>
             <div class="col">
                 <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_initframes" type="number" value="{{raspiconfig.motion_initframes}}">                
+                    <input class="form-control form-control-sm" id="motion_initframes" type="number" value="{{raspiconfig.motion_initframes}}">
                     <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'ms','params':$('#motion_initframes').val()});">OK</button>
                 </div>
             </div>
@@ -65,7 +65,7 @@
             <label class="col col-form-label">Change Frames to start:</label>
             <div class="col">
                 <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_startframes" type="number" value="{{raspiconfig.motion_startframes}}">                
+                    <input class="form-control form-control-sm" id="motion_startframes" type="number" value="{{raspiconfig.motion_startframes}}">
                     <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'mb','params':$('#motion_startframes').val()});">OK</button>
                 </div>
             </div>
@@ -74,7 +74,7 @@
             <label class="col col-form-label">Still Frames to stop:</label>
             <div class="col">
                 <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_stopframes" type="number" value="{{raspiconfig.motion_stopframes}}">                
+                    <input class="form-control form-control-sm" id="motion_stopframes" type="number" value="{{raspiconfig.motion_stopframes}}">
                     <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'me','params':$('#motion_stopframes').val()});">OK</button>
                 </div>
             </div>

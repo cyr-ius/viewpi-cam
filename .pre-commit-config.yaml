@@ -4,7 +4,7 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
-      # - id: trailing-whitespace
+      - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-toml
@@ -26,6 +26,7 @@ repos:
     rev: v3.0.3
     hooks:
       - id: prettier
+        types_or: [css, javascript]
   # - repo: https://github.com/pre-commit/mirrors-mypy
   #   rev: v1.5.1
   #   hooks:
