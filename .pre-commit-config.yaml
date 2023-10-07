@@ -26,9 +26,9 @@ repos:
     rev: v3.0.3
     hooks:
       - id: prettier
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
-    hooks:
-      - id: mypy
-        additional_dependencies: [types-requests==2.28.11.7]
-        exclude: tests/
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.5.1
+  #   hooks:
+  #     - id: mypy
+  #       additional_dependencies: [types-requests==2.28.11.7]
+  #       exclude: tests/

@@ -7,8 +7,7 @@ from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import token_required
 from ..helpers.utils import delete_log
-from .models import message, forbidden
-
+from .models import forbidden, message
 
 api = Namespace("logs")
 api.add_model("Error", message)

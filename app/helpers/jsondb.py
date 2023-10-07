@@ -1,9 +1,9 @@
 """Class to save properties object to json file."""
 import json
+import logging
 import os
 from json import JSONDecodeError
 from typing import Any
-import logging
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,7 +62,9 @@ class JsonDB(AttrDict, object):
                 try:
                     data = json.load(file, object_hook=lambda o: AttrDict(**o))
                 except JSONDecodeError as error:
-                    raise JsonDBException(f"Error while loading file {fpath} ({error})") from error
+                    raise JsonDBException(
+                        f"Error while loading file {fpath} ({error})"
+                    ) from error
         else:
             data = AttrDict(default)
             saveset = True

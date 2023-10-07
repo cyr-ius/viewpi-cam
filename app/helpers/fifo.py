@@ -3,7 +3,7 @@ import os
 
 from flask import current_app as ca
 
-from .utils import write_log, execute_cmd
+from .utils import execute_cmd, write_log
 
 
 def open_pipe(pipename: str):

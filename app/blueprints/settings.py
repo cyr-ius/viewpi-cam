@@ -1,8 +1,8 @@
 """Blueprint Settings."""
 from flask import Blueprint, current_app, render_template
 
-from ..helpers.decorator import auth_required
 from ..apis.settings import Macros
+from ..helpers.decorator import auth_required
 
 bp = Blueprint(
     "settings", __name__, template_folder="templates", url_prefix="/settings"

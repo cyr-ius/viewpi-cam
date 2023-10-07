@@ -29,7 +29,7 @@
 */
 
 var colorconv = {
-  RGB2HSL : function (RGB) {
+  RGB2HSL: function (RGB) {
     "use strict";
     var r = Math.max(Math.min(parseInt(RGB[0], 10) / 255, 1), 0),
       g = Math.max(Math.min(parseInt(RGB[1], 10) / 255, 1), 0),
@@ -57,7 +57,7 @@ var colorconv = {
     }
     return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
   },
-  HSL2RGB : function (HSL) {
+  HSL2RGB: function (HSL) {
     "use strict";
     var h = Math.max(Math.min(parseInt(HSL[0], 10), 360), 0) / 360,
       s = Math.max(Math.min(parseInt(HSL[1], 10), 100), 0) / 100,
@@ -87,40 +87,40 @@ var colorconv = {
     fract = h - six;
     vsfract = v * sv * fract;
     switch (six) {
-    case 1:
-      r = v - vsfract;
-      g = v;
-      b = min;
-      break;
-    case 2:
-      r = min;
-      g = v;
-      b = min + vsfract;
-      break;
-    case 3:
-      r = min;
-      g = v - vsfract;
-      b = v;
-      break;
-    case 4:
-      r = min + vsfract;
-      g = min;
-      b = v;
-      break;
-    case 5:
-      r = v;
-      g = min;
-      b = v - vsfract;
-      break;
-    default:
-      r = v;
-      g = min + vsfract;
-      b = min;
-      break;
+      case 1:
+        r = v - vsfract;
+        g = v;
+        b = min;
+        break;
+      case 2:
+        r = min;
+        g = v;
+        b = min + vsfract;
+        break;
+      case 3:
+        r = min;
+        g = v - vsfract;
+        b = v;
+        break;
+      case 4:
+        r = min + vsfract;
+        g = min;
+        b = v;
+        break;
+      case 5:
+        r = v;
+        g = min;
+        b = v - vsfract;
+        break;
+      default:
+        r = v;
+        g = min + vsfract;
+        b = min;
+        break;
     }
     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
   },
-  RGB2CMYK : function (RGB) {
+  RGB2CMYK: function (RGB) {
     "use strict";
     var red = Math.max(Math.min(parseInt(RGB[0], 10), 255), 0),
       green = Math.max(Math.min(parseInt(RGB[1], 10), 255), 0),
@@ -138,29 +138,38 @@ var colorconv = {
     } else {
       black = 1;
     }
-    return [Math.round(cyan * 255), Math.round(magenta * 255), Math.round(yellow * 255), Math.round(black + 254)];
+    return [
+      Math.round(cyan * 255),
+      Math.round(magenta * 255),
+      Math.round(yellow * 255),
+      Math.round(black + 254),
+    ];
   },
-  CMYK2RGB : function (CMYK) {
+  CMYK2RGB: function (CMYK) {
     "use strict";
     var cyan = Math.max(Math.min(parseInt(CMYK[0], 10) / 255, 1), 0),
       magenta = Math.max(Math.min(parseInt(CMYK[1], 10) / 255, 1), 0),
       yellow = Math.max(Math.min(parseInt(CMYK[2], 10) / 255, 1), 0),
       black = Math.max(Math.min(parseInt(CMYK[3], 10) / 255, 1), 0),
-      red = (1 - cyan * (1 - black) - black),
-      green = (1 - magenta * (1 - black) - black),
-      blue = (1 - yellow * (1 - black) - black);
+      red = 1 - cyan * (1 - black) - black,
+      green = 1 - magenta * (1 - black) - black,
+      blue = 1 - yellow * (1 - black) - black;
 
-    return [Math.round(red * 255), Math.round(green * 255), Math.round(blue * 255)];
+    return [
+      Math.round(red * 255),
+      Math.round(green * 255),
+      Math.round(blue * 255),
+    ];
   },
-  HEX2RGB : function (hex) {
+  HEX2RGB: function (hex) {
     "use strict";
-    if (hex.charAt(0) === '#') {
+    if (hex.charAt(0) === "#") {
       hex = hex.substr(1);
     }
-    if ((hex.length < 2) || (hex.length > 6)) {
+    if (hex.length < 2 || hex.length > 6) {
       return false;
     }
-    var values = hex.split(''),
+    var values = hex.split(""),
       r,
       g,
       b;
@@ -182,18 +191,18 @@ var colorconv = {
     }
     return [r, g, b];
   },
-  RGB2HEX : function (RGB) {
+  RGB2HEX: function (RGB) {
     "use strict";
     var hexr = Math.max(Math.min(parseInt(RGB[0], 10), 255), 0),
       hexg = Math.max(Math.min(parseInt(RGB[1], 10), 255), 0),
       hexb = Math.max(Math.min(parseInt(RGB[2], 10), 255), 0);
 
-    hexr = hexr > 15 ? hexr.toString(16) : '0' + hexr.toString(16);
-    hexg = hexg > 15 ? hexg.toString(16) : '0' + hexg.toString(16);
-    hexb = hexb > 15 ? hexb.toString(16) : '0' + hexb.toString(16);
+    hexr = hexr > 15 ? hexr.toString(16) : "0" + hexr.toString(16);
+    hexg = hexg > 15 ? hexg.toString(16) : "0" + hexg.toString(16);
+    hexb = hexb > 15 ? hexb.toString(16) : "0" + hexb.toString(16);
     return hexr + hexg + hexb;
   },
-  RGB2YUV : function (RGB) {
+  RGB2YUV: function (RGB) {
     "use strict";
     var r = parseInt(RGB[0], 10),
       g = parseInt(RGB[1], 10),
@@ -203,15 +212,15 @@ var colorconv = {
       v;
 
     y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-    u = Math.round((((b - y) * 0.493) + 111) / 222 * 255);
-    v = Math.round((((r - y) * 0.877) + 155) / 312 * 255);
+    u = Math.round((((b - y) * 0.493 + 111) / 222) * 255);
+    v = Math.round((((r - y) * 0.877 + 155) / 312) * 255);
     return [y, u, v];
   },
-  YUV2RGB : function (YUV) {
+  YUV2RGB: function (YUV) {
     "use strict";
     var y = parseInt(YUV[0], 10),
-      u = parseInt(YUV[1], 10) / 255 * 222 - 111,
-      v = parseInt(YUV[2], 10) / 255 * 312 - 155,
+      u = (parseInt(YUV[1], 10) / 255) * 222 - 111,
+      v = (parseInt(YUV[2], 10) / 255) * 312 - 155,
       r,
       g,
       b;
@@ -221,7 +230,7 @@ var colorconv = {
     b = Math.round(y + u / 0.493);
     return [r, g, b];
   },
-  RGB2HSV : function (RGB) {
+  RGB2HSV: function (RGB) {
     "use strict";
     var r = parseInt(RGB[0], 10) / 255,
       g = parseInt(RGB[1], 10) / 255,
@@ -242,23 +251,25 @@ var colorconv = {
       h = 0;
     } else {
       switch (max) {
-      case r:
-        h = (g - b) / d + (g < b ? 6 : 0);
-        break;
-      case g:
-        h = (b - r) / d + 2;
-        break;
-      case b:
-        h = (r - g) / d + 4;
-        break;
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
       }
       h = h / 6;
     }
     return [h, s, v];
   },
-  HSV2RGB : function (HSV) {
+  HSV2RGB: function (HSV) {
     "use strict";
-    var r, g, b,
+    var r,
+      g,
+      b,
       h = HSV[0],
       s = HSV[1],
       v = HSV[2],
@@ -268,50 +279,51 @@ var colorconv = {
       q = v * (1 - f * s),
       t = v * (1 - (1 - f) * s);
     switch (i % 6) {
-    case 0:
-      r = v;
-      g = t;
-      b = p;
-      break;
-    case 1:
-      r = q;
-      g = v;
-      b = p;
-      break;
-    case 2:
-      r = p;
-      g = v;
-      b = t;
-      break;
-    case 3:
-      r = p;
-      g = q;
-      b = v;
-      break;
-    case 4:
-      r = t;
-      g = p;
-      b = v;
-      break;
-    case 5:
-      r = v;
-      g = p;
-      b = q;
-      break;
+      case 0:
+        r = v;
+        g = t;
+        b = p;
+        break;
+      case 1:
+        r = q;
+        g = v;
+        b = p;
+        break;
+      case 2:
+        r = p;
+        g = v;
+        b = t;
+        break;
+      case 3:
+        r = p;
+        g = q;
+        b = v;
+        break;
+      case 4:
+        r = t;
+        g = p;
+        b = v;
+        break;
+      case 5:
+        r = v;
+        g = p;
+        b = q;
+        break;
     }
     return [r * 255, g * 255, b * 255];
   },
-  HSL2HEX : function (HSL) {
+  HSL2HEX: function (HSL) {
     "use strict";
     return colorconv.RGB2HEX(colorconv.HSL2RGB(HSL));
   },
-  HEX2HSL : function (hex) {
+  HEX2HSL: function (hex) {
     "use strict";
     return colorconv.RGB2HSL(colorconv.HEX2RGB(hex));
   },
-  complexity2int : function (string) {
+  complexity2int: function (string) {
     "use strict";
-    var valunicode, keys = string.split(""),
+    var valunicode,
+      keys = string.split(""),
       numbers = 1,
       uletter = 1,
       lletter = 1,
@@ -321,40 +333,43 @@ var colorconv = {
 
     for (i = 0; i < keys.length; i += 1) {
       valunicode = keys[i].charCodeAt(0);
-      if ((valunicode > 0x40) && (valunicode < 0x5B)) {
+      if (valunicode > 0x40 && valunicode < 0x5b) {
         //Großbuchstaben A-Z
         uletter += 1;
-      } else if ((valunicode > 0x60) && (valunicode < 0x7B)) {
+      } else if (valunicode > 0x60 && valunicode < 0x7b) {
         //Kleinbuchstaben a-z
         lletter += 1;
-      } else if ((valunicode > 0x2F) && (valunicode < 0x3A)) {
+      } else if (valunicode > 0x2f && valunicode < 0x3a) {
         //Zahlen 0-9
         numbers += 1;
-      } else if ((valunicode > 0x20) && (valunicode < 0x7F)) {
+      } else if (valunicode > 0x20 && valunicode < 0x7f) {
         //Sonderzeichen
         special += 1;
       }
     }
-    complex = ((uletter * lletter * numbers * special) + Math.round(uletter * 1.8 + lletter * 1.5 + numbers + special * 2)) - 6;
+    complex =
+      uletter * lletter * numbers * special +
+      Math.round(uletter * 1.8 + lletter * 1.5 + numbers + special * 2) -
+      6;
     return complex;
   },
-  int2RGB : function (intval) {
+  int2RGB: function (intval) {
     "use strict";
-    if ((typeof intval !== 'number') && (intval !== false) && (intval !== true)) {
+    if (typeof intval !== "number" && intval !== false && intval !== true) {
       intval = parseInt(intval, 10);
     }
-    if (typeof intval === 'number') {
-      if ((intval < 115) && (intval > 1)) {
+    if (typeof intval === "number") {
+      if (intval < 115 && intval > 1) {
         return [255, 153 + intval, 153 - intval];
       }
-      if ((intval > 115) && (intval < 230)) {
+      if (intval > 115 && intval < 230) {
         return [255 - intval, 243, 63];
       }
-      if ((intval > 230) || (intval === true)) {
+      if (intval > 230 || intval === true) {
         return [145, 243, 63];
       }
     }
-    if (intval === 'none') {
+    if (intval === "none") {
       return [204, 204, 204];
     }
     if (intval === true) {
@@ -362,55 +377,66 @@ var colorconv = {
     }
     return false;
   },
-  complexity2RGB : function (string) {
+  complexity2RGB: function (string) {
     "use strict";
     return colorconv.int2RGB(colorconv.complexity2int(string));
   },
-  mixRGB : function (RGB1, RGB2) {
+  mixRGB: function (RGB1, RGB2) {
     "use strict";
-    var r,
-      g,
-      b;
+    var r, g, b;
 
     r = parseInt((RGB1[0] + RGB2[0]) / 2, 10);
     g = parseInt((RGB1[1] + RGB2[1]) / 2, 10);
     b = parseInt((RGB1[2] + RGB2[2]) / 2, 10);
     return [r, g, b];
   },
-  parse : function (input) {
+  parse: function (input) {
     "use strict";
     var geregext,
-      pattern = /((rgb|hsl|#|yuv)(\(([%, ]*([\d]+)[%, ]+([\d]+)[%, ]+([\d]+)[%, ]*)+\)|([a-f0-9]+)))/gmi;
+      pattern =
+        /((rgb|hsl|#|yuv)(\(([%, ]*([\d]+)[%, ]+([\d]+)[%, ]+([\d]+)[%, ]*)+\)|([a-f0-9]+)))/gim;
 
     geregext = pattern.exec(input);
     if (geregext !== null) {
       switch (geregext[2]) {
-      case '#':
-        return colorconv.HEX2RGB(geregext[3]);
-      case 'rgb':
-        return [parseInt(geregext[5].trim(), 10), parseInt(geregext[6].trim(), 10), parseInt(geregext[7].trim(), 10)];
-      case 'hsl':
-        return colorconv.HSL2RGB([parseInt(geregext[5].trim(), 10), parseInt(geregext[6].trim(), 10), parseInt(geregext[7].trim(), 10)]);
-      case 'yuv':
-        return colorconv.YUV2RGB([parseInt(geregext[5].trim(), 10), parseInt(geregext[6].trim(), 10), parseInt(geregext[7].trim(), 10)]);
-      default:
-        return false;
+        case "#":
+          return colorconv.HEX2RGB(geregext[3]);
+        case "rgb":
+          return [
+            parseInt(geregext[5].trim(), 10),
+            parseInt(geregext[6].trim(), 10),
+            parseInt(geregext[7].trim(), 10),
+          ];
+        case "hsl":
+          return colorconv.HSL2RGB([
+            parseInt(geregext[5].trim(), 10),
+            parseInt(geregext[6].trim(), 10),
+            parseInt(geregext[7].trim(), 10),
+          ]);
+        case "yuv":
+          return colorconv.YUV2RGB([
+            parseInt(geregext[5].trim(), 10),
+            parseInt(geregext[6].trim(), 10),
+            parseInt(geregext[7].trim(), 10),
+          ]);
+        default:
+          return false;
       }
     }
     return false;
-  }
+  },
 };
 
 (function (root, factory) {
   "use strict";
-  if (typeof define === 'function' && define.amd) {
+  if (typeof define === "function" && define.amd) {
     define([], factory);
-  } else if (typeof exports === 'object') {
+  } else if (typeof exports === "object") {
     module.exports = factory();
   } else {
     root.returnExports = factory();
   }
-}(this, function () {
-  'use strict';
+})(this, function () {
+  "use strict";
   return colorconv;
-}));
+});

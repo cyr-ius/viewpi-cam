@@ -2,11 +2,11 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from .settings import users, buttons, settings
-from .logs import api as ns2
 from .captures import api as ns3
+from .logs import api as ns2
 from .previews import api as ns4
 from .schedule import api as ns5
+from .settings import buttons, settings, users
 from .system import api as ns6
 
 bp = Blueprint("api", __name__)

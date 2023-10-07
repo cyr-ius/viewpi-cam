@@ -180,4 +180,3 @@ enforce_lf 0
 
 #FIFO poll interval microseconds 1000000 minimum
 fifo_interval 100000
-

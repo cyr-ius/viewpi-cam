@@ -2,7 +2,7 @@
 import os
 import time
 
-from flask import json, request, Blueprint
+from flask import Blueprint, json, request
 
 from ..helpers.decorator import auth_required
 from ..helpers.utils import get_pid
@@ -41,9 +41,9 @@ bp = Blueprint("motion", __name__, url_prefix="/motion")
 @bp.route("/motion", methods=["GET", "POST"])
 @auth_required
 def motion():
-    motion_ready = check_motion()
-    show_all = False
-    debug = ""
+    # motion_ready = check_motion()
+    # show_all = False
+    # debug = ""
 
     response = request.get(f"{MOTION_URL}/config/list")
     motion_config = response.read()
@@ -64,8 +64,8 @@ def motion():
                     motion_config = restart_motion()
                     motions = _get_file_config(motion_config)
 
-            case "showAll":
-                show_all = True
+            # case "showAll":
+            # show_all = True
             case "backup":
                 backup = {}
                 backup.setdefault(MOTION_PARS, motions)

@@ -2,7 +2,8 @@
 import os
 import time
 from subprocess import Popen
-from .utils import write_log, execute_cmd
+
+from .utils import execute_cmd, write_log
 
 
 # pylint: disable=E1101

@@ -1,6 +1,7 @@
+import re
+
 from flask_assets import Bundle, Filter
 from webassets.filter import get_filter
-import re
 
 
 class ConcatFilter(Filter):
@@ -26,11 +27,11 @@ bs_icons = (
 )
 
 css_main = Bundle(
-    "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic",
+    "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic",  # noqa
     "https://fonts.googleapis.com/css?family=Roboto+Mono:400,300,700",
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
     Bundle(
-        "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.min.css",
+        "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.min.css",  # noqa
         filters=bs_icons,
     ),
     output="css/main.css",

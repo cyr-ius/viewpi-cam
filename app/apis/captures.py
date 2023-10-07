@@ -1,10 +1,11 @@
 """Api camera."""
-from flask import current_app as ca, request
-from flask_restx import Namespace, Resource, fields
+from flask import current_app as ca
+from flask import request
+from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import token_required
 from ..helpers.raspiconfig import RaspiConfigError
-from .models import message, forbidden
+from .models import forbidden, message
 
 api = Namespace("captures")
 api.add_model("Error", message)
@@ -46,7 +47,7 @@ class Image(Resource):
             ca.raspiconfig.send("im")
             return "", 204
         except RaspiConfigError as error:
-            abort(422, error)        
+            abort(422, error)
 
 
 @api.response(204, "Action execute")
@@ -68,4 +69,3 @@ class Timelapse(Resource):
             return "", 204
         except RaspiConfigError as error:
             abort(422, error)
-            

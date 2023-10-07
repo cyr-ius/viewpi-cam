@@ -7,14 +7,14 @@ from subprocess import PIPE, Popen
 import pytz
 from flask import current_app as ca
 from flask import request
-from flask_restx import Namespace, Resource, fields, abort
+from flask_restx import Namespace, Resource, abort, fields
 from suntime import Sun
 
 from ..const import SCHEDULE_RESET
 from ..helpers.decorator import token_required
 from ..helpers.fifo import send_motion
 from ..helpers.utils import execute_cmd, get_pid, write_log
-from .models import message, forbidden, date_time
+from .models import date_time, forbidden, message
 
 api = Namespace("schedule")
 api.add_model("Error", message)

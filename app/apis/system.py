@@ -4,8 +4,8 @@ from flask import request
 from flask_restx import Namespace, Resource, abort, fields
 
 from ..helpers.decorator import token_required
-from ..helpers.utils import execute_cmd
 from ..helpers.raspiconfig import RaspiConfigError
+from ..helpers.utils import execute_cmd
 from .models import message
 
 api = Namespace("system")
