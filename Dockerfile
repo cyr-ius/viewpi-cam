@@ -22,12 +22,17 @@ RUN /bin/bash -c ./buildme
 
 
 FROM python:3.11-alpine
-ARG VERSION
 WORKDIR /app
+
+# Add binaries
+COPY --from=gpac_builder /app/gpac-master/bin/gcc/MP4Box /usr/bin
+COPY --from=gpac_builder /app/gpac-master/bin/gcc/gpac /usr/bin
+COPY --from=userland_builder /app/userland/build/bin /usr/bin
+COPY --from=userland_builder /app/userland/build/lib /usr/lib
 
 # set version label
 LABEL org.opencontainers.image.source https://github.com/cyr-ius/viewpi-cam
-LABEL org.opencontainers.image.description ViewPI Cam (inspired Rpi Cam Interface)
+LABEL org.opencontainers.image.description ViewPI Cam (inspired by Rpi Cam Interface)
 LABEL org.opencontainers.image.licenses MIT
 LABEL maintainer="cyr-ius"
 
@@ -41,17 +46,17 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache libstdc++
 RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja git rust cargo
 
+# Venv python
+RUN python3 -m venv --system-site-packages /env 
+ENV VIRTUAL_ENV /env
+ENV PATH $PATH:/env/bin
+
 # Install pip requirements
 ADD requirements.txt /tmp/
-RUN python3 -m venv --system-site-packages /env 
-RUN /env/bin/pip3 install --upgrade pip
-RUN /env/bin/pip3 install --no-cache-dir -r /tmp/requirements.txt
-RUN rm -f /tmp/requirements.txt
+RUN /env/bin/pip3 install --upgrade pip && /env/bin/pip3 install --no-cache-dir -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
 
 # clean content
 RUN apk del build
-
-ADD --chmod=744 docker-entrypoint.sh /
 
 # Create folders
 RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
@@ -59,11 +64,6 @@ RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
 ADD raspimjpeg /etc/
 ADD --chmod=744 macros/* /app/macros/
 
-COPY --from=gpac_builder /app/gpac-master/bin/gcc/MP4Box /usr/bin
-COPY --from=gpac_builder /app/gpac-master/bin/gcc/gpac /usr/bin
-COPY --from=userland_builder /app/userland/build/bin /usr/bin
-COPY --from=userland_builder /app/userland/build/lib /usr/lib
- 
 ADD app ./app/
 
 VOLUME /app/static
@@ -72,10 +72,9 @@ VOLUME /app/media
 VOLUME /app/h264
 VOLUME /app/system
 
-ENV VIRTUAL_ENV /env
-ENV PATH $PATH:/env/bin
+ARG VERSION
 ENV VERSION ${VERSION}
 
+ADD --chmod=744 docker-entrypoint.sh /
 EXPOSE 8000
-
 ENTRYPOINT ["/docker-entrypoint.sh"]
