@@ -45,11 +45,11 @@ class RaspiConfig:
                         if index >= 0:
                             key = line[0:index]
                             value = line[index + 1 :]  # noqa: E203
+                            config[key] = value
                             if value == "true":
-                                nvalue = 1
+                                config[key] = 1
                             if value == "false":
-                                nvalue = 0
-                            config[key] = nvalue
+                                config[key] = 0
                         else:
                             config[line] = ""
                 file.close()
