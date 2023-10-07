@@ -174,14 +174,14 @@ class Sunset(Resource):
 def time_offset(offset: int | float | str = 0) -> td:
     """Get time offset."""
     if isinstance(offset, (int, float)):
-        offset = td(hours=offset)
+        noffset = td(hours=offset)
     else:
         try:
             gmt_time = dt.now(pytz.timezone(offset))
-            offset = gmt_time.utcoffset()
+            noffset = gmt_time.utcoffset()
         except pytz.UnknownTimeZoneError:
-            offset = td(hours=0)
-    return offset
+            noffset = td(hours=0)
+    return noffset
 
 
 def utc_offset(offset) -> timezone:

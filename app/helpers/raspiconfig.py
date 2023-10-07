@@ -2,6 +2,7 @@
 import os
 import time
 from subprocess import Popen
+from typing import Any
 
 from .utils import execute_cmd, write_log
 
@@ -32,7 +33,9 @@ class RaspiConfig:
         except RaspiConfigError as error:
             raise error
 
-    def _get_file_config(self, filename, config: dict[str, any] = None):
+    def _get_file_config(
+        self, filename: str, config: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         config = {} if not config else config
         if os.path.isfile(filename):
             with open(filename, mode="r", encoding="utf-8") as file:
@@ -43,10 +46,10 @@ class RaspiConfig:
                             key = line[0:index]
                             value = line[index + 1 :]  # noqa: E203
                             if value == "true":
-                                value = 1
+                                nvalue = 1
                             if value == "false":
-                                value = 0
-                            config[key] = value
+                                nvalue = 0
+                            config[key] = nvalue
                         else:
                             config[line] = ""
                 file.close()
@@ -63,7 +66,7 @@ class RaspiConfig:
         for key, value in config.items():
             setattr(self, key, value)
 
-    def set_config(self, config: dict[str, any]) -> None:
+    def set_config(self, config: dict[str, Any]) -> None:
         """Set raspimjpeg config."""
         user_config = self._get_file_config(self.user_config)
         user_config.update(**config)

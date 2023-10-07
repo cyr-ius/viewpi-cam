@@ -71,7 +71,7 @@ def delete_mediafiles(filename: str, delete: bool = True) -> int:
 
     compute_delete_file(f"{media_path}/{filename}", size, delete)
 
-    return size / 1024
+    return round(size / 1024)
 
 
 def data_file_name(file: str) -> str:
@@ -94,7 +94,7 @@ def is_thumbnail(file: str) -> bool:
     return file[-7:] == ca.config["THUMBNAIL_EXT"]
 
 
-def get_file_size(path) -> str:
+def get_file_size(path) -> int:
     """Return file size."""
     if ca.config["FILESIZE_METHOD"] == 0:
         return os.path.getsize(path)

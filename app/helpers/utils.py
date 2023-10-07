@@ -68,7 +68,7 @@ def disk_usage() -> tuple[int, int, int, int, str]:
     )
 
 
-def hash_password(password: str) -> bool:
+def hash_password(password: str) -> str:
     """Hash string text."""
     salt = ca.config["SECRET_KEY"]
     hashed = hashlib.pbkdf2_hmac(

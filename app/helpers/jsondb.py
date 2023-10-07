@@ -45,7 +45,7 @@ class JsonDB(AttrDict):
         print(json_db.city.name)
     """
 
-    def __init__(self, path, default: dict[Any:Any] = None) -> None:
+    def __init__(self, path: str, default: dict[str, Any] | None = None) -> None:
         """Initialize object.
 
         path : full qualified path json file , folder create if not exist
@@ -83,7 +83,7 @@ class JsonDB(AttrDict):
         except JsonDBException as error:
             raise JsonDBException(f"Error while updating file ({error})") from error
 
-    def save(self, backup=False, **kwargs) -> bool:
+    def save(self, backup: bool = False, **kwargs: Any) -> None:
         """Save properties to Json file."""
         folder = os.path.abspath(os.path.dirname(self.__path))
         os.makedirs(folder, exist_ok=True)
@@ -106,14 +106,14 @@ class JsonDB(AttrDict):
         except Exception as error:
             raise JsonDBException(f"Error to save json ({error})") from error
 
-    def backup(self) -> bool:
+    def backup(self) -> None:
         """Backup file."""
-        return self.save(backup=True)
+        self.save(backup=True)
 
-    def restore(self) -> bool:
+    def restore(self) -> None:
         """Restore file."""
         self.__maping(restore=True)
-        return self.save()
+        self.save()
 
 
 class JsonDBException(Exception):

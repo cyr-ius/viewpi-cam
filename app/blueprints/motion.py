@@ -1,6 +1,7 @@
 """Blueprint for Motion (external capture)."""
 import os
 import time
+from typing import Any
 
 from flask import Blueprint, json, request
 
@@ -111,7 +112,7 @@ def restart_motion():
         return request.get(f"{MOTION_URL}/config/list")
 
 
-def _get_file_config(filename, config: dict[str, any] = None):
+def _get_file_config(filename, config: dict[str, Any] | None = None):
     config = {} if not config else config
     if os.path.isfile(filename):
         with open(filename, mode="r", encoding="utf-8") as file:
@@ -122,10 +123,10 @@ def _get_file_config(filename, config: dict[str, any] = None):
                         key = line[0:index]
                         value = line[index + 1 :]  # noqa: E203
                         if value == "true":
-                            value = 1
+                            nvalue = 1
                         if value == "false":
-                            value = 0
-                        config[key] = value
+                            nvalue = 0
+                        config[key] = nvalue
                     else:
                         config[line] = ""
             file.close()

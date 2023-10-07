@@ -5,6 +5,7 @@ import time
 import zoneinfo
 from datetime import datetime as dt
 from subprocess import PIPE, Popen
+from typing import Any
 
 from flask import Blueprint
 from flask import current_app as ca
@@ -56,7 +57,7 @@ def index():
 
 @bp.cli.command("stop", short_help="Stop scheduler task")
 @with_appcontext
-def stop_scheduler() -> int | None:
+def stop_scheduler() -> None:
     """Stop scheduler."""
     pid = get_pid("scheduler")
     Popen(f"kill {pid}", shell=True)
@@ -64,12 +65,12 @@ def stop_scheduler() -> int | None:
 
 @bp.cli.command("start", short_help="Start scheduler task")
 @with_appcontext
-def start_scheduler() -> int | None:
+def start_scheduler() -> None:
     """Start scheduler."""
     scheduler()
 
 
-def scheduler():
+def scheduler() -> None:
     """Scheduler."""
     if not os.path.isfile(ca.raspiconfig.status_file):
         write_log("Status mjpeg not found")
@@ -228,7 +229,7 @@ def purge_files(
                     case "v":
                         purge_hours = sch_purgevideohours
                 if purge_hours > 0:
-                    f_mod_hours = os.path.getmtime(f"{media_path}/{file}").hour()
+                    f_mod_hours: dt = os.path.getmtime(f"{media_path}/{file}").hour()
                     if f_mod_hours > 0 and (current_hours - f_mod_hours) > purge_hours:
                         os.remove(f"{media_path}/{file}")
                         purge_count += 1
@@ -248,7 +249,7 @@ def purge_files(
 
         match sch_purgespacemode:
             case 1 | 2:
-                level = min(max(sch_purgespacelevel, 3), 97) * total / 100
+                level: float = min(max(sch_purgespacelevel, 3), 97) * total / 100
             case 3 | 4:
                 level = sch_purgespacelevel * 1048576.0
 
@@ -273,8 +274,8 @@ def purge_files(
 
 
 def send_cmds(
-    str_cmd: str, days: dict[str, any] | None = None, bool_period: bool = False
-):
+    str_cmd: str, days: dict[str, Any] | None = None, bool_period: bool = False
+) -> None:
     """Send multiple commands to FIFO."""
     if str_cmd and (bool_period is False or is_day_active(days, bool_period)):
         cmds = str_cmd.split(";")
@@ -290,7 +291,7 @@ def send_cmds(
 
 def is_day_active(days, bool_period: int) -> bool:
     if days:
-        day = int(dt_now().strftime("%w"))
+        day: int = int(dt_now().strftime("%w"))
         return days[str(bool_period)][day] == 1
     return False
 

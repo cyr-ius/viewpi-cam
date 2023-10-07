@@ -21,7 +21,7 @@ class Settings(JsonDB):
                 return True
         return False
 
-    def get_user(self, username: str) -> dict[str, Any]:
+    def get_user(self, username: str) -> dict[str, Any] | None:
         """Return user infos."""
         for user in self.users:
             if user["name"] == username:

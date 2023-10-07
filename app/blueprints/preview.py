@@ -292,7 +292,7 @@ def thumbs(
     return draw_files(thumb_filenames)
 
 
-def get_thumbnails_id(uid: str = None) -> dict[str, Any]:
+def get_thumbnails_id(uid: str | None = None) -> dict[str, Any] | list[dict[str, Any]]:
     """Get file name and real name."""
     media_path = ca.raspiconfig.media_path
     files = list_folder_files(media_path)
