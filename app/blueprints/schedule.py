@@ -286,7 +286,7 @@ def send_cmds(
                 try:
                     ca.raspiconfig.send(cmd)
                 except RaspiConfigError as error:
-                    pass      
+                    write_log(f"Error while send command scheduling {error}")
                 time.sleep(0.2)
 
 
