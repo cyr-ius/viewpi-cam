@@ -14,7 +14,6 @@ docker-compose up
 
 ### Environment Variables
 
-
 Set the `SESSION_SECRET` environment variable to a random value.
 
 In order to sent the viewpicam configuration to clients via email (using sendgrid api) set the following environment variables
@@ -32,11 +31,14 @@ SECURITY_CONFIRMABLE:[True|False] Confirm account A valid email address is requi
 ```
 
 ## License
+
 MIT. See [LICENSE](https://github.com/cyr-ius/viewpicam/blob/master/LICENSE).
 
 # Build
+
 docker buildx build -t viewpicam/amd64:latest . --load
 docker buildx build --platform=linux/arm/v6 -t viewpicam/armel:latest . --load
 
 # Test
+
 docker run --rm -t viewpicam/armel:latest $(uname -m)
