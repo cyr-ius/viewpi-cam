@@ -66,7 +66,7 @@ class Previews(Resource):
         api.model("Deletes", {"ids": fields.List(fields.String(description="id"))})
     )
     @token_required
-    @api.response(204, "Action is successful")
+    @api.response(204, "Action is success")
     def delete(self):
         """Delete all media files."""
         maintain_folders(ca.raspiconfig.media_path, True, True)
@@ -90,7 +90,7 @@ class Preview(Resource):
 
     @token_required
     @api.doc(description="Delete file")
-    @api.response(204, "Action is successful")
+    @api.response(204, "Action is success")
     def delete(self, id):
         """Delete file."""
         if thumb := get_thumbnails_id(id):
@@ -115,7 +115,7 @@ class Preview(Resource):
     endpoint="previews_convert",
     doc={"description": "Convert timelapse file to mp4"},
 )
-@api.response(204, "Action is successful")
+@api.response(204, "Action is success")
 @api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
 class Actions(Resource):
