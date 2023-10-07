@@ -2,7 +2,7 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from .users import api as ns1
+from .settings import users, buttons, settings
 from .logs import api as ns2
 from .captures import api as ns3
 from .previews import api as ns4
@@ -20,7 +20,9 @@ api = Api(
     authorizations={"apikey": {"type": "apiKey", "in": "header", "name": "X-API-KEY"}},
     security="apikey",
 )
-api.add_namespace(ns1, path="/api")
+api.add_namespace(users, path="/api")
+api.add_namespace(buttons, path="/api")
+api.add_namespace(settings, path="/api")
 api.add_namespace(ns2, path="/api")
 api.add_namespace(ns3, path="/api")
 api.add_namespace(ns4, path="/api")
