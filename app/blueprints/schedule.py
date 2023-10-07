@@ -289,14 +289,14 @@ def send_cmds(
                 time.sleep(0.2)
 
 
-def is_day_active(days, bool_period: int) -> bool:
+def is_day_active(days: dict[str, Any] | None, bool_period: int) -> bool:
     if days:
         day: int = int(dt_now().strftime("%w"))
         return days[str(bool_period)][day] == 1
     return False
 
 
-def launch_schedule():
+def launch_schedule() -> None:
     """Run scheduler."""
     if not get_pid("scheduler"):
         Popen(["flask", "scheduler", "start"], stdout=PIPE)
