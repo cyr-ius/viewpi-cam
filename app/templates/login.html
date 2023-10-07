@@ -10,18 +10,18 @@
 <main class="form-signin w-100 m-auto">
   <form id="login" class="needs-validation" method="POST" action="{{ url_for('auth.register') if register else url_for('auth.login') }}" novalidate>
       <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-      <div class="form-floating">
-        <input class="form-control" id="user_id" name="user_id" placeholder="Username" type="text" required>
-        <label for="user_id">Username</label>
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+        <input class="form-control" id="user_id" name="user_id" placeholder="Username" type="text" aria-label="Username" required autofocus>
       </div>
-      <div class="form-floating">
-        <input class="form-control" id="password" name="password" placeholder="Password" type="password" required>
-        <label for="password">Password</label>
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+        <input class="form-control" id="password" name="password" placeholder="Password" type="password" aria-label="Password" required>
       </div>
       {% if register %}
-      <div class="form-floating">
-        <input class="form-control" id="password_2" name="password_2" placeholder="Password" type="password" required>
-        <label for="password_2">Password</label>
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+        <input class="form-control" id="password_2" name="password_2" placeholder="Password" type="password" aria-label="Password" required>
       </div>
       {%endif%}
       <input id="next" name="next" type="hidden" value="{{request.args.next}}">
