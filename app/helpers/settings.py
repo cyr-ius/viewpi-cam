@@ -1,5 +1,6 @@
 """Settings class."""
 from dataclasses import dataclass
+from typing import Any
 
 from .jsondb import JsonDB
 
@@ -13,3 +14,15 @@ class Settings(JsonDB):
         default = app.config["DEFAULT_INIT"]
         super().__init__(path, default)
         app.settings = self
+
+    def has_username(self, username):
+        for user in self.users:
+            if user["name"] == username:
+                return True
+        return False
+
+    def get_user(self, username: str) -> dict[str, Any]:
+        """Return user infos."""
+        for user in self.users:
+            if user["name"] == username:
+                return user
