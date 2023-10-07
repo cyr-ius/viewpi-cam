@@ -1,22 +1,15 @@
 """Blueprint Main."""
 import os
 import time
-from flask import (
-    Blueprint,
-    Response,
-    current_app,
-    render_template,
-    request,
-    send_file,
-    session,
-    json,
-    g,
-)
 
+from flask import Blueprint, Response
+from flask import current_app as ca
+from flask import g, json, render_template, request, send_file, session
+
+from ..apis.logs import get_logs
 from ..const import PRESETS
 from ..helpers.decorator import auth_required
 from ..helpers.utils import write_log
-from ..apis.logs import get_logs
 from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
@@ -24,7 +17,7 @@ bp = Blueprint("main", __name__, template_folder="templates")
 
 @bp.before_app_request
 def before_app_request():
-    g.loglevel = current_app.settings.loglevel
+    g.loglevel = ca.settings.loglevel
 
 
 @bp.route("/", methods=["GET"])
@@ -37,25 +30,25 @@ def index():
 
     mode = 0
     cam_pos = None
-    pipan_file = current_app.config["PIPAN_FILE"]
+    pipan_file = ca.config["PIPAN_FILE"]
     if os.path.isfile(pipan_file):
         mode = 1
         with open(pipan_file, mode="r", encoding="utf-8") as file:
             pipan_sck = file.read().decode("utf-8")
             cam_pos = pipan_sck.split(" ")
             file.close()
-    if current_app.settings.servo:
+    if ca.settings.servo:
         mode = 2
 
     return render_template(
         "main.html",
         mode=mode,
         cam_pos=cam_pos,
-        user_buttons=current_app.settings.ubuttons,
-        raspiconfig=current_app.raspiconfig,
+        user_buttons=ca.settings.get("ubuttons", []),
+        raspiconfig=ca.raspiconfig,
         display_mode=display_mode,
         mjpegmode=mjpegmode,
-        preset=current_app.settings.upreset,
+        preset=ca.settings.get("upreset", "v2"),
         presets=PRESETS,
     )
 
@@ -64,7 +57,7 @@ def index():
 @auth_required
 def log():
     if request.method == "POST":
-        return send_file(current_app.raspiconfig.log_file, as_attachment=True)
+        return send_file(ca.raspiconfig.log_file, as_attachment=True)
 
     return render_template("logs.html", log=get_logs(True))
 
@@ -72,7 +65,7 @@ def log():
 @bp.route("/streamlog", methods=["GET"])
 @auth_required
 def streamlog():
-    log_file = current_app.raspiconfig.log_file
+    log_file = ca.raspiconfig.log_file
 
     def generate(log_file):
         if os.path.isfile(log_file):
@@ -87,7 +80,7 @@ def streamlog():
 @bp.route("/debug", methods=["GET"])
 @auth_required
 def debugcmd():
-    return render_template("debug.html", raspiconfig=current_app.raspiconfig.__dict__)
+    return render_template("debug.html", raspiconfig=ca.raspiconfig.__dict__)
 
 
 @bp.route("/help", methods=["GET"])
@@ -105,7 +98,7 @@ def minview():
 @auth_required
 def pipan():
     servo_cmd = "/dev/servoblaster"
-    servo_data = current_app.config["SERVO_FILE"]
+    servo_data = ca.config["SERVO_FILE"]
     min_pan = 50
     max_pan = 250
     min_tilt = 80
