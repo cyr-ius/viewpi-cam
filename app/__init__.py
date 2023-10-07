@@ -26,6 +26,7 @@ from .services.handle import (
     handle_bad_request,
     handle_internal_server_error,
     handle_page_not_found,
+    handle_bad_gateway,
 )
 
 # from flask_mail import Mail
@@ -117,6 +118,7 @@ def create_app(config=None):
     app.register_error_handler(403, handle_access_forbidden)
     app.register_error_handler(404, handle_page_not_found)
     app.register_error_handler(500, handle_internal_server_error)
+    app.register_error_handler(502, handle_bad_gateway)
 
     # Register filter
     app.jinja_env.add_extension("jinja2.ext.debug")
