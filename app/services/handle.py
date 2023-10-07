@@ -1,5 +1,5 @@
 # import base64
-from flask import render_template, jsonify
+from flask import render_template
 
 
 def handle_bad_request(e):
@@ -18,20 +18,5 @@ def handle_internal_server_error(e):
     return render_template("errors/500.html", code=500, message=e), 500
 
 
-def bad_gateway(e):
+def handle_bad_gateway(e):
     return render_template("errors/502.html", code=502, message=e), 502
-
-
-def handle_exception(e):
-    """Return JSON instead of HTML for HTTP errors."""
-    return (
-        jsonify(
-            error={
-                "errors": e.args,
-                "code": 500,
-                "message": str(e.args[0]),
-                "meta": {"type": "exception"},
-            }
-        ),
-        500,
-    )
