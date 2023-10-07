@@ -64,8 +64,10 @@ class RaspiConfig:
 
     def set_config(self, config: dict[str, any]) -> None:
         """Set raspimjpeg config."""
+        user_config = self._get_file_config(self.user_config)
+        user_config.update(**config)
         lines = "#User config file\n"
-        for key, value in config:
+        for key, value in user_config.items():
             lines += f"{key} {value}\n"
 
         with open(self.user_config, mode="w", encoding="utf-8") as file:
