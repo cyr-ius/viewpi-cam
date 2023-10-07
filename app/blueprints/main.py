@@ -23,7 +23,7 @@ def before_app_request():
 @bp.route("/", methods=["GET"])
 @auth_required
 def index():
-    write_log(f"Logged in user: {session['user_id']}")
+    write_log(f"Logged in user: {session['username']}")
     write_log(f"UserLevel {session['user_level']}")
     display_mode = request.cookies.get("display_mode", "On")
     mjpegmode = int(request.cookies.get("mjpegmode", 0))

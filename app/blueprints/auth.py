@@ -1,6 +1,4 @@
 """Blueprint Authentication."""
-from typing import Any
-
 from flask import Blueprint
 from flask import current_app as ca
 from flask import flash, g, redirect, render_template, request, session, url_for
@@ -16,7 +14,7 @@ def before_app_request():
     """Execute before request."""
     if hasattr(ca.settings, "users") and len(ca.settings.users) == 0:
         session.clear()
-    g.user = session.get("user_id")
+    g.user = session.get("username")
 
 
 @bp.route("/register", methods=["GET", "POST"])
@@ -31,7 +29,7 @@ def register():
                 if (next_page := request.form.get("next"))
                 else url_for("main.index")
             )
-            if (username := request.form["user_id"]) and password:
+            if (username := request.form["username"]) and password:
                 first_user = {
                     "id": 1,
                     "name": username,
@@ -58,13 +56,13 @@ def login():
     if ca.settings.get("users") is None or len(ca.settings.users) == 0:
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
-        username = request.form.get("user_id")
+        username = request.form.get("username")
         password = request.form.get("password")
-        if (user := get_user(username)) and (
+        if (user := ca.settings.get_user(username)) and (
             hash_password(password) == user["password"]
         ):
             session.clear()
-            session["user_id"] = username
+            session["username"] = username
             session["user_level"] = user.get("rights")
             next_page = (
                 next_page
@@ -84,10 +82,3 @@ def logout():
     """Logout  button."""
     session.clear()
     return redirect(url_for("auth.login"))
-
-
-def get_user(username: str) -> dict[str, Any]:
-    """Return user infos."""
-    for user in ca.settings.users:
-        if user["name"] == username:
-            return user
