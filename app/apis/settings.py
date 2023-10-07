@@ -142,15 +142,17 @@ class Buttons(Resource):
     @token_required
     def get(self):
         """List buttons."""
-        return ca.settings.ubuttons
+        return ca.settings.get("ubuttons", [])
 
     @buttons.expect(button)
     @token_required
     @buttons.response(204, "Actions is success")
     def post(self):
         """Create button."""
+        if ca.settings.get("ubuttons") is None:
+            ca.settings.ubuttons = []
         ids = [button["id"] for button in ca.settings.ubuttons]
-        uid = max(ids) + 1
+        uid = 1 if len(ids) == 0 else max(ids) + 1
         buttons.payload["id"] = uid
         ca.settings.ubuttons.append(buttons.payload)
         ca.settings.update(buttons=ca.settings.ubuttons)
@@ -165,7 +167,7 @@ class Button(Resource):
 
     def get_byid(self, uid: int):
         """Return button."""
-        for button_dict in ca.settings.ubuttons:
+        for button_dict in ca.settings.get("ubuttons", []):
             if button_dict["id"] == uid:
                 return button_dict
 
@@ -257,7 +259,7 @@ class Token(Resource):
     @token_required
     def get(self):
         """Get token."""
-        return ca.settings.token
+        return ca.settings.get("token")
 
     @token_required
     def post(self):
@@ -301,7 +303,7 @@ class Macros(Resource):
     def get(self):
         """Get macros."""
         list_macros = []
-        for key, value in Macros().get_config().items():
+        for key, value in Macros().get_config().items():    
             state = True
             if value[:1] == "-":
                 value = value[1:]
