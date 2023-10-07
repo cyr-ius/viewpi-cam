@@ -24,6 +24,7 @@
             </div>
             {% endfor%}
             <div id="ubuttons-ref" class="row row-cols-7 row-cols-md-7 g-1 ms-2">
+                <input type="hidden" name="id">
                 <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="display" type="checkbox"></div></div>               
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text"></div>
                 <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text"></div>
@@ -53,7 +54,8 @@
                 <div class="col" id="btn_del_user"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
             {%endfor%}
-            <div id="users-ref" class="row row-cols-4 row-cols-md-4 g-1 ms-2">                
+            <div id="users-ref" class="row row-cols-4 row-cols-md-4 g-1 ms-2">
+                <input type="hidden" name="id">                
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" type="text" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" required></div>
                 <div class="col">
@@ -196,8 +198,10 @@
         callback = function(data){
                 user.find('#btn_add_user').addClass('d-none');
                 user.find('#btn_del_user').removeClass('d-none');
-                user.removeAttr('id');
-                $(user).find('input[name="user_id"]').attr("readonly","readonly");
+                user.attr('id','users-'+data["id"]);
+                user.addClass('uchange');
+                $(user).find('input[name="name"]').attr("readonly","readonly");
+                $(user).find('input[name="id"]').val(data["id"])
                 $(templ_user).find('input').val('');   
                 templ_user.insertAfter(user);
         }
@@ -224,8 +228,10 @@
         callback = function(data){
                 button.find('#btn_add_button').addClass('d-none');
                 button.find('#btn_del_button').removeClass('d-none');
-                button.removeAttr('id');
+                button.attr('id','ubuttons-'+data["id"]);
+                button.addClass('uchange');
                 $(button).find('input[name="name"]').attr("readonly","readonly");
+                $(button).find('input[name="id"]').val(data["id"])
                 $(templ_ubutton).find('input').val('');
                 templ_ubutton.insertAfter(button);
         }
