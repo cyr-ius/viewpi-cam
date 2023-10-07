@@ -32,7 +32,7 @@ class AttrDict(dict):
             raise AttributeError(f"AttrDict has no key {attr}") from exception
 
 
-class JsonDB(AttrDict, object):
+class JsonDB(AttrDict):
     """Class for store database to json file.
 
     Exemple:
