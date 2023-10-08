@@ -9,7 +9,7 @@ bp = Blueprint(
 )
 
 
-@bp.route("/", methods=["GET", "POST", "DELETE"])
+@bp.route("/", methods=["GET"])
 @auth_required
 def index():
     macros = Macros().get_config()
