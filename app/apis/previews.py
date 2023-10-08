@@ -29,7 +29,7 @@ files = api.model(
         "file_size": fields.Integer(required=True, description="Size"),
         # "file_icon": fields.String(required=False, description="Icon"),
         "file_datetime": fields.DateTime(required=False, description="DateTime"),
-        "file_right": fields.Boolean(
+        "file_lock": fields.Boolean(
             required=True, description="Read/Write right on disk"
         ),
         "real_file": fields.String(required=True, description="Original name"),
@@ -53,14 +53,17 @@ class Previews(Resource):
 
     @token_required
     @api.marshal_list_with(files)
-    @api.param("order", "Ordering thumbnail (True/False)")
+    @api.param("sort_order", "Ordering thumbnail (True/False)")
+    @api.param("show_types", "Show types")
+    @api.param("time_filter", "Time filter")
     @api.response(200, "Success")
     def get(self):
         """Get all media files."""
-        sort_order = int(
-            1 if request.args.get("order", "true").lower() == "true" else 2
+        return thumbs(
+            sort_order=int(request.args.get("sort_order", 1)),
+            show_types=int(request.args.get("show_types", 1)),
+            time_filter=int(request.args.get("time_filter", 1)),
         )
-        return thumbs(sort_order)
 
     @token_required
     @api.response(204, "Action is success")
