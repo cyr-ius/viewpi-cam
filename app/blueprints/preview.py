@@ -31,7 +31,6 @@ bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/pr
 @auth_required
 def index():
     """Index page."""
-    media_path = ca.raspiconfig.media_path
     time_filter_max = 8
     select_all = ""
 
@@ -46,23 +45,6 @@ def index():
         time_filter = int(request.json.get("time_filter", time_filter))
         sort_order = int(request.json.get("sort_order", sort_order))
         show_types = int(request.json.get("show_types", show_types))
-
-        if (filename := request.json.get("filename")) and check_media_path(filename):
-            if get_file_type(filename) != "t":
-                dx_file = data_file_name(filename)
-                if data_file_ext(filename) == "jpg":
-                    mimetype = "image/jpeg"
-                else:
-                    mimetype = "video/mp4"
-
-                return send_file(
-                    f"{media_path}/{dx_file}",
-                    mimetype=mimetype,
-                    as_attachment=True,
-                    download_name=dx_file,
-                )
-            else:
-                return get_zip([filename])
 
     thumbnails = thumbs(
         sort_order=sort_order,
@@ -96,6 +78,29 @@ def index():
         response.set_cookie("thumb_size", str(thumb_size))
 
     return response
+
+
+@bp.route("/download", methods=["POST"])
+@auth_required
+def download():
+    """Download File."""
+    media_path = ca.raspiconfig.media_path
+    if (filename := request.json.get("filename")) and check_media_path(filename):
+        if get_file_type(filename) != "t":
+            dx_file = data_file_name(filename)
+            if data_file_ext(filename) == "jpg":
+                mimetype = "image/jpeg"
+            else:
+                mimetype = "video/mp4"
+
+            return send_file(
+                f"{media_path}/{dx_file}",
+                mimetype=mimetype,
+                as_attachment=True,
+                download_name=dx_file,
+            )
+        else:
+            return get_zip([filename])
 
 
 @bp.route("/zipfile", methods=["POST"])
