@@ -15,7 +15,8 @@ class Settings(JsonDB):
         super().__init__(path, default)
         app.settings = self
 
-    def has_username(self, username):
+    def has_username(self, username: str) -> bool:
+        """User is exists."""
         for user in self.users:
             if user["name"] == username:
                 return True
