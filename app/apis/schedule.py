@@ -72,7 +72,6 @@ schedule = api.model(
 
 
 @api.route("/schedule")
-@api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
 class Settings(Resource):
     """Schedule."""
