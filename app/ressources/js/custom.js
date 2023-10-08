@@ -56,6 +56,7 @@ $(function () {
         callbackSuccess: null,
         callbackError: null,
         convertJson: true,
+        xhrFields: null,
       },
       options || {},
     );
@@ -65,6 +66,7 @@ $(function () {
       url: o.url,
       data: o.convertJson && o.data != "" ? JSON.stringify(o.data) : o.data,
       contentType: "application/json; charset=utf-8",
+      xhrFields: o.xhrFields,
       success: function (data) {
         $("#toast").addClass("text-bg-primary");
         if (data && data.responseJSON)
