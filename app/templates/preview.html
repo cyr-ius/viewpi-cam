@@ -4,12 +4,20 @@
     <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar" style="background-color:{{disk_usage[4]}};width: {{disk_usage[3]}}%"><span>local: {{disk_usage[3]}}%  Total: {{disk_usage[0]}} MB</span></div>
     </div>
-    <div id="preview" class="d-none text-center">
+    <div id="preview" class="d-none text-center" style="position:relative">
         <span id="media-title"></span>
         <div id="media"></div>
+        <button id="prev" class="carousel-control-prev" type="button">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Prev</span>
+        </button>
+        <button id="next" class="carousel-control-next" type="button">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
     {% if thumbnails is iterable %}
-    <div id="filtering" class="row g-3 my-1">
+    <div id="filtering" class="row m-1">
         <label class="col-auto col-form-label-sm">Ordering</label>
         <div class="col-1">
             <select id="sort_order" class="form-select form-select-sm" name="sort_order">
@@ -35,8 +43,9 @@
                 <option value="{{time_filter_max}}" {% if time_filter|int == time_filter_max %}selected{%endif%} >{{(time_filter_max-2) * 24}} hours old</option>
             </select>
         </div>
+        <div class="col-auto ms-auto"><button id="hide-preview" class="btn d-none" style="border-style: none;"><i class="bi bi-arrow-bar-up"></i></button></div>
     </div>
-    <div id="thumbs" class="row g-3 my-1">
+    <div id="thumbs" class="row g-3 m-1">
         {% for thumbnail in thumbnails%}
         <div id="{{thumbnail.id}}" class="col-6 col-md-4 col-lg-4 col-xl-2 col-xxl-1">
             <div class='card shadow-sm'>
@@ -130,6 +139,14 @@ $('#time_filter, #show_types, #sort_order').on('change', function() {
     window.location.replace("{{url_for('preview.index')}}?"+urlParams.toLocaleString());
 })
 
+$('#hide-preview').unbind()
+$('#hide-preview').click(function(){
+    $('#preview, #display').addClass('d-none');
+    $("#gallery").removeClass("d-none");
+    $(this).addClass('d-none');
+    history.pushState(null, null, "{{url_for('preview.index')}}");
+});
+
 $('#selectNone').unbind();
 $('#selectNone').click(function(){
     $('#thumbs input:checkbox').prop('checked',false)
@@ -154,11 +171,9 @@ $('#deleteSel').click(function(){
 $('#lockSel, #unlockSel').unbind();
 $('#lockSel, #unlockSel').click(function(){
     let data = $('#thumbs input').serializeObject();
-    console.log(data);
     let action = $(this).prop('id') == "lockSel" ?"lock" : "unlock";
     if (typeof data.check_list === 'string' || data.check_list instanceof String)
         data.check_list = [data.check_list]
-    console.log(data);
     data.check_list.forEach(function(item){
         let callbackSuccess = function(data) {
             $(`#${item} input:checkbox`).prop('checked',false)
@@ -178,7 +193,7 @@ $('#lockSel, #unlockSel').click(function(){
 $('#deleteAll').unbind();
 $('#deleteAll').click(function(){
     if (confirm('Are you sure you want to delete all files ?')) {
-        $('#thumbs input:checkbox').attr('checked','checked');
+        $('#thumbs input:checkbox').attr('checked',true);
         $('#deleteSel').trigger('click');
     }
 });
@@ -273,8 +288,7 @@ function load_preview(id) {
     let media_content;
     history.pushState(null, null, linksBase + id);
     $("#gallery").addClass("d-none");
-    $("#display").removeClass("d-none");
-    $("#preview").removeClass("d-none");
+    $("#display, #preview, #hide-preview").removeClass("d-none");
     $('#media-title').html(fileTitle(thumbnail));
     $('#download').val(thumbnail);
     $('#delete').val(id);
