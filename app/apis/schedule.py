@@ -141,7 +141,7 @@ class Period(Resource):
     @api.expect(
         api.model("Period", {"daymode": fields.Integer(description="Day mode")})
     )
-    @api.token_required
+    @token_required
     def post(self):
         """Post day mode and return period."""
         return {"period": period(ca.settings.daymode)}
