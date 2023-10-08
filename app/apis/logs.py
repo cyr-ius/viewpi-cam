@@ -28,11 +28,12 @@ class Content(Resource):
         return get_logs(reverse)
 
     @token_required
+    @api.response(204, "Action is success")
     def delete(self):
         """Delete log."""
         try:
             delete_log(1)
-            return {"message": "Delete successful"}
+            return "", 204
         except Exception as error:  # pylint: disable=W0718
             abort(422, error)
 
