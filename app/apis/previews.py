@@ -62,9 +62,6 @@ class Previews(Resource):
         )
         return thumbs(sort_order)
 
-    @api.expect(
-        api.model("Deletes", {"ids": fields.List(fields.String(description="id"))})
-    )
     @token_required
     @api.response(204, "Action is success")
     def delete(self):
@@ -74,7 +71,7 @@ class Previews(Resource):
 
 
 @api.route("/previews/<string:id>")
-@api.response(422, "Error", message)
+@api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
 class Preview(Resource):
     """Preview."""
@@ -97,7 +94,7 @@ class Preview(Resource):
             delete_mediafiles(thumb["file_name"])
             maintain_folders(ca.raspiconfig.media_path, False, False)
             return "", 204
-        abort(422, f"Thumb not found ({id})")
+        abort(404, f"Thumb not found ({id})")
 
 
 @api.route(
@@ -110,19 +107,14 @@ class Preview(Resource):
     endpoint="previews_unlock",
     doc={"description": "Unlock file"},
 )
-@api.route(
-    "/previews/<string:id>/convert",
-    endpoint="previews_convert",
-    doc={"description": "Convert timelapse file to mp4"},
-)
 @api.response(204, "Action is success")
-@api.response(422, "Error", message)
+@api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
 class Actions(Resource):
     """Actions."""
 
     @token_required
-    def post(self, id):
+    def post(self, id: str):
         """Post action."""
         if request.endpoint in ["api.previews_lock", "api.previews_unlock"]:
             if thumb := get_thumbnails_id(id):
@@ -132,9 +124,29 @@ class Actions(Resource):
                     request.endpoint == "api.previews_lock",
                 )
                 return "", 204
-            abort(422, f"Thumb not found ({id})")
+            abort(404, f"Thumb not found ({id})")
         if request.endpoint == "previews_convert":
             if thumb := get_thumbnails_id(id):
                 video_convert(thumb["file_name"])
                 return "", 204
-            abort(422, f"Thumb not found ({id})")
+            abort(404, f"Thumb not found ({id})")
+
+
+@api.route(
+    "/previews/<string:id>/convert",
+    endpoint="previews_convert",
+    doc={"description": "Convert timelapse file to mp4"},
+)
+@api.response(204, "Action is success")
+@api.response(404, "Not found", message)
+@api.response(403, "Forbidden", forbidden)
+class Convert(Resource):
+    """Convert to mp4."""
+
+    @token_required
+    def post(self, id: str):
+        """Coonvert timelapse."""
+        if thumb := get_thumbnails_id(id):
+            video_convert(thumb["file_name"])
+            return "", 204
+        abort(404, f"Thumb not found ({id})")
