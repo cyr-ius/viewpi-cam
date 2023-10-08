@@ -51,7 +51,6 @@ class Users(Resource):
 
     @token_required
     @users.expect(user)
-    @users.response(204, "Actions is success")
     def post(self):
         """Create user."""
         if ca.settings.has_username(users.payload["name"]):
@@ -79,15 +78,17 @@ class User(Resource):
 
     @token_required
     @users.marshal_with(user)
+    @api.response(404, "Not found", message)
     def get(self, uid: int):
         """Get user."""
         if dict_user := self.get_byid(uid):
             return dict_user
-        abort(422, "User not found")
+        abort(404, "User not found")
 
     @token_required
     @users.expect(user)
     @users.marshal_with(user)
+    @api.response(404, "Not found", message)
     def put(self, uid: int):
         """Set user."""
         if ca.settings.has_username(users.payload["name"]):
@@ -102,17 +103,18 @@ class User(Resource):
             ca.settings.users.append(users.payload)
             ca.settings.update(users=ca.settings.users)
             return users.payload
-        abort(422, "User not found")
+        abort(404, "User not found")
 
     @token_required
     @users.response(204, "Actions is success")
+    @api.response(404, "Not found", message)
     def delete(self, uid: int):
         """Delete user."""
         if dict_user := self.get_byid(uid):
             ca.settings.users.remove(dict_user)
             ca.settings.update(users=ca.settings.users)
             return "", 204
-        abort(422, "User not found")
+        abort(404, "User not found")
 
 
 button = buttons.model(
@@ -136,7 +138,6 @@ listed_button = buttons.model(
 )
 
 
-@buttons.response(422, "Error", message)
 @buttons.response(403, "Forbidden", message)
 @buttons.route("/buttons")
 class Buttons(Resource):
@@ -150,7 +151,6 @@ class Buttons(Resource):
 
     @buttons.expect(button)
     @token_required
-    @buttons.response(204, "Actions is success")
     def post(self):
         """Create button."""
         if ca.settings.get("ubuttons") is None:
@@ -163,7 +163,6 @@ class Buttons(Resource):
         return buttons.payload
 
 
-@buttons.response(422, "Error", message)
 @buttons.response(403, "Forbidden", message)
 @buttons.route("/buttons/<int:uid>")
 class Button(Resource):
@@ -177,15 +176,17 @@ class Button(Resource):
 
     @token_required
     @buttons.marshal_with(button)
+    @api.response(404, "Not found", message)
     def get(self, uid: int):
         """Get button."""
         if button_dict := self.get_byid(uid):
             return button_dict
-        abort(422, "Button not found")
+        abort(404, "Button not found")
 
     @token_required
     @buttons.expect(button)
     @buttons.marshal_with(button)
+    @api.response(404, "Not found", message)
     def put(self, uid: int):
         """Set button."""
         if dict_button := self.get_byid(uid):
@@ -194,17 +195,18 @@ class Button(Resource):
             ca.settings.ubuttons.append(buttons.payload)
             ca.settings.update(ubuttons=ca.settings.ubuttons)
             return buttons.payload
-        abort(422, "Button not found")
+        abort(404, "Button not found")
 
     @token_required
     @buttons.response(204, "Actions is success")
+    @api.response(404, "Not found", message)
     def delete(self, uid: int):
         """Delete button."""
         if dict_button := self.get_byid(uid):
             ca.settings.ubuttons.remove(dict_button)
             ca.settings.update(ubuttons=ca.settings.ubuttons)
             return "", 204
-        abort(422, "Button not found")
+        abort(404, "Button not found")
 
 
 setting = settings.model(
@@ -231,7 +233,6 @@ setting = settings.model(
 )
 
 
-@settings.response(422, "Error", message)
 @settings.response(403, "Forbidden", message)
 @settings.route("/settings")
 class Sets(Resource):
@@ -246,6 +247,7 @@ class Sets(Resource):
     @token_required
     @buttons.expect(setting)
     @settings.marshal_with(setting)
+    @api.response(204, "Action is success")
     def post(self):
         """Set setttings."""
         ca.settings.update(**settings.payload)
@@ -254,7 +256,6 @@ class Sets(Resource):
         return "", 204
 
 
-@settings.response(422, "Error", message)
 @settings.response(403, "Forbidden", message)
 @settings.route("/token")
 class Token(Resource):
@@ -291,7 +292,6 @@ macros = settings.model(
 )
 
 
-@settings.response(422, "Error", message)
 @settings.response(403, "Forbidden", message)
 @settings.route("/macros")
 class Macros(Resource):
@@ -313,12 +313,12 @@ class Macros(Resource):
                 value = value[1:]
                 state = False
             list_macros.append({"name": key, "command": value, "state": state})
-
         return list_macros
 
     @token_required
     @buttons.expect(macros)
     @settings.marshal_with(macros)
+    @api.response(204, "Action is success")
     def post(self):
         """Set macro."""
         if settings.payload:
