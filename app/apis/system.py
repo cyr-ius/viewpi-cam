@@ -22,6 +22,7 @@ command_m = api.model(
 )
 
 
+@api.response(204, "Action is success")
 @api.response(422, "Error", message)
 @api.response(403, "Forbidden", message)
 @api.route(
@@ -52,10 +53,11 @@ class Actions(Resource):
                 execute_cmd("killall gunicorn")
         except Exception as error:  # pylint: disable=W0718
             abort(422, error)
-        return {}, 200
+        return "", 204
 
 
 @api.response(422, "Error", message)
+@api.response(404, "Not found", message)
 @api.response(403, "Forbidden", message)
 @api.route("/command")
 class Command(Resource):
@@ -73,4 +75,4 @@ class Command(Resource):
                 return ca.raspiconfig.send(f"{cmd}")
             except RaspiConfigError as error:
                 abort(422, str(error))
-        abort(422, f"Command not found {cmd}")
+        abort(404, f"Command not found {cmd}")
