@@ -27,7 +27,7 @@ from ..helpers.utils import disk_usage, write_log
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
 
-@bp.route("/", methods=["GET", "POST"])
+@bp.route("/", methods=["GET"])
 @auth_required
 def index():
     """Index page."""
