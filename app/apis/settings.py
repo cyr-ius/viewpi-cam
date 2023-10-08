@@ -37,7 +37,6 @@ listed_user = buttons.model(
 )
 
 
-@users.response(422, "Error", message)
 @users.response(403, "Forbidden", message)
 @users.route("/users")
 class Users(Resource):
@@ -64,7 +63,6 @@ class Users(Resource):
         return users.payload
 
 
-@users.response(422, "Error", message)
 @users.response(403, "Forbidden", message)
 @users.route("/users/<int:uid>")
 class User(Resource):
