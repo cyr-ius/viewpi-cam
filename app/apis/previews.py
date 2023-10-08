@@ -91,10 +91,12 @@ class Preview(Resource):
     def delete(self, id):
         """Delete file."""
         if thumb := get_thumbnails_id(id):
+            if id in ca.settings.lock_files:
+                abort(422, f"Protected thumbnail ({id})")
             delete_mediafiles(thumb["file_name"])
             maintain_folders(ca.raspiconfig.media_path, False, False)
             return "", 204
-        abort(404, f"Thumb not found ({id})")
+        abort(404, "Thumb not found")
 
 
 @api.route(
@@ -129,7 +131,7 @@ class Actions(Resource):
             if thumb := get_thumbnails_id(id):
                 video_convert(thumb["file_name"])
                 return "", 204
-            abort(404, f"Thumb not found ({id})")
+            abort(404, "Thumb not found")
 
 
 @api.route(
@@ -149,4 +151,4 @@ class Convert(Resource):
         if thumb := get_thumbnails_id(id):
             video_convert(thumb["file_name"])
             return "", 204
-        abort(404, f"Thumb not found ({id})")
+        abort(404, "Thumb not found")
