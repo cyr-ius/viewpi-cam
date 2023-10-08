@@ -9,7 +9,7 @@ from flask import current_app as ca
 from psutil import process_iter
 
 
-def get_pid(pid_type):
+def get_pid(pid_type: str) -> int:
     """Return process id."""
     for proc in process_iter():
         if pid_type == "scheduler":
@@ -20,7 +20,7 @@ def get_pid(pid_type):
     return 0
 
 
-def execute_cmd(cmd):
+def execute_cmd(cmd: str) -> None:
     """Execute shell command."""
     return Popen(cmd, stdout=PIPE, shell=True)
 
