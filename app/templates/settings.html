@@ -169,7 +169,7 @@
 
     $('#upreset, #pilight, #pipan, #servo, #loglevel').unbind()
     $('#upreset, #pilight, #pipan, #servo, #loglevel').on("change", function(event) {
-        data = $(this).serializeObject({"checkboxesAsBools":true});
+        let data = $(this).serializeObject({"checkboxesAsBools":true});
         $.queryData({"url":"{{ url_for('api.settings_sets')}}","data":data});
     })
 
@@ -181,38 +181,37 @@
 
     $('#get_token').unbind();
     $('#get_token').click(function () {
-        callback = function(data){$('#token').val(data["token"])}
+        let callback = function(data){$('#token').val(data["token"])}
         $.queryData({"url":"{{ url_for('api.settings_token')}}","callbackSuccess":callback});
     });
 
     $('#del_token').unbind();
     $('#del_token').click(function () {
-        callback = function(data){$('#token').val('')}
+        let callback = function(data){$('#token').val('')}
         $.queryData({"method":"delete", "url":"{{ url_for('api.settings_token')}}","callbackSuccess":callback});
     });
 
     $('#users').on('click','.add_user', function() {
-        user = $(this).parent().parent();
-        data = $(user).find('input, select').serializeObject();
+        let user = $(this).parent().parent();
+        let data = $(user).find('input, select').serializeObject();
         let templ_user = $('#users-ref').clone();
-        callback = function(data){
-                user.find('#btn_add_user').addClass('d-none');
-                user.find('#btn_del_user').removeClass('d-none');
-                user.attr('id','users-'+data["id"]);
-                user.addClass('uchange');
-                $(user).find('input[name="name"]').attr("readonly","readonly");
-                $(user).find('input[name="id"]').val(data["id"])
-                $(templ_user).find('input').val('');
-                templ_user.insertAfter(user);
+        let callback = function(data){
+            user.find('#btn_add_user').addClass('d-none');
+            user.find('#btn_del_user').removeClass('d-none');
+            user.attr('id','users-'+data["id"]);
+            user.addClass('uchange');
+            $(user).find('input[name="name"]').attr("readonly","readonly");
+            $(user).find('input[name="id"]').val(data["id"])
+            $(templ_user).find('input').val('');
+            templ_user.insertAfter(user);
         }
         $.queryData({"url":"{{ url_for('api.users_users')}}","data":data, "callbackSuccess":callback});
-
     });
 
     $('#users').on('click','.del_user', function() {
-        user = $(this).parent().parent()
-        data = $(user).find('input, select').serializeObject();
-        callback = function(data){ user.remove() }
+        let user = $(this).parent().parent()
+        let data = $(user).find('input, select').serializeObject();
+        let callback = function(data){ user.remove() }
         $.queryData({"method":"delete", "url":`{{ url_for('api.users_users')}}/${data["id"]}`, "callbackSuccess":callback});
     });
 
@@ -222,26 +221,26 @@
     });
 
     $('#ubuttons').on('click','.add_button', function() {
-        button = $(this).parent().parent();
-        data = $(button).find('input').serializeObject({"checkboxesAsBools":true});
+        let button = $(this).parent().parent();
+        let data = $(button).find('input').serializeObject({"checkboxesAsBools":true});
         let templ_ubutton = $('#ubuttons-ref').clone();
-        callback = function(data){
-                button.find('#btn_add_button').addClass('d-none');
-                button.find('#btn_del_button').removeClass('d-none');
-                button.attr('id','ubuttons-'+data["id"]);
-                button.addClass('uchange');
-                $(button).find('input[name="name"]').attr("readonly","readonly");
-                $(button).find('input[name="id"]').val(data["id"])
-                $(templ_ubutton).find('input').val('');
-                templ_ubutton.insertAfter(button);
+        let callback = function(data){
+            button.find('#btn_add_button').addClass('d-none');
+            button.find('#btn_del_button').removeClass('d-none');
+            button.attr('id','ubuttons-'+data["id"]);
+            button.addClass('uchange');
+            $(button).find('input[name="name"]').attr("readonly","readonly");
+            $(button).find('input[name="id"]').val(data["id"])
+            $(templ_ubutton).find('input').val('');
+            templ_ubutton.insertAfter(button);
         }
         $.queryData({"url":"{{ url_for('api.buttons_buttons')}}","data":data, "callbackSuccess":callback});
     });
 
     $('#ubuttons').on('click','.del_button', function() {
-        button = $(this).parent().parent();
-        data = $(button).find('input').serializeObject({"checkboxesAsBools":true});
-        callback = function(data){ button.remove() }
+        let button = $(this).parent().parent();
+        let data = $(button).find('input').serializeObject({"checkboxesAsBools":true});
+        let callback = function(data){ button.remove() }
         $.queryData({"method":"delete", "url":`{{ url_for('api.buttons_buttons')}}/${data["id"]}`, "callbackSuccess":callback});
     });
 
@@ -252,7 +251,6 @@
 
     $('#macros').on('change','.uchange', function(){
         let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        console.log(data);
         $.queryData({"method":"post", "url":"{{ url_for('api.settings_macros')}}", "data":data});
     });
 
