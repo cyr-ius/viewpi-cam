@@ -76,7 +76,7 @@ class User(Resource):
 
     @token_required
     @users.marshal_with(user)
-    @api.response(404, "Not found", message)
+    @users.response(404, "Not found", message)
     def get(self, uid: int):
         """Get user."""
         if dict_user := self.get_byid(uid):
@@ -86,7 +86,7 @@ class User(Resource):
     @token_required
     @users.expect(user)
     @users.marshal_with(user)
-    @api.response(404, "Not found", message)
+    @users.response(404, "Not found", message)
     def put(self, uid: int):
         """Set user."""
         if ca.settings.has_username(users.payload["name"]):
@@ -105,7 +105,7 @@ class User(Resource):
 
     @token_required
     @users.response(204, "Actions is success")
-    @api.response(404, "Not found", message)
+    @users.response(404, "Not found", message)
     def delete(self, uid: int):
         """Delete user."""
         if dict_user := self.get_byid(uid):
@@ -174,7 +174,7 @@ class Button(Resource):
 
     @token_required
     @buttons.marshal_with(button)
-    @api.response(404, "Not found", message)
+    @buttons.response(404, "Not found", message)
     def get(self, uid: int):
         """Get button."""
         if button_dict := self.get_byid(uid):
@@ -184,7 +184,7 @@ class Button(Resource):
     @token_required
     @buttons.expect(button)
     @buttons.marshal_with(button)
-    @api.response(404, "Not found", message)
+    @buttons.response(404, "Not found", message)
     def put(self, uid: int):
         """Set button."""
         if dict_button := self.get_byid(uid):
@@ -197,7 +197,7 @@ class Button(Resource):
 
     @token_required
     @buttons.response(204, "Actions is success")
-    @api.response(404, "Not found", message)
+    @buttons.response(404, "Not found", message)
     def delete(self, uid: int):
         """Delete button."""
         if dict_button := self.get_byid(uid):
@@ -245,7 +245,7 @@ class Sets(Resource):
     @token_required
     @buttons.expect(setting)
     @settings.marshal_with(setting)
-    @api.response(204, "Action is success")
+    @settings.response(204, "Action is success")
     def post(self):
         """Set setttings."""
         ca.settings.update(**settings.payload)
@@ -272,7 +272,7 @@ class Token(Resource):
         return {"token": token}
 
     @token_required
-    @buttons.response(204, "Actions is success")
+    @settings.response(204, "Actions is success")
     def delete(self):
         """Delete token."""
         del ca.settings.token
@@ -314,9 +314,9 @@ class Macros(Resource):
         return list_macros
 
     @token_required
-    @buttons.expect(macros)
+    @settings.expect(macros)
     @settings.marshal_with(macros)
-    @api.response(204, "Action is success")
+    @settings.response(204, "Action is success")
     def post(self):
         """Set macro."""
         if settings.payload:
