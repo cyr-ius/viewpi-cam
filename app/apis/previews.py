@@ -45,7 +45,6 @@ files = api.model(
 )
 
 
-@api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
 @api.route("/previews")
 class Previews(Resource):
@@ -56,7 +55,6 @@ class Previews(Resource):
     @api.param("sort_order", "Ordering thumbnail (True/False)")
     @api.param("show_types", "Show types")
     @api.param("time_filter", "Time filter")
-    @api.response(200, "Success")
     def get(self):
         """Get all media files."""
         return thumbs(
@@ -74,6 +72,7 @@ class Previews(Resource):
 
 
 @api.route("/previews/<string:id>")
+@api.response(422, "Error", message)
 @api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
 class Preview(Resource):
@@ -81,7 +80,6 @@ class Preview(Resource):
 
     @token_required
     @api.marshal_with(files)
-    @api.response(200, "Success")
     def get(self, id):
         """Get file information."""
         for thumb in thumbs():
