@@ -46,7 +46,7 @@
         <div class="col-auto ms-auto"><button id="hide-preview" class="btn d-none" style="border-style: none;"><i class="bi bi-arrow-bar-up"></i></button></div>
     </div>
     <div id="thumbs" class="row g-3 m-1">
-        {% for thumbnail in thumbnails%}
+        {# {% for thumbnail in thumbnails%}
         <div id="{{thumbnail.id}}" class="col-6 col-md-4 col-lg-4 col-xl-2 col-xxl-1">
             <div class='card shadow-sm'>
                 {% if thumbnail.file_size > 0 %}
@@ -77,7 +77,7 @@
                 </div>
             </div>
         </div>
-        {%endfor%}
+        {%endfor%} #}
     </div>
     {%else%}
     <p>No videos/images saved</p>
@@ -118,6 +118,8 @@ $(function(){
     if (preview_id != ''){
         load_preview(preview_id);
     }
+    let callbackSuccess=function(data){load_thumbs(data);}
+    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}", callbackSuccess: callbackSuccess })
 });
 
 $('#thumbs button[name="delete"], #delete').unbind()
@@ -130,13 +132,9 @@ $('#thumbs button[name="delete"], #delete').click(function(){
 })
 
 $('#time_filter, #show_types, #sort_order').on('change', function() {
-    const urlParams = new URLSearchParams(window.location.search);
     let data = $('#filtering input,#filtering select,#filtering textarea').serializeObject();
-    urlParams.set("time_filter",data['time_filter']);
-    urlParams.set("show_types",data['show_types']);
-    urlParams.set("sort_order",data['sort_order']);
-    urlParams.set("preview_size",data['preview_size']);
-    window.location.replace("{{url_for('preview.index')}}?"+urlParams.toLocaleString());
+    let callbackSuccess=function(data){load_thumbs(data);}
+    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}",data:data, callbackSuccess: callbackSuccess, convertJson:false })
 })
 
 $('#hide-preview').unbind()
@@ -342,6 +340,54 @@ function load_preview(id) {
         $('#convert').addClass("d-none");
 		$('#convert').val();
 	}
+}
+
+function thumbs(thumb){
+    let size=""
+    let lapse_count=""
+    let duration=""
+    let icon="bi-camera"
+    let lock="d-none"
+    let date = new Date(thumb.file_datetime)
+    if (thumb.file_type == "v") icon="bi-camera-reels"
+    if (thumb.file_type == "t") icon="bi-images"
+    if (thumb.file_type == "i") icon="bi-camera"
+    if (thumb.file_lock) lock=""
+    if (thumb.file_size > 1024) {size=`${Math.round(thumb.file_size/1024)} MB`} else {size=`${thumb.file_size} KB`}
+    if (thumb.lapse_count) lapse_count=thumb.lapse_count
+    if (thumb.duration) duration=`${thumb.duration}s`
+    let string=`\
+    <div id="${thumb.id}" class="col-6 col-md-4 col-lg-4 col-xl-2 col-xxl-1">
+        <div class="card shadow-sm">
+            <a id="load_preview" title="${thumb.real_file}" href="#" onclick="load_preview('${thumb.id}');">
+                <img class="mx-auto d-block card-img-top" src="{{ url_for('static', filename=config['MEDIA']) }}/${thumb.file_name}"/>
+            </a>
+            <div class="card-img-overlay" style="height:5px;">
+                <i class="float-start ${icon}" style="font-size: 16px;color: white;"></i>
+                <i id="icon_lock" class="float-start bi bi-lock-fill ${lock}" style="font-size: 16px;color: rgb(209, 182, 28);position: absolute;right: 5px;"></i>
+            </div>
+            <div class="card-body">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="btn-check-${thumb.id}}" name="check_list" value="${thumb.id}">
+                    <label class="form-check-label" for="${thumb.id}">Created ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}</label>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="${thumb.id}"><i class="bi bi-trash"></i>Delete</button>
+                    <small class="text-body-secondary">
+                    ${size} ${lapse_count} ${duration}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>`;
+    return string;
+}
+
+function load_thumbs(data){
+    $('#thumbs').html('');
+    data.forEach(function(item){
+        $('#thumbs').append(thumbs(item));
+    });
 }
 </script>
 {% endblock%}
