@@ -34,48 +34,42 @@ def index():
     time_filter_max = 8
     select_all = ""
 
-    preview_size = int(request.cookies.get("preview_size", 640))
-    thumb_size = int(request.cookies.get("thumb_size", 96))
-    sort_order = int(request.cookies.get("sort_order", 1))
-    show_types = int(request.cookies.get("show_types", 1))
-    time_filter = int(request.cookies.get("time_filter", 1))
     preview_id = request.args.get("preview", "")
+    preview_size = int(request.cookies.get("preview_size", 640))
+    show_types = int(request.cookies.get("show_types", 1))
+    sort_order = int(request.cookies.get("sort_order", 1))
+    time_filter = int(request.cookies.get("time_filter", 1))
 
-    if request.method == "POST":
-        time_filter = int(request.json.get("time_filter", time_filter))
-        sort_order = int(request.json.get("sort_order", sort_order))
-        show_types = int(request.json.get("show_types", show_types))
+    preview_size = int(request.args.get("preview_size", preview_size))
+    show_types = int(request.args.get("show_types", show_types))
+    sort_order = int(request.args.get("sort_order", sort_order))
+    time_filter = int(request.args.get("time_filter", time_filter))
 
     thumbnails = thumbs(
-        sort_order=sort_order,
         show_types=show_types,
-        time_filter=time_filter,
+        sort_order=sort_order,
         time_filter_max=time_filter_max,
+        time_filter=time_filter,
     )
-
     response = make_response(
         render_template(
             "preview.html",
-            raspiconfig=ca.raspiconfig,
             disk_usage=disk_usage(),
-            preview_size=preview_size,
-            thumb_size=thumb_size,
-            sort_order=sort_order,
-            show_types=show_types,
-            time_filter=time_filter,
-            time_filter_max=time_filter_max,
             preview_id=preview_id,
-            thumbnails=thumbnails,
+            preview_size=preview_size,
+            raspiconfig=ca.raspiconfig,
             select_all=select_all,
+            show_types=show_types,
+            sort_order=sort_order,
+            thumbnails=thumbnails,
+            time_filter_max=time_filter_max,
+            time_filter=time_filter,
         )
     )
 
-    if request.method == "POST":
-        response.set_cookie("time_filter", str(time_filter))
-        response.set_cookie("sort_order", str(sort_order))
-        response.set_cookie("show_types", str(show_types))
-        response.set_cookie("preview_size", str(preview_size))
-        response.set_cookie("thumb_size", str(thumb_size))
+    response.set_cookie("show_types", str(show_types))
+    response.set_cookie("sort_order", str(sort_order))
+    response.set_cookie("time_filter", str(time_filter))
 
     return response
 
