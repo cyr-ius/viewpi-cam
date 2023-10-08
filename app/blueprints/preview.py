@@ -148,9 +148,8 @@ def get_zip(files: list):
     )
 
 
-def video_convert(thumb: dict[str, Any]) -> None:
+def video_convert(filename: str) -> None:
     media_path = ca.raspiconfig.media_path
-    filename = thumb["file_name"]
     if check_media_path(filename):
         file_type = get_file_type(filename)
         file_index = get_file_index(filename)
