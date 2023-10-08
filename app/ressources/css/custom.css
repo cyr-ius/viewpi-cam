@@ -30,7 +30,7 @@ main > .container-fluid {
 .video {
   max-width: 800px;
   height: auto;
-  width: 100%;
+  /* width: 100%; */
 }
 
 .standard {

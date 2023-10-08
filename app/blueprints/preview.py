@@ -35,12 +35,10 @@ def index():
     select_all = ""
 
     preview_id = request.args.get("preview", "")
-    preview_size = int(request.cookies.get("preview_size", 640))
     show_types = int(request.cookies.get("show_types", 1))
     sort_order = int(request.cookies.get("sort_order", 1))
     time_filter = int(request.cookies.get("time_filter", 1))
 
-    preview_size = int(request.args.get("preview_size", preview_size))
     show_types = int(request.args.get("show_types", show_types))
     sort_order = int(request.args.get("sort_order", sort_order))
     time_filter = int(request.args.get("time_filter", time_filter))
@@ -56,7 +54,6 @@ def index():
             "preview.html",
             disk_usage=disk_usage(),
             preview_id=preview_id,
-            preview_size=preview_size,
             raspiconfig=ca.raspiconfig,
             select_all=select_all,
             show_types=show_types,
