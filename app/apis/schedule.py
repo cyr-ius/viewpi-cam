@@ -86,6 +86,7 @@ class Settings(Resource):
     @api.expect(schedule)
     @api.marshal_with(message)
     @token_required
+    @api.response(204, "Action is success")
     def put(self):
         """Set settings."""
         cur_tz = ca.settings.gmt_offset
@@ -94,7 +95,7 @@ class Settings(Resource):
             write_log(f"Set timezone {new_tz}")
             execute_cmd(f"ln -fs /usr/share/zoneinfo/{new_tz} /etc/localtime")
         send_motion(SCHEDULE_RESET)
-        return {"message": "Save successful"}
+        return "", 204
 
 
 @api.route("/schedule/actions", doc=False)
@@ -102,8 +103,8 @@ class Settings(Resource):
 @api.route("/schedule/actions/start", endpoint="schedule_start")
 @api.route("/schedule/actions/backup", endpoint="schedule_backup")
 @api.route("/schedule/actions/restore", endpoint="schedule_restore")
-@api.response(200, "Success", message)
-@api.response(422, "Error", message)
+@api.response(204, "Action is success")
+@api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
 class Actions(Resource):
     """Actions."""
@@ -116,22 +117,21 @@ class Actions(Resource):
             case "api.schedule_start":
                 if not get_pid("scheduler"):
                     Popen(["flask", "scheduler", "start"], stdout=PIPE)
-                return {"message": "Start successful"}
+                return "", 204
             case "api.schedule_stop":
                 pid = get_pid("scheduler")
                 execute_cmd(f"kill {pid}")
-                return {"message": "Stop successful"}
+                return "", 204
             case "api.schedule_backup":
                 ca.settings.backup()
-                return {"message": "Backup successful"}
+                return "", 204
             case "api.schedule_restore":
                 ca.settings.restore()
-                return {"message": "Restore successful"}
-        abort(422, message="Action not found")
+                return "", 204
+        abort(404, "Action not found")
 
 
 @api.route("/schedule/period")
-@api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
 class Period(Resource):
     """Sunrise."""
@@ -142,14 +142,13 @@ class Period(Resource):
     @api.expect(
         api.model("Period", {"daymode": fields.Integer(description="Day mode")})
     )
+    @api.token_required
     def post(self):
         """Post day mode and return period."""
         return {"period": period(ca.settings.daymode)}
 
 
 @api.route("/sun/sunrise")
-@api.response(422, "Error", message)
-@api.response(403, "Forbidden", forbidden)
 class Sunrise(Resource):
     """Sunrise."""
 
@@ -160,8 +159,6 @@ class Sunrise(Resource):
 
 
 @api.route("/sun/sunset")
-@api.response(422, "Error", message)
-@api.response(403, "Forbidden", forbidden)
 class Sunset(Resource):
     """Sunset."""
 
