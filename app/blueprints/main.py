@@ -70,7 +70,12 @@ def streamlog():
     def generate(log_file):
         if os.path.isfile(log_file):
             with open(log_file, mode="r", encoding="utf-8") as file:
+                first = True
                 while True:
+                    if first:
+                        # Remove first occurence
+                        file.read()
+                        first = False
                     yield f"data: {file.read()}\n\n"
                     time.sleep(0.5)
 
