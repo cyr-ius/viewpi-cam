@@ -15,14 +15,13 @@ from ..helpers.decorator import auth_required
 from ..helpers.filer import (
     data_file_ext,
     data_file_name,
-    execute_cmd,
     find_lapse_files,
     get_file_index,
     get_file_size,
     get_file_type,
     list_folder_files,
 )
-from ..helpers.utils import disk_usage, write_log
+from ..helpers.utils import disk_usage, execute_cmd, write_log
 from ..services.handle import ViewPiCamException
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
