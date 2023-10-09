@@ -4,6 +4,7 @@ import os
 from flask import current_app as ca
 
 from .utils import execute_cmd, write_log
+from ..services.handle import ViewPiCamException
 
 
 def open_pipe(pipename: str):
@@ -19,6 +20,8 @@ def open_pipe(pipename: str):
         return pipe
     except OSError as error:
         write_log(f"Error open pipe {pipename} {str(error)}")
+    except ViewPiCamException as error:
+        write_log(error)
 
 
 def send_motion(cmd: str) -> None:

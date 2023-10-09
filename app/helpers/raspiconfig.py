@@ -1,10 +1,10 @@
 """Class for raspimjpeg file."""
 import os
 import time
-from subprocess import Popen
 from typing import Any
 
 from .utils import execute_cmd, write_log
+from ..services.handle import ViewPiCamException
 
 
 # pylint: disable=E1101
@@ -96,11 +96,18 @@ class RaspiConfig:
 
             # Create /dev/shm/mjpeg/status_mjpeg
             if not os.path.isfile(self.status_file):
-                execute_cmd(f"touch {self.status_file}")
+                try:
+                    execute_cmd(f"touch {self.status_file}")
+                except ViewPiCamException:
+                    self.logging.error("Error: touch status file")
 
             # Execute binary
-            Popen(self.bin)
-            self.logging.info("Start raspimjpeg")
+            try:
+                execute_cmd(self.bin)
+            except ViewPiCamException as error:
+                self.logging.error(f"Error starting raspimjpeg ({error})")
+            else:
+                self.logging.info("Start raspimjpeg")
         else:
             self.logging.error(f"Error: File not found ({self.bin})")
 
@@ -120,7 +127,10 @@ class RaspiConfig:
             self.refresh()
 
     def stop(self) -> None:
-        execute_cmd("killall raspimjpeg")
+        try:
+            execute_cmd("killall raspimjpeg")
+        except ViewPiCamException as error:
+            self.logging.error(error)
 
 
 class RaspiConfigError(Exception):

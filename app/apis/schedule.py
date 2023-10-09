@@ -14,6 +14,7 @@ from ..const import SCHEDULE_RESET
 from ..helpers.decorator import token_required
 from ..helpers.fifo import send_motion
 from ..helpers.utils import execute_cmd, get_pid, write_log
+from ..services.handle import ViewPiCamException
 from .models import date_time, forbidden, message
 
 api = Namespace("schedule")
@@ -91,8 +92,11 @@ class Settings(Resource):
         cur_tz = ca.settings.gmt_offset
         ca.settings.update(**api.payload)
         if (new_tz := ca.settings.gmt_offset) != cur_tz:
-            write_log(f"Set timezone {new_tz}")
-            execute_cmd(f"ln -fs /usr/share/zoneinfo/{new_tz} /etc/localtime")
+            try:
+                execute_cmd(f"ln -fs /usr/share/zoneinfo/{new_tz} /etc/localtime")
+                write_log(f"Set timezone {new_tz}")
+            except ViewPiCamException as error:
+                write_log(error)
         send_motion(SCHEDULE_RESET)
         return "", 204
 
@@ -105,6 +109,7 @@ class Settings(Resource):
 @api.response(204, "Action is success")
 @api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
+@api.response(422, "Error", message)
 class Actions(Resource):
     """Actions."""
 
@@ -119,7 +124,10 @@ class Actions(Resource):
                 return "", 204
             case "api.schedule_stop":
                 pid = get_pid("scheduler")
-                execute_cmd(f"kill {pid}")
+                try:
+                    execute_cmd(f"kill {pid}")
+                except ViewPiCamException as error:
+                    return abort(422, error)
                 return "", 204
             case "api.schedule_backup":
                 ca.settings.backup()

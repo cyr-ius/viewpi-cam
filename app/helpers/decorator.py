@@ -51,7 +51,3 @@ def token_required(function):
             abort(422, "Please provide an API key")
 
     return decorator
-
-
-class ViewPiCamException(Exception):
-    """ViewPi Cam exception."""

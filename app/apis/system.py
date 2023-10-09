@@ -5,6 +5,7 @@ from flask_restx import Namespace, Resource, abort, fields
 from ..helpers.decorator import token_required
 from ..helpers.raspiconfig import RaspiConfigError
 from ..helpers.utils import execute_cmd
+from ..services.handle import ViewPiCamException
 from .models import message
 
 api = Namespace("system")
@@ -34,7 +35,7 @@ class Restart(Resource):
         try:
             execute_cmd("echo s > /proc/sysrq-trigger")
             execute_cmd("echo b > /proc/sysrq-trigger")
-        except Exception as error:  # pylint: disable=W0718
+        except ViewPiCamException as error:
             abort(422, error)
         return "", 204
 
@@ -52,7 +53,7 @@ class Shutdown(Resource):
         try:
             execute_cmd("echo s > /proc/sysrq-trigger")
             execute_cmd("echo o > /proc/sysrq-trigger")
-        except Exception as error:  # pylint: disable=W0718
+        except ViewPiCamException as error:
             abort(422, error)
         return "", 204
 
@@ -69,7 +70,7 @@ class RestartApp(Resource):
         """Execute command."""
         try:
             execute_cmd("killall gunicorn")
-        except Exception as error:  # pylint: disable=W0718
+        except ViewPiCamException as error:
             abort(422, error)
         return "", 204
 

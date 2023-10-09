@@ -27,6 +27,7 @@ from .services.handle import (
     handle_bad_request,
     handle_internal_server_error,
     handle_page_not_found,
+    ViewPiCamException,
 )
 
 # from flask_mail import Mail
@@ -141,7 +142,10 @@ def create_app(config=None):
 
     # Set timezone
     if offset := settings.get("gmt_offset"):
-        execute_cmd(f"ln -sf /usr/share/zoneinfo/{offset} /etc/localtime")
+        try:
+            execute_cmd(f"ln -sf /usr/share/zoneinfo/{offset} /etc/localtime")
+        except ViewPiCamException as error:
+            app.logger.error(error)
 
     # Start raspimjpeg
     if "NO_RASPIMJPEG" not in os.environ and not get_pid(app.config["RASPI_BINARY"]):

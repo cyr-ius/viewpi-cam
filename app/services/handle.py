@@ -20,3 +20,7 @@ def handle_internal_server_error(e):
 
 def handle_bad_gateway(e):
     return render_template("errors/502.html", code=502, message=e), 502
+
+
+class ViewPiCamException(Exception):
+    """ViewPi Cam exception."""

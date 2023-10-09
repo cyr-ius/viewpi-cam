@@ -7,6 +7,7 @@ from subprocess import PIPE, Popen
 
 from flask import current_app as ca
 from psutil import process_iter
+from ..services.handle import ViewPiCamException
 
 
 def get_pid(pid_type: str) -> int:
@@ -22,7 +23,12 @@ def get_pid(pid_type: str) -> int:
 
 def execute_cmd(cmd: str) -> None:
     """Execute shell command."""
-    return Popen(cmd, stdout=PIPE, shell=True)
+    process = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
+    output, error = process.communicate()
+    if process.returncode != 0:
+        err = error.decode("utf-8").replace("\n", "")
+        raise ViewPiCamException(f"Error execute command ({err})")
+    return output.decode("utf-8")
 
 
 def write_log(msg: str) -> None:
