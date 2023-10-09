@@ -88,11 +88,10 @@
 <script language="javascript">
 let subdir_char = '{{raspiconfig.subdir_char}}';
 let next, next_info, prev, prev_info;
-let dict_thumbnails = {{thumbnails|tojson}};
+let dict_thumbnails = {};
 let thumbnails = [];
-$.each( dict_thumbnails, function( index, value ){ thumbnails[index]=value['id'];});
 let linksBase = '{{url_for('preview.index')}}?preview=';
-let mediaBase = "/static/{{config['MEDIA']}}/";
+let mediaBase = "{{url_for("static", filename=config['MEDIA'])}}/";
 let preview_id = '{{preview_id}}';
 
 (function() {
@@ -396,7 +395,10 @@ function thumbs(thumb){
 
 function load_thumbs(data){
     $('#thumbs').html('');
+    dict_thumbnails = data;
+    thumbnails= []
     data.forEach(function(item){
+         thumbnails.push(item['id']);
         $('#thumbs').append(thumbs(item));
     });
 }
