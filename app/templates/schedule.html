@@ -265,24 +265,20 @@ $('#restore').click(function(){
 
 $('#schedule').on('click','#start', function(){
     let callbackSuccess = function(response) {
-        if (response.type == "success") {
-            $('.stopstart').val('stop')
-            $('.stopstart').prop("id", 'stop')
-            $('.stopstart').prop("name",'stop')
-            $('.stopstart').html('Stop')
-        }
+        $('.stopstart').val('stop')
+        $('.stopstart').prop("id", 'stop')
+        $('.stopstart').prop("name",'stop')
+        $('.stopstart').html('Stop')
     }
     $.queryData({"url":"{{ url_for('api.schedule_actions')}}/start","callbackSuccess": callbackSuccess})
 });
 
 $('#schedule').on('click','#stop', function(){
     let callbackSuccess = function(response) {
-        if (response.type == "success") {
-            $('.stopstart').val('start')
-            $('.stopstart').prop("id", 'start')
-            $('.stopstart').prop("name",'start')
-            $('.stopstart').html('Start')
-        }
+        $('.stopstart').val('start')
+        $('.stopstart').prop("id", 'start')
+        $('.stopstart').prop("name",'start')
+        $('.stopstart').html('Start')
     }
     $.queryData({"url":"{{ url_for('api.schedule_actions')}}/stop","callbackSuccess": callbackSuccess})
 });
