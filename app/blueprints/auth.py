@@ -2,9 +2,9 @@
 from flask import Blueprint
 from flask import current_app as ca
 from flask import flash, g, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..helpers.decorator import auth_required
-from ..helpers.utils import hash_password
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -33,7 +33,7 @@ def register():
                 first_user = {
                     "id": 1,
                     "name": username,
-                    "password": hash_password(password),
+                    "password": generate_password_hash(password),
                     "rights": ca.config["USERLEVEL_MAX"],
                 }
                 ca.settings.update(users=[first_user])
@@ -59,7 +59,7 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
         if (user := ca.settings.get_user(username)) and (
-            hash_password(password) == user["password"]
+            check_password_hash(user.get("password"), password)
         ):
             session.clear()
             session["username"] = username

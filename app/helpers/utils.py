@@ -1,5 +1,4 @@
 """Utils functions."""
-import hashlib
 import os
 import shutil
 from datetime import datetime as dt
@@ -73,12 +72,3 @@ def disk_usage() -> tuple[int, int, int, int, str]:
         int(percent_used),
         colour,
     )
-
-
-def hash_password(password: str) -> str:
-    """Hash string text."""
-    salt = ca.config["SECRET_KEY"]
-    hashed = hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt.encode("utf-8"), 100000
-    )
-    return hashed.hex()

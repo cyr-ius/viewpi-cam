@@ -3,9 +3,9 @@ import random
 
 from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort, fields
+from werkzeug.security import generate_password_hash
 
 from ..helpers.decorator import token_required
-from ..helpers.utils import hash_password
 from .models import message
 
 users = Namespace("users")
@@ -57,7 +57,7 @@ class Users(Resource):
         ids = [user["id"] for user in ca.settings.users]
         uid = max(ids) + 1
         users.payload["id"] = uid
-        users.payload["password"] = hash_password(users.payload["password"])
+        users.payload["password"] = generate_password_hash(users.payload["password"])
         ca.settings.users.append(users.payload)
         ca.settings.update(users=ca.settings.users)
         return users.payload
@@ -97,7 +97,7 @@ class User(Resource):
             if (pwd := users.payload.get("password")) is None:
                 users.payload["password"] = dict_user["password"]
             else:
-                users.payload["password"] = hash_password(pwd)
+                users.payload["password"] = generate_password_hash(pwd)
             ca.settings.users.append(users.payload)
             ca.settings.update(users=ca.settings.users)
             return users.payload
