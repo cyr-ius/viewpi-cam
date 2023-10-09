@@ -22,12 +22,12 @@ from .helpers.settings import Settings
 from .helpers.utils import execute_cmd, get_pid
 from .services.assets import css_custom, css_main, js_custom, js_main, js_pipan
 from .services.handle import (
+    ViewPiCamException,
     handle_access_forbidden,
     handle_bad_gateway,
     handle_bad_request,
     handle_internal_server_error,
     handle_page_not_found,
-    ViewPiCamException,
 )
 
 # from flask_mail import Mail
