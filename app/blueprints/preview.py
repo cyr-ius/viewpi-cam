@@ -5,7 +5,6 @@ import time
 import zipfile
 from datetime import datetime as dt
 from io import BytesIO
-from subprocess import PIPE, Popen
 from typing import Any
 
 from flask import Blueprint
@@ -16,6 +15,7 @@ from ..helpers.decorator import auth_required
 from ..helpers.filer import (
     data_file_ext,
     data_file_name,
+    execute_cmd,
     find_lapse_files,
     get_file_index,
     get_file_size,
@@ -23,6 +23,7 @@ from ..helpers.filer import (
     list_folder_files,
 )
 from ..helpers.utils import disk_usage, write_log
+from ..services.handle import ViewPiCamException
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
@@ -162,13 +163,16 @@ def video_convert(filename: str) -> None:
             ext = ca.config["THUMBNAIL_EXT"]
             rst = cmd.replace(f"i_{i:05d}", f"tmp/i_{i:05d}")
             cmd = f"({rst} {media_path}/{video_file}; rm -rf {tmp};) >/dev/null 2>&1 &"
-            write_log(f"start lapse convert: {cmd}")
-            Popen(cmd, stdout=PIPE, shell=True)
-            shutil.copy(
-                src=f"{media_path}/{filename}",
-                dst=f"{media_path}/{video_file}.v{file_index}{ext}",
-            )
-            write_log("Convert finished")
+            try:
+                write_log(f"Start lapse convert: {cmd}")
+                execute_cmd(cmd)
+                shutil.copy(
+                    src=f"{media_path}/{filename}",
+                    dst=f"{media_path}/{video_file}.v{file_index}{ext}",
+                )
+                write_log("Convert finished")
+            except ViewPiCamException as error:
+                write_log(f"Error converting ({error})")
 
 
 def get_thumbnails(sort_order, show_types, time_filter, time_filter_max):
