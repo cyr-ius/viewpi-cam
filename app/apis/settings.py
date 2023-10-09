@@ -260,11 +260,13 @@ class Token(Resource):
     """Token."""
 
     @token_required
+    @settings.marshal_with(settings.model("Token", {"token": fields.String()}))
     def get(self):
         """Get token."""
-        return ca.settings.get("token")
+        return {"token": ca.settings.get("token")}
 
     @token_required
+    @settings.marshal_with(settings.model("Token", {"token": fields.String()}))
     def post(self):
         """Create token."""
         token = f"B{random.getrandbits(256)}"
