@@ -1,6 +1,5 @@
 """Api system."""
 from flask import current_app as ca
-from flask import request
 from flask_restx import Namespace, Resource, abort, fields
 
 from ..helpers.decorator import token_required
@@ -25,32 +24,51 @@ command_m = api.model(
 @api.response(204, "Action is success")
 @api.response(422, "Error", message)
 @api.response(403, "Forbidden", message)
-@api.route(
-    "/system/restart", endpoint="system_restart", doc={"description": "Restart host"}
-)
-@api.route(
-    "/system/shutdown", endpoint="system_shutown", doc={"description": "Shutdown host"}
-)
-@api.route(
-    "/system/restart/app",
-    endpoint="system_restart_app",
-    doc={"description": "Restart application"},
-)
-class Actions(Resource):
-    """Get log."""
+@api.route("/system/restart")
+class Restart(Resource):
+    """Restart host."""
 
     @token_required
     def post(self):
-        """Execute system command."""
+        """Execute command."""
         try:
-            if request.endpoint == "api.system_restart":
-                execute_cmd("echo s > /proc/sysrq-trigger")
-                execute_cmd("echo b > /proc/sysrq-trigger")
-            if request.endpoint == "api.system_shutown":
-                execute_cmd("echo s > /proc/sysrq-trigger")
-                execute_cmd("echo o > /proc/sysrq-trigger")
-            if request.endpoint == "api.system_restart_app":
-                execute_cmd("killall gunicorn")
+            execute_cmd("echo s > /proc/sysrq-trigger")
+            execute_cmd("echo b > /proc/sysrq-trigger")
+        except Exception as error:  # pylint: disable=W0718
+            abort(422, error)
+        return "", 204
+
+
+@api.response(204, "Action is success")
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
+@api.route("/system/shutdown")
+class Shutdown(Resource):
+    """Restart application."""
+
+    @token_required
+    def post(self):
+        """Execute command."""
+        try:
+            execute_cmd("echo s > /proc/sysrq-trigger")
+            execute_cmd("echo o > /proc/sysrq-trigger")
+        except Exception as error:  # pylint: disable=W0718
+            abort(422, error)
+        return "", 204
+
+
+@api.response(204, "Action is success")
+@api.response(422, "Error", message)
+@api.response(403, "Forbidden", message)
+@api.route("/system/restart/app", endpoint="system_restart_app")
+class RestartApp(Resource):
+    """Restart application."""
+
+    @token_required
+    def post(self):
+        """Execute command."""
+        try:
+            execute_cmd("killall gunicorn")
         except Exception as error:  # pylint: disable=W0718
             abort(422, error)
         return "", 204

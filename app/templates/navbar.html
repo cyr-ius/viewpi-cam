@@ -113,7 +113,7 @@ $('#restart').click(function(){
 });
 $('#shutdown').click(function(){
   if(confirm('Are you sure to shutdown this host?')) {
-    $.queryData({"url":"{{url_for('api.system_shutown')}}"})
+    $.queryData({"url":"{{url_for('api.system_shutdown')}}"})
   }
 });
 $('#reset').click(function(){
