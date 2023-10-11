@@ -255,8 +255,8 @@ def check_media_path(filename):
 
 
 def thumbs(
-    sort_order: bool = False,
-    show_types: bool = True,
+    sort_order: str = "asc",
+    show_types: str = "both",
     time_filter: int = 1,
     time_filter_max: int = 8,
 ) -> dict[str, Any]:
