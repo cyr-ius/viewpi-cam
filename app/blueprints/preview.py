@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from io import BytesIO
 from typing import Any
 
-from flask import Blueprint, config
+from flask import Blueprint
 from flask import current_app as ca
 from flask import make_response, render_template, request, send_file
 
@@ -31,7 +31,7 @@ bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/pr
 @auth_required
 def index():
     """Index page."""
-    time_filter_max = config["TIME_FILTER_MAX"]
+    time_filter_max = ca.config["TIME_FILTER_MAX"]
     preview_id = request.args.get("preview", "")
     show_types = request.cookies.get("show_types", "both")
     sort_order = request.cookies.get("sort_order", "desc")
