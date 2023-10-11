@@ -89,15 +89,15 @@ class User(Resource):
     @users.response(404, "Not found", message)
     def put(self, uid: int):
         """Set user."""
-        if ca.settings.has_username(users.payload["name"]):
-            abort(422, "User name is already exists, please change.")
         if dict_user := self.get_byid(uid):
-            ca.settings.users.remove(dict_user)
+            if dict_user["name"] != users.payload["name"] and ca.settings.has_username(users.payload["name"]):
+                abort(422, "User name is already exists, please change.")
             users.payload["id"] = uid
             if (pwd := users.payload.get("password")) is None:
                 users.payload["password"] = dict_user["password"]
             else:
                 users.payload["password"] = generate_password_hash(pwd)
+            ca.settings.users.remove(dict_user)
             ca.settings.users.append(users.payload)
             ca.settings.update(users=ca.settings.users)
             return users.payload
