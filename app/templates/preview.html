@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container-fluid overflow-auto">
-    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress mb-3" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar" style="background-color:{{disk_usage[4]}};width: {{disk_usage[3]}}%"><span>local: {{disk_usage[3]}}%  Total: {{disk_usage[0]}} MB</span></div>
     </div>
     <div id="preview" class="d-none text-center" style="position:relative">
