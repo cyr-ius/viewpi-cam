@@ -20,16 +20,16 @@
         <label class="col-auto col-form-label-sm">Ordering</label>
         <div class="col-1">
             <select id="sort_order" class="form-select form-select-sm" name="sort_order">
-                <option value="1" {%  if sort_order|int == 1 %}selected{%endif%}>Ascending</option>
-                <option value="2" {%  if sort_order|int == 2 %}selected{%endif%}>Descending</option>
+                <option value="asc" {%  if sort_order == "asc" %}selected{%endif%}>Ascending</option>
+                <option value="desc" {%  if sort_order == "desc" %}selected{%endif%}>Descending</option>
             </select>
         </div>
         <label class="col-auto col-form-label-sm">Types</label>
         <div class="col-1">
             <select id="show_types" class="form-select form-select-sm" name="show_types">
-                <option value="1" {%  if show_types|int == 1 %}selected{%endif%}>Images &amp Videos</option>
-                <option value="2" {%  if show_types|int == 2 %}selected{%endif%}>Images only</option>
-                <option value="3" {%  if show_types|int == 3 %}selected{%endif%}>Videos only</option>
+                <option value="both" {%  if show_types == "both" %}selected{%endif%}>Images &amp Videos</option>
+                <option value="image" {%  if show_types == "image" %}selected{%endif%}>Images only</option>
+                <option value="video" {%  if show_types == "video" %}selected{%endif%}>Videos only</option>
             </select>
         </div>
         <label class="col-auto col-form-label-sm">Filter</label>
@@ -83,7 +83,8 @@ $(function(){
         load_preview(preview_id);
     }
     let callbackSuccess=function(data){load_thumbs(data);}
-    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}", callbackSuccess: callbackSuccess })
+    data = {"show_types": Cookies.get('show_types') || "both" , "sort_order": Cookies.get('sort_order') || "desc", "time_filter": Cookies.get('time_filter') || 1}
+    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}", data:data, callbackSuccess: callbackSuccess, convertJson: false })
 });
 
 $('#delete').unbind()
@@ -108,7 +109,10 @@ $('#thumbs').on('click','button[name="delete"], #delete', function() {
 
 $('#time_filter, #show_types, #sort_order').on('change', function() {
     let data = $('#filtering input,#filtering select,#filtering textarea').serializeObject();
-    let callbackSuccess=function(data){load_thumbs(data);}
+    let callbackSuccess=function(event){
+        for (let k in data) {Cookies.set(k, data[k])}
+        load_thumbs(event);
+    }
     $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}",data:data, callbackSuccess: callbackSuccess, convertJson:false })
 })
 

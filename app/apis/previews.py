@@ -52,14 +52,14 @@ class Previews(Resource):
 
     @token_required
     @api.marshal_list_with(files)
-    @api.param("sort_order", "Ordering thumbnail (True/False)")
-    @api.param("show_types", "Show types")
+    @api.param("order", "Ordering thumbnail [desc|asc]")
+    @api.param("show_types", "Show types [both|image|video]")
     @api.param("time_filter", "Time filter")
     def get(self):
         """Get all media files."""
         return thumbs(
-            sort_order=int(request.args.get("sort_order", 1)),
-            show_types=int(request.args.get("show_types", 1)),
+            sort_order=request.args.get("sort_order", "asc").lower(),
+            show_types=request.args.get("show_types", "both").lower(),
             time_filter=int(request.args.get("time_filter", 1)),
         )
 

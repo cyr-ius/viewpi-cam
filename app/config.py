@@ -96,6 +96,8 @@ MACROS = [
     "startstop",
 ]
 
+TIME_FILTER_MAX = 8
+
 # API Swagger documentation
 SWAGGER_UI_DOC_EXPANSION = "list"
 SWAGGER_UI_OPERATION_ID = True

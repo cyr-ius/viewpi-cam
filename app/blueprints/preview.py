@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from io import BytesIO
 from typing import Any
 
-from flask import Blueprint
+from flask import Blueprint, config
 from flask import current_app as ca
 from flask import make_response, render_template, request, send_file
 
@@ -31,42 +31,24 @@ bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/pr
 @auth_required
 def index():
     """Index page."""
-    time_filter_max = 8
-    select_all = ""
-
+    time_filter_max = config["TIME_FILTER_MAX"]
     preview_id = request.args.get("preview", "")
-    show_types = int(request.cookies.get("show_types", 1))
-    sort_order = int(request.cookies.get("sort_order", 1))
+    show_types = request.cookies.get("show_types", "both")
+    sort_order = request.cookies.get("sort_order", "desc")
     time_filter = int(request.cookies.get("time_filter", 1))
 
-    show_types = int(request.args.get("show_types", show_types))
-    sort_order = int(request.args.get("sort_order", sort_order))
-    time_filter = int(request.args.get("time_filter", time_filter))
-
-    thumbnails = thumbs(
-        show_types=show_types,
-        sort_order=sort_order,
-        time_filter_max=time_filter_max,
-        time_filter=time_filter,
-    )
     response = make_response(
         render_template(
             "preview.html",
             disk_usage=disk_usage(),
             preview_id=preview_id,
             raspiconfig=ca.raspiconfig,
-            select_all=select_all,
             show_types=show_types,
             sort_order=sort_order,
-            thumbnails=thumbnails,
             time_filter_max=time_filter_max,
             time_filter=time_filter,
         )
     )
-
-    response.set_cookie("show_types", str(show_types))
-    response.set_cookie("sort_order", str(sort_order))
-    response.set_cookie("time_filter", str(time_filter))
 
     return response
 
@@ -194,15 +176,13 @@ def get_thumbnails(sort_order, show_types, time_filter, time_filter_max):
         if include:
             file_type = get_file_type(file)
             if (
-                show_types == 1
-                or (  # noqa: W503
-                    show_types == 2 and (file_type == "i" or file_type == "t")
-                )
-                or (show_types == 3 and file_type == "v")  # noqa: W503
+                (show_types == "both" and (file_type in ["i", "t", "v"]))
+                or (show_types == "image" and (file_type in ["i", "t"]))
+                or (show_types == "video" and file_type == "v")
             ):
                 thumbnails[file] = f"{file_type}_{file_timestamp}"
 
-    if sort_order == 1:
+    if sort_order == "asc":
         thumbnails = dict(sorted(thumbnails.items()))
     else:
         thumbnails = dict(sorted(thumbnails.items(), reverse=True))
