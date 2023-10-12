@@ -53,8 +53,8 @@
 <script language="javascript">
 let subdir_char = '{{raspiconfig.subdir_char}}';
 let next, next_info, prev, prev_info;
-let dict_thumbnails = {};
-let thumbnails = [];
+let thumbnails = {};
+let dataCarousel = [];
 let linksBase = '{{url_for('preview.index')}}?preview=';
 let mediaBase = "{{url_for("static", filename=config['MEDIA'])}}/";
 let preview_id = '{{preview_id}}';
@@ -95,7 +95,7 @@ $('#delete').click(function(){
             $('#hide-preview').trigger('click');
             $(`#${id}`).remove();
         }
-        $.queryData({"method":"delete", "url":`{{url_for('api.previews_previews')}}/${id}`, "callbackSuccess":callbackSuccess})
+        $.queryData({method:"delete", url:`{{url_for('api.previews_previews')}}/${id}`, callbackSuccess:callbackSuccess})
     }
 })
 
@@ -103,14 +103,14 @@ $('#thumbs').on('click','button[name="delete"], #delete', function() {
     if (confirm('Are you sure you want to delete this file?')) {
         let id = $(this).val();
         let callbackSuccess = function(data) {$(`#${id}`).remove();}
-        $.queryData({"method":"delete", "url":`{{url_for('api.previews_previews')}}/${id}`, "callbackSuccess":callbackSuccess})
+        $.queryData({method:"delete", url:`{{url_for('api.previews_previews')}}/${id}`, callbackSuccess:callbackSuccess})
     }
 });
 
 $('#time_filter, #show_types, #sort_order').on('change', function() {
     let data = $('#filtering input,#filtering select,#filtering textarea').serializeObject();
     let callbackSuccess=function(event){
-        for (let k in data) {Cookies.set(k, data[k])}
+        $.each(data,function(index,value){Cookies.set(index,value)})
         load_thumbs(event);
     }
     $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}",data:data, callbackSuccess: callbackSuccess, convertJson:false })
@@ -141,7 +141,7 @@ $('#deleteSel').click(function(){
         data.check_list = [data.check_list]
     data.check_list.forEach(function(item){
         let callbackSuccess = function(data) { $(`#${item}`).remove();}
-        $.queryData({"method":"delete", "url":`{{url_for('api.previews_previews')}}/${item}`, "callbackSuccess":callbackSuccess})
+        $.queryData({method:"delete", url:`{{url_for('api.previews_previews')}}/${item}`, callbackSuccess:callbackSuccess})
     });
 });
 
@@ -162,7 +162,7 @@ $('#lockSel, #unlockSel').click(function(){
                 $(`#${item} button[name="delete"]`).prop('disabled', 'disabled');
             }
         }
-        $.queryData({"url":`{{url_for('api.previews_previews')}}/${item}/${action}`, "callbackSuccess":callbackSuccess})
+        $.queryData({url:`{{url_for('api.previews_previews')}}/${item}/${action}`, callbackSuccess:callbackSuccess})
     });
 
 });
@@ -217,7 +217,7 @@ $('#download').click(function(){
 $('#convert').unbind();
 $('#convert').click(function(){
     let id = $(this).val();
-    $.queryData({"url":`{{url_for('api.previews_previews')}}/${id}/convert`})
+    $.queryData({url:`{{url_for('api.previews_previews')}}/${id}/convert`})
 });
 
 
@@ -238,7 +238,7 @@ function suffixLength(thumbnail) {
    return thumbnail.length - thumbnail.lastIndexOf(".", thumbnail.length - 8);
 }
 
-function imageFromThumbnail(thumbnailName)
+function imageFromThumbnail(thumbnailName) {
    let temp = thumbnailName.substr(0, thumbnailName.length - suffixLength(thumbnailName));
    return temp.split(subdir_char).join("/");
 }
@@ -249,7 +249,7 @@ function preloadImage(url) {
 }
 
 function search_media(id) {
-    for (let item of dict_thumbnails) {
+    for (let item of thumbnails) {
         if (item.id == id)
             return item
     }
@@ -269,11 +269,11 @@ function load_preview(id) {
     $('#download').val(thumbnail);
     $('#delete').val(id);
 
-	var imageIndex = thumbnails.indexOf(id);
+	var imageIndex = dataCarousel.indexOf(id);
 
 	// Previous
 	if (imageIndex > 0) {
-        prev = thumbnails[imageIndex-1];
+        prev = dataCarousel[imageIndex-1];
         $('#prev').prop('disabled', false);
         $('#prev').unbind();
         $('#prev').click(function(){load_preview(prev);});
@@ -287,8 +287,8 @@ function load_preview(id) {
 	}
 
 	// Next
-	if (imageIndex >= 0 && imageIndex < thumbnails.length - 1) {
-        next = thumbnails[imageIndex+1];
+	if (imageIndex >= 0 && imageIndex < dataCarousel.length - 1) {
+        next = dataCarousel[imageIndex+1];
         $('#next').prop('disabled', false);
         $('#next').unbind();
         $('#next').click(function(){load_preview(next);});
@@ -361,12 +361,14 @@ function thumbs(thumb){
 
 function load_thumbs(data){
     $('#thumbs').html('');
-    dict_thumbnails = data;
-    thumbnails= []
+    thumbnails = data;
+    dataCarousel= []
+    let stringAppend="";
     data.forEach(function(item){
-         thumbnails.push(item['id']);
-        $('#thumbs').append(thumbs(item));
+         dataCarousel.push(item['id']);
+         stringAppend += thumbs(item);
     });
+    $('#thumbs').append(stringAppend);
 }
 </script>
 {% endblock%}
