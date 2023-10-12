@@ -83,7 +83,7 @@ $(function(){
         load_preview(preview_id);
     }
     let callbackSuccess=function(data){load_thumbs(data);}
-    data = {"show_types": Cookies.get('show_types') || "both" , "sort_order": Cookies.get('sort_order') || "desc", "time_filter": Cookies.get('time_filter') || 1}
+    let data = {"show_types": Cookies.get('show_types') || "both" , "sort_order": Cookies.get('sort_order') || "desc", "time_filter": Cookies.get('time_filter') || 1}
     $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}", data:data, callbackSuccess: callbackSuccess, convertJson: false })
 });
 
@@ -177,7 +177,7 @@ $('#deleteAll').click(function(){
 
 $('#zipSel').unbind();
 $('#zipSel').click(function(){
-    data = $('#thumbs input').serializeObject()
+    let data = $('#thumbs input').serializeObject()
     let callbackSuccess = function (data) {
         var a = document.createElement('a');
         var url = window.URL.createObjectURL(data);
@@ -238,8 +238,8 @@ function suffixLength(thumbnail) {
    return thumbnail.length - thumbnail.lastIndexOf(".", thumbnail.length - 8);
 }
 
-function imageFromThumbnail(thumbnailName) {
-	let temp = thumbnailName.substr(0, thumbnailName.length - suffixLength(thumbnailName));
+function imageFromThumbnail(thumbnailName)
+   let temp = thumbnailName.substr(0, thumbnailName.length - suffixLength(thumbnailName));
    return temp.split(subdir_char).join("/");
 }
 
