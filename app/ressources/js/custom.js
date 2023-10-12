@@ -47,6 +47,16 @@ $(function () {
   // Start observing the target node for configured mutations
   observer.observe(targetNode, config);
 
+  function spinner(status) {
+    if (status) {
+      $(".bi-eye").addClass("d-none");
+      $(".spinner-border").removeClass("d-none");
+    } else {
+      $(".bi-eye").removeClass("d-none");
+      $(".spinner-border").addClass("d-none");
+    }
+  }
+
   $.queryData = function (options) {
     var o = $.extend(
       {
@@ -67,13 +77,18 @@ $(function () {
       data: o.convertJson && o.data != "" ? JSON.stringify(o.data) : o.data,
       contentType: "application/json; charset=utf-8",
       xhrFields: o.xhrFields,
+      beforeSend: function (data) {
+        spinner(true);
+      },
       success: function (data) {
+        spinner(false);
         $("#toast").addClass("text-bg-primary");
         if (data && data.responseJSON)
           $("#toast .toast-body").html(data.responseJSON["message"]);
         if (o.callbackSuccess) return o.callbackSuccess(data);
       },
       error: function (data) {
+        spinner(false);
         $("#toast").removeClass("text-bg-primary").addClass("text-bg-danger");
         $("#toast .toast-body").html(data.status + " - " + data["message"]);
         if (data.responseJSON)
