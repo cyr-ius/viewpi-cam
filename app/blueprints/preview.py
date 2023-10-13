@@ -214,9 +214,13 @@ def get_thumb(uid: str | None = None) -> dict[str, Any] | list[dict[str, Any]]:
 
 
 def thumb2timestamp(filename):
-    afile = real_name if (real_name := data_file_name(filename)) != "" else filename
-    sdatetime = afile[:-4][-15:].replace("_", "")
-    return dt.strptime(sdatetime, "%Y%m%d%H%M%S").timestamp()
+    try:
+        afile = real_name if (real_name := data_file_name(filename)) != "" else filename
+        sdatetime = afile[:-4][-15:].replace("_", "")
+        return dt.strptime(sdatetime, "%Y%m%d%H%M%S").timestamp()
+    except ValueError:
+        print(f"Error {filename} {afile} {sdatetime}")
+        return 0
 
 
 def check_media_path(filename):
