@@ -18,6 +18,7 @@ from ..helpers.filer import (
     find_lapse_files,
     get_file_index,
     get_file_size,
+    get_file_timestamp,
     get_file_type,
     list_folder_files,
 )
@@ -153,13 +154,17 @@ def get_thumbnails(
                 file_icon = "bi-camera"
         if os.path.isfile(f"{media_path}/{real_file}"):
             file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
-            file_timestamp = thumb2timestamp(file)
+            file_timestamp = get_file_timestamp(real_file)
             if file_type == "v":
                 duration = round(
                     os.path.getmtime(f"{media_path}/{file}") - file_timestamp
                 )
         else:
-            file_timestamp = thumb2timestamp(file)
+            file_timestamp = (
+                get_file_timestamp(real_file)
+                if real_file != ""
+                else get_file_timestamp(file)
+            )
 
         if time_filter == 1:
             include = True
@@ -211,16 +216,6 @@ def get_thumb(uid: str | None = None) -> dict[str, Any] | list[dict[str, Any]]:
     for thumb in get_thumbnails():
         if thumb["id"] == uid:
             return thumb
-
-
-def thumb2timestamp(filename):
-    try:
-        afile = real_name if (real_name := data_file_name(filename)) != "" else filename
-        sdatetime = afile[:-4][-15:].replace("_", "")
-        return dt.strptime(sdatetime, "%Y%m%d%H%M%S").timestamp()
-    except ValueError:
-        print(f"Error {filename} {afile} {sdatetime}")
-        return 0
 
 
 def check_media_path(filename):
