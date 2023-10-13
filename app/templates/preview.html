@@ -340,7 +340,7 @@ function thumbs(thumb){
     <div id="${thumb.id}" class="col-6 col-md-4 col-lg-4 col-xl-2 col-xxl-1">
         <div class="card shadow-sm">
             <a id="load_preview" title="${thumb.real_file}" href="#" onclick="load_preview('${thumb.id}');scroll_top();">
-                <img class="mx-auto d-block card-img-top" src="{{ url_for('static', filename=config['MEDIA']) }}/${thumb.file_name}"/>
+                <img class="mx-auto d-block card-img-top" loading="lazy" src="{{ url_for('static', filename=config['MEDIA']) }}/${thumb.file_name}"/>
             </a>
             <div class="card-img-overlay" style="height:5px;">
                 <i class="float-start ${icon}" style="font-size: 16px;color: white;"></i>
