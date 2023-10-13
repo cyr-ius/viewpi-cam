@@ -1,5 +1,6 @@
 """Files functions."""
 import os
+from datetime import datetime as dt
 
 from flask import current_app as ca
 
@@ -121,6 +122,13 @@ def get_file_index(file: str) -> str:
     if i > 0:
         return file[i + 2 : len(file) - 7]  # noqa: E203
     return ""
+
+
+def get_file_timestamp(file: str) -> dt:
+    """Return timestamp."""
+    ext = (len(get_file_ext(file)) + 1) * -1
+    sdatetime = file[:ext][-15:].replace("_", "")
+    return dt.strptime(sdatetime, "%Y%m%d%H%M%S").timestamp()
 
 
 def list_folder_files(path: str, ext=None) -> list[str]:
