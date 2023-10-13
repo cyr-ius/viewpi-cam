@@ -86,7 +86,7 @@ def zipdata():
     if check_list:
         zip_list = []
         for uid in check_list:
-            thumb = get_thumbnails_id(uid)
+            thumb = get_thumb(uid)
             zip_list.append(thumb["file_name"])
 
         return get_zip(zip_list)
@@ -119,6 +119,113 @@ def get_zip(files: list):
         as_attachment=True,
         download_name=zipname,
     )
+
+
+def get_thumbnails(
+    sort_order: str = "asc",
+    show_types: str = "both",
+    time_filter: int = 1,
+    time_filter_max: int = 8,
+):
+    """Return thumbnails and extra informations."""
+    media_path = ca.raspiconfig.media_path
+    select_thumbs = {}
+    thumbnails = []
+    for file in list_folder_files(media_path):
+        file_type = get_file_type(file)
+        real_file = data_file_name(file)
+        file_id = real_file[:-4].replace("_", "")
+        file_number = get_file_index(file)
+        file_lock = file_id in ca.settings.get("lock_files", [])
+        file_size = 0
+        lapse_count = 0
+        duration = 0
+
+        match file_type:
+            case "v":
+                file_icon = "bi-camera-reels"
+            case "t":
+                file_icon = "bi-images"
+                lapse_count = len(find_lapse_files(file))
+            case "i":
+                file_icon = "bi-camera"
+            case _:
+                file_icon = "bi-camera"
+        if os.path.isfile(f"{media_path}/{real_file}"):
+            file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
+            file_timestamp = thumb2timestamp(file)
+            if file_type == "v":
+                duration = round(
+                    os.path.getmtime(f"{media_path}/{file}") - file_timestamp
+                )
+        else:
+            file_timestamp = thumb2timestamp(file)
+
+        if time_filter == 1:
+            include = True
+        else:
+            time_delta = dt.now().timestamp() - file_timestamp
+            if time_filter == time_filter_max:
+                include = time_delta >= (86400 * (time_filter - 2))
+            else:
+                include = time_delta >= (86400 * (time_filter - 2)) and (
+                    time_delta < ((time_filter - 1) * 86400)
+                )
+
+        if include and file_type:
+            if (
+                (show_types == "both" and (file_type in ["v", "i", "t"]))
+                or (show_types == "image" and (file_type in ["i", "t"]))
+                or (show_types == "video" and file_type == "v")
+            ):
+                select_thumbs.update(
+                    {
+                        file_timestamp: {
+                            "id": file_id,
+                            "file_name": file,
+                            "file_type": file_type,
+                            "file_size": file_size,
+                            "file_icon": file_icon,
+                            "file_datetime": dt.fromtimestamp(file_timestamp),
+                            "file_lock": file_lock,
+                            "real_file": real_file,
+                            "file_number": file_number,
+                            "lapse_count": lapse_count,
+                            "duration": duration,
+                        }
+                    }
+                )
+
+    if sort_order == "asc":
+        select_thumbs = dict(sorted(select_thumbs.items()))
+    else:
+        select_thumbs = dict(sorted(select_thumbs.items(), reverse=True))
+
+    thumbnails = list(select_thumbs.values())
+
+    return thumbnails
+
+
+def get_thumb(uid: str | None = None) -> dict[str, Any] | list[dict[str, Any]]:
+    """Get file name and real name."""
+    for thumb in get_thumbnails():
+        if thumb["id"] == uid:
+            return thumb
+
+
+def thumb2timestamp(filename):
+    afile = real_name if (real_name := data_file_name(filename)) != "" else filename
+    sdatetime = afile[:-4][-15:].replace("_", "")
+    return dt.strptime(sdatetime, "%Y%m%d%H%M%S").timestamp()
+
+
+def check_media_path(filename):
+    """Check file if existe media path."""
+    media_path = ca.raspiconfig.media_path
+    if os.path.realpath(
+        os.path.dirname(f"{media_path}/{filename}")
+    ) == os.path.realpath(media_path):
+        return os.path.isfile(f"{media_path}/{filename}")
 
 
 def video_convert(filename: str) -> None:
@@ -154,133 +261,3 @@ def video_convert(filename: str) -> None:
                 write_log("Convert finished")
             except ViewPiCamException as error:
                 write_log(f"Error converting ({error})")
-
-
-def get_thumbnails(sort_order, show_types, time_filter, time_filter_max):
-    """Return files."""
-    media_path = ca.raspiconfig.media_path
-    files = list_folder_files(media_path)
-    thumbnails = {}
-    for file in files:
-        file_timestamp = os.path.getmtime(f"{media_path}/{file}")
-        if time_filter == 1:
-            include = True
-        else:
-            time_delta = dt.now().timestamp() - file_timestamp
-            if time_filter == time_filter_max:
-                include = time_delta >= (86400 * (time_filter - 2))
-            else:
-                include = time_delta >= (86400 * (time_filter - 2)) and (
-                    time_delta < ((time_filter - 1) * 86400)
-                )
-        if include:
-            file_type = get_file_type(file)
-            if (
-                (show_types == "both" and (file_type in ["i", "t", "v"]))
-                or (show_types == "image" and (file_type in ["i", "t"]))
-                or (show_types == "video" and file_type == "v")
-            ):
-                thumbnails[file] = file_timestamp
-
-    if sort_order == "asc":
-        thumbnails = dict(sorted(thumbnails.items()))
-    else:
-        thumbnails = dict(sorted(thumbnails.items(), reverse=True))
-
-    return list(thumbnails.keys())
-
-
-def draw_files(filesnames: list):
-    """Return thumbnails and extra informations."""
-    media_path = ca.raspiconfig.media_path
-    thumbnails = []
-    for file in filesnames:
-        file_type = get_file_type(file)
-        real_file = data_file_name(file)
-        file_id = real_file[:-4].replace("_", "")
-        file_number = get_file_index(file)
-        file_lock = file_id in ca.settings.get("lock_files", [])
-        file_size = 0
-        lapse_count = 0
-        duration = 0
-
-        match file_type:
-            case "v":
-                file_icon = "bi-camera-reels"
-            case "t":
-                file_icon = "bi-images"
-                lapse_count = len(find_lapse_files(file))
-            case "i":
-                file_icon = "bi-camera"
-            case _:
-                file_icon = "bi-camera"
-        if os.path.isfile(f"{media_path}/{real_file}"):
-            file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
-            file_timestamp = os.path.getmtime(f"{media_path}/{real_file}")
-            if file_type == "v":
-                duration = round(
-                    os.path.getmtime(f"{media_path}/{file}") - file_timestamp
-                )
-        else:
-            file_timestamp = os.path.getmtime(f"{media_path}/{file}")
-
-        if file_type:
-            thumbnails.append(
-                {
-                    "id": file_id,
-                    "file_name": file,
-                    "file_type": file_type,
-                    "file_size": file_size,
-                    "file_icon": file_icon,
-                    "file_datetime": dt.fromtimestamp(file_timestamp),
-                    "file_lock": file_lock,
-                    "real_file": real_file,
-                    "file_number": file_number,
-                    "lapse_count": lapse_count,
-                    "duration": duration,
-                }
-            )
-
-    ca.logger.debug(f"Thumbnails: {thumbnails}")
-    return thumbnails
-
-
-def check_media_path(filename):
-    """Check file if existe media path."""
-    media_path = ca.raspiconfig.media_path
-    if os.path.realpath(
-        os.path.dirname(f"{media_path}/{filename}")
-    ) == os.path.realpath(media_path):
-        return os.path.isfile(f"{media_path}/{filename}")
-
-
-def thumbs(
-    sort_order: str = "asc",
-    show_types: str = "both",
-    time_filter: int = 1,
-    time_filter_max: int = 8,
-) -> dict[str, Any]:
-    """Get details files infos."""
-    thumb_filenames = get_thumbnails(
-        sort_order=sort_order,
-        show_types=show_types,
-        time_filter=time_filter,
-        time_filter_max=time_filter_max,
-    )
-    return draw_files(thumb_filenames)
-
-
-def get_thumbnails_id(uid: str | None = None) -> dict[str, Any] | list[dict[str, Any]]:
-    """Get file name and real name."""
-    media_path = ca.raspiconfig.media_path
-    files = list_folder_files(media_path)
-    thumbnails = []
-    for file in files:
-        real_file = data_file_name(file)
-        file_id = real_file[:-4].replace("_", "")
-        if real_file:
-            thumb = {"id": file_id, "real_file": real_file, "file_name": file}
-            if uid and uid == file_id:
-                return thumb
-            thumbnails.append(thumb)
-    return thumbnails

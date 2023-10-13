@@ -79,10 +79,12 @@ let preview_id = '{{preview_id}}';
 $(function(){
     $('#main').addClass("d-none")
     $('#gallery').removeClass("d-none")
-    if (preview_id != ''){
-        load_preview(preview_id);
+    let callbackSuccess=function(data){
+        load_thumbs(data);
+        if (preview_id != ''){
+            load_preview(preview_id);
+        }
     }
-    let callbackSuccess=function(data){load_thumbs(data);}
     let data = {"show_types": Cookies.get('show_types') || "both" , "sort_order": Cookies.get('sort_order') || "desc", "time_filter": Cookies.get('time_filter') || 1}
     $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}", data:data, callbackSuccess: callbackSuccess, convertJson: false })
 });

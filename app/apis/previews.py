@@ -3,7 +3,7 @@ from flask import current_app as ca
 from flask import request, url_for
 from flask_restx import Namespace, Resource, abort, fields
 
-from ..blueprints.preview import get_thumbnails_id, thumbs, video_convert
+from ..blueprints.preview import get_thumb, get_thumbnails, video_convert
 from ..helpers.decorator import token_required
 from ..helpers.filer import delete_mediafiles, lock_file, maintain_folders
 from .models import forbidden, message
@@ -57,7 +57,7 @@ class Previews(Resource):
     @api.param("time_filter", "Time filter")
     def get(self):
         """Get all media files."""
-        return thumbs(
+        return get_thumbnails(
             sort_order=request.args.get("sort_order", "asc").lower(),
             show_types=request.args.get("show_types", "both").lower(),
             time_filter=int(request.args.get("time_filter", 1)),
@@ -82,16 +82,14 @@ class Preview(Resource):
     @api.marshal_with(files)
     def get(self, id):
         """Get file information."""
-        for thumb in thumbs():
-            if thumb["id"] == id:
-                return thumb
+        return get_thumb(id)
 
     @token_required
     @api.doc(description="Delete file")
     @api.response(204, "Action is success")
     def delete(self, id):
         """Delete file."""
-        if thumb := get_thumbnails_id(id):
+        if thumb := get_thumb(id):
             if id in ca.settings.lock_files:
                 abort(422, f"Protected thumbnail ({id})")
             delete_mediafiles(thumb["file_name"])
@@ -110,7 +108,7 @@ class Lock(Resource):
     @token_required
     def post(self, id: str):
         """Lock."""
-        if thumb := get_thumbnails_id(id):
+        if thumb := get_thumb(id):
             lock_file(
                 thumb["file_name"],
                 thumb["id"],
@@ -130,7 +128,7 @@ class Unlock(Resource):
     @token_required
     def post(self, id: str):
         """Unlock."""
-        if thumb := get_thumbnails_id(id):
+        if thumb := get_thumb(id):
             lock_file(
                 thumb["file_name"],
                 thumb["id"],
@@ -150,7 +148,7 @@ class Convert(Resource):
     @token_required
     def post(self, id: str):
         """Coonvert timelapse."""
-        if thumb := get_thumbnails_id(id):
+        if thumb := get_thumb(id):
             video_convert(thumb["file_name"])
             return "", 204
         abort(404, "Thumb not found")
