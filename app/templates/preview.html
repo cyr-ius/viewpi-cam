@@ -339,7 +339,7 @@ function thumbs(thumb){
     let string=`\
     <div id="${thumb.id}" class="col-6 col-md-4 col-lg-4 col-xl-2 col-xxl-1">
         <div class="card shadow-sm">
-            <a id="load_preview" title="${thumb.real_file}" href="#" onclick="load_preview('${thumb.id}');">
+            <a id="load_preview" title="${thumb.real_file}" href="#" onclick="load_preview('${thumb.id}');scroll_top();">
                 <img class="mx-auto d-block card-img-top" src="{{ url_for('static', filename=config['MEDIA']) }}/${thumb.file_name}"/>
             </a>
             <div class="card-img-overlay" style="height:5px;">
@@ -372,5 +372,10 @@ function load_thumbs(data){
     });
     $('#thumbs').append(stringAppend);
 }
+
+function scroll_top() {
+  $('main .container-fluid')[0].scrollTop=0
+}
+
 </script>
 {% endblock%}
