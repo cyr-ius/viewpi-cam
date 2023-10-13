@@ -180,7 +180,7 @@ def get_thumbnails(sort_order, show_types, time_filter, time_filter_max):
                 or (show_types == "image" and (file_type in ["i", "t"]))
                 or (show_types == "video" and file_type == "v")
             ):
-                thumbnails[file] = f"{file_type}_{file_timestamp}"
+                thumbnails[file] = file_timestamp
 
     if sort_order == "asc":
         thumbnails = dict(sorted(thumbnails.items()))
