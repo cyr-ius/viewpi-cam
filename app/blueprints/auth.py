@@ -2,7 +2,7 @@
 import pyotp
 from flask import Blueprint
 from flask import current_app as ca
-from flask import flash, g, redirect, render_template, request, session, url_for
+from flask import flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..helpers.decorator import auth_required
@@ -15,7 +15,6 @@ def before_app_request():
     """Execute before request."""
     if hasattr(ca.settings, "users") and len(ca.settings.users) == 0:
         session.clear()
-    g.user = session.get("username")
 
 
 @bp.route("/register", methods=["GET", "POST"])
@@ -63,8 +62,6 @@ def login():
             check_password_hash(user.get("password"), password)
         ):
             session.clear()
-            session["username"] = username
-            session["user_level"] = user.get("rights")
             next_page = (
                 next_page
                 if (next_page := request.form.get("next"))
@@ -74,6 +71,9 @@ def login():
             if user.get("totp"):
                 return render_template("totp.html", next=next_page, id=user.get("id"))
 
+            session["username"] = username
+            session["level"] = user.get("rights")
+
             return redirect(next_page)
 
         flash("User or password invalid.")
@@ -82,7 +82,6 @@ def login():
 
 
 @bp.route("/totp-verified", methods=["GET", "POST"])
-@auth_required
 def totpverified():
     """Totop verified."""
     id = request.args.get("id")
@@ -93,6 +92,8 @@ def totpverified():
         if dict_user := ca.settings.get_user_byid(int(request.form.get("id"))):
             totp = pyotp.TOTP(dict_user["secret"])
             if totp.verify(request.form.get("secret")):
+                session["username"] = dict_user.get("name")
+                session["level"] = dict_user.get("rights")
                 return redirect(next)
             flash("Code invalid.")
 
