@@ -2,7 +2,7 @@
 from functools import partial, wraps
 from typing import overload
 
-from flask import abort, current_app, g, redirect, request, url_for
+from flask import abort, current_app, redirect, request, session, url_for
 
 
 @overload
@@ -17,7 +17,7 @@ def auth_required(*, token_accept=False):
 
 def auth_required(func=None, *, token_accept=False):
     def wrapper(func, *args, **kwargs):
-        if g.user:
+        if session.get("username"):
             return func(*args, **kwargs)
         if token_accept is True and (token := request.args.get("token")):
             if token == current_app.settings.get("token"):
@@ -40,7 +40,7 @@ def auth_required(func=None, *, token_accept=False):
 def token_required(function):
     @wraps(function)
     def decorator(*args, **kwargs):
-        if g.user:
+        if session.get("username"):
             return function(*args, **kwargs)
         if api_key := request.headers.get("X_API_KEY"):
             if api_key == current_app.settings.get("token"):
