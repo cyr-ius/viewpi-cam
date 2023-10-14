@@ -1,0 +1,30 @@
+<div id="otpmodal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="otp_svg"></div>
+        <input type="text" name="totpcode" class="form-input">
+        <input type="hidden" id="userid" name="id">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button id="otp_btn" type="button" class="btn btn-primary">Check OTP</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let otpModal = new bootstrap.Modal('#otpmodal');
+$('#otp_btn').unbind();
+$('#otp_btn').click(function () {
+  let data = $('#otpmodal').find('input, select').serializeObject();
+  let callback = function(data){
+    otpModal.hide();
+  }
+  $.queryData({method:"put", url:`{{ url_for('api.users_totp')}}/${data["id"]}`,data:data, "callbackSuccess":callback});
+});
+</script>

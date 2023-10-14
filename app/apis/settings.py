@@ -1,6 +1,10 @@
 """Blueprint API."""
 import random
+from typing import Any
 
+import pyotp
+import qrcode
+import qrcode.image.svg
 from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort, fields
 from werkzeug.security import generate_password_hash
@@ -17,6 +21,10 @@ buttons.add_model("Error", message)
 settings = Namespace("settings")
 settings.add_model("Error", message)
 
+otps = Namespace("otps")
+otps.add_model("Error", message)
+
+
 user = users.model(
     "User",
     {
@@ -25,6 +33,7 @@ user = users.model(
         "rights": fields.Integer(
             required=True, description="The user rights", enum=[2, 4, 6, 8]
         ),
+        "totp-enable": fields.Boolean(required=False, description="Totp status"),
     },
 )
 
@@ -68,7 +77,7 @@ class Users(Resource):
 class User(Resource):
     """User objet."""
 
-    def get_byid(self, uid: int):
+    def get_byid(self, uid: int) -> dict[str, Any]:
         """Return user."""
         for dict_user in ca.settings.users:
             if dict_user["id"] == uid:
@@ -90,7 +99,9 @@ class User(Resource):
     def put(self, uid: int):
         """Set user."""
         if dict_user := self.get_byid(uid):
-            if dict_user["name"] != users.payload["name"] and ca.settings.has_username(users.payload["name"]):
+            if dict_user["name"] != users.payload["name"] and ca.settings.has_username(
+                users.payload["name"]
+            ):
                 abort(422, "User name is already exists, please change.")
             users.payload["id"] = uid
             if (pwd := users.payload.get("password")) is None:
@@ -328,3 +339,105 @@ class Macros(Resource):
                 command = f"-{command}"
             ca.raspiconfig.set_config({name: command})
         return "", 204
+
+
+class UriOTP(fields.Raw):
+    """totp SVG."""
+
+    def output(self, key, obj, **kwargs):
+        if not obj:
+            return
+        name = obj["name"]
+        totp = obj["totp"]
+        uri = f"otpauth://totp/viewpicam:{name}?secret={totp}&issuer=viewpicam"
+        qr = qrcode.QRCode(image_factory=qrcode.image.svg.SvgPathImage)
+        qr.make(fit=True)
+        qr.add_data(uri)
+        img = qr.make_image()
+        return img.to_string(encoding="unicode")
+
+
+otp = users.model(
+    "TOTP",
+    {
+        "id": fields.Integer(required=True, description="Id"),
+        "name": fields.String(required=True, description="The user name"),
+        "otp_svg": UriOTP(required=False),
+        "totp-enable": fields.Boolean(required=False),
+    },
+)
+
+
+@otps.response(403, "Forbidden", message)
+@otps.route("/totp", doc=False, endpoint="users_totp")
+@otps.route("/totp/<int:id>")
+class Totp(Resource):
+    """TOTP."""
+
+    def get_byid(self, uid: int):
+        """Return user."""
+        for dict_user in ca.settings.users:
+            if dict_user["id"] == uid:
+                return dict_user
+
+    @token_required
+    @otps.marshal_with(otp)
+    @otps.response(204, "OTP already enabled")
+    @otps.response(422, "Error", message)
+    def get(self, id: int):
+        """Get OTP for a user."""
+        if dict_user := self.get_byid(id):
+            if dict_user.get("totp-enable", False) is False:
+                ca.settings.users.remove(dict_user)
+                dict_user["totp"] = pyotp.random_base32()
+                ca.settings.users.append(dict_user)
+                ca.settings.update(users=ca.settings.users)
+            return dict_user
+        abort(404, "User not found")
+
+    @token_required
+    @otps.response(204, "Action is success")
+    @otps.response(404, "Not found", message)
+    def post(self, id: int):
+        """Check OTP code."""
+        if dict_user := self.get_byid(id):
+            if (totpcode := dict_user.get("totp")) and dict_user.get(
+                "totp-enable", False
+            ):
+                totp = pyotp.TOTP(totpcode)
+                if totp.verify(otps.payload["totpcode"]):
+                    return "", 204
+                abort(422, "OTP incorrect")
+            abort(422, "OTP not enable")
+        abort(404, "User not found")
+
+    @token_required
+    @otps.response(204, "Action is success")
+    @otps.response(404, "Not found", message)
+    @otps.response(422, "Error", message)
+    def put(self, id: int):
+        """Check and create OTP Code for a user."""
+        if (dict_user := self.get_byid(id)) and (totpcode := dict_user.get("totp")):
+            totp = pyotp.TOTP(totpcode)
+            if totp.verify(otps.payload["totpcode"]):
+                ca.settings.users.remove(dict_user)
+                dict_user["totp-enable"] = True
+                ca.settings.users.append(dict_user)
+                ca.settings.update(users=ca.settings.users)
+                return "", 204
+            abort(422, "OTP incorrect")
+        abort(404, "User or otp code not found")
+
+    @token_required
+    @otps.response(204, "Action is success")
+    @otps.response(404, "Not found", message)
+    def delete(self, id: int):
+        """Delete OTP infos for a user."""
+        if dict_user := self.get_byid(id):
+            ca.settings.users.remove(dict_user)
+            dict_user.pop("totp-enable", None)
+            dict_user.pop("totp", None)
+            ca.settings.users.append(dict_user)
+            ca.settings.update(users=ca.settings.users)
+            return "", 204
+        abort(404, "User not found")
