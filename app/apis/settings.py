@@ -66,7 +66,8 @@ class Users(Resource):
         users.payload["id"] = 1 if len(ids) == 0 else max(ids) + 1
         users.payload["password"] = generate_password_hash(users.payload["password"])
         ca.settings.users.append(users.payload)
-        ca.settings.update(users=ca.settings.users)
+        if len(ca.settings.users) > 0:
+            ca.settings.update(users=ca.settings.users)
         return users.payload
 
 
@@ -102,7 +103,8 @@ class User(Resource):
                 users.payload["password"] = generate_password_hash(pwd)
             ca.settings.users.remove(dict_user)
             ca.settings.users.append(users.payload)
-            ca.settings.update(users=ca.settings.users)
+            if len(ca.settings.users) > 0:
+                ca.settings.update(users=ca.settings.users)
             return users.payload
         abort(404, "User not found")
 
@@ -111,6 +113,8 @@ class User(Resource):
     @users.response(404, "Not found", message)
     def delete(self, id: int):  # pylint: disable=W0622
         """Delete user."""
+        if id == 1:
+            abort(403, "Admin account cannot be deleted")
         if dict_user := ca.settings.get_user_byid(id):
             ca.settings.users.remove(dict_user)
             ca.settings.update(users=ca.settings.users)
@@ -376,7 +380,8 @@ class Totp(Resource):
                 ca.settings.users.remove(dict_user)
                 dict_user["secret"] = pyotp.random_base32()
                 ca.settings.users.append(dict_user)
-                ca.settings.update(users=ca.settings.users)
+                if len(ca.settings.users) > 0:
+                    ca.settings.update(users=ca.settings.users)
             return dict_user
         abort(404, "User not found")
 
@@ -408,7 +413,8 @@ class Totp(Resource):
                 ca.settings.users.remove(dict_user)
                 dict_user["totp"] = True
                 ca.settings.users.append(dict_user)
-                ca.settings.update(users=ca.settings.users)
+                if len(ca.settings.users) > 0:
+                    ca.settings.update(users=ca.settings.users)
                 return "", 204
             abort(422, "OTP incorrect")
         abort(404, "User or otp code not found")
@@ -423,6 +429,7 @@ class Totp(Resource):
             dict_user.pop("totp", None)
             dict_user.pop("secret", None)
             ca.settings.users.append(dict_user)
-            ca.settings.update(users=ca.settings.users)
+            if len(ca.settings.users) > 0:
+                ca.settings.update(users=ca.settings.users)
             return "", 204
         abort(404, "User not found")
