@@ -1,4 +1,5 @@
 """Blueprint Authentication."""
+import pyotp
 from flask import Blueprint
 from flask import current_app as ca
 from flask import flash, g, redirect, render_template, request, session, url_for
@@ -69,11 +70,33 @@ def login():
                 if (next_page := request.form.get("next"))
                 else url_for("main.index")
             )
+
+            if user.get("totp"):
+                return render_template("totp.html", next=next_page, id=user.get("id"))
+
             return redirect(next_page)
 
         flash("User or password invalid.")
 
     return render_template("login.html")
+
+
+@bp.route("/totp-verified", methods=["GET", "POST"])
+@auth_required
+def totpverified():
+    """Totop verified."""
+    id = request.args.get("id")
+    next = request.args.get("next")
+    if request.method == "POST":
+        id = request.form.get("id")
+        next = request.form.get("next")
+        if dict_user := ca.settings.get_user_byid(int(request.form.get("id"))):
+            totp = pyotp.TOTP(dict_user["secret"])
+            if totp.verify(request.form.get("secret")):
+                return redirect(next)
+            flash("Code invalid.")
+
+    return render_template("totp.html", id=id, next=next)
 
 
 @bp.route("/logout", methods=["GET", "POST"])
