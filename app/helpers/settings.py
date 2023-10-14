@@ -27,3 +27,9 @@ class Settings(JsonDB):
         for user in self.users:
             if user["name"] == username:
                 return user
+
+    def get_user_byid(self, id: int) -> dict[str, Any] | None:
+        """Return user infos."""
+        for user in self.users:
+            if user["id"] == id:
+                return user
