@@ -63,8 +63,7 @@ class Users(Resource):
         if ca.settings.has_username(users.payload["name"]):
             abort(422, "User name is already exists, please change.")
         ids = [user["id"] for user in ca.settings.users]
-        uid = max(ids) + 1
-        users.payload["id"] = uid
+        users.payload["id"] = 1 if len(ids) == 0 else max(ids) + 1
         users.payload["password"] = generate_password_hash(users.payload["password"])
         ca.settings.users.append(users.payload)
         ca.settings.update(users=ca.settings.users)
@@ -158,8 +157,7 @@ class Buttons(Resource):
         if ca.settings.get("ubuttons") is None:
             ca.settings.ubuttons = []
         ids = [button["id"] for button in ca.settings.ubuttons]
-        uid = 1 if len(ids) == 0 else max(ids) + 1
-        buttons.payload["id"] = uid
+        buttons.payload["id"] = 1 if len(ids) == 0 else max(ids) + 1
         ca.settings.ubuttons.append(buttons.payload)
         ca.settings.update(buttons=ca.settings.ubuttons)
         return buttons.payload
