@@ -2,12 +2,18 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
+        <h5 class="modal-title"><i class="bi bi-shield-lock"></i> TOTP Enrollment</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center">
-        <div id="otp_svg"></div>
-        <input type="text" name="totpcode" class="form-input">
+        <p>Please scan QR Code and input code to first onboarding</p>
+        <div id="otp_svg" class="col-6 mx-auto bg-light my-3"></div>
+        <div class="col-6 mx-auto">
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+            <input class="form-control" name="secret" placeholder="OTP Code" type="text" aria-label="Otpcode" required autofocus>
+          </div>
+        </div>
         <input type="hidden" id="userid" name="id">
       </div>
       <div class="modal-footer">
@@ -22,9 +28,7 @@ let otpModal = new bootstrap.Modal('#otpmodal');
 $('#otp_btn').unbind();
 $('#otp_btn').click(function () {
   let data = $('#otpmodal').find('input, select').serializeObject();
-  let callback = function(data){
-    otpModal.hide();
-  }
+  let callback = function(data){ otpModal.hide();}
   $.queryData({method:"put", url:`{{ url_for('api.users_totp')}}/${data["id"]}`,data:data, "callbackSuccess":callback});
 });
 </script>

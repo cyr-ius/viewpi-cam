@@ -1,6 +1,5 @@
 """Blueprint API."""
 import random
-from typing import Any
 
 import pyotp
 import qrcode
@@ -33,7 +32,7 @@ user = users.model(
         "rights": fields.Integer(
             required=True, description="The user rights", enum=[2, 4, 6, 8]
         ),
-        "totp-enable": fields.Boolean(required=False, description="Totp status"),
+        "totp": fields.Boolean(required=False, description="otp status"),
     },
 )
 
@@ -77,18 +76,12 @@ class Users(Resource):
 class User(Resource):
     """User objet."""
 
-    def get_byid(self, uid: int) -> dict[str, Any]:
-        """Return user."""
-        for dict_user in ca.settings.users:
-            if dict_user["id"] == uid:
-                return dict_user
-
     @token_required
     @users.marshal_with(user)
     @users.response(404, "Not found", message)
-    def get(self, uid: int):
+    def get(self, id: int):  # pylint: disable=W0622
         """Get user."""
-        if dict_user := self.get_byid(uid):
+        if dict_user := ca.settings.get_user_byid(id):
             return dict_user
         abort(404, "User not found")
 
@@ -96,14 +89,14 @@ class User(Resource):
     @users.expect(user)
     @users.marshal_with(user)
     @users.response(404, "Not found", message)
-    def put(self, uid: int):
+    def put(self, id: int):  # pylint: disable=W0622
         """Set user."""
-        if dict_user := self.get_byid(uid):
+        if dict_user := ca.settings.get_user_byid(id):
             if dict_user["name"] != users.payload["name"] and ca.settings.has_username(
                 users.payload["name"]
             ):
                 abort(422, "User name is already exists, please change.")
-            users.payload["id"] = uid
+            users.payload["id"] = id
             if (pwd := users.payload.get("password")) is None:
                 users.payload["password"] = dict_user["password"]
             else:
@@ -117,9 +110,9 @@ class User(Resource):
     @token_required
     @users.response(204, "Actions is success")
     @users.response(404, "Not found", message)
-    def delete(self, uid: int):
+    def delete(self, id: int):  # pylint: disable=W0622
         """Delete user."""
-        if dict_user := self.get_byid(uid):
+        if dict_user := ca.settings.get_user_byid(id):
             ca.settings.users.remove(dict_user)
             ca.settings.update(users=ca.settings.users)
             return "", 204
@@ -173,14 +166,14 @@ class Buttons(Resource):
 
 
 @buttons.response(403, "Forbidden", message)
-@buttons.route("/buttons/<int:uid>")
+@buttons.route("/buttons/<int:id>")
 class Button(Resource):
     """Button objet."""
 
-    def get_byid(self, uid: int):
+    def get_byid(self, id: int):  # pylint: disable=W0622
         """Return button."""
         for button_dict in ca.settings.get("ubuttons", []):
-            if button_dict["id"] == uid:
+            if button_dict["id"] == id:
                 return button_dict
 
     @token_required
@@ -196,11 +189,11 @@ class Button(Resource):
     @buttons.expect(button)
     @buttons.marshal_with(button)
     @buttons.response(404, "Not found", message)
-    def put(self, uid: int):
+    def put(self, id: int):  # pylint: disable=W0622
         """Set button."""
-        if dict_button := self.get_byid(uid):
+        if dict_button := self.get_byid(id):
             ca.settings.ubuttons.remove(dict_button)
-            buttons.payload["id"] = uid
+            buttons.payload["id"] = id
             ca.settings.ubuttons.append(buttons.payload)
             ca.settings.update(ubuttons=ca.settings.ubuttons)
             return buttons.payload
@@ -209,9 +202,9 @@ class Button(Resource):
     @token_required
     @buttons.response(204, "Actions is success")
     @buttons.response(404, "Not found", message)
-    def delete(self, uid: int):
+    def delete(self, id: int):  # pylint: disable=W0622
         """Delete button."""
-        if dict_button := self.get_byid(uid):
+        if dict_button := self.get_byid(id):
             ca.settings.ubuttons.remove(dict_button)
             ca.settings.update(ubuttons=ca.settings.ubuttons)
             return "", 204
@@ -348,8 +341,8 @@ class UriOTP(fields.Raw):
         if not obj:
             return
         name = obj["name"]
-        totp = obj["totp"]
-        uri = f"otpauth://totp/viewpicam:{name}?secret={totp}&issuer=viewpicam"
+        secret = obj["secret"]
+        uri = f"otpauth://totp/viewpicam:{name}?secret={secret}&issuer=viewpicam"
         qr = qrcode.QRCode(image_factory=qrcode.image.svg.SvgPathImage)
         qr.make(fit=True)
         qr.add_data(uri)
@@ -363,7 +356,7 @@ otp = users.model(
         "id": fields.Integer(required=True, description="Id"),
         "name": fields.String(required=True, description="The user name"),
         "otp_svg": UriOTP(required=False),
-        "totp-enable": fields.Boolean(required=False),
+        "totp": fields.Boolean(required=False),
     },
 )
 
@@ -374,22 +367,16 @@ otp = users.model(
 class Totp(Resource):
     """TOTP."""
 
-    def get_byid(self, uid: int):
-        """Return user."""
-        for dict_user in ca.settings.users:
-            if dict_user["id"] == uid:
-                return dict_user
-
     @token_required
     @otps.marshal_with(otp)
     @otps.response(204, "OTP already enabled")
     @otps.response(422, "Error", message)
-    def get(self, id: int):
+    def get(self, id: int):  # pylint: disable=W0622
         """Get OTP for a user."""
-        if dict_user := self.get_byid(id):
-            if dict_user.get("totp-enable", False) is False:
+        if dict_user := ca.settings.get_user_byid(id):
+            if dict_user.get("totp", False) is False:
                 ca.settings.users.remove(dict_user)
-                dict_user["totp"] = pyotp.random_base32()
+                dict_user["secret"] = pyotp.random_base32()
                 ca.settings.users.append(dict_user)
                 ca.settings.update(users=ca.settings.users)
             return dict_user
@@ -398,14 +385,12 @@ class Totp(Resource):
     @token_required
     @otps.response(204, "Action is success")
     @otps.response(404, "Not found", message)
-    def post(self, id: int):
+    def post(self, id: int):  # pylint: disable=W0622
         """Check OTP code."""
-        if dict_user := self.get_byid(id):
-            if (totpcode := dict_user.get("totp")) and dict_user.get(
-                "totp-enable", False
-            ):
-                totp = pyotp.TOTP(totpcode)
-                if totp.verify(otps.payload["totpcode"]):
+        if dict_user := ca.settings.get_user_byid(id):
+            if (secret := dict_user.get("secret")) and dict_user.get("totp", False):
+                totp = pyotp.TOTP(secret)
+                if totp.verify(otps.payload["secret"]):
                     return "", 204
                 abort(422, "OTP incorrect")
             abort(422, "OTP not enable")
@@ -415,13 +400,15 @@ class Totp(Resource):
     @otps.response(204, "Action is success")
     @otps.response(404, "Not found", message)
     @otps.response(422, "Error", message)
-    def put(self, id: int):
+    def put(self, id: int):  # pylint: disable=W0622
         """Check and create OTP Code for a user."""
-        if (dict_user := self.get_byid(id)) and (totpcode := dict_user.get("totp")):
-            totp = pyotp.TOTP(totpcode)
-            if totp.verify(otps.payload["totpcode"]):
+        if (dict_user := ca.settings.get_user_byid(id)) and (
+            secret := dict_user.get("secret")
+        ):
+            totp = pyotp.TOTP(secret)
+            if totp.verify(otps.payload["secret"]):
                 ca.settings.users.remove(dict_user)
-                dict_user["totp-enable"] = True
+                dict_user["totp"] = True
                 ca.settings.users.append(dict_user)
                 ca.settings.update(users=ca.settings.users)
                 return "", 204
@@ -431,12 +418,12 @@ class Totp(Resource):
     @token_required
     @otps.response(204, "Action is success")
     @otps.response(404, "Not found", message)
-    def delete(self, id: int):
+    def delete(self, id: int):  # pylint: disable=W0622
         """Delete OTP infos for a user."""
-        if dict_user := self.get_byid(id):
+        if dict_user := ca.settings.get_user_byid(id):
             ca.settings.users.remove(dict_user)
-            dict_user.pop("totp-enable", None)
             dict_user.pop("totp", None)
+            dict_user.pop("secret", None)
             ca.settings.users.append(dict_user)
             ca.settings.update(users=ca.settings.users)
             return "", 204

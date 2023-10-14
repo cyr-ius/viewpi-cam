@@ -39,8 +39,10 @@
         <div class="row">Users</div>
         <div id="users" class="row">
             {%for user in settings.users%}
+            {% if user["totp"] %}{% set otpclass="danger"%}{%else%}{% set otpclass="success"%}{%endif%}
             <div id="users-{{user.id}}" class="row g-1 ms-2 uchange">
                 <input type="hidden" name="id" value="{{user.id}}">
+                <div class="col-auto"><button class="btn btn-sm btn-outline-{{otpclass}} otp_user" type="button"><i class="bi"></i>OTP</button></div>
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" required="" type="text" value="{{user.name}}" readonly></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password"></div>
                 <div class="col">
@@ -51,12 +53,12 @@
                         <option {% if user.rights == 8 %}selected{%endif%} value="8">Max</option>
                     </select>
                 </div>
-                <div class="col-auto"><button class="btn btn-sm btn-outline-light otp_user" type="button"><i class="bi"></i>OTP</button></div>
                 <div class="col-auto" id="btn_del_user"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
             {%endfor%}
             <div id="users-ref" class="row g-1 ms-2">
                 <input type="hidden" name="id">
+                <div class="col-auto"><button id="btn_otp_user" class="btn btn-sm btn-outline-success otp_user" type="button" disabled><i class="bi"></i>OTP</button></div>
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" type="text" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" required></div>
                 <div class="col">
@@ -67,6 +69,7 @@
                         <option value="8">Max</option>
                     </select>
                 </div>
+
                 <div class="col-auto" id="btn_add_user"><button class="btn btn-sm btn-success add_user" name="add_user" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
                 <div class="col-auto d-none" id="btn_del_user"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
@@ -209,7 +212,8 @@
             user.find('#btn_del_user').removeClass('d-none');
             user.attr('id','users-'+data["id"]);
             user.addClass('uchange');
-            $(user).find('input[name="name"]').attr("readonly","readonly");
+            $(user).find('input[name="name"]').prop("readonly",true);
+            $(user).find('.otp_user').prop("disabled",false);
             $(user).find('input[name="id"]').val(data["id"])
             $(templ_user).find('input').val('');
             templ_user.insertAfter(user);
@@ -228,10 +232,11 @@
         let user = $(this).parent().parent();
         let data = $(user).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
         let callback = function(data){
-            if (!data["totp-enable"]) {
-                otpModal.show()
+            if (!data["totp"]) {
+                $('#otpmodal input').val('');
                 $('#otp_svg').html(data["otp_svg"]);
                 $('#userid').val(data["id"]);
+                otpModal.show();
             } else if (confirm('Are you sure you want to delete OTP code ?')) {
                 $.queryData({"method":"delete", "url":`{{ url_for('api.users_totp')}}/${data["id"]}`});
             }
@@ -256,7 +261,7 @@
             button.addClass('uchange');
             $(button).find('input[name="name"]').attr("readonly","readonly");
             $(button).find('input[name="id"]').val(data["id"])
-            $(templ_ubutton).find('input').val('');
+            $(templ_ubutton).find('input, select, textarea').val('');
             templ_ubutton.insertAfter(button);
         }
         $.queryData({"url":"{{ url_for('api.buttons_buttons')}}","data":data, "callbackSuccess":callback});
