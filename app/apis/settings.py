@@ -72,7 +72,7 @@ class Users(Resource):
 
 
 @users.response(403, "Forbidden", message)
-@users.route("/users/<int:uid>")
+@users.route("/users/<int:id>")
 class User(Resource):
     """User objet."""
 
@@ -179,9 +179,9 @@ class Button(Resource):
     @token_required
     @buttons.marshal_with(button)
     @buttons.response(404, "Not found", message)
-    def get(self, uid: int):
+    def get(self, id: int):  # pylint: disable=W0622
         """Get button."""
-        if button_dict := self.get_byid(uid):
+        if button_dict := self.get_byid(id):
             return button_dict
         abort(404, "Button not found")
 
