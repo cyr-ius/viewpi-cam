@@ -169,17 +169,17 @@ def maintain_folders(
     return empty and not root and os.rmdir(path)
 
 
-def lock_file(filename: str, uid: str, lock: bool) -> None:
+def lock_file(filename: str, id: str, lock: bool) -> None:  # pylint: disable=W0622
     """Lock file (remove w via chmod)."""
     media_path = ca.raspiconfig.media_path
     lock_files = ca.settings.get("lock_files", [])
     if lock == 1:
         attr = 0o444
-        lock_files.append(uid)
+        lock_files.append(id)
     else:
         attr = 0o644
-        if uid in lock_files:
-            lock_files.remove(uid)
+        if id in lock_files:
+            lock_files.remove(id)
     ca.settings.update(lock_files=lock_files)
     file_type = get_file_type(filename)
     if file_type == "t":

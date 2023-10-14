@@ -86,8 +86,8 @@ def zipdata():
         check_list = [request.json["check_list"]]
     if check_list:
         zip_list = []
-        for uid in check_list:
-            thumb = get_thumb(uid)
+        for id in check_list:
+            thumb = get_thumb(id)
             zip_list.append(thumb["file_name"])
 
         return get_zip(zip_list)
@@ -211,10 +211,12 @@ def get_thumbnails(
     return thumbnails
 
 
-def get_thumb(uid: str | None = None) -> dict[str, Any] | list[dict[str, Any]]:
+def get_thumb(
+    id: str | None = None,  # pylint: disable=W0622
+) -> dict[str, Any] | list[dict[str, Any]]:
     """Get file name and real name."""
     for thumb in get_thumbnails():
-        if thumb["id"] == uid:
+        if thumb["id"] == id:
             return thumb
 
 
