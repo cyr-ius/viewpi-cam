@@ -24,7 +24,7 @@ def before_app_request():
 @auth_required
 def index():
     write_log(f"Logged in user: {session['username']}")
-    write_log(f"UserLevel {session['user_level']}")
+    write_log(f"UserLevel {session['level']}")
     display_mode = request.cookies.get("display_mode", "On")
     mjpegmode = int(request.cookies.get("mjpegmode", 0))
 
