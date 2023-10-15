@@ -12,78 +12,69 @@ api.add_model("Error", message)
 api.add_model("Set", setting)
 api.add_model("Macros", macros)
 api.add_model("Token", token)
-
-ubuttons = Namespace("buttons", path="/api", description="User buttons")
-ubuttons.add_model("Error", message)
-ubuttons.add_model("Button", button)
-ubuttons.add_model("Buttons", buttons)
+api.add_model("Button", button)
+api.add_model("Buttons", buttons)
 
 
-@ubuttons.response(403, "Forbidden", message)
-@ubuttons.route("/buttons")
+@api.response(403, "Forbidden", message)
+@api.route("/buttons")
 class Buttons(Resource):
     """List buttons."""
 
-    @ubuttons.marshal_with(buttons, as_list=True)
+    @api.marshal_with(buttons, as_list=True)
     @token_required
     def get(self):
         """List buttons."""
         return ca.settings.get("ubuttons", [])
 
-    @ubuttons.expect(button)
-    @ubuttons.marshal_with(buttons)
+    @api.expect(button)
+    @api.marshal_with(buttons)
     @token_required
     def post(self):
         """Create button."""
         if ca.settings.get("ubuttons") is None:
             ca.settings.ubuttons = []
         ids = [button["id"] for button in ca.settings.ubuttons]
-        ubuttons.payload["id"] = 1 if len(ids) == 0 else max(ids) + 1
-        ca.settings.ubuttons.append(ubuttons.payload)
+        api.payload["id"] = 1 if len(ids) == 0 else max(ids) + 1
+        ca.settings.ubuttons.append(api.payload)
         ca.settings.update(ubuttons=ca.settings.ubuttons)
-        return ubuttons.payload
+        return api.payload
 
 
-@ubuttons.response(403, "Forbidden", message)
-@ubuttons.route("/buttons/<int:id>")
+@api.response(403, "Forbidden", message)
+@api.route("/buttons/<int:id>")
 class Button(Resource):
     """Button objet."""
 
-    def get_byid(self, id: int):  # pylint: disable=W0622
-        """Return button."""
-        for button_dict in ca.settings.get("ubuttons", []):
-            if button_dict["id"] == id:
-                return button_dict
-
     @token_required
-    @ubuttons.marshal_with(button)
-    @ubuttons.response(404, "Not found", message)
+    @api.marshal_with(button)
+    @api.response(404, "Not found", message)
     def get(self, id: int):  # pylint: disable=W0622
         """Get button."""
-        if button_dict := self.get_byid(id):
+        if button_dict := ca.settings.get_object("ubuttons", id):
             return button_dict
         abort(404, "Button not found")
 
     @token_required
-    @ubuttons.expect(button)
-    @ubuttons.marshal_with(button)
-    @ubuttons.response(404, "Not found", message)
+    @api.expect(button)
+    @api.marshal_with(button)
+    @api.response(404, "Not found", message)
     def put(self, id: int):  # pylint: disable=W0622
         """Set button."""
-        if dict_button := self.get_byid(id):
+        if dict_button := ca.settings.get_object("ubuttons", id):
             ca.settings.ubuttons.remove(dict_button)
-            ubuttons.payload["id"] = id
-            ca.settings.ubuttons.append(ubuttons.payload)
+            api.payload["id"] = id
+            ca.settings.ubuttons.append(api.payload)
             ca.settings.update(ubuttons=ca.settings.ubuttons)
-            return ubuttons.payload
+            return api.payload
         abort(404, "Button not found")
 
     @token_required
-    @ubuttons.response(204, "Actions is success")
-    @ubuttons.response(404, "Not found", message)
+    @api.response(204, "Actions is success")
+    @api.response(404, "Not found", message)
     def delete(self, id: int):  # pylint: disable=W0622
         """Delete button."""
-        if dict_button := self.get_byid(id):
+        if dict_button := ca.settings.get_object("ubuttons", id):
             ca.settings.ubuttons.remove(dict_button)
             ca.settings.update(ubuttons=ca.settings.ubuttons)
             return "", 204
@@ -102,7 +93,7 @@ class Sets(Resource):
         return ca.settings
 
     @token_required
-    @ubuttons.expect(setting)
+    @api.expect(setting)
     @api.marshal_with(setting)
     @api.response(204, "Action is success")
     def post(self):

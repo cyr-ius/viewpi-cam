@@ -284,19 +284,19 @@
             $(templ).find('input, select, textarea').val('');
             templ.insertAfter(parent);
         }
-        $.queryData({url:"{{url_for('api.buttons_buttons')}}",data:data, callbackSuccess:callbackSuccess});
+        $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, callbackSuccess:callbackSuccess});
     });
 
     $('#ubuttons').on('click','.del_button', function() {
         let parent = $(this).parent().parent();
         let data = $(parent).find('input').serializeObject({"checkboxesAsBools":true});
         let callbackSuccess = function(data){ parent.remove() }
-        $.queryData({method:"delete", url:`{{ url_for('api.buttons_buttons')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
+        $.queryData({method:"delete", url:`{{ url_for('api.settings_buttons')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
     });
 
     $('#ubuttons').on('change','.uchange', function(){
         let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        $.queryData({method:"put", url:`{{url_for('api.buttons_buttons')}}/${data["id"]}`, data:data});
+        $.queryData({method:"put", url:`{{url_for('api.settings_buttons')}}/${data["id"]}`, data:data});
     });
 
     $('#multiviews').on('click','.add_button', function() {

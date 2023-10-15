@@ -8,7 +8,6 @@ from .multiview import api as ns7
 from .previews import api as ns4
 from .schedule import api as ns5
 from .settings import api as ns1
-from .settings import ubuttons
 from .system import api as ns6
 from .totp import api as ns8
 from .users import api as ns9
@@ -24,7 +23,6 @@ api = Api(
     authorizations={"apikey": {"type": "apiKey", "in": "header", "name": "X-API-KEY"}},
     security="apikey",
 )
-api.add_namespace(ubuttons)
 api.add_namespace(ns1)
 api.add_namespace(ns2)
 api.add_namespace(ns3)
