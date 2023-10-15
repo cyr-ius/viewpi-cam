@@ -82,10 +82,10 @@
             <div class="row g-1 ms-2">
                 <div class="col">
                     <div class="input-group">
-                        <input class="form-control form-control-sm" disabled="disabled" id="token" name="token" type="text" value="{{settings.token}}">
-                        <button class="btn btn-sm btn-outline-secondary" id="copy" name="copy" type="button"><i class="bi bi-clipboard"></i></button>
-                        <button class="btn btn-sm btn-outline-secondary" id="get_token" name="generate" type="button">Generate</button>
-                        <button class="btn btn-sm btn-outline-secondary" id="del_token" name="reset" type="button">Reset</button>
+                        <input class="form-control form-control-sm" id="token" name="token" type="text" value="{{settings.token}}" disabled>
+                        <button class="btn btn-sm btn-outline-secondary" id="copy" type="button"><i class="bi bi-clipboard"></i></button>
+                        <button class="btn btn-sm btn-outline-secondary" id="get_token" type="button">Generate</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="del_token" type="button">Reset</button>
                     </div>
                     <a href="{{ url_for("camera.cam_pic_new", token=settings.token) }}" target="_blank">Stream view</a>
                     <a href="{{ url_for("camera.cam_pic", token=settings.token) }}" target="_blank">Last Picture</a>
@@ -221,7 +221,7 @@
     $('#del_token').unbind();
     $('#del_token').click(function () {
         let callbackSuccess = function(data){$('#token').val('')}
-        $.queryData({method:"delete", url:"{{ url_for('api.settings_token')}}",callbackSuccess:callback});
+        $.queryData({method:"delete", url:"{{ url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
     });
 
     $('#users').on('click','.add_user', function() {

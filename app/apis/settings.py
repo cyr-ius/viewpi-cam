@@ -130,7 +130,7 @@ class Token(Resource):
         """Create token."""
         secure_token = f"B{random.getrandbits(256)}"
         ca.settings.update(token=secure_token)
-        return {"token": token}
+        return {"token": secure_token}
 
     @token_required
     @api.response(204, "Actions is success")
