@@ -25,7 +25,7 @@ class Users(Resource):
 
     @token_required
     @api.expect(user)
-    @api.marshal_with(user)
+    @api.marshal_with(users)
     @api.response(422, "Error", message)
     def post(self):
         """Create user."""
