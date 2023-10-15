@@ -58,7 +58,7 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        if (user := ca.settings.get_user(username)) and (
+        if (user := ca.settings.get_object(attr="users", id=username, key="name")) and (
             check_password_hash(user.get("password"), password)
         ):
             session.clear()
@@ -84,12 +84,12 @@ def login():
 @bp.route("/totp-verified", methods=["GET", "POST"])
 def totpverified():
     """Totop verified."""
-    id = request.args.get("id")
-    next = request.args.get("next")
+    id = int(request.args.get("id"))  # pylint: disable=W0622
+    next = request.args.get("next")  # pylint: disable=W0622
     if request.method == "POST":
-        id = request.form.get("id")
+        id = int(request.form.get("id"))
         next = request.form.get("next")
-        if dict_user := ca.settings.get_user_byid(int(request.form.get("id"))):
+        if dict_user := ca.settings.get_object("users", id):
             totp = pyotp.TOTP(dict_user["secret"])
             if totp.verify(request.form.get("secret")):
                 session["username"] = dict_user.get("name")
