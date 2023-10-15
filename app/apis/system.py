@@ -1,30 +1,21 @@
 """Api system."""
 from flask import current_app as ca
-from flask_restx import Namespace, Resource, abort, fields
+from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import token_required
 from ..helpers.raspiconfig import RaspiConfigError
 from ..helpers.utils import execute_cmd
 from ..services.handle import ViewPiCamException
-from .models import message
+from .models import command, message
 
-api = Namespace("system")
+api = Namespace("system", path="/api", description="Host command")
 api.add_model("Error", message)
-
-command_m = api.model(
-    "Command",
-    {
-        "cmd": fields.String(description="Command", required=True),
-        "params": fields.List(
-            fields.String(), description="Parameters", required=False
-        ),
-    },
-)
+api.add_model("Command", command)
 
 
 @api.response(204, "Action is success")
-@api.response(422, "Error", message)
 @api.response(403, "Forbidden", message)
+@api.response(422, "Error", message)
 @api.route("/system/restart")
 class Restart(Resource):
     """Restart host."""
@@ -41,8 +32,8 @@ class Restart(Resource):
 
 
 @api.response(204, "Action is success")
-@api.response(422, "Error", message)
 @api.response(403, "Forbidden", message)
+@api.response(422, "Error", message)
 @api.route("/system/shutdown")
 class Shutdown(Resource):
     """Restart application."""
@@ -59,8 +50,8 @@ class Shutdown(Resource):
 
 
 @api.response(204, "Action is success")
-@api.response(422, "Error", message)
 @api.response(403, "Forbidden", message)
+@api.response(422, "Error", message)
 @api.route("/system/restart/app", endpoint="system_restart_app")
 class RestartApp(Resource):
     """Restart application."""
@@ -75,15 +66,15 @@ class RestartApp(Resource):
         return "", 204
 
 
-@api.response(422, "Error", message)
-@api.response(404, "Not found", message)
 @api.response(403, "Forbidden", message)
+@api.response(404, "Not found", message)
+@api.response(422, "Error", message)
 @api.route("/command")
 class Command(Resource):
     """FIFO Command."""
 
     @token_required
-    @api.expect(command_m)
+    @api.expect(command)
     def post(self):
         """Send command to control fifo."""
         if cmd := api.payload.get("cmd"):

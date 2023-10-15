@@ -1,28 +1,14 @@
 """Blueprint Multiview API."""
 from flask import current_app as ca
-from flask_restx import Namespace, Resource, abort, fields
+from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import token_required
-from .models import message
+from .models import message, stream, streams
 
-api = Namespace("multiview")
+api = Namespace("multiview", path="/api")
 api.add_model("Error", message)
-
-host = api.model(
-    "Stream",
-    {
-        "id": fields.Integer(required=False, description="Unique id"),
-        "streamer": fields.String(
-            required=True,
-            description="URL Stream MJPEG",
-            example="http://192.168.1.1:8080/stream",
-        ),
-        "delays": fields.Integer(required=True, description="Refresh rate"),
-    },
-)
-
-hosts = api.model("Streamers", host)
-hosts.pop("id")
+api.add_model("Stream", stream)
+api.add_model("Streams", streams)
 
 
 @api.response(403, "Forbidden", message)
@@ -31,14 +17,14 @@ class Streamers(Resource):
     """List hosts."""
 
     @token_required
-    @api.marshal_with(host, as_list=True)
+    @api.marshal_with(stream, as_list=True)
     def get(self):
         """List hosts."""
         return ca.settings.get("streamers", [])
 
     @token_required
-    @api.expect(hosts, validate=True)
-    @api.marshal_with(host)
+    @api.expect(streams, validate=True)
+    @api.marshal_with(stream)
     def post(self):
         """Create host."""
         if ca.settings.get("streamers") is None:
@@ -56,23 +42,23 @@ class Streamer(Resource):
     """Host objet."""
 
     @token_required
-    @api.marshal_with(host)
+    @api.marshal_with(stream)
     @api.response(404, "Not found", message)
     def get(self, id: int):  # pylint: disable=W0622
         """Get streamer."""
-        if stream := ca.settings.get_object("streamers", id):
-            return stream
+        if stm := ca.settings.get_object("streamers", id):
+            return stm
         abort(404, "Host not found")
 
     @token_required
-    @api.expect(hosts)
-    @api.marshal_with(host)
+    @api.expect(streams)
+    @api.marshal_with(stream)
     @api.response(404, "Not found", message)
     def put(self, id: int):  # pylint: disable=W0622
         """Set streamer."""
         api.payload["id"] = id
-        if stream := ca.settings.get_object("streamers", id):
-            ca.settings.streamers.remove(stream)
+        if stm := ca.settings.get_object("streamers", id):
+            ca.settings.streamers.remove(stm)
             ca.settings.streamers.append(api.payload)
             ca.settings.update(streamers=ca.settings.streamers)
             return api.payload
@@ -83,8 +69,8 @@ class Streamer(Resource):
     @api.response(404, "Not found", message)
     def delete(self, id: int):  # pylint: disable=W0622
         """Delete streamer."""
-        if stream := ca.settings.get_object("streamers", id):
-            ca.settings.streamers.remove(stream)
+        if stm := ca.settings.get_object("streamers", id):
+            ca.settings.streamers.remove(stm)
             ca.settings.update(streamers=ca.settings.streamers)
             return "", 204
         abort(404, "Host not found")

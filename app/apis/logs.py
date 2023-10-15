@@ -9,7 +9,7 @@ from ..helpers.decorator import token_required
 from ..helpers.utils import delete_log
 from .models import forbidden, message
 
-api = Namespace("logs")
+api = Namespace("logs", path="/api")
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 

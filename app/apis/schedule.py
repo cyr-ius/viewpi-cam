@@ -15,61 +15,14 @@ from ..helpers.decorator import token_required
 from ..helpers.fifo import send_motion
 from ..helpers.utils import execute_cmd, get_pid, write_log
 from ..services.handle import ViewPiCamException
-from .models import date_time, forbidden, message
+from .models import date_time, day, forbidden, message, schedule
 
-api = Namespace("schedule")
+api = Namespace("schedule", path="/api")
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 api.add_model("Datetime", date_time)
-
-wild = fields.Wildcard(fields.List(fields.Integer()))
-day = api.model("Day", {"*": wild})
-
-schedule = api.model(
-    "Schedule",
-    {
-        "autocamera_interval": fields.Integer(required=True, description="File name"),
-        "autocapture_interval": fields.Integer(required=True, description="I/T/V"),
-        "cmd_poll": fields.Float(required=True, description="Size"),
-        "command_off": fields.List(fields.String(description="Command")),
-        "command_on": fields.List(fields.String(description="Command")),
-        "dawnstart_minute": fields.Integer(
-            required=True, description="Read/Write right on disk"
-        ),
-        "daystart_minute": fields.Integer(
-            required=True, description="Read/Write right on disk"
-        ),
-        "dayend_minute": fields.Integer(
-            required=True, description="Read/Write right on disk"
-        ),
-        "daymode": fields.Integer(required=True, description="Original name"),
-        "days": fields.Nested(day),
-        "gmt_offset": fields.String(
-            required=False, description="image numbers of timelapse"
-        ),
-        "latitude": fields.Float(
-            required=False, description="image numbers of timelapse"
-        ),
-        "longitude": fields.Float(
-            required=False, description="image numbers of timelapse"
-        ),
-        "managment_command": fields.String(
-            required=False, description="image numbers of timelapse"
-        ),
-        "managment_interval": fields.Integer(
-            required=True, description="Original name"
-        ),
-        "max_capture": fields.Integer(required=True, description="Size"),
-        "mode_poll": fields.Integer(required=True, description="Size"),
-        "modes": fields.List(fields.String(description="mode")),
-        "purgeimage_hours": fields.Integer(required=True, description="Size"),
-        "purgelapse_hours": fields.Integer(required=True, description="Size"),
-        "purgevideo_hours": fields.Integer(required=True, description="Size"),
-        "purgespace_level": fields.Integer(required=True, description="Size"),
-        "purgespace_modeex": fields.Integer(required=True, description="Size"),
-        "times": fields.List(fields.String(description="time")),
-    },
-)
+api.add_model("Schedule", schedule)
+api.add_model("Day", day)
 
 
 @api.route("/schedule")

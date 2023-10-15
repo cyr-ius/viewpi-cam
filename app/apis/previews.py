@@ -1,48 +1,17 @@
 """Api gallery."""
 from flask import current_app as ca
-from flask import request, url_for
-from flask_restx import Namespace, Resource, abort, fields
+from flask import request
+from flask_restx import Namespace, Resource, abort
 
 from ..blueprints.preview import get_thumb, get_thumbnails, video_convert
 from ..helpers.decorator import token_required
 from ..helpers.filer import delete_mediafiles, lock_file, maintain_folders
-from .models import forbidden, message
+from .models import files, forbidden, message
 
-api = Namespace("previews")
+api = Namespace("previews", path="/api")
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
-
-
-class PathURI(fields.Raw):
-    """Path URI."""
-
-    def format(self, value):
-        return url_for("static", filename=value)
-
-
-files = api.model(
-    "Files",
-    {
-        "id": fields.String(required=True, description="Id"),
-        "file_name": fields.String(required=True, description="File name"),
-        "file_type": fields.String(required=True, description="I/T/V"),
-        "file_size": fields.Integer(required=True, description="Size"),
-        # "file_icon": fields.String(required=False, description="Icon"),
-        "file_datetime": fields.DateTime(required=False, description="DateTime"),
-        "file_lock": fields.Boolean(
-            required=True, description="Read/Write right on disk"
-        ),
-        "real_file": fields.String(required=True, description="Original name"),
-        "file_number": fields.String(required=True, description="Index"),
-        "lapse_count": fields.Integer(
-            required=False, description="image numbers of timelapse"
-        ),
-        "duration": fields.Float(
-            required=False, description="image numbers of timelapse"
-        ),
-        "uri": PathURI(attribute="file_name", example="string"),
-    },
-)
+api.add_model("Files", files)
 
 
 @api.response(403, "Forbidden", forbidden)
