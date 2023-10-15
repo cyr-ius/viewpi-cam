@@ -16,7 +16,7 @@ button = Model(
     {
         "display": fields.Boolean(required=True, description="Display"),
         "name": fields.String(required=True, description="Button name"),
-        "macros": fields.String(required=True, description="Script name"),
+        "macro": fields.String(required=True, description="Script name"),
         "css_class": fields.String(required=False, description="Class"),
         "style": fields.String(required=False, description="Style"),
         "other": fields.String(required=False, description="Others options"),
