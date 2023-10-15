@@ -143,22 +143,25 @@ setting = Model(
         ),
     },
 )
-stream = Model(
-    "Stream",
+multiview = Model(
+    "Multiview",
     {
-        "streamer": fields.String(
+        "url": fields.String(
             required=True,
             description="URL Stream MJPEG",
             example="http://192.168.1.1:8080/stream",
         ),
-        "delays": fields.Integer(required=True, description="Refresh rate"),
+        "delay": fields.Integer(required=True, description="Refresh rate"),
+        "state": fields.Boolean(
+            required=True, default=False, description="Display camera"
+        ),
     },
 )
-streams = Model(
-    "Streams",
+multiviews = Model(
+    "Multiviews",
     {
         "id": fields.Integer(required=True, description="Id"),
-        **stream,
+        **multiview,
     },
 )
 token = Model("Token", {"token": fields.String()})
