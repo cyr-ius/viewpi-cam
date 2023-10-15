@@ -149,7 +149,7 @@ multiview = Model(
         "url": fields.String(
             required=True,
             description="URL Stream MJPEG",
-            example="http://192.168.1.1:8080/stream",
+            example="http://192.168.1.1/cam/cam_pic?token=Bxxxxxxxxxxxxx",
         ),
         "delay": fields.Integer(required=True, description="Refresh rate"),
         "state": fields.Boolean(
@@ -164,7 +164,7 @@ multiviews = Model(
         **multiview,
     },
 )
-token = Model("Token", {"token": fields.String()})
+token = Model("Token", {"token": fields.String(required=True)})
 user = Model(
     "User",
     {

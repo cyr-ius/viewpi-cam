@@ -1,8 +1,9 @@
 """Blueprint Main."""
 import os
 import time
+import urllib
 
-from flask import Blueprint, Response
+from flask import Blueprint, Response, abort
 from flask import current_app as ca
 from flask import g, json, render_template, request, send_file, session
 
@@ -97,6 +98,41 @@ def helpcmd():
 @auth_required
 def minview():
     return render_template("min.html")
+
+
+@bp.route("/multiview", methods=["GET"])
+@auth_required
+def multiview():
+    return render_template(
+        "multiview.html", multiviews=ca.settings.get("multiviews", [])
+    )
+
+
+@bp.route("/view", methods=["GET"])
+@auth_required
+def view():
+    id = request.args.get(  # pylint: disable=W0622
+        "rHost", request.args.get("pHost", 0)
+    )
+    if (host := ca.settings.get_object("multiviews", int(id))) is None:
+        abort(404)
+
+    def _gather_img(url, delay):
+        while True:
+            uri = urllib.request.urlopen(url)
+            file_contents = uri.read()
+            yield (
+                b"--PIderman\r\nContent-Type: image/jpeg\r\n"
+                + f"Content-Type: {len(file_contents)}\r\n\r\n".encode()
+                + file_contents
+                + b"\r\n"
+            )
+            time.sleep(delay)
+
+    return Response(
+        _gather_img(host["url"], host["delay"]),
+        mimetype="multipart/x-mixed-replace; boundary=PIderman",
+    )
 
 
 @bp.route("/pipan", methods=["GET"])

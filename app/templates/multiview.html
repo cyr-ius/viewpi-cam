@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid overflow-auto">
+	<div class="row g-3 justify-content-md-center">
+	{%for multiview in multiviews%}
+	{% if multiview.state%}
+		<div class="col-auto">
+			<a href="{{url_for('main.view',rHost=multiview.id)}}"><img id="mjpeg_dest_{{multiview.id}}"/></a>
+		</div>
+	{%endif%}
+	{%endfor%}
+	</div>
+</div>
+{%endblock%}
+{%block extrascripts%}
+<script>
+
+{%-for multiview in multiviews%}
+{% if multiview.state%}
+let mjpeg_img_{{multiview.id}};
+function load_img_{{multiview.id}}() {
+	mjpeg_img_{{multiview.id}}.src = "{{url_for('main.view',pHost=multiview.id)}}&time=" + new Date().getTime();
+}
+{%endif%}
+{%-endfor%}
+
+function init() {
+	{%-for multiview in multiviews%}
+	{% if multiview.state%}
+	mjpeg_img_{{multiview.id}} = document.getElementById("mjpeg_dest_{{multiview.id}}");
+	if (mjpeg_img_{{multiview.id}}) mjpeg_img_{{multiview.id}}.onload=load_img_{{multiview.id}}();
+	{%endif%}
+	{%-endfor%}
+}
+
+$(function () {
+	setTimeout('init();', 100)
+});
+
+
+</script>
+{%endblock%}
