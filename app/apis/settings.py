@@ -31,6 +31,7 @@ class Buttons(Resource):
         return ca.settings.get("ubuttons", [])
 
     @ubuttons.expect(button)
+    @ubuttons.marshal_with(buttons)
     @token_required
     def post(self):
         """Create button."""
