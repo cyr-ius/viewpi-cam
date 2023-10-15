@@ -72,22 +72,22 @@ class Previews(Resource):
 
 
 @api.route("/previews/<string:id>")
-@api.response(422, "Error", message)
-@api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
 class Preview(Resource):
     """Preview."""
 
     @token_required
     @api.marshal_with(files)
-    def get(self, id):
+    def get(self, id: str):  # pylint: disable=W0622
         """Get file information."""
         return get_thumb(id)
 
     @token_required
     @api.doc(description="Delete file")
     @api.response(204, "Action is success")
-    def delete(self, id):
+    @api.response(404, "Not found", message)
+    @api.response(422, "Error", message)
+    def delete(self, id: str):  # pylint: disable=W0622
         """Delete file."""
         if thumb := get_thumb(id):
             if id in ca.settings.lock_files:
@@ -106,7 +106,7 @@ class Lock(Resource):
     """Lock file."""
 
     @token_required
-    def post(self, id: str):
+    def post(self, id: str):  # pylint: disable=W0622
         """Lock."""
         if thumb := get_thumb(id):
             lock_file(
@@ -126,7 +126,7 @@ class Unlock(Resource):
     """Unock file."""
 
     @token_required
-    def post(self, id: str):
+    def post(self, id: str):  # pylint: disable=W0622
         """Unlock."""
         if thumb := get_thumb(id):
             lock_file(
@@ -146,7 +146,7 @@ class Convert(Resource):
     """Convert timelapse file to mp4."""
 
     @token_required
-    def post(self, id: str):
+    def post(self, id: str):  # pylint: disable=W0622
         """Coonvert timelapse."""
         if thumb := get_thumb(id):
             video_convert(thumb["file_name"])
