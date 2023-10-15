@@ -33,3 +33,12 @@ class Settings(JsonDB):
         for user in self.users:
             if user["id"] == id:
                 return user
+
+    def get_object(
+        self, attr: str, id: int, key: str = "id"  # pylint: disable=W0622
+    ) -> dict[str, Any] | None:
+        """Search for a dictionary key value \
+            in an array of dictionaries and returns the identified dictionary."""
+        for item in getattr(self, attr, []):
+            if item[key] == id:
+                return item
