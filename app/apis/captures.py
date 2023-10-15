@@ -7,7 +7,7 @@ from ..helpers.decorator import token_required
 from ..helpers.raspiconfig import RaspiConfigError
 from .models import forbidden, message
 
-api = Namespace("captures")
+api = Namespace("captures", path="/api")
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 
