@@ -14,7 +14,6 @@ api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 
 
-@api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
 @api.route("/logs")
 class Content(Resource):
@@ -29,6 +28,7 @@ class Content(Resource):
 
     @token_required
     @api.response(204, "Action is success")
+    @api.response(422, "Error", message)
     def delete(self):
         """Delete log."""
         try:
