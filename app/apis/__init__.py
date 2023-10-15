@@ -4,10 +4,12 @@ from flask_restx import Api
 
 from .captures import api as ns3
 from .logs import api as ns2
+from .multiview import api as ns7
 from .previews import api as ns4
 from .schedule import api as ns5
-from .settings import buttons, otps, settings, users
+from .settings import buttons, settings, users
 from .system import api as ns6
+from .totp import api as ns8
 
 bp = Blueprint("api", __name__)
 
@@ -23,9 +25,10 @@ api = Api(
 api.add_namespace(users, path="/api")
 api.add_namespace(buttons, path="/api")
 api.add_namespace(settings, path="/api")
-api.add_namespace(otps, path="/api")
 api.add_namespace(ns2, path="/api")
 api.add_namespace(ns3, path="/api")
 api.add_namespace(ns4, path="/api")
 api.add_namespace(ns5, path="/api")
 api.add_namespace(ns6, path="/api")
+api.add_namespace(ns7, path="/api")
+api.add_namespace(ns8, path="/api")
