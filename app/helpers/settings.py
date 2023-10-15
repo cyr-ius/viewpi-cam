@@ -15,24 +15,14 @@ class Settings(JsonDB):
         super().__init__(path, default)
         app.settings = self
 
-    def has_username(self, name: str) -> bool:
+    def has_object(
+        self, attr: str, id: int, key: str = "id"  # pylint: disable=W0622
+    ) -> dict[str, Any] | None:
         """User is exists."""
-        for user in self.users:
-            if user["name"] == name:
+        for item in getattr(self, attr, []):
+            if item.get(key) == id:
                 return True
         return False
-
-    def get_user(self, name: str) -> dict[str, Any] | None:
-        """Return user infos."""
-        for user in self.users:
-            if user["name"] == name:
-                return user
-
-    def get_user_byid(self, id: int) -> dict[str, Any] | None:  # pylint: disable=W0622
-        """Return user infos."""
-        for user in self.users:
-            if user["id"] == id:
-                return user
 
     def get_object(
         self, attr: str, id: int, key: str = "id"  # pylint: disable=W0622
@@ -40,5 +30,5 @@ class Settings(JsonDB):
         """Search for a dictionary key value \
             in an array of dictionaries and returns the identified dictionary."""
         for item in getattr(self, attr, []):
-            if item[key] == id:
+            if item.get(key) == id:
                 return item
