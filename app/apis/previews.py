@@ -59,7 +59,7 @@ class Preview(Resource):
     def delete(self, id: str):  # pylint: disable=W0622
         """Delete file."""
         if thumb := get_thumb(id):
-            if id in ca.settings.lock_files:
+            if id in ca.settings.get("lock_files", []):
                 abort(422, f"Protected thumbnail ({id})")
             delete_mediafiles(thumb["file_name"])
             maintain_folders(ca.raspiconfig.media_path, False, False)
