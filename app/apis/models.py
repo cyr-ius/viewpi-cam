@@ -171,7 +171,7 @@ user = Model(
         "name": fields.String(required=True, description="The user name"),
         "password": fields.String(required=False, description="The user password"),
         "rights": fields.Integer(
-            required=True, description="The user rights", enum=[2, 4, 6, 8]
+            required=True, description="The user rights", enum=[1, 2, 4, 8]
         ),
         "totp": fields.Boolean(required=False, description="otp status"),
     },
