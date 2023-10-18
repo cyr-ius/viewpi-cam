@@ -1,4 +1,4 @@
-{% if session.get("level",0) >= config['USERLEVEL_MEDIUM'] %}
+{% if session.get("level",0) >= config.USERLEVEL.medium %}
 {% block navbar %}
 <nav class="navbar navbar-expand-lg">
     <a class="navbar-brand ms-3" href="{{ url_for('main.index') }}">
@@ -15,7 +15,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarToggler">
-    {% if session["level"] >= config['USERLEVEL_MAX'] %}
+    {% if session["level"] >= config.USERLEVEL.max %}
     <ul class="navbar-nav d-none" id="main">
       <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">Camera Settings</a></li>
       {% if raspiconfig is defined and raspiconfig.motion_external == 1 %}
@@ -25,7 +25,7 @@
       {%endif%}
     </ul>
     {%endif%}
-    {% if session["level"] >= config['USERLEVEL_MAX'] %}
+    {% if session["level"] >= config.USERLEVEL.max %}
     <ul class="navbar-nav d-none" id="schedule">
       {% set action="start" if schedule_pid == 0  else "stop"%}
       <div class="container-fluid justify-content-start">
@@ -36,13 +36,13 @@
       </div>
     </ul>
     {%endif%}
-    {% if session["level"] >= config['USERLEVEL_MAX'] %}
+    {% if session["level"] >= config.USERLEVEL.max %}
     <ul class="navbar-nav d-none" id="log">
       <li class="nav-item pe-1"><button id="downloadlog" class="btn btn-sm btn-outline-secondary" type="button">Download Log</button></li>
       <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button">Clear Log</button></li>
     </ul>
     {%endif%}
-    {% if session["level"] >= config['USERLEVEL_MINP'] %}
+    {% if session["level"] >= config.USERLEVEL.preview %}
     <ul class="navbar-nav d-none" id="gallery">
       <li class="nav-item pe-1"><button id="selectNone" class="btn btn-sm btn-outline-secondary" type="button">Deselect</button></li>
       <li class="nav-item pe-1"><button id="selectAll" class="btn btn-sm btn-outline-secondary" type="button">Select All</button></li>
@@ -53,7 +53,7 @@
       <li class="nav-item pe-1"><button id="unlockSel" class="btn btn-sm btn-primary" type="button">Unlock</button></li>
     </ul>
     {%endif%}
-    {% if session["level"] >= config['USERLEVEL_MINP'] %}
+    {% if session["level"] >= config.USERLEVEL.preview %}
     <ul class="navbar-nav d-none" id="display">
       <li class="nav-item pe-1"><button id="download" class="btn btn-sm btn-primary" type="button">Download</button></li>
       <li class="nav-item pe-1"><button id="delete" class="btn btn-sm btn-danger" type="button">Delete</button></li>
@@ -61,10 +61,10 @@
     </ul>
     {%endif%}
     <ul class="navbar-nav ms-md-auto" id="nav-right">
-      {% if session["level"] >= config['USERLEVEL_MINP']%}
+      {% if session["level"] >= config.USERLEVEL.preview%}
       <li class="nav-item"><a class="nav-link" href="{{ url_for('preview.index') }}">Gallery</a></li>
       {% endif %}
-      {% if session["level"] >= config['USERLEVEL_MAX']%}
+      {% if session["level"] >= config.USERLEVEL.max%}
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">System</a>
         <ul class="dropdown-menu">

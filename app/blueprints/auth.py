@@ -5,6 +5,7 @@ from flask import current_app as ca
 from flask import flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from ..const import USERLEVEL_MAX
 from ..helpers.decorator import auth_required
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
@@ -34,7 +35,7 @@ def register():
                     "id": 1,
                     "name": username,
                     "password": generate_password_hash(password),
-                    "rights": ca.config["USERLEVEL_MAX"],
+                    "rights": USERLEVEL_MAX,
                 }
                 ca.settings.update(users=[first_user])
                 return redirect(next_page)

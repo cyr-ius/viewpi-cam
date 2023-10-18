@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-{% set lbl_periods = ['AllDay','Night','Dawn','Day','Dusk'] %}
 <div class="container-fluid overflow-auto px-5 py-2">
     <form id="form_schedule" class="row needs-validation" action="{{ url_for('schedule.index')}}" method="POST" novalidate>
         <div class="row"><h4 class="p-0">Scheduler</h3></div>
@@ -10,7 +9,7 @@
             <span class="col">Sunrise: <b>{{sunrise}}</b></span>
             <span class="col">Sunset: <b>{{sunset}}</b></span>
             <span class="col">Current: <b>{{current_time}}</b></span>
-            <span id="period" class="col">Period: <b>{% if period < 5%}{{ lbl_periods[period]}}{%else%}{{settings.times[period - 5]}}{%endif%}</b></span>
+            <span id="period" class="col">Period: <b>{% if period < 5%}{{ config.PERIODS[period]}}{%else%}{{settings.times[period - 5]}}{%endif%}</b></span>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">Motion - Fifo In</label></div>

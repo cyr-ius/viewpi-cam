@@ -1,90 +1,21 @@
-BTN_START = "Start"
-BTN_STOP = "Stop"
-BTN_SAVE = "Save Settings"
-BTN_BACKUP = "Backup"
-BTN_RESTORE = "Restore"
-BTN_SHOWLOG = "Show Log"
-BTN_DOWNLOADLOG = "Download Log"
-BTN_CLEARLOG = "Clear Log"
-BTN_DOWNLOAD = "Download"
-BTN_DELETE = "Delete"
-BTN_DELETE_CONFIRM = "Are you sure you want to delete this file?"
-BTN_CONVERT = "Start Convert"
-BTN_DELETEALL = "Delete All"
-BTN_DELETEALL_CONFIRM = "Are you sure you want to delete all items?"
-BTN_DELETESEL = "Delete Selected"
-BTN_DELETESEL_CONFIRM = "Are you sure you want to delete selected items?"
-BTN_SELECTALL = "Select All"
-BTN_SELECTNONE = "Deselect"
-BTN_GETZIP = "Get Zip"
-BTN_LOCKSEL = "Lock Sel"
-BTN_UNLOCKSEL = "Unlock Selected"
-BTN_UPDATESIZEORDER = "Update"
-
+"""Constants."""
 LBL_PERIODS = ["AllDay", "Night", "Dawn", "Day", "Dusk"]
-LBL_COLUMNS = ["Period", "Days Su-Sa", "Motion Start", "Motion Stop", "Period Start"]
-LBL_PARAMETERS = "Parameter", "Value"
-LBL_DAYMODES = ["Sun based", "All Day", "Fixed Times"]
-LBL_PURGESPACEMODES = [
-    "Off",
-    "Min Space %",
-    "Max Usage %",
-    "Min Space GB",
-    "Max Usage GB",
-]
-LBL_DAWN = "Dawn"
-LBL_DAY = "Day"
-LBL_DUSK = "Dusk"
 
-TXT_PREVIEW = "Preview"
-TXT_THUMB = "Thumb"
-TXT_FILES = "Files"
-CONVERT_CMD = "convertCmd.txt"
-CONTROLS_POS = "top"
-
+SCHEDULE_RESET = "9"
 SCHEDULE_START = "1"
 SCHEDULE_STOP = "0"
-SCHEDULE_RESET = "9"
 
-ATTR_AUTOCAMERAINTERVAL = "autocamera_interval"
-ATTR_AUTOCAPTUREINTERVAL = "autocapture_interval"
-ATTR_CMDPOLL = "cmd_poll"
-ATTR_COMMANDSOFF = "commands_off"
-ATTR_COMMANDSON = "commands_on"
-ATTR_DAWNSTARTMINUTES = "dawnstart_minutes"
-ATTR_DAYENDMINUTES = "dayend_minutes"
-ATTR_DAYMODE = "daymode"
-ATTR_DAYS = "days"
-ATTR_DAYSTARTMINUTES = "daystart_minutes"
-ATTR_DUSKENDMINUTES = "duskend_minutes"
-ATTR_GMTOFFSET = "gmt_offset"
-ATTR_LATITUDE = "latitude"
-ATTR_LONGITUDE = "longitude"
-ATTR_MAXCAPTURE = "max_capture"
-ATTR_MGMTCOMMAND = "management_command"
-ATTR_MGMTINTERVAL = "management_interval"
-ATTR_MODE_ALLDAY = 1
-ATTR_MODE_POLL = "mode_poll"
-ATTR_MODES = "modes"
-ATTR_PILIGHT = "pilight"
-ATTR_PIPAN = "pipan"
-ATTR_PRESET = "upreset"
-ATTR_PURGEIMAGEHOURS = "purgeimage_hours"
-ATTR_PURGELAPSEHOURS = "purgelapse_hours"
-ATTR_PURGESPACELEVEL = "purgespace_level"
-ATTR_PURGESPACEMODE = "purgespace_modeex"
-ATTR_PURGEVIDEOHOURS = "purgevideo_hours"
-ATTR_SERVO = "servo"
-ATTR_TIMES = "times"
-ATTR_USER_BUTTONS = "ubuttons"
-ATTR_USERS = "users"
-SCHEDULE_ALLDAY = "all_days"
-SCHEDULE_FIXEDTIMES = "fixed_times"
-SCHEDULE_MODE_FIXED = 2
-SCHEDULE_MODE_SUN = 0
-SCHEDULE_ZENITH = 90.8
-SCHEDULE_TIMES_MAX = 12
-SCHEDULE_TIMES_VALUE = []
+USERLEVEL_MIN = 1
+USERLEVEL_MINP = 2
+USERLEVEL_MEDIUM = 4
+USERLEVEL_MAX = 8
+
+LEVELS = {
+    "min": USERLEVEL_MIN,
+    "preview": USERLEVEL_MINP,
+    "medium": USERLEVEL_MEDIUM,
+    "max": USERLEVEL_MAX,
+}
 
 PRESETS = {
     "v2": {

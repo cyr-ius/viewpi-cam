@@ -1,41 +1,7 @@
 """Confilg file."""
 import os
 
-from .const import (
-    ATTR_AUTOCAMERAINTERVAL,
-    ATTR_AUTOCAPTUREINTERVAL,
-    ATTR_CMDPOLL,
-    ATTR_COMMANDSOFF,
-    ATTR_COMMANDSON,
-    ATTR_DAWNSTARTMINUTES,
-    ATTR_DAYENDMINUTES,
-    ATTR_DAYMODE,
-    ATTR_DAYS,
-    ATTR_DAYSTARTMINUTES,
-    ATTR_DUSKENDMINUTES,
-    ATTR_GMTOFFSET,
-    ATTR_LATITUDE,
-    ATTR_LONGITUDE,
-    ATTR_MAXCAPTURE,
-    ATTR_MGMTCOMMAND,
-    ATTR_MGMTINTERVAL,
-    ATTR_MODE_ALLDAY,
-    ATTR_MODE_POLL,
-    ATTR_MODES,
-    ATTR_PILIGHT,
-    ATTR_PIPAN,
-    ATTR_PRESET,
-    ATTR_PURGEIMAGEHOURS,
-    ATTR_PURGELAPSEHOURS,
-    ATTR_PURGESPACELEVEL,
-    ATTR_PURGESPACEMODE,
-    ATTR_PURGEVIDEOHOURS,
-    ATTR_SERVO,
-    ATTR_TIMES,
-    ATTR_USER_BUTTONS,
-    ATTR_USERS,
-    SCHEDULE_TIMES_MAX,
-)
+from .const import LBL_PERIODS, LEVELS
 
 basedir = os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
 
@@ -46,11 +12,6 @@ VERSION = os.getenv("VERSION", "v0.0.0")
 # BASIC APP CONFIG
 SECRET_KEY = os.getenv("SECRET_KEY", "12345678900987654321")
 SESSION_TYPE = "filesystem"
-
-# DEFAULT ACCOUNT
-APP_USERNAME = os.getenv("APP_USERNAME", "admin")
-APP_PASSWORD = os.getenv("APP_PASSWORD", "admin")
-APP_MAIL = os.getenv("APP_MAIL", "please_change_me@localhost")
 
 # The host running the application
 HOSTNAME = os.uname()[1]
@@ -65,8 +26,6 @@ RASPI_BINARY = "/usr/bin/raspimjpeg"
 MEDIA = "media"
 # Character used to flatten file paths
 THUMBNAIL_EXT = ".th.jpg"
-# File where a debug file is stored
-LOGFILE_DEBUG = "debug.log"
 # Select size metho 0=python , 1=stats
 FILESIZE_METHOD = 0
 # File for settings
@@ -75,12 +34,8 @@ SERVO_FILE = f"{basedir}/../system/servo"
 PIPAN_FILE = f"{basedir}/../system/pipan"
 # Convert command
 CONVERT_CMD = "/usr/bin/ffmpeg -f image2 -i i_%05d.jpg"
-
-# USER LEVEL
-USERLEVEL_MIN = 1
-USERLEVEL_MINP = 2  # minimum+preview
-USERLEVEL_MEDIUM = 4
-USERLEVEL_MAX = 8
+# Userlevel
+USERLEVEL = LEVELS
 
 # MACROS
 MACROS = [
@@ -95,8 +50,9 @@ MACROS = [
     "motion_event",
     "startstop",
 ]
-
+PERIODS = LBL_PERIODS
 TIME_FILTER_MAX = 8
+SCHEDULE_TIMES_MAX = 12
 
 # API Swagger documentation
 SWAGGER_UI_DOC_EXPANSION = "list"
@@ -106,28 +62,24 @@ RESTX_MASK_SWAGGER = False
 
 # Default settings
 DEFAULT_INIT = {
-    ATTR_USERS: {},
-    ATTR_USER_BUTTONS: {},
-    ATTR_AUTOCAMERAINTERVAL: 0,
-    ATTR_AUTOCAPTUREINTERVAL: 0,
-    ATTR_CMDPOLL: 0.03,
-    ATTR_COMMANDSOFF: ["ca 0", "", "", "ca 0", "", "", "", "", "", "", ""],
-    ATTR_COMMANDSON: ["ca 1", "", "", "ca 1", "", "", "", "", "", "", ""],
-    ATTR_DAWNSTARTMINUTES: -180,
-    ATTR_DAYENDMINUTES: 0,
-    ATTR_DAYMODE: ATTR_MODE_ALLDAY,
-    ATTR_DAYS: {
-        f"{i}": [1, 1, 1, 1, 1, 1, 1] for i in range(0, SCHEDULE_TIMES_MAX + 5)
-    },
-    ATTR_DAYSTARTMINUTES: 0,
-    ATTR_DUSKENDMINUTES: 180,
-    ATTR_GMTOFFSET: "Etc/UTC",
-    ATTR_LATITUDE: 52.00,
-    ATTR_LONGITUDE: 0.00,
-    ATTR_MGMTCOMMAND: "",
-    ATTR_MGMTINTERVAL: 3600,
-    ATTR_MAXCAPTURE: 0,
-    ATTR_MODES: [
+    "autocamera_interval": 0,
+    "autocapture_interval": 0,
+    "cmd_poll": 0.03,
+    "commands_off": ["ca 0", "", "", "ca 0", "", "", "", "", "", "", ""],
+    "commands_on": ["ca 1", "", "", "ca 1", "", "", "", "", "", "", ""],
+    "dawnstart_minutes": -180,
+    "dayend_minutes": 0,
+    "daymode": 1,
+    "days": {f"{i}": [1, 1, 1, 1, 1, 1, 1] for i in range(0, SCHEDULE_TIMES_MAX + 5)},
+    "daystart_minutes": 0,
+    "duskend_minutes": 180,
+    "gmt_offset": "Etc/UTC",
+    "latitude": 52.00,
+    "longitude": 0.00,
+    "management_command": "",
+    "management_interval": 3600,
+    "max_capture": 0,
+    "modes": [
         "",
         "em night",
         "md 1;em night",
@@ -140,15 +92,15 @@ DEFAULT_INIT = {
         "",
         "",
     ],
-    ATTR_MODE_POLL: 10,
-    ATTR_PURGEIMAGEHOURS: 0,
-    ATTR_PURGELAPSEHOURS: 0,
-    ATTR_PURGESPACELEVEL: 10,
-    ATTR_PURGESPACEMODE: 0,
-    ATTR_PURGEVIDEOHOURS: 0,
-    ATTR_TIMES: [f"{i + 9:02d}:00" for i in range(0, SCHEDULE_TIMES_MAX)],
-    ATTR_PIPAN: 0,
-    ATTR_SERVO: 0,
-    ATTR_PILIGHT: 0,
-    ATTR_PRESET: "v2",
+    "mode_poll": 10,
+    "purgeimage_hours": 0,
+    "purgelapse_hours": 0,
+    "purgespace_level": 10,
+    "purgespace_modeex": 0,
+    "purgevideo_hours": 0,
+    "times": [f"{i + 9:02d}:00" for i in range(0, SCHEDULE_TIMES_MAX)],
+    "pipan": 0,
+    "servo": 0,
+    "pilight": 0,
+    "upreset": "v2",
 }
