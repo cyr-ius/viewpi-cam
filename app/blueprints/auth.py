@@ -10,7 +10,7 @@ from flask import flash, redirect, render_template, request, session, url_for
 
 from ..const import USERLEVEL_MAX
 from ..helpers.decorator import auth_required
-from ..helpers.users import User, Users
+from ..helpers.users import User
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -35,8 +35,7 @@ def register():
                 else url_for("main.index")
             )
             if (name := request.form["username"]) and password:
-                users = Users()
-                users.set(name=name, password=password, right=USERLEVEL_MAX)
+                User.create(name=name, password=password, right=USERLEVEL_MAX)
                 return redirect(next_page)
             flash_msg = "User or password is empty."
         else:
