@@ -30,10 +30,6 @@ from .services.handle import (
     handle_page_not_found,
 )
 
-# from flask_mail import Mail
-
-
-# mail = Mail()
 assets = Environment()
 babel = Babel()
 settings = Settings()
