@@ -1,4 +1,6 @@
 """Error handler."""
+import qrcode
+import qrcode.image.svg
 from flask import url_for
 from flask_restx import Model, fields
 
@@ -8,6 +10,22 @@ class PathURI(fields.Raw):
 
     def format(self, value):
         return url_for("static", filename=value)
+
+
+class UriOTP(fields.Raw):
+    """totp SVG."""
+
+    def output(self, key, obj, **kwargs):
+        if not obj:
+            return
+        uri = (
+            f"otpauth://totp/viewpicam:{obj.name}?secret={obj.secret}&issuer=viewpicam"
+        )
+        qr = qrcode.QRCode(image_factory=qrcode.image.svg.SvgPathImage)
+        qr.make(fit=True)
+        qr.add_data(uri)
+        img = qr.make_image()
+        return img.to_string(encoding="unicode")
 
 
 wild = fields.Wildcard(fields.List(fields.Integer()))
@@ -164,13 +182,28 @@ multiviews = Model(
         **multiview,
     },
 )
-token = Model("Token", {"token": fields.String(required=True)})
+
+
+cam_token = Model("CamToken", {"cam_token": fields.String(required=True)})
+api_token = Model("APIToken", {"api_token": fields.String(required=True)})
+
+
+otp = Model(
+    "TOTP",
+    {
+        "id": fields.Integer(required=True, description="Id"),
+        "name": fields.String(required=True, description="The user name"),
+        "otp_svg": UriOTP(required=False),
+        "totp": fields.Boolean(required=False, description="otp status"),
+    },
+)
+
+
 user = Model(
     "User",
     {
         "name": fields.String(required=True, description="The user name"),
-        "password": fields.String(required=False, description="The user password"),
-        "rights": fields.Integer(
+        "right": fields.Integer(
             required=True, description="The user rights", enum=[1, 2, 4, 8]
         ),
         "totp": fields.Boolean(required=False, description="otp status"),
