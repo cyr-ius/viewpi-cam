@@ -1,5 +1,7 @@
 """Blueprint Settings API."""
 import random
+from datetime import datetime as dt
+from datetime import timezone
 
 import jwt
 from flask import current_app as ca
@@ -143,7 +145,7 @@ class APIToken(Resource):
     def post(self):
         """Create token."""
         secure_token = jwt.encode(
-            {"iss": "system", "id": 0},
+            {"iss": "system", "id": 0, "iat": dt.now(tz=timezone.utc)},
             ca.config["SECRET_KEY"],
             algorithm="HS256",
         )
