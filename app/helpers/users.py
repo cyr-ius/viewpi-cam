@@ -103,7 +103,7 @@ class User:
             raise UserAlreadyExists("User name is already exists, please change.")
 
         kwargs["id"] = self.id
-        if (pwd := kwargs.get("password")) is None:
+        if (pwd := kwargs.get("password")) is None or pwd == "":
             kwargs["password"] = self._user["password"]
         else:
             kwargs["password"] = generate_password_hash(pwd)
