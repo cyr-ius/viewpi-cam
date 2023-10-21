@@ -10,7 +10,7 @@ from flask import flash, redirect, render_template, request, session, url_for
 
 from ..const import USERLEVEL_MAX
 from ..helpers.decorator import auth_required
-from ..helpers.users import User
+from ..helpers.users import User, UserNotFound
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -55,26 +55,28 @@ def login():
     if ca.settings.get("users") is None or len(ca.settings.users) == 0:
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
-        user = User(name=request.form.get("username"))
-        if user.check_password(request.form.get("password")):
-            session.clear()
-            next_page = (
-                next_page
-                if (next_page := request.form.get("next"))
-                else url_for("main.index")
-            )
+        try:
+            user = User(name=request.form.get("username"))
+            if user.check_password(request.form.get("password")):
+                session.clear()
+                next_page = (
+                    next_page
+                    if (next_page := request.form.get("next"))
+                    else url_for("main.index")
+                )
 
-            if user.totp:
-                session["totp"] = user.totp
-                return render_template("totp.html", next=next_page, id=user.id)
+                if user.totp:
+                    session["totp"] = user.totp
+                    return render_template("totp.html", next=next_page, id=user.id)
 
-            session["username"] = user.name
-            session["level"] = user.right
-            session["bearer_token"] = _generate_jwt(user)
+                session["username"] = user.name
+                session["level"] = user.right
+                session["bearer_token"] = _generate_jwt(user)
 
-            return redirect(next_page)
-
-        flash("User or password invalid.")
+                return redirect(next_page)
+            flash("User or password invalid.")
+        except UserNotFound:
+            flash("User or password invalid.")
 
     return render_template("login.html")
 
@@ -85,13 +87,16 @@ def totpverified():
     if session.get("totp") and request.method == "POST":
         id = int(request.form.get("id"))  # pylint: disable=W0622
         next = request.form.get("next")  # pylint: disable=W0622
-        if user := User(id=id):
+        try:
+            user = User(id=id)
             totp = pyotp.TOTP(user.secret)
             if totp.verify(request.form.get("secret")):
                 session["username"] = user.name
                 session["level"] = user.right
                 session["bearer_token"] = _generate_jwt(user)
                 return redirect(next)
+        except UserNotFound:
+            pass
 
     flash("Acccess id denied.")
 
