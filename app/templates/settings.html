@@ -46,9 +46,9 @@
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" required="" type="text" value="{{user.name}}" readonly></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password"></div>
                 <div class="col">
-                    <select class="form-select form-select-sm" name="rights" required>
+                    <select class="form-select form-select-sm" name="right" required>
                         {% for key,value in config.USERLEVEL.items() %}
-                        <option {% if user.rights == value %}selected{%endif%} value="{{value}}">{{key| capitalize}}</option>
+                        <option {% if user.right == value %}selected{%endif%} value="{{value}}">{{key| capitalize}}</option>
                         {% endfor%}
                     </select>
                 </div>
@@ -61,7 +61,7 @@
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" type="text" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" required></div>
                 <div class="col">
-                    <select class="form-select form-select-sm" name="rights" onchange="$(this).trigger('submit');" required>
+                    <select class="form-select form-select-sm" name="right" onchange="$(this).trigger('submit');" required>
                         {% for key,value in config.USERLEVEL.items() %}
                         <option value="{{value}}">{{key| capitalize}}</option>
                         {% endfor%}
@@ -79,14 +79,31 @@
         <div class="row">
             <div class="row g-1 ms-2">
                 <div class="col">
-                    <div class="input-group">
-                        <input class="form-control form-control-sm" id="token" name="token" type="text" value="{{settings.token}}" disabled>
-                        <button class="btn btn-sm btn-outline-secondary" id="copy" type="button"><i class="bi bi-clipboard"></i></button>
+                    <div id="cam_token" class="input-group">
+                        <input class="form-control form-control-sm" id="token" name="token" type="text" value="{{settings.cam_token}}" disabled>
+                        <button class="btn btn-sm btn-outline-secondary" id="btn_token" type="button"><i class="bi bi-clipboard"></i></button>
                         <button class="btn btn-sm btn-outline-secondary" id="get_token" type="button">Generate</button>
                         <button class="btn btn-sm btn-outline-secondary" id="del_token" type="button">Reset</button>
                     </div>
-                    <a href="{{ url_for("camera.cam_pic_new", token=settings.token) }}" target="_blank">Stream view</a>
-                    <a href="{{ url_for("camera.cam_pic", token=settings.token) }}" target="_blank">Last Picture</a>
+                    <a href="{{ url_for("camera.cam_pic_new", cam_token=settings.cam_token) }}" target="_blank">Stream view</a>
+                    <a href="{{ url_for("camera.cam_pic", cam_token=settings.cam_token) }}" target="_blank">Last Picture</a>
+                </div>
+            </div>
+        </div>
+        <hr class="mt-3">
+        <div class="row">
+            API Token<p class="text-body-secondary">The generation of the token allows it to be passed as a parameter of the pages to avoid authentication.</p>
+        </div>
+        <div class="row">
+            <div class="row g-1 ms-2">
+                <div class="col">
+                    <div class="input-group">
+                        <input class="form-control form-control-sm" id="apitoken" name="apitoken" type="text" value="{{settings.api_token}}" disabled>
+                        <button class="btn btn-sm btn-outline-secondary" id="btn_api_token" type="button"><i class="bi bi-clipboard"></i></button>
+                        <button class="btn btn-sm btn-outline-secondary" id="get_api_token" type="button">Generate</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="del_api_token" type="button">Reset</button>
+                    </div>
+                    <a href="{{ url_for('api.doc') }}" target="_blank">API Swagger</a>
                 </div>
             </div>
         </div>
@@ -204,23 +221,40 @@
         $.queryData({url:"{{url_for('api.settings_sets')}}",data:data});
     })
 
-    $('#copy').unbind();
-    $('#copy').click(function () {
-        copyToClipboard('#token');$.
+    $('#btn_token, #btn_api_token').unbind();
+    $('#btn_token, #btn_api_token').click(function () {
+        copyToClipboard('#'+$(this).siblings('input').prop("id"));
         event.preventDefault();
     });
 
     $('#get_token').unbind();
     $('#get_token').click(function () {
-        let callbackSuccess = function(data){$('#token').val(data["token"])}
+        let callbackSuccess = function(data){
+            $('#token').val(data["cam_token"])
+        }
         $.queryData({url:"{{url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
     });
 
     $('#del_token').unbind();
     $('#del_token').click(function () {
-        let callbackSuccess = function(data){$('#token').val('')}
+        let callbackSuccess = function(data){$('#cam_token').val('')}
         $.queryData({method:"delete", url:"{{ url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
     });
+
+    $('#get_api_token').unbind();
+    $('#get_api_token').click(function () {
+        let callbackSuccess = function(data){
+            $('#apitoken').val(data["api_token"])
+        }
+        $.queryData({url:"{{url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
+    });
+
+    $('#del_api_token').unbind();
+    $('#del_api_token').click(function () {
+        let callbackSuccess = function(data){$('#apitoken').val('')}
+        $.queryData({method:"delete", url:"{{ url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
+    });
+
 
     $('#users').on('click','.add_user', function() {
         let parent = $(this).parent().parent();

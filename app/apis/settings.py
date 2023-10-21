@@ -1,17 +1,19 @@
 """Blueprint Settings API."""
 import random
 
+import jwt
 from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import token_required
-from .models import button, buttons, macros, message, setting, token
+from ..helpers.decorator import role_required, token_required
+from .models import api_token, button, buttons, cam_token, macros, message, setting
 
 api = Namespace("settings", path="/api", description="Change settings")
 api.add_model("Error", message)
 api.add_model("Set", setting)
 api.add_model("Macros", macros)
-api.add_model("Token", token)
+api.add_model("CamToken", cam_token)
+api.add_model("APIToken", api_token)
 api.add_model("Button", button)
 api.add_model("Buttons", buttons)
 
@@ -23,6 +25,7 @@ class Buttons(Resource):
 
     @api.marshal_with(buttons, as_list=True)
     @token_required
+    @role_required("max")
     def get(self):
         """List buttons."""
         return ca.settings.get("ubuttons", [])
@@ -105,30 +108,62 @@ class Sets(Resource):
 
 
 @api.response(403, "Forbidden", message)
-@api.route("/token")
+@api.route("/ctoken")
 class Token(Resource):
     """Token."""
 
     @token_required
-    @api.marshal_with(token)
+    @api.marshal_with(cam_token)
     def get(self):
         """Get token."""
-        return {"token": ca.settings.get("token")}
+        return {"cam_token": ca.settings.get("cam_token")}
 
     @token_required
-    @api.marshal_with(token)
+    @api.marshal_with(cam_token)
     def post(self):
         """Create token."""
         secure_token = f"B{random.getrandbits(256)}"
-        ca.settings.update(token=secure_token)
-        return {"token": secure_token}
+        ca.settings.update(cam_token=secure_token)
+        return {"cam_token": secure_token}
+
+    @token_required
+    @api.response(204, "Actions is success")
+    def delete(self):
+        """Delete token."""
+        del ca.settings.cam_token
+        ca.settings.update(cam_token=None)
+        return "", 204
+
+
+@api.response(403, "Forbidden", message)
+@api.route("/token", doc=False)
+class APIToken(Resource):
+    """Token."""
+
+    @token_required
+    @api.marshal_with(api_token)
+    def get(self):
+        """Get token."""
+        return {"api_token": ca.settings.get("token")}
+
+    @token_required
+    @api.marshal_with(api_token)
+    def post(self):
+        """Create token."""
+        secure_token = jwt.encode(
+            {"iss": "system", "id": 0},
+            ca.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
+        ca.settings.update(api_token=secure_token)
+        return {"api_token": secure_token}
 
     @token_required
     @api.response(204, "Actions is success")
     def delete(self):
         """Delete token."""
         del ca.settings.token
-        ca.settings.update(token=None)
+        ca.settings.update(api_token=None)
         return "", 204
 
 

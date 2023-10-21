@@ -1,12 +1,13 @@
 """Blueprint Authentication."""
+import jwt
 import pyotp
 from flask import Blueprint
 from flask import current_app as ca
 from flask import flash, redirect, render_template, request, session, url_for
-from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..const import USERLEVEL_MAX
 from ..helpers.decorator import auth_required
+from ..helpers.users import User, Users
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -30,14 +31,9 @@ def register():
                 if (next_page := request.form.get("next"))
                 else url_for("main.index")
             )
-            if (username := request.form["username"]) and password:
-                first_user = {
-                    "id": 1,
-                    "name": username,
-                    "password": generate_password_hash(password),
-                    "rights": USERLEVEL_MAX,
-                }
-                ca.settings.update(users=[first_user])
+            if (name := request.form["username"]) and password:
+                users = Users()
+                users.set(name=name, password=password, right=USERLEVEL_MAX)
                 return redirect(next_page)
             flash_msg = "User or password is empty."
         else:
@@ -57,11 +53,8 @@ def login():
     if ca.settings.get("users") is None or len(ca.settings.users) == 0:
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        if (user := ca.settings.get_object(attr="users", id=username, key="name")) and (
-            check_password_hash(user.get("password"), password)
-        ):
+        user = User(name=request.form.get("username"))
+        if user.check_password(request.form.get("password")):
             session.clear()
             next_page = (
                 next_page
@@ -69,11 +62,17 @@ def login():
                 else url_for("main.index")
             )
 
-            if user.get("totp"):
-                return render_template("totp.html", next=next_page, id=user.get("id"))
+            if user.totp:
+                session["totp"] = True
+                return render_template("totp.html", next=next_page, id=user.id)
 
-            session["username"] = username
-            session["level"] = user.get("rights")
+            session["username"] = user.name
+            session["level"] = user.right
+            session["bearer_token"] = jwt.encode(
+                {"iis": user.name, "id": user.id},
+                ca.config["SECRET_KEY"],
+                algorithm="HS256",
+            )
 
             return redirect(next_page)
 
@@ -85,18 +84,22 @@ def login():
 @bp.route("/totp-verified", methods=["GET", "POST"])
 def totpverified():
     """Totop verified."""
-    id = int(request.args.get("id"))  # pylint: disable=W0622
-    next = request.args.get("next")  # pylint: disable=W0622
-    if request.method == "POST":
-        id = int(request.form.get("id"))
-        next = request.form.get("next")
-        if dict_user := ca.settings.get_object("users", id):
-            totp = pyotp.TOTP(dict_user["secret"])
+    if session.get("totp") and request.method == "POST":
+        id = int(request.form.get("id"))  # pylint: disable=W0622
+        next = request.form.get("next")  # pylint: disable=W0622
+        if user := User(id=id):
+            totp = pyotp.TOTP(user.secret)
             if totp.verify(request.form.get("secret")):
-                session["username"] = dict_user.get("name")
-                session["level"] = dict_user.get("rights")
+                session["username"] = user.name
+                session["level"] = user.right
+                session["bearer_token"] = jwt.encode(
+                    {"iis": user.name, "id": user.id},
+                    ca.config["SECRET_KEY"],
+                    algorithm="HS256",
+                )
                 return redirect(next)
-            flash("Code invalid.")
+
+    flash("Acccess id denied.")
 
     return render_template("totp.html", id=id, next=next)
 
