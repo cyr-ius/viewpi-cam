@@ -5,13 +5,14 @@ import time
 
 from flask import Blueprint, Response, current_app, request
 
-from ..helpers.decorator import auth_required
+from ..helpers.decorator import auth_required, token_cam_accept
 
 bp = Blueprint("camera", __name__, url_prefix="/cam")
 
 
 @bp.route("/cam_pic", methods=["GET"])
-@auth_required(token_accept=True)
+@token_cam_accept
+@auth_required
 def cam_pic():
     delay = float(request.args.get("delay", 100)) / 1000  # Unit (ms)
     cam_jpg = _get_shm_cam()
@@ -21,7 +22,8 @@ def cam_pic():
 
 
 @bp.route("/cam_picLatestTL", methods=["GET"])
-@auth_required(token_accept=True)
+@token_cam_accept
+@auth_required
 def cam_pictl():
     media_path = current_app.raspiconfig.media_path
     list_of_files = filter(os.path.isfile, glob.glob(media_path + "*"))
@@ -32,7 +34,8 @@ def cam_pictl():
 
 
 @bp.route("/cam_get", methods=["GET"])
-@auth_required(token_accept=True)
+@token_cam_accept
+@auth_required
 def cam_get():
     os.popen(f"touch {current_app.config.root_path}/status_mjpeg.txt")
     cam_jpg = _get_shm_cam()
@@ -40,7 +43,8 @@ def cam_get():
 
 
 @bp.route("/cam_pic_new", methods=["GET"])
-@auth_required(token_accept=True)
+@token_cam_accept
+@auth_required
 def cam_pic_new():
     delay = float(request.args.get("delay", 100)) / 1000  # Unit (ms)
     preview_path = current_app.raspiconfig.preview_path

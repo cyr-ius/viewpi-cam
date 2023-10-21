@@ -1,53 +1,68 @@
 """Authentication decorators."""
-from functools import partial, wraps
-from typing import overload
+from functools import wraps
 
-from flask import abort, current_app, redirect, request, session, url_for
+import jwt
+from flask import abort
+from flask import current_app as ca
+from flask import redirect, request, session, url_for
 
-
-@overload
-def auth_required(func):
-    ...
-
-
-@overload
-def auth_required(*, token_accept=False):
-    ...
+from ..const import USERLEVEL_MAX
 
 
-def auth_required(func=None, *, token_accept=False):
-    def wrapper(func, *args, **kwargs):
+def auth_required(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
         if session.get("username"):
-            return func(*args, **kwargs)
-        if token_accept is True and (token := request.args.get("token")):
-            if token == current_app.settings.get("token"):
-                return func(*args, **kwargs)
+            return function(*args, **kwargs)
         return redirect(url_for("auth.login", next=request.url))
 
-    # Without arguments `func` is passed directly to the decorator
-    if func is not None:
-        if not callable(func):
-            raise TypeError("Not a callable. Did you use a non-keyword argument?")
-        return wraps(func)(partial(wrapper, func))
+    return wrapper
 
-    # With arguments, we need to return a function that accepts the function
-    def decorator(func):
-        return wraps(func)(partial(wrapper, func))
 
-    return decorator
+def role_required(rights: str | list[str]):
+    def decorate(function):
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            listrights = [rights] if not isinstance(rights, list) else rights
+            values = [
+                ca.config["USERLEVEL"][item]
+                for item in listrights
+                if item in ca.config["USERLEVEL"].keys()
+            ]
+            if session.get("level") in values:
+                return function(*args, **kwargs)
+            abort(403, "Access is denied")
+
+        return wrapper
+
+    return decorate
 
 
 def token_required(function):
     @wraps(function)
-    def decorator(*args, **kwargs):
-        if session.get("username"):
+    def wrapper(*args, **kwargs):
+        if (btoken := session.get("bearer_token")) and jwt.decode(
+            btoken, ca.config["SECRET_KEY"], algorithms=["HS256"]
+        ):
             return function(*args, **kwargs)
-        if api_key := request.headers.get("X_API_KEY"):
-            if api_key == current_app.settings.get("token"):
-                return function(*args, **kwargs)
-            else:
-                abort(403, "The provided API key is not valid")
-        else:
-            abort(422, "Please provide an API key")
+        if (btoken := request.headers.get("X_API_KEY")) and jwt.decode(
+            btoken, ca.config["SECRET_KEY"], algorithms=["HS256"]
+        ):
+            session["accept"] = True
+            session["level"] = USERLEVEL_MAX
+            return function(*args, **kwargs)
+        abort(422, "Please provide an API token")
 
-    return decorator
+    return wrapper
+
+
+def token_cam_accept(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        if cam_token := request.args.get("cam_token"):
+            if ca.settings.get("cam_token") == cam_token:
+                return function.__wrapped__(*args, **kwargs)
+            abort(403, "The provided Camera token is not valid")
+        return function(*args, **kwargs)
+
+    return wrapper
