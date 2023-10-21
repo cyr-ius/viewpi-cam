@@ -1,5 +1,4 @@
 """Users class."""
-import random
 from typing import Any
 
 import pyotp
@@ -16,6 +15,8 @@ class User:
             ca.settings.get_object("users", id)
             or ca.settings.get_object("users", name, "name")
         ):
+            self._users = ca.settings.users.copy()
+            self._users.remove(user)
             self._user = user
         else:
             raise UserNotFound("User not found.")
@@ -44,33 +45,20 @@ class User:
     def totp(self):
         return self._user.get("totp") is True
 
-    def set_token(self) -> None:
-        ca.settings.users.remove(self._user)
-        self._user["token"] = f"B{random.getrandbits(256)}"
-        ca.settings.users.append(self._user)
-        ca.settings.update(users=ca.settings.users)
-
     def set_secret(self) -> None:
-        ca.settings.users.remove(self._user)
         self._user["secret"] = pyotp.random_base32()
         self._user["totp"] = False
-        ca.settings.users.append(self._user)
-        ca.settings.update(users=ca.settings.users)
+        self._saveset()
 
     def delete_secret(self) -> None:
-        ca.settings.users.remove(self._user)
         self._user.pop("totp", None)
         self._user.pop("secret", None)
-        ca.settings.users.append(self._user)
-        ca.settings.update(users=ca.settings.users)
+        self._saveset()
 
     def validate_secret(self, code: str) -> bool:
         totp = pyotp.TOTP(self._user["secret"])
-        ca.settings.users.remove(self._user)
         self._user["totp"] = totp.verify(code)
-        ca.settings.users.append(self._user)
-        ca.settings.update(users=ca.settings.users)
-
+        self._saveset()
         return self._user["totp"]
 
     def check_password(self, password: str) -> bool:
@@ -81,66 +69,43 @@ class User:
         totp = pyotp.TOTP(self._user["secret"])
         return totp.verify(code)
 
-    def set_password(self, password: str) -> None:
-        ca.settings.users.remove(self._user)
-        self._user["password"] = generate_password_hash(password)
-        ca.settings.users.append(self._user)
-        ca.settings.update(users=ca.settings.users)
+    def _saveset(self) -> None:
+        self._users.append(self._user)
+        ca.settings.update(users=self._users)
 
-    def set_right(self, right: int) -> None:
-        ca.settings.users.remove(self._user)
-        self._user["right"] = right
-        ca.settings.users.append(self._user)
-        ca.settings.update(users=ca.settings.users)
-
-    def refresh(self) -> None:
-        self._user = ca.settings.get_object("users", self.id)
-
-    def update(self, **kwargs) -> None:
-        if self.name != kwargs["name"] and ca.settings.has_object(
-            attr="users", id=kwargs["name"], key="name"
-        ):
+    @staticmethod
+    def checkname(users, name) -> None:
+        if len(users) > 0 and ca.settings.has_object(attr="users", id=name, key="name"):
             raise UserAlreadyExists("User name is already exists, please change.")
 
-        kwargs["id"] = self.id
+    @staticmethod
+    def create(name: str, password: str, right: int, **kwargs: Any) -> None:
+        users = ca.settings.get("users", [])
+        User.checkname(users, name)
+        ids = [user["id"] for user in users]
+        kwargs["id"] = 1 if len(ids) == 0 else (max(ids) + 1)
+        password = generate_password_hash(password)
+        users.append({"name": name, "password": password, "right": right, **kwargs})
+        ca.settings.update(users=users)
+        return User(id=kwargs["id"])
+
+    def update(self, **kwargs) -> None:
+        kwargs.pop("id", None)
+        if self.name != kwargs["name"]:
+            User.checkname(self._users, kwargs["name"])
+
         if (pwd := kwargs.get("password")) is None or pwd == "":
             kwargs["password"] = self._user["password"]
         else:
             kwargs["password"] = generate_password_hash(pwd)
 
-        ca.settings.users.remove(self._user)
-        ca.settings.users.append(kwargs)
-        ca.settings.update(users=ca.settings.users)
+        self._user.update(kwargs)
+        self._saveset()
 
         return kwargs
 
-
-class Users:
-    """Class users."""
-
-    def set(self, name: str, password: str, right: int, **kwargs: Any) -> None:
-        """Create user."""
-        users = ca.settings.get("users", [])
-        if len(users) == 0:
-            ca.settings.users = []
-        if ca.settings.has_object(attr="users", id=name, key="name"):
-            raise UserAlreadyExists("User name is already exists, please change.")
-        ids = [user["id"] for user in users]
-        kwargs["id"] = 1 if len(ids) == 0 else (max(ids) + 1)
-        ca.settings.users.append({"name": name, "right": right, **kwargs})
-        ca.settings.update(users=ca.settings.users)
-        user = User(kwargs["id"])
-        user.set_password(password)
-
-        return user
-
-    def delete(self, id: int) -> bool:  # pylint: disable=W0622
-        """Delete user."""
-        if user := ca.settings.get_object("users", id):
-            ca.settings.users.remove(user)
-            ca.settings.update(users=ca.settings.users)
-        else:
-            raise UsersException("User not found.")
+    def delete(self) -> None:
+        ca.settings.update(users=self._users)
 
 
 class UsersException(Exception):
