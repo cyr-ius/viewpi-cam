@@ -19,7 +19,7 @@ api = Api(
     title="APIS ViewPi Cam",
     version="1.0",
     description="Apis for Viewpi Cam",
-    doc="/swagger",
+    doc="/api/doc",
     authorizations={
         "apikey": {"type": "apiKey", "in": "header", "name": "Authorization"}
     },
