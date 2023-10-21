@@ -20,7 +20,9 @@ api = Api(
     version="1.0",
     description="Apis for Viewpi Cam",
     doc="/swagger",
-    authorizations={"apikey": {"type": "apiKey", "in": "header", "name": "X-API-KEY"}},
+    authorizations={
+        "apikey": {"type": "apiKey", "in": "header", "name": "Authorization"}
+    },
     security="apikey",
 )
 api.add_namespace(ns1)
