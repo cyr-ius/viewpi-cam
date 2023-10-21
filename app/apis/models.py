@@ -59,6 +59,7 @@ command = Model(
 )
 date_time = Model("Datetime", {"datetime": fields.DateTime(dt_format="iso8601")})
 day = Model("Day", {"*": wild})
+daymode = Model("Daymode", {"daymode": fields.Integer(description="Day mode")})
 files = Model(
     "Files",
     {
@@ -94,6 +95,7 @@ macros = Model(
     },
 )
 message = Model("Error", {"message": fields.String(required=True)})
+period = Model("Period", {"period": fields.Integer(description="period")})
 schedule = Model(
     "Schedule",
     {
