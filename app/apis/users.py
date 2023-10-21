@@ -4,9 +4,7 @@ from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required, token_required
 from ..helpers.users import User as usr
-from ..helpers.users import UserAlreadyExists, UserNotFound
-from ..helpers.users import Users as usrs
-from ..helpers.users import UsersException
+from ..helpers.users import UserAlreadyExists, UserNotFound, UsersException
 from .models import message, user, users
 
 api = Namespace(
@@ -36,8 +34,7 @@ class Users(Resource):
     def post(self):
         """Create user."""
         try:
-            obj_user = usrs()
-            return obj_user.set(**api.payload)
+            return usr.create(**api.payload)
         except UserAlreadyExists:
             abort(422, "User name is already exists, please change.")
 
@@ -76,8 +73,8 @@ class User(Resource):
         if id == 1:
             abort(403, "Admin account cannot be deleted")
         try:
-            usrmgmt = usrs()
-            usrmgmt.delete(id)
+            user = usr(id)  # pylint: disable=W0621
+            user.delete()
         except UsersException:
             abort(404, "User not found")
         else:
