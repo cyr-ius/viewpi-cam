@@ -1,4 +1,7 @@
 """Blueprint Authentication."""
+from datetime import datetime as dt
+from datetime import timezone
+
 import jwt
 import pyotp
 from flask import Blueprint
@@ -63,16 +66,12 @@ def login():
             )
 
             if user.totp:
-                session["totp"] = True
+                session["totp"] = user.totp
                 return render_template("totp.html", next=next_page, id=user.id)
 
             session["username"] = user.name
             session["level"] = user.right
-            session["bearer_token"] = jwt.encode(
-                {"iis": user.name, "id": user.id},
-                ca.config["SECRET_KEY"],
-                algorithm="HS256",
-            )
+            session["bearer_token"] = _generate_jwt(user)
 
             return redirect(next_page)
 
@@ -92,11 +91,7 @@ def totpverified():
             if totp.verify(request.form.get("secret")):
                 session["username"] = user.name
                 session["level"] = user.right
-                session["bearer_token"] = jwt.encode(
-                    {"iis": user.name, "id": user.id},
-                    ca.config["SECRET_KEY"],
-                    algorithm="HS256",
-                )
+                session["bearer_token"] = _generate_jwt(user)
                 return redirect(next)
 
     flash("Acccess id denied.")
@@ -110,3 +105,17 @@ def logout():
     """Logout  button."""
     session.clear()
     return redirect(url_for("auth.login"))
+
+
+def _generate_jwt(user):
+    lifetime = dt.now(tz=timezone.utc) + ca.config["PERMANENT_SESSION_LIFETIME"]
+    return jwt.encode(
+        {
+            "iis": user.name,
+            "id": user.id,
+            "iat": dt.now(tz=timezone.utc),
+            "exp": lifetime,
+        },
+        ca.config["SECRET_KEY"],
+        algorithm="HS256",
+    )
