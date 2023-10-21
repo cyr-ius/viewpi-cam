@@ -11,7 +11,7 @@ from flask import Blueprint
 from flask import current_app as ca
 from flask import make_response, render_template, request, send_file
 
-from ..helpers.decorator import auth_required
+from ..helpers.decorator import auth_required, role_required
 from ..helpers.filer import (
     data_file_ext,
     data_file_name,
@@ -30,6 +30,7 @@ bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/pr
 
 @bp.route("/", methods=["GET"])
 @auth_required
+@role_required(["preview", "medium", "max"])
 def index():
     """Index page."""
     time_filter_max = ca.config["TIME_FILTER_MAX"]
@@ -55,6 +56,7 @@ def index():
 
 
 @bp.route("/download", methods=["POST"])
+@role_required(["preview", "medium", "max"])
 @auth_required
 def download():
     """Download File."""
@@ -78,6 +80,7 @@ def download():
 
 
 @bp.route("/zipfile", methods=["POST"])
+@role_required(["preview", "medium", "max"])
 @auth_required
 def zipdata():
     """ZIP File."""

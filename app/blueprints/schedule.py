@@ -14,7 +14,7 @@ from flask.cli import with_appcontext
 
 from ..apis.schedule import dt_now, period, sun_info, time_offset
 from ..const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
-from ..helpers.decorator import auth_required
+from ..helpers.decorator import auth_required, role_required
 from ..helpers.fifo import check_motion, open_pipe
 from ..helpers.filer import (
     delete_mediafiles,
@@ -37,6 +37,7 @@ bp.cli.short_help = "Stop/Start scheduler"
 
 
 @bp.route("/", methods=["GET"])
+@role_required(["max"])
 @auth_required
 def index():
     """Index page."""

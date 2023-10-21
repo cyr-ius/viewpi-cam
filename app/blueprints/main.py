@@ -9,7 +9,7 @@ from flask import g, json, render_template, request, send_file, session
 
 from ..apis.logs import get_logs
 from ..const import PRESETS
-from ..helpers.decorator import auth_required
+from ..helpers.decorator import auth_required, role_required
 from ..helpers.utils import write_log
 from .camera import status_mjpeg
 
@@ -55,6 +55,7 @@ def index():
 
 
 @bp.route("/log", methods=["GET", "POST"])
+@role_required(["max"])
 @auth_required
 def log():
     if request.method == "POST":
@@ -64,6 +65,7 @@ def log():
 
 
 @bp.route("/streamlog", methods=["GET"])
+@role_required(["max"])
 @auth_required
 def streamlog():
     log_file = ca.raspiconfig.log_file
@@ -84,6 +86,7 @@ def streamlog():
 
 
 @bp.route("/debug", methods=["GET"])
+@role_required(["max"])
 @auth_required
 def debugcmd():
     return render_template("debug.html", raspiconfig=ca.raspiconfig.__dict__)
