@@ -9,7 +9,9 @@ from ..helpers.decorator import token_required
 from ..helpers.utils import delete_log
 from .models import forbidden, message
 
-api = Namespace("logs", path="/api")
+api = Namespace(
+    "logs", path="/api", description="Log managment", decorators=[token_required]
+)
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 
@@ -20,13 +22,11 @@ class Content(Resource):
     """Get log."""
 
     @api.param("reverse", description="Ordering display (True|False)", _in="query")
-    @token_required
     def get(self):
         """List log."""
         reverse = request.args.get("reverse", True) is True
         return get_logs(reverse)
 
-    @token_required
     @api.response(204, "Action is success")
     @api.response(422, "Error", message)
     def delete(self):

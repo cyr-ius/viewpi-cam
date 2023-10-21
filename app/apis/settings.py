@@ -8,7 +8,12 @@ from flask_restx import Namespace, Resource, abort
 from ..helpers.decorator import role_required, token_required
 from .models import api_token, button, buttons, cam_token, macros, message, setting
 
-api = Namespace("settings", path="/api", description="Change settings")
+api = Namespace(
+    "settings",
+    path="/api",
+    description="Change settings",
+    decorators=[token_required, role_required("max")],
+)
 api.add_model("Error", message)
 api.add_model("Set", setting)
 api.add_model("Macros", macros)
@@ -24,15 +29,12 @@ class Buttons(Resource):
     """List buttons."""
 
     @api.marshal_with(buttons, as_list=True)
-    @token_required
-    @role_required("max")
     def get(self):
         """List buttons."""
         return ca.settings.get("ubuttons", [])
 
     @api.expect(button)
     @api.marshal_with(buttons)
-    @token_required
     def post(self):
         """Create button."""
         if ca.settings.get("ubuttons") is None:
@@ -49,7 +51,6 @@ class Buttons(Resource):
 class Button(Resource):
     """Button objet."""
 
-    @token_required
     @api.marshal_with(button)
     @api.response(404, "Not found", message)
     def get(self, id: int):  # pylint: disable=W0622
@@ -58,7 +59,6 @@ class Button(Resource):
             return button_dict
         abort(404, "Button not found")
 
-    @token_required
     @api.expect(button)
     @api.marshal_with(button)
     @api.response(404, "Not found", message)
@@ -72,7 +72,6 @@ class Button(Resource):
             return api.payload
         abort(404, "Button not found")
 
-    @token_required
     @api.response(204, "Actions is success")
     @api.response(404, "Not found", message)
     def delete(self, id: int):  # pylint: disable=W0622
@@ -89,13 +88,11 @@ class Button(Resource):
 class Sets(Resource):
     """Settings."""
 
-    @token_required
     @api.marshal_with(setting)
     def get(self):
         """Get settings."""
         return ca.settings
 
-    @token_required
     @api.expect(setting)
     @api.marshal_with(setting)
     @api.response(204, "Action is success")
@@ -112,13 +109,11 @@ class Sets(Resource):
 class Token(Resource):
     """Token."""
 
-    @token_required
     @api.marshal_with(cam_token)
     def get(self):
         """Get token."""
         return {"cam_token": ca.settings.get("cam_token")}
 
-    @token_required
     @api.marshal_with(cam_token)
     def post(self):
         """Create token."""
@@ -126,7 +121,6 @@ class Token(Resource):
         ca.settings.update(cam_token=secure_token)
         return {"cam_token": secure_token}
 
-    @token_required
     @api.response(204, "Actions is success")
     def delete(self):
         """Delete token."""
@@ -140,13 +134,11 @@ class Token(Resource):
 class APIToken(Resource):
     """Token."""
 
-    @token_required
     @api.marshal_with(api_token)
     def get(self):
         """Get token."""
         return {"api_token": ca.settings.get("token")}
 
-    @token_required
     @api.marshal_with(api_token)
     def post(self):
         """Create token."""
@@ -158,7 +150,6 @@ class APIToken(Resource):
         ca.settings.update(api_token=secure_token)
         return {"api_token": secure_token}
 
-    @token_required
     @api.response(204, "Actions is success")
     def delete(self):
         """Delete token."""
@@ -177,7 +168,6 @@ class Macros(Resource):
         """Return config."""
         return {item: getattr(ca.raspiconfig, item) for item in ca.config["MACROS"]}
 
-    @token_required
     @api.marshal_with(macros, as_list=True)
     def get(self):
         """Get macros."""
@@ -190,7 +180,6 @@ class Macros(Resource):
             list_macros.append({"name": key, "command": value, "state": state})
         return list_macros
 
-    @token_required
     @api.expect(macros)
     @api.marshal_with(macros)
     @api.response(204, "Action is success")

@@ -4,11 +4,16 @@ from flask import request
 from flask_restx import Namespace, Resource, abort
 
 from ..blueprints.preview import get_thumb, get_thumbnails, video_convert
-from ..helpers.decorator import token_required
+from ..helpers.decorator import role_required, token_required
 from ..helpers.filer import delete_mediafiles, lock_file, maintain_folders
 from .models import files, forbidden, message
 
-api = Namespace("previews", path="/api")
+api = Namespace(
+    "previews",
+    path="/api",
+    description="Gallery managment",
+    decorators=[token_required, role_required(["medium", "max"])],
+)
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 api.add_model("Files", files)
@@ -19,7 +24,6 @@ api.add_model("Files", files)
 class Previews(Resource):
     """Previews."""
 
-    @token_required
     @api.marshal_list_with(files)
     @api.param("order", "Ordering thumbnail [desc|asc]")
     @api.param("show_types", "Show types [both|image|video]")
@@ -32,7 +36,6 @@ class Previews(Resource):
             time_filter=int(request.args.get("time_filter", 1)),
         )
 
-    @token_required
     @api.response(204, "Action is success")
     def delete(self):
         """Delete all media files."""
@@ -45,13 +48,11 @@ class Previews(Resource):
 class Preview(Resource):
     """Preview."""
 
-    @token_required
     @api.marshal_with(files)
     def get(self, id: str):  # pylint: disable=W0622
         """Get file information."""
         return get_thumb(id)
 
-    @token_required
     @api.doc(description="Delete file")
     @api.response(204, "Action is success")
     @api.response(404, "Not found", message)
@@ -74,7 +75,6 @@ class Preview(Resource):
 class Lock(Resource):
     """Lock file."""
 
-    @token_required
     def post(self, id: str):  # pylint: disable=W0622
         """Lock."""
         if thumb := get_thumb(id):
@@ -94,7 +94,6 @@ class Lock(Resource):
 class Unlock(Resource):
     """Unock file."""
 
-    @token_required
     def post(self, id: str):  # pylint: disable=W0622
         """Unlock."""
         if thumb := get_thumb(id):
@@ -114,7 +113,6 @@ class Unlock(Resource):
 class Convert(Resource):
     """Convert timelapse file to mp4."""
 
-    @token_required
     def post(self, id: str):  # pylint: disable=W0622
         """Coonvert timelapse."""
         if thumb := get_thumb(id):

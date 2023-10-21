@@ -2,10 +2,15 @@
 from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import token_required
+from ..helpers.decorator import role_required, token_required
 from .models import message, multiview, multiviews
 
-api = Namespace("multiview", path="/api")
+api = Namespace(
+    "multiview",
+    path="/api",
+    description="Multiviews",
+    decorators=[token_required, role_required("max")],
+)
 api.add_model("Error", message)
 api.add_model("Multiview", multiview)
 api.add_model("Multiviews", multiviews)
@@ -16,13 +21,11 @@ api.add_model("Multiviews", multiviews)
 class Multiviews(Resource):
     """List hosts."""
 
-    @token_required
     @api.marshal_with(multiview, as_list=True)
     def get(self):
         """List hosts."""
         return ca.settings.get("multiviews", [])
 
-    @token_required
     @api.expect(multiview)
     @api.marshal_with(multiviews)
     def post(self):
@@ -41,7 +44,6 @@ class Multiviews(Resource):
 class Multiview(Resource):
     """Multiview objet."""
 
-    @token_required
     @api.marshal_with(multiview)
     @api.response(404, "Not found", message)
     def get(self, id: int):  # pylint: disable=W0622
@@ -50,7 +52,6 @@ class Multiview(Resource):
             return stm
         abort(404, "Host not found")
 
-    @token_required
     @api.expect(multiviews)
     @api.marshal_with(multiview)
     @api.response(404, "Not found", message)
@@ -64,7 +65,6 @@ class Multiview(Resource):
             return api.payload
         abort(404, "Host not found")
 
-    @token_required
     @api.response(204, "Actions is success")
     @api.response(404, "Not found", message)
     def delete(self, id: int):  # pylint: disable=W0622

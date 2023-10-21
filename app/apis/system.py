@@ -2,13 +2,18 @@
 from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import token_required
+from ..helpers.decorator import role_required, token_required
 from ..helpers.raspiconfig import RaspiConfigError
 from ..helpers.utils import execute_cmd
 from ..services.handle import ViewPiCamException
 from .models import command, message
 
-api = Namespace("system", path="/api", description="Host command")
+api = Namespace(
+    "system",
+    path="/api",
+    description="Host command",
+    decorators=[token_required, role_required("max")],
+)
 api.add_model("Error", message)
 api.add_model("Command", command)
 
@@ -20,7 +25,6 @@ api.add_model("Command", command)
 class Restart(Resource):
     """Restart host."""
 
-    @token_required
     def post(self):
         """Execute command."""
         try:
@@ -38,7 +42,6 @@ class Restart(Resource):
 class Shutdown(Resource):
     """Restart application."""
 
-    @token_required
     def post(self):
         """Execute command."""
         try:
@@ -56,7 +59,6 @@ class Shutdown(Resource):
 class RestartApp(Resource):
     """Restart application."""
 
-    @token_required
     def post(self):
         """Execute command."""
         try:
@@ -73,7 +75,6 @@ class RestartApp(Resource):
 class Command(Resource):
     """FIFO Command."""
 
-    @token_required
     @api.expect(command)
     def post(self):
         """Send command to control fifo."""

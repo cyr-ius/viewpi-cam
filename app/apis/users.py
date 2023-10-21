@@ -2,14 +2,19 @@
 from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import token_required
+from ..helpers.decorator import role_required, token_required
 from ..helpers.users import User as usr
 from ..helpers.users import UserAlreadyExists, UserNotFound
 from ..helpers.users import Users as usrs
 from ..helpers.users import UsersException
 from .models import message, user, users
 
-api = Namespace("users", description="Create, update and delete users.", path="/api")
+api = Namespace(
+    "users",
+    description="Create, update and delete users.",
+    path="/api",
+    decorators=[token_required, role_required("max")],
+)
 api.add_model("Error", message)
 api.add_model("User", user)
 api.add_model("Users", users)
@@ -20,13 +25,11 @@ api.add_model("Users", users)
 class Users(Resource):
     """List users."""
 
-    @token_required
     @api.marshal_with(users, as_list=True)
     def get(self):
         """List users."""
         return ca.settings.users
 
-    @token_required
     @api.expect(user)
     @api.marshal_with(users)
     @api.response(422, "Error", message)
@@ -44,7 +47,6 @@ class Users(Resource):
 class User(Resource):
     """User objet."""
 
-    @token_required
     @api.marshal_with(user)
     @api.response(404, "Not found", message)
     def get(self, id: int):  # pylint: disable=W0622
@@ -54,7 +56,6 @@ class User(Resource):
         except UserNotFound:
             abort(404, "User not found")
 
-    @token_required
     @api.expect(user)
     @api.marshal_with(user)
     @api.response(404, "Not found", message)
@@ -68,7 +69,6 @@ class User(Resource):
         except UserAlreadyExists:
             abort(422, "User name is already exists, please change.")
 
-    @token_required
     @api.response(204, "Actions is success")
     @api.response(404, "Not found", message)
     def delete(self, id: int):  # pylint: disable=W0622

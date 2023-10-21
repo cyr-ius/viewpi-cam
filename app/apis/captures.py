@@ -3,11 +3,16 @@ from flask import current_app as ca
 from flask import request
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import token_required
+from ..helpers.decorator import role_required, token_required
 from ..helpers.raspiconfig import RaspiConfigError
 from .models import forbidden, message
 
-api = Namespace("captures", path="/api")
+api = Namespace(
+    "captures",
+    path="/api",
+    description="Stop/Start capture and preview camera/images",
+    decorators=[token_required, role_required("max")],
+)
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 
@@ -20,7 +25,6 @@ api.add_model("Forbidden", forbidden)
 class Camera(Resource):
     """Camera."""
 
-    @token_required
     def post(self):
         """Get capture video."""
         try:
@@ -40,7 +44,6 @@ class Camera(Resource):
 class Image(Resource):
     """Image."""
 
-    @token_required
     def post(self):
         """Get capture image."""
         try:
@@ -58,7 +61,6 @@ class Image(Resource):
 class Timelapse(Resource):
     """Timelapse."""
 
-    @token_required
     def post(self):
         """Get capture Timelapse."""
         try:
