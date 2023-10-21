@@ -41,16 +41,18 @@ def role_required(rights: str | list[str]):
 def token_required(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
-        if (btoken := session.get("bearer_token")) and jwt.decode(
-            btoken, ca.config["SECRET_KEY"], algorithms=["HS256"]
-        ):
-            return function(*args, **kwargs)
-        if (btoken := request.headers.get("X_API_KEY")) and jwt.decode(
-            btoken, ca.config["SECRET_KEY"], algorithms=["HS256"]
-        ):
-            session["accept"] = True
-            session["level"] = USERLEVEL_MAX
-            return function(*args, **kwargs)
+        token = session.get("bearer_token") or request.headers.get("Authorization")
+        if token:
+            try:
+                content = jwt.decode(
+                    token, ca.config["SECRET_KEY"], algorithms=["HS256"]
+                )
+            except (jwt.ImmatureSignatureError, jwt.ExpiredSignatureError):
+                abort(422, "API token expired")
+            else:
+                if content.get("iis") == "system":
+                    session["level"] = USERLEVEL_MAX
+                return function(*args, **kwargs)
         abort(422, "Please provide an API token")
 
     return wrapper
