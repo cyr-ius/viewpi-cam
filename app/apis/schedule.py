@@ -7,22 +7,29 @@ from subprocess import PIPE, Popen
 import pytz
 from flask import current_app as ca
 from flask import request
-from flask_restx import Namespace, Resource, abort, fields
+from flask_restx import Namespace, Resource, abort
 from suntime import Sun
 
 from ..const import SCHEDULE_RESET
-from ..helpers.decorator import token_required
+from ..helpers.decorator import role_required, token_required
 from ..helpers.fifo import send_motion
 from ..helpers.utils import execute_cmd, get_pid, write_log
 from ..services.handle import ViewPiCamException
-from .models import date_time, day, forbidden, message, schedule
+from .models import date_time, day, daymode, forbidden, message, period, schedule
 
-api = Namespace("schedule", path="/api")
+api = Namespace(
+    "schedule",
+    path="/api",
+    description="Scheduler managment",
+    decorators=[token_required, role_required("max")],
+)
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 api.add_model("Datetime", date_time)
 api.add_model("Schedule", schedule)
 api.add_model("Day", day)
+api.add_model("Daymode", daymode)
+api.add_model("Period", period)
 
 
 @api.route("/schedule")
@@ -30,7 +37,6 @@ api.add_model("Day", day)
 class Settings(Resource):
     """Schedule."""
 
-    @token_required
     @api.marshal_with(schedule)
     def get(self):
         """Get settiings scheduler."""
@@ -38,7 +44,6 @@ class Settings(Resource):
 
     @api.expect(schedule)
     @api.marshal_with(message)
-    @token_required
     @api.response(204, "Action is success")
     def put(self):
         """Set settings."""
@@ -66,7 +71,6 @@ class Settings(Resource):
 class Actions(Resource):
     """Actions."""
 
-    @token_required
     @api.marshal_with(message)
     def post(self):
         """Post action."""
@@ -96,23 +100,17 @@ class Actions(Resource):
 class Period(Resource):
     """Sunrise."""
 
-    @api.marshal_with(
-        api.model("Period", {"period": fields.Integer(description="period")})
-    )
-    @api.expect(
-        api.model("Period", {"daymode": fields.Integer(description="Day mode")})
-    )
-    @token_required
+    @api.marshal_with(period)
+    @api.expect(daymode)
     def post(self):
         """Post day mode and return period."""
-        return {"period": period(ca.settings.daymode)}
+        return {"period": get_period(ca.settings.daymode)}
 
 
 @api.route("/sun/sunrise")
 class Sunrise(Resource):
     """Sunrise."""
 
-    @api.doc(security=[])
     @api.marshal_with(date_time)
     def get(self):
         """Get sunrise datetime."""
@@ -123,7 +121,6 @@ class Sunrise(Resource):
 class Sunset(Resource):
     """Sunset."""
 
-    @api.doc(security=[])
     @api.marshal_with(date_time)
     def get(self):
         """Get sunset datetime."""
@@ -158,7 +155,7 @@ def dt_now(minute: bool = False) -> dt | int:
     return now
 
 
-def sun_info(mode):
+def sun_info(mode: str) -> dt:
     """Return sunset or sunrise datetime."""
     offset = time_offset(ca.settings.gmt_offset)
     sun = Sun(ca.settings.latitude, ca.settings.longitude)
@@ -169,7 +166,7 @@ def sun_info(mode):
     return sun_time.replace(tzinfo=utc_offset(offset.seconds)) + offset
 
 
-def period(daymode):
+def get_period(daymode: int) -> int:
     """Get period."""
     now = dt_now()
     sunrise = sun_info("sunrise")

@@ -12,7 +12,7 @@ from flask import current_app as ca
 from flask import render_template
 from flask.cli import with_appcontext
 
-from ..apis.schedule import dt_now, period, sun_info, time_offset
+from ..apis.schedule import dt_now, get_period, sun_info, time_offset
 from ..const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
 from ..helpers.decorator import auth_required, role_required
 from ..helpers.fifo import check_motion, open_pipe
@@ -47,7 +47,7 @@ def index():
         current_time=dt_now().strftime("%H:%M"),
         motion_pipe=ca.raspiconfig.motion_pipe,
         offset=time_offset(ca.settings.gmt_offset),
-        period=period(ca.settings.daymode),
+        period=get_period(ca.settings.daymode),
         schedule_pid=get_pid("scheduler"),
         settings=ca.settings,
         sunrise=sun_info("sunrise").strftime("%H:%M"),
@@ -156,7 +156,7 @@ def scheduler() -> None:
                     modechecktime = timenow + ca.settings.mode_poll
                     force_period_check = 0
                     if last_on_cmd < 0:
-                        new_day_period = period(ca.settings.daymode)
+                        new_day_period = get_period(ca.settings.daymode)
                         if new_day_period != last_day_period:
                             write_log(f"New period detected {new_day_period}")
                             send_cmds(
