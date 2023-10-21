@@ -26,13 +26,13 @@
     </div>
     <div id="main-buttons" class="my-2 {% if display_mode == "Off" %}d-none{%endif%}">
         {% if session["level"] >= config.USERLEVEL.medium%}
-        <button id="video_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
-        <button id="image_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
-        <button id="timelapse_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
+        <button id="video_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
+        <button id="image_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
+        <button id="timelapse_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
         {%endif%}
         {% if session["level"] >= config.USERLEVEL.max%}
-        <button id="md_button" type="button" class="btn btn-sm btn-outline-secondary" value=""></button>
-        <button id="halt_button" type="button" class="btn btn-sm btn-danger" value=""></button>
+        <button id="md_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
+        <button id="halt_button" type="button" class="btn btn-sm btn-danger"></button>
         {%endif%}
     </div>
     <div id="secondary-buttons" class="container-fluid text-center">
