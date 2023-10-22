@@ -14,7 +14,6 @@ $(function () {
           event.preventDefault();
           event.stopPropagation();
         }
-
         form.classList.add("was-validated");
       },
       false,
@@ -45,6 +44,19 @@ $(function () {
   observer.observe(targetNode, config);
 
   // *** Global functions ***
+  $.fn.isValid = function () {
+    let check = true;
+    $.each(this, function (event) {
+      if (!this.checkValidity()) {
+        check = false;
+        $(this).addClass("is-invalid").removeClass("is-valid");
+      } else {
+        $(this).addClass("is-valid").removeClass("is-invalid");
+      }
+    });
+    return check;
+  };
+
   $.spinner = function (options) {
     var o = $.extend({ status: null }, options || {});
     if (o.status) {
