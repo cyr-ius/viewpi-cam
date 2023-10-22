@@ -224,14 +224,11 @@
     $('#btn_token, #btn_api_token').unbind();
     $('#btn_token, #btn_api_token').click(function () {
         copyToClipboard('#'+$(this).siblings('input').prop("id"));
-        event.preventDefault();
     });
 
     $('#get_token').unbind();
     $('#get_token').click(function () {
-        let callbackSuccess = function(data){
-            $('#token').val(data["cam_token"])
-        }
+        let callbackSuccess = function(data){$('#token').val(data["cam_token"])}
         $.queryData({url:"{{url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
     });
 
@@ -243,9 +240,7 @@
 
     $('#get_api_token').unbind();
     $('#get_api_token').click(function () {
-        let callbackSuccess = function(data){
-            $('#apitoken').val(data["api_token"])
-        }
+        let callbackSuccess = function(data){$('#apitoken').val(data["api_token"])}
         $.queryData({url:"{{url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
     });
 
@@ -265,13 +260,16 @@
             parent.find('#btn_del_user').removeClass('d-none');
             parent.attr('id','users-'+data["id"]);
             parent.addClass('uchange');
-            $(parent).find('input[name="name"]').prop("readonly",true);
-            $(parent).find('.otp_user').prop("disabled",false);
-            $(parent).find('input[name="id"]').val(data["id"])
-            $(templ).find('input').val('');
+            parent.find('input, select, textarea').removeClass('is-valid is-invalid');
+            parent.find('input[name="name"]').prop("readonly",true);
+            parent.find('.otp_user').prop("disabled",false);
+            parent.find('input[name="id"]').val(data["id"])
+            templ.find('input, select, textarea').removeClass('is-valid is-invalid')
+            templ.find('input').val('');
             templ.insertAfter(parent);
         }
-        $.queryData({url:"{{url_for('api.users_users')}}",data:data, callbackSuccess:callbackSuccess});
+        if ($(parent).find('input').isValid())
+            $.queryData({url:"{{url_for('api.users_users')}}",data:data, callbackSuccess:callbackSuccess});
     });
 
     $('#users').on('click','.del_user', function() {
@@ -302,12 +300,14 @@
             parent.find('#btn_del_button').removeClass('d-none');
             parent.attr('id','ubuttons-'+data["id"]);
             parent.addClass('uchange');
-            $(parent).find('input[name="name"]').attr("readonly","readonly");
-            $(parent).find('input[name="id"]').val(data["id"])
-            $(templ).find('input, select, textarea').val('');
+            parent.find('input, select, textarea').removeClass('is-valid is-invalid');
+            parent.find('input[name="name"]').prop("readonly",true);
+            parent.find('input[name="id"]').val(data["id"]);
+            templ.find('input, select, textarea').removeClass('is-valid is-invalid').val('');
             templ.insertAfter(parent);
         }
-        $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, callbackSuccess:callbackSuccess});
+        if ($(parent).find('input').isValid())
+            $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, callbackSuccess:callbackSuccess});
     });
 
     $('#ubuttons').on('click','.del_button', function() {
@@ -331,11 +331,13 @@
             parent.find('#btn_del_button').removeClass('d-none');
             parent.attr('id','multiviews-'+data["id"]);
             parent.addClass('uchange');
-            $(parent).find('input[name="id"]').val(data["id"])
-            $(templ).find('input, select, textarea').val('');
+            parent.find('input, select, textarea').removeClass('is-valid is-invalid');
+            parent.find('input[name="id"]').val(data["id"])
+            templ.find('input, select, textarea').removeClass('is-valid is-invalid').val('');
             templ.insertAfter(parent);
         }
-        $.queryData({url:"{{url_for('api.multiview_multiviews')}}",data:data, callbackSuccess:callbackSuccess});
+        if ($(parent).find('input').isValid())
+            $.queryData({url:"{{url_for('api.multiview_multiviews')}}",data:data, callbackSuccess:callbackSuccess});
     });
 
     $('#multiviews').on('click','.del_button', function() {
