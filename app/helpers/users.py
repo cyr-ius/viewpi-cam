@@ -43,12 +43,12 @@ class User:
 
     @property
     def totp(self):
-        return self._user.get("totp") is True
+        return self._user.get("totp", False) is True
 
     def set_secret(self) -> None:
-        self._user["secret"] = pyotp.random_base32()
-        self._user["totp"] = False
-        self._saveset()
+        if self.totp is False:
+            self._user["secret"] = pyotp.random_base32()
+            self._saveset()
 
     def delete_secret(self) -> None:
         self._user.pop("totp", None)
