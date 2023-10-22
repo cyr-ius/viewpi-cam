@@ -1,7 +1,7 @@
 // Main functions
 $(function () {
   "use strict";
-
+  // *** Bootstrap Validation ***
   // Fetch all the forms we want to apply custom Bootstrap validation styles to
   const forms = document.querySelectorAll(".needs-validation");
 
@@ -21,12 +21,7 @@ $(function () {
     );
   });
 
-  // Select the node that will be observed for mutations
-  const targetNode = document.getElementById("toast");
-
-  // Options for the observer (which mutations to observe)
-  const config = { attributes: true, childList: true, subtree: true };
-
+  // *** Observer Toast ***
   // Callback function to execute when mutations are observed
   const callback = function (mutationsList, observer) {
     for (const mutation of mutationsList) {
@@ -40,22 +35,26 @@ $(function () {
       }
     }
   };
-
+  // Select the node that will be observed for mutations
   // Create an observer instance linked to the callback function
+  // Options for the observer (which mutations to observe)
+  const targetNode = document.getElementById("toast");
   const observer = new MutationObserver(callback);
-
+  const config = { attributes: true, childList: true, subtree: true };
   // Start observing the target node for configured mutations
   observer.observe(targetNode, config);
 
-  function spinner(status) {
-    if (status) {
+  // *** Global functions ***
+  $.spinner = function (options) {
+    var o = $.extend({ status: null }, options || {});
+    if (o.status) {
       $(".bi-eye").addClass("d-none");
       $(".spinner-border").removeClass("d-none");
     } else {
       $(".bi-eye").removeClass("d-none");
       $(".spinner-border").addClass("d-none");
     }
-  }
+  };
 
   $.queryData = function (options) {
     var o = $.extend(
@@ -65,11 +64,14 @@ $(function () {
         data: null,
         callbackSuccess: null,
         callbackError: null,
-        convertJson: true,
+        convertJson: null,
         xhrFields: null,
       },
       options || {},
     );
+
+    if (o.convertJson == null) o.convertJson = true;
+    if (o.method.toUpperCase() == "GET") o.convertJson = false;
 
     $.ajax({
       method: o.method,
@@ -78,17 +80,17 @@ $(function () {
       contentType: "application/json; charset=utf-8",
       xhrFields: o.xhrFields,
       beforeSend: function (data) {
-        spinner(true);
+        $.spinner({ status: true });
       },
       success: function (data) {
-        spinner(false);
+        $.spinner({ status: false });
         $("#toast").addClass("text-bg-primary");
         if (data && data.responseJSON)
           $("#toast .toast-body").html(data.responseJSON["message"]);
         if (o.callbackSuccess) return o.callbackSuccess(data);
       },
       error: function (data) {
-        spinner(false);
+        $.spinner({ status: false });
         $("#toast").removeClass("text-bg-primary").addClass("text-bg-danger");
         $("#toast .toast-body").html(data.status + " - " + data["message"]);
         if (data.responseJSON)
@@ -96,10 +98,6 @@ $(function () {
         if (o.callbackError) return o.callbackError(data);
       },
     });
-  };
-
-  $.capitalize = function (value) {
-    return value.charAt(0).toUpperCase() + value.slice(1);
   };
 
   $.filterFloat = function (value) {
@@ -111,11 +109,11 @@ $(function () {
   $.sendCmd = function (options) {
     var o = $.extend(
       {
-        url: "/api/command",
+        url: "{{url_for('api.system_command')}}",
         cmd: null,
         params: null,
-        callbackSuccess: null,
-        callbackError: null,
+        success: null,
+        error: null,
       },
       options || {},
     );
@@ -125,8 +123,8 @@ $(function () {
     $.queryData({
       url: o.url,
       data: { cmd: o.cmd, params: o.params },
-      callbackSuccess: o.callbackSuccess,
-      callbackError: o.callbackError,
+      callbackSuccess: o.success,
+      callbackError: o.error,
     });
   };
 
