@@ -39,7 +39,7 @@
         <div class="row">Users</div>
         <div id="users" class="row">
             {%for user in settings.users%}
-            {% if user["totp"] %}{% set otpclass="danger"%}{%else%}{% set otpclass="success"%}{%endif%}
+            {% if user.totp %}{% set otpclass="danger"%}{%else%}{% set otpclass="success"%}{%endif%}
             <div id="users-{{user.id}}" class="row g-1 ms-2 uchange">
                 <input type="hidden" name="id" value="{{user.id}}">
                 <div class="col-auto"><button class="btn btn-sm btn-outline-{{otpclass}} otp_user" type="button"><i class="bi"></i>OTP</button></div>
@@ -284,17 +284,8 @@
     $('#users').on('click','.otp_user', function() {
         let parent = $(this).parent().parent();
         let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        let callbackSuccess = function(data){
-            if (!data["totp"]) {
-                $('#otpmodal input').val('');
-                $('#otp_svg').html(data["otp_svg"]);
-                $('#userid').val(data["id"]);
-                otpModal.show();
-            } else if (confirm('Are you sure you want to delete OTP code ?')) {
-                $.queryData({"method":"delete", "url":`{{ url_for('api.users_totp')}}/${data["id"]}`});
-            }
-        }
-        $.queryData({method:"get", url:`{{url_for('api.users_totp')}}/${data["id"]}`,data:"", callbackSuccess:callbackSuccess});
+        $('#otpmodal').attr("aria-viewpicam-modal-id", data["id"])
+        otpModal.show();
     });
 
     $('#users').on('change','.uchange', function(){
