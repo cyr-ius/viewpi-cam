@@ -12,7 +12,7 @@ api = Namespace(
     "system",
     path="/api",
     description="Host command",
-    decorators=[token_required],
+    decorators=[token_required, role_required("max")],
 )
 api.add_model("Error", message)
 api.add_model("Command", command)
@@ -25,7 +25,6 @@ api.add_model("Command", command)
 class Restart(Resource):
     """Restart host."""
 
-    @role_required("max")
     def post(self):
         """Execute command."""
         try:
@@ -43,7 +42,6 @@ class Restart(Resource):
 class Shutdown(Resource):
     """Restart application."""
 
-    @role_required("max")
     def post(self):
         """Execute command."""
         try:
@@ -61,7 +59,6 @@ class Shutdown(Resource):
 class RestartApp(Resource):
     """Restart application."""
 
-    @role_required("max")
     def post(self):
         """Execute command."""
         try:
