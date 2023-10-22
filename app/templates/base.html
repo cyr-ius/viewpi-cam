@@ -23,9 +23,7 @@
     {% assets "js_main" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
     {% endblock %}
     <!-- Content -->
-    {# {% if config["DEBUG"] == True %}
-      {% debug %}
-    {%endif%} #}
+    {# {% if config["DEBUG"] == True %}{% debug %}{%endif%} #}
     <!-- Header -->
     {%block header%}
     <header>
@@ -46,6 +44,7 @@
     {% endblock %}
     <!-- Scripts -->
     {% block scripts %}
+    {% assets "js_colors" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
     {% assets "js_custom" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
     {% endblock %}
     <!-- Extra scripts -->

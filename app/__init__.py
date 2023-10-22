@@ -20,7 +20,14 @@ from .blueprints.settings import bp as sets_bp
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
 from .helpers.utils import execute_cmd, get_pid
-from .services.assets import css_custom, css_main, js_custom, js_main, js_pipan
+from .services.assets import (
+    css_custom,
+    css_main,
+    js_colors,
+    js_custom,
+    js_main,
+    js_pipan,
+)
 from .services.handle import (
     ViewPiCamException,
     handle_access_forbidden,
@@ -99,6 +106,7 @@ def create_app(config=None):
     assets.register("js_custom", js_custom)
     assets.register("js_main", js_main)
     assets.register("js_pipan", js_pipan)
+    assets.register("js_colors", js_colors)
 
     # Create app blueprints
     app.register_blueprint(auth_bp)
