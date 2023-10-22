@@ -86,7 +86,7 @@ $(function(){
         }
     }
     let data = {"show_types": Cookies.get('show_types') || "both" , "sort_order": Cookies.get('sort_order') || "desc", "time_filter": Cookies.get('time_filter') || 1}
-    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}", data:data, callbackSuccess: callbackSuccess, convertJson: false })
+    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}", data:data, callbackSuccess: callbackSuccess})
 });
 
 $('#delete').unbind()
@@ -115,7 +115,7 @@ $('#time_filter, #show_types, #sort_order').on('change', function() {
         $.each(data,function(index,value){Cookies.set(index,value)})
         load_thumbs(event);
     }
-    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}",data:data, callbackSuccess: callbackSuccess, convertJson:false })
+    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}",data:data, callbackSuccess: callbackSuccess})
 })
 
 $('#hide-preview').unbind()

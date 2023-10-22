@@ -294,7 +294,7 @@
                 $.queryData({"method":"delete", "url":`{{ url_for('api.users_totp')}}/${data["id"]}`});
             }
         }
-        $.queryData({method:"get", url:`{{url_for('api.users_totp')}}/${data["id"]}`,data:"", callbackSuccess:callbackSuccess, convertJson:false});
+        $.queryData({method:"get", url:`{{url_for('api.users_totp')}}/${data["id"]}`,data:"", callbackSuccess:callbackSuccess});
     });
 
     $('#users').on('change','.uchange', function(){

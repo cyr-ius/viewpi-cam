@@ -120,7 +120,7 @@ $('#shutdown').click(function(){
 $('#reset').click(function(){
   let callbackSuccess = function(e){setTimeout(function(){location.reload(true);}, 1000);}
   if(confirm('Are you sure to reset the settings to the default values?')) {
-    $.sendCmd({"cmd":"rs","params":"1","callbackSuccess":callbackSuccess})
+    $.sendCmd({cmd:"rs",params:"1",success:callbackSuccess})
   }
 });
 $('#toggle_stream').click(function(){

@@ -607,7 +607,7 @@ function set_motion_external(value){
                 $('#motion-mode').prop("href","#motionExternal")
         }
     }
-    $.sendCmd({"cmd":"mx","params":value,"callbackSuccess":callbackSuccess});
+    $.sendCmd({cmd:"mx",params:value, success:callbackSuccess});
 }
 
 function set_res() {
