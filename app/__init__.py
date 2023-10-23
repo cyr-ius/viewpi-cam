@@ -86,7 +86,6 @@ def create_app(config=None):
         app.config.from_envvar("FLASK_CONF")
 
     # Load app's components
-    # mail.init_app(app)
     assets.init_app(app)
     babel.init_app(app)
 
