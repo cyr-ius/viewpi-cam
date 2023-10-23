@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from io import BytesIO
 from typing import Any
 
-from flask import Blueprint
+from flask import Blueprint, abort
 from flask import current_app as ca
 from flask import make_response, render_template, request, send_file
 
@@ -69,11 +69,12 @@ def download():
             else:
                 mimetype = "video/mp4"
 
+            fullpath = os.path.normpath(os.path.join(media_path, dx_file))
+            if not fullpath.startswith(media_path):
+                abort(500, "Download not allowed")
+
             return send_file(
-                f"{media_path}/{dx_file}",
-                mimetype=mimetype,
-                as_attachment=True,
-                download_name=dx_file,
+                fullpath, mimetype=mimetype, as_attachment=True, download_name=dx_file
             )
         else:
             return get_zip([filename])
@@ -229,7 +230,11 @@ def check_media_path(filename):
     if os.path.realpath(
         os.path.dirname(f"{media_path}/{filename}")
     ) == os.path.realpath(media_path):
-        return os.path.isfile(f"{media_path}/{filename}")
+        fullpath = os.path.normpath(os.path.join(media_path, filename))
+        if not fullpath.startswith(media_path):
+            abort(500, "Media ath not allowed")
+
+        return os.path.isfile(fullpath)
 
 
 def video_convert(filename: str) -> None:
