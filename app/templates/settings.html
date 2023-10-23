@@ -20,19 +20,19 @@
                 <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value="{{ubutton.css_class}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text" value="{{ubutton.style}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="other" placeholder="Other" type="text" value="{{ubutton.other}}"></div>
-                <div class="col-auto" id="btn_del_button"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+                <div class="col-auto"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
             {% endfor%}
-            <div id="ubuttons-ref" class="row g-1 ms-2">
+            <div id="ubuttons-ref" class="row g-1 ms-2 needs-validation">
                 <input type="hidden" name="id">
                 <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="display" type="checkbox"></div></div>
-                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text"></div>
-                <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text"></div>
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Name" required="" type="text" required></div>
+                <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text"></div>
                 <div class="col"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text"></div>
                 <div class="col"><input class="form-control form-control-sm" name="other" placeholder="Other" type="text"></div>
-                <div class="col-auto" id="btn_add_button"><button class="btn btn-sm btn-success add_button" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
-                <div class="col-auto d-none" id="btn_del_button"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+                <div class="col-auto"><button class="btn btn-sm btn-success add_button" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
+                <div class="col-auto d-none"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
         </div>
         <hr class="mt-3">
@@ -42,8 +42,8 @@
             {% if user.totp %}{% set otpclass="danger"%}{%else%}{% set otpclass="success"%}{%endif%}
             <div id="users-{{user.id}}" class="row g-1 ms-2 uchange">
                 <input type="hidden" name="id" value="{{user.id}}">
-                <div class="col-auto"><button class="btn btn-sm btn-outline-{{otpclass}} otp_user" type="button"><i class="bi"></i>OTP</button></div>
-                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" required="" type="text" value="{{user.name}}" readonly></div>
+                <div class="col-auto"><button class="btn btn-sm btn-outline-{{otpclass}} otp_user" type="button"><i class="bi bi-shield-lock"></i></button></div>
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" type="text" value="{{user.name}}" required readonly></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password"></div>
                 <div class="col">
                     <select class="form-select form-select-sm" name="right" required>
@@ -52,12 +52,12 @@
                         {% endfor%}
                     </select>
                 </div>
-                <div class="col-auto" id="btn_del_user"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+                <div class="col-auto" id="btn_del_button"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
             {%endfor%}
-            <div id="users-ref" class="row g-1 ms-2">
+            <div id="users-ref" class="row g-1 ms-2 needs-validation">
                 <input type="hidden" name="id">
-                <div class="col-auto"><button id="btn_otp_user" class="btn btn-sm btn-outline-success otp_user" type="button" disabled><i class="bi"></i>OTP</button></div>
+                <div class="col-auto"><button class="btn btn-sm btn-outline-success otp_user" type="button" disabled><i class="bi bi-shield-lock"></i></button></div>
                 <div class="col"><input class="form-control form-control-sm" name="name" placeholder="Username" type="text" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="Password" type="password" required></div>
                 <div class="col">
@@ -67,9 +67,8 @@
                         {% endfor%}
                     </select>
                 </div>
-
-                <div class="col-auto" id="btn_add_user"><button class="btn btn-sm btn-success add_user" name="add_user" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
-                <div class="col-auto d-none" id="btn_del_user"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+                <div class="col-auto"><button class="btn btn-sm btn-success add_user" name="add_user" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
+                <div class="col-auto d-none"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
         </div>
         <hr class="mt-3">
@@ -181,16 +180,16 @@
                 <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="state" type="checkbox" {% if multiview.state %}checked{%endif%}></div></div>
                 <div class="col"><input class="form-control form-control-sm" name="url" type="url" value="{{multiview.url}}" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="delay" type="number" value="{{multiview.delay}}" required></div>
-                <div class="col-auto" id="btn_del_button"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+                <div class="col-auto"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
             {% endfor%}
-            <div id="multiviews-ref" class="row g-1 ms-2">
+            <div id="multiviews-ref" class="row g-1 ms-2 needs-validation">
                 <input type="hidden" name="id">
                 <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="state" type="checkbox"></div></div>
                 <div class="col"><input class="form-control form-control-sm" name="url" placeholder="http://192.168.1.1/cam/cam_pic?token=Bxxxxxxxxxxxxx" type="url" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="delay" placeholder="delay" type="number" required></div>
-                <div class="col-auto" id="btn_add_button"><button class="btn btn-sm btn-success add_button" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
-                <div class="col-auto d-none" id="btn_del_button"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+                <div class="col-auto"><button class="btn btn-sm btn-success add_button" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
+                <div class="col-auto d-none"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
         </div>
         <hr class="mt-3">
@@ -250,25 +249,24 @@
         $.queryData({method:"delete", url:"{{ url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
     });
 
-
     $('#users').on('click','.add_user', function() {
         let parent = $(this).parent().parent();
         let data = $(parent).find('input, select').serializeObject();
         let templ = $('#users-ref').clone();
         let callbackSuccess = function(data){
-            parent.find('#btn_add_user').addClass('d-none');
-            parent.find('#btn_del_user').removeClass('d-none');
-            parent.attr('id','users-'+data["id"]);
-            parent.addClass('uchange');
-            parent.find('input, select, textarea').removeClass('is-valid is-invalid');
-            parent.find('input[name="name"]').prop("readonly",true);
-            parent.find('.otp_user').prop("disabled",false);
-            parent.find('input[name="id"]').val(data["id"])
-            templ.find('input, select, textarea').removeClass('is-valid is-invalid')
-            templ.find('input').val('');
-            templ.insertAfter(parent);
+            templ.find('.add_button').parent().addClass('d-none');
+            templ.find('.del_button').parent().removeClass('d-none');
+            templ.find('.otp_user').prop('disabled',false);
+            templ.attr('id','users-'+data["id"]);
+            templ.addClass('uchange').removeClass('needs-validation was-validated');
+            templ.find('input[name="name"]').prop("readonly",true);
+            templ.find('input[name="id"]').val(data["id"]);
+            templ.insertBefore(parent);
+            parent.find('input').val('');
+            parent.removeClass('was-validated')
         }
-        if ($(parent).find('input').isValid())
+        let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
+        if (this.dispatchEvent(divsubmit))
             $.queryData({url:"{{url_for('api.users_users')}}",data:data, callbackSuccess:callbackSuccess});
     });
 
@@ -296,18 +294,20 @@
         let data = $(parent).find('input').serializeObject({"checkboxesAsBools":true});
         let templ = $('#ubuttons-ref').clone();
         let callbackSuccess = function(data){
-            parent.find('#btn_add_button').addClass('d-none');
-            parent.find('#btn_del_button').removeClass('d-none');
-            parent.attr('id','ubuttons-'+data["id"]);
-            parent.addClass('uchange');
-            parent.find('input, select, textarea').removeClass('is-valid is-invalid');
-            parent.find('input[name="name"]').prop("readonly",true);
-            parent.find('input[name="id"]').val(data["id"]);
-            templ.find('input, select, textarea').removeClass('is-valid is-invalid').val('');
-            templ.insertAfter(parent);
+            templ.find('.add_button').parent().addClass('d-none');
+            templ.find('.del_button').parent().removeClass('d-none');
+            templ.attr('id','ubuttons-'+data["id"]);
+            templ.addClass('uchange').removeClass('needs-validation was-validated');
+            templ.find('input[name="name"]').prop("readonly",true);
+            templ.find('input[name="id"]').val(data["id"]);
+            templ.insertBefore(parent);
+            parent.find('input, select, textarea').val('');
+            parent.removeClass('was-validated')
         }
-        if ($(parent).find('input').isValid())
+        let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
+        if (this.dispatchEvent(divsubmit))
             $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, callbackSuccess:callbackSuccess});
+
     });
 
     $('#ubuttons').on('click','.del_button', function() {
@@ -327,16 +327,17 @@
         let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
         let templ = $('#multiviews-ref').clone();
         let callbackSuccess = function(data){
-            parent.find('#btn_add_button').addClass('d-none');
-            parent.find('#btn_del_button').removeClass('d-none');
-            parent.attr('id','multiviews-'+data["id"]);
-            parent.addClass('uchange');
-            parent.find('input, select, textarea').removeClass('is-valid is-invalid');
-            parent.find('input[name="id"]').val(data["id"])
-            templ.find('input, select, textarea').removeClass('is-valid is-invalid').val('');
-            templ.insertAfter(parent);
+            templ.find('.add_button').parent().addClass('d-none');
+            templ.find('.del_button').parent().removeClass('d-none');
+            templ.attr('id','multiviews-'+data["id"]);
+            templ.addClass('uchange').removeClass('needs-validation was-validated');
+            templ.find('input[name="id"]').val(data["id"]);
+            templ.insertBefore(parent);
+            parent.find('input, select, textarea').val('');
+            parent.removeClass('was-validated')
         }
-        if ($(parent).find('input').isValid())
+        let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
+        if (this.dispatchEvent(divsubmit))
             $.queryData({url:"{{url_for('api.multiview_multiviews')}}",data:data, callbackSuccess:callbackSuccess});
     });
 

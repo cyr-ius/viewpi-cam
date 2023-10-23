@@ -20,6 +20,25 @@ $(function () {
     );
   });
 
+  // *** Div Validation ***
+  // Loop over them and prevent submission
+  Array.from(forms).forEach((div) => {
+    div.addEventListener(
+      "submit-line",
+      (event) => {
+        let fields = div.querySelectorAll("input, select, textarea");
+        Array.from(fields).forEach((field) => {
+          if (!field.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        });
+        div.classList.add("was-validated");
+      },
+      false,
+    );
+  });
+
   // *** Observer Toast ***
   // Callback function to execute when mutations are observed
   const callback = function (mutationsList, observer) {
@@ -44,19 +63,6 @@ $(function () {
   observer.observe(targetNode, config);
 
   // *** Global functions ***
-  $.fn.isValid = function () {
-    let check = true;
-    $.each(this, function (event) {
-      if (!this.checkValidity()) {
-        check = false;
-        $(this).addClass("is-invalid").removeClass("is-valid");
-      } else {
-        $(this).addClass("is-valid").removeClass("is-invalid");
-      }
-    });
-    return check;
-  };
-
   $.spinner = function (options) {
     var o = $.extend({ status: null }, options || {});
     if (o.status) {
