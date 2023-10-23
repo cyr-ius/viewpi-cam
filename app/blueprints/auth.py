@@ -4,13 +4,14 @@ from datetime import timezone
 
 import jwt
 import pyotp
-from flask import Blueprint
+from flask import Blueprint, abort
 from flask import current_app as ca
 from flask import flash, redirect, render_template, request, session, url_for
 
 from ..const import USERLEVEL_MAX
 from ..helpers.decorator import auth_required
 from ..helpers.users import User, UserNotFound
+from ..helpers.utils import reverse
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -36,6 +37,8 @@ def register():
             )
             if (name := request.form["username"]) and password:
                 User.create(name=name, password=password, right=USERLEVEL_MAX)
+                if reverse(next_page) is False:
+                    abort(404)
                 return redirect(next_page)
             flash_msg = "User or password is empty."
         else:
@@ -73,6 +76,9 @@ def login():
                 session["level"] = user.right
                 session["bearer_token"] = _generate_jwt(user)
 
+                if reverse(next_page) is False:
+                    abort(404)
+
                 return redirect(next_page)
             flash("User or password invalid.")
         except UserNotFound:
@@ -86,7 +92,7 @@ def totpverified():
     """Totop verified."""
     if session.get("totp") and request.method == "POST":
         id = int(request.form.get("id"))  # pylint: disable=W0622
-        next = request.form.get("next")  # pylint: disable=W0622
+        next_page = request.form.get("next")
         try:
             user = User(id=id)
             totp = pyotp.TOTP(user.secret)
@@ -94,7 +100,9 @@ def totpverified():
                 session["username"] = user.name
                 session["level"] = user.right
                 session["bearer_token"] = _generate_jwt(user)
-                return redirect(next)
+                if reverse(next_page) is False:
+                    abort(404)
+                return redirect(next_page)
         except UserNotFound:
             pass
 

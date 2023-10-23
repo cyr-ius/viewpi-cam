@@ -1,13 +1,26 @@
 """Utils functions."""
 import os
+import re
 import shutil
 from datetime import datetime as dt
 from subprocess import PIPE, Popen
 
 from flask import current_app as ca
+from flask import request
 from psutil import process_iter
 
 from ..services.handle import ViewPiCamException
+
+
+def reverse(url: str) -> bool:
+    """Check url exists in url_map."""
+    url = url.replace(request.host_url, "/")
+    for rule in ca.url_map.iter_rules():
+        url_rule = re.sub("<.*>", "[^/]*", rule.rule)
+        p = re.compile(rf"^{url_rule}$")
+        if check := bool(p.match(url)):
+            return check
+    return False
 
 
 def get_pid(pid_type: str) -> int:
