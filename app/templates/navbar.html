@@ -15,11 +15,11 @@
     <div class="collapse navbar-collapse" id="navbarToggler">
     {% if session.level >= config.USERLEVEL.max %}
     <ul class="navbar-nav d-none" id="main">
-      <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">Camera Settings</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">{{_('Camera Settings')}}</a></li>
       {% if raspiconfig is defined and raspiconfig.motion_external == 1 %}
-      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionExternal">Motion Settings</a></li>
+      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionExternal">{{ _('Motion Settings')}}</a></li>
       {%else%}
-      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionSetting">Motion Settings</a></li>
+      <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionSetting">{{ _('Motion Settings')}}</a></li>
       {%endif%}
     </ul>
     {%endif%}
@@ -27,74 +27,74 @@
     <ul class="navbar-nav d-none" id="schedule">
       {% set action="start" if schedule_pid == 0  else "stop"%}
       <div class="container-fluid justify-content-start">
-      <button id="sch_save" class="btn btn-sm btn-outline-secondary" type="button">Save Settings</button>
-      <button id="backup" class="btn btn-sm btn-outline-secondary" type="button">Backup</button>
-      <button id="restore" class="btn btn-sm btn-outline-secondary" type="button">Restore</button>
+      <button id="sch_save" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Save Settings')}}</button>
+      <button id="backup" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Backup')}}</button>
+      <button id="restore" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Restore')}}</button>
       <button id="{{action}}" class="btn btn-sm btn-outline-secondary stopstart" type="button">{{action|capitalize}}</button>
       </div>
     </ul>
     {%endif%}
     {% if session.level >= config.USERLEVEL.max %}
     <ul class="navbar-nav d-none" id="log">
-      <li class="nav-item pe-1"><button id="downloadlog" class="btn btn-sm btn-outline-secondary" type="button">Download Log</button></li>
-      <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button">Clear Log</button></li>
+      <li class="nav-item pe-1"><button id="downloadlog" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Download Log')}}</button></li>
+      <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Clear Log')}}</button></li>
     </ul>
     {%endif%}
     {% if session.level >= config.USERLEVEL.preview %}
     <ul class="navbar-nav d-none" id="gallery">
-      <li class="nav-item pe-1"><button id="selectNone" class="btn btn-sm btn-outline-secondary" type="button">Deselect</button></li>
-      <li class="nav-item pe-1"><button id="selectAll" class="btn btn-sm btn-outline-secondary" type="button">Select All</button></li>
-      <li class="nav-item pe-1"><button id="zipSel" class="btn btn-sm btn-primary" type="button">Download Zip</button></li>
-      <li class="nav-item pe-1"><button id="deleteSel" class="btn btn-sm btn-warning" type="button">Delete Selected</button></li>
-      <li class="nav-item pe-1"><button id="deleteAll" class="btn btn-sm btn-danger" type="button">Delete All</button></li>
-      <li class="nav-item pe-1"><button id="lockSel" class="btn btn-sm btn-primary" type="button">Lock</button></li>
-      <li class="nav-item pe-1"><button id="unlockSel" class="btn btn-sm btn-primary" type="button">Unlock</button></li>
+      <li class="nav-item pe-1"><button id="selectNone" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Deselect')}}</button></li>
+      <li class="nav-item pe-1"><button id="selectAll" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Select All')}}</button></li>
+      <li class="nav-item pe-1"><button id="zipSel" class="btn btn-sm btn-primary" type="button">{{ _('Download Zip')}}</button></li>
+      <li class="nav-item pe-1"><button id="deleteSel" class="btn btn-sm btn-warning" type="button">{{ _('Delete Selected')}}</button></li>
+      <li class="nav-item pe-1"><button id="deleteAll" class="btn btn-sm btn-danger" type="button">{{ _('Delete All')}}</button></li>
+      <li class="nav-item pe-1"><button id="lockSel" class="btn btn-sm btn-primary" type="button">{{ _('Lock')}}</button></li>
+      <li class="nav-item pe-1"><button id="unlockSel" class="btn btn-sm btn-primary" type="button">{{ _('Unlock')}}</button></li>
     </ul>
     {%endif%}
     {% if session.level >= config.USERLEVEL.preview %}
     <ul class="navbar-nav d-none" id="display">
-      <li class="nav-item pe-1"><button id="download" class="btn btn-sm btn-primary" type="button">Download</button></li>
-      <li class="nav-item pe-1"><button id="delete" class="btn btn-sm btn-danger" type="button">Delete</button></li>
-      <li class="nav-item pe-1"><button id="convert" class="btn btn-sm btn-primary" type="button">Start Convert</button></li>
+      <li class="nav-item pe-1"><button id="download" class="btn btn-sm btn-primary" type="button">{{ _('Download')}}</button></li>
+      <li class="nav-item pe-1"><button id="delete" class="btn btn-sm btn-danger" type="button">{{ _('Delete')}}</button></li>
+      <li class="nav-item pe-1"><button id="convert" class="btn btn-sm btn-primary" type="button">{{ _('Start convert')}}</button></li>
     </ul>
     {%endif%}
     <ul class="navbar-nav ms-md-auto" id="nav-right">
       {% if session.level >= config.USERLEVEL.preview%}
-      <li class="nav-item"><a class="nav-link" href="{{ url_for('preview.index') }}">Gallery</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('preview.index') }}">{{ _('Gallery')}}</a></li>
       {% endif %}
       {% if session.level >= config.USERLEVEL.max%}
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">System</a>
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ _('System')}}</a>
         <ul class="dropdown-menu">
           {% if request.path == url_for('main.index') %}
           {% set mjpegmode = 1 if mjpegmode == 0 else 0%}
           {% set label_stream = "MJPEG-Stream" if mjpegmode == 1 else "Default-Stream"%}
           <li class="nav-item"><button id="toggle_stream" class="dropdown-item" value="{{mjpegmode}}">{{label_stream}}</button></li>
           {% set display_mode = "Off" if display_mode == "On" else "On"%}
-          <li class="nav-item"><button id="display_mode" class="dropdown-item" value="{{display_mode}}">Display {{display_mode}}</button></li>
+          <li class="nav-item"><button id="display_mode" class="dropdown-item" value="{{display_mode}}">{{ _('Display')}} {{display_mode}}</button></li>
           <li><hr class="dropdown-divider"></li>
           {%endif%}
           <div id="system">
-          <li class="nav-item"><a class="dropdown-item" href="{{url_for('settings.index')}}">Settings</a></li>
-          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">Schedule</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="{{url_for('settings.index')}}">{{ _('Settings')}}</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">{{ _('Scheduler')}}</a></li>
           <li><hr class="dropdown-divider"></li>
           </div>
-          <li class="nav-item"><button id="restart_app" class="dropdown-item">Restart application</button></li>
-          <li class="nav-item"><button id="restart" class="dropdown-item">Restart system</button></li>
-          <li class="nav-item"><button id="shutdown" class="dropdown-item">Shutdown system</button></li>
-          <li class="nav-item"><button id="reset" class="dropdown-item">Reset settings</button></li>
+          <li class="nav-item"><button id="restart_app" class="dropdown-item">{{ _('Restart application')}}</button></li>
+          <li class="nav-item"><button id="restart" class="dropdown-item">{{ _('Restart system')}}</button></li>
+          <li class="nav-item"><button id="shutdown" class="dropdown-item">{{ _('Shutdown system')}}</button></li>
+          <li class="nav-item"><button id="reset" class="dropdown-item">{{ _('Reset settings')}}</button></li>
           <li><hr class="dropdown-divider"></li>
-          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">Show Log</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.log') }}">{{ _('Show log')}}</a></li>
           {% if g.loglevel == 'DEBUG' %}
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.debugcmd') }}">Debug</a></li>
           {%endif%}
           <li class="nav-item"><a class="dropdown-item" href="{{ url_for('api.doc') }}" target="_blank">API Docs</a></li>
-          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.helpcmd') }}">Help</a></li>
+          <li class="nav-item"><a class="dropdown-item" href="{{ url_for('main.helpcmd') }}">{{ _('Help')}}</a></li>
         </ul>
       </li>
       {% endif %}
       {% if session.username %}
-      <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Deconnexion</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">{{_('Logout')}}</a></li>
       {% endif %}
     </ul>
     </div>

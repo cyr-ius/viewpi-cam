@@ -9,14 +9,14 @@
 </svg>
 <main class="form-signin w-100 m-auto">
   <form  class="needs-validation" method="POST" action="{{ url_for('auth.totpverified') }}" novalidate>
-      <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+      <h1 class="h3 mb-3 fw-normal">{{_('Please sign in')}}</h1>
       <div class="input-group mb-3">
         <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
         <input class="form-control" name="secret" placeholder="OTP Code" type="text" aria-label="Otpcode" required autofocus>
       </div>
       <input name="id" type="hidden" value="{{id}}">
       <input name="next" type="hidden" value="{{next}}">
-      <input class="btn btn-primary w-100 py-2" id="submit" name="submit" type="submit" value="Sign in">
+      <input class="btn btn-primary w-100 py-2" id="submit" name="submit" type="submit" value="{{_('Check')}}">
       {% for message in get_flashed_messages() %}
       <div class="alert alert-danger d-flex align-items-center mt-2" role="alert">
         <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:" style="width:20px;height:20px;">

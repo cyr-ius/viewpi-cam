@@ -9,43 +9,43 @@
         <div id="media"></div>
         <button id="prev" class="carousel-control-prev" type="button">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Prev</span>
+            <span class="visually-hidden">{{ _('Prev')}}</span>
         </button>
         <button id="next" class="carousel-control-next" type="button">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
+            <span class="visually-hidden">{{ _('Next')}}</span>
         </button>
     </div>
     <div id="filtering" class="row m-1">
-        <label class="col-auto col-form-label-sm">Ordering</label>
+        <label class="col-auto col-form-label-sm">{{_('Ordering')}}</label>
         <div class="col-1">
             <select id="sort_order" class="form-select form-select-sm" name="sort_order">
-                <option value="asc" {%  if sort_order == "asc" %}selected{%endif%}>Ascending</option>
-                <option value="desc" {%  if sort_order == "desc" %}selected{%endif%}>Descending</option>
+                <option value="asc" {%  if sort_order == "asc" %}selected{%endif%}>{{ _('Ascending')}}</option>
+                <option value="desc" {%  if sort_order == "desc" %}selected{%endif%}>{{ _('Descending')}}</option>
             </select>
         </div>
-        <label class="col-auto col-form-label-sm">Types</label>
+        <label class="col-auto col-form-label-sm">{{_('Types')}}</label>
         <div class="col-1">
             <select id="show_types" class="form-select form-select-sm" name="show_types">
-                <option value="both" {%  if show_types == "both" %}selected{%endif%}>Images &amp Videos</option>
-                <option value="image" {%  if show_types == "image" %}selected{%endif%}>Images only</option>
-                <option value="video" {%  if show_types == "video" %}selected{%endif%}>Videos only</option>
+                <option value="both" {%  if show_types == "both" %}selected{%endif%}>{{ _('Images &amp Videos')}}</option>
+                <option value="image" {%  if show_types == "image" %}selected{%endif%}>{{ _('Images only')}}</option>
+                <option value="video" {%  if show_types == "video" %}selected{%endif%}>{{ _('Videos only')}}</option>
             </select>
         </div>
-        <label class="col-auto col-form-label-sm">Filter</label>
+        <label class="col-auto col-form-label-sm">{{ _('Filter')}}</label>
         <div class="col-1">
             <select id="time_filter" class="form-select form-select-sm" name="time_filter">
-                <option value="1" {%  if time_filter|int == 1 %}selected{%endif%}>All</option>
+                <option value="1" {%  if time_filter|int == 1 %}selected{%endif%}>{{_('All')}}</option>
                 {% for i in range(2, time_filter_max)%}
-                <option value="{{i}}" {% if time_filter|int == i %}selected{%endif%}>{{(i-2) * 24}} - {{(i-1) * 24}} hours old</option>
+                <option value="{{i}}" {% if time_filter|int == i %}selected{%endif%}>{{(i-2) * 24}} - {{(i-1) * 24}} {{_('hours old')}}</option>
                 {%endfor%}
-                <option value="{{time_filter_max}}" {% if time_filter|int == time_filter_max %}selected{%endif%} >{{(time_filter_max-2) * 24}} hours old</option>
+                <option value="{{time_filter_max}}" {% if time_filter|int == time_filter_max %}selected{%endif%} >{{(time_filter_max-2) * 24}} {{_('hours old')}}</option>
             </select>
         </div>
         <div class="col-auto ms-auto"><button id="hide-preview" class="btn d-none" style="border-style: none;"><i class="bi bi-arrow-bar-up"></i></button></div>
     </div>
     <div id="thumbs" class="row g-3 m-1">
-        <p>No videos/images saved</p>
+        <p>{{_('No videos/images saved')}}</p>
     </div>
 </div>
 {% endblock %}
