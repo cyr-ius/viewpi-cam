@@ -1,5 +1,11 @@
 """Constants."""
-LBL_PERIODS = ["AllDay", "Night", "Dawn", "Day", "Dusk"]
+from flask_babel import gettext as _
+
+LBL_PERIODS = [_("AllDay"), _("Night"), _("Dawn"), _("Day"), _("Dusk")]
+
+TXT_MSG_1 = _("User or password is empty.")
+TXT_MSG_2 = _("User or password invalid.")
+TXT_MSG_3 = _("Access id denied.")
 
 SCHEDULE_RESET = "9"
 SCHEDULE_START = "1"
