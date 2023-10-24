@@ -36,6 +36,8 @@ PIPAN_FILE = f"{basedir}/../system/pipan"
 CONVERT_CMD = "/usr/bin/ffmpeg -f image2 -i i_%05d.jpg"
 # Userlevel
 USERLEVEL = LEVELS
+# Locales
+LOCALES = ["en", "fr"]
 
 # MACROS
 MACROS = [

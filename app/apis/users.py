@@ -5,7 +5,7 @@ from flask_restx import Namespace, Resource, abort
 from ..helpers.decorator import role_required, token_required
 from ..helpers.users import User as usr
 from ..helpers.users import UserAlreadyExists, UserNotFound, UsersException
-from .models import message, user, users
+from .models import locale, message, user, users
 
 api = Namespace(
     "users",
@@ -16,6 +16,7 @@ api = Namespace(
 api.add_model("Error", message)
 api.add_model("User", user)
 api.add_model("Users", users)
+api.add_model("Locale", locale)
 
 
 @api.response(403, "Forbidden", message)
@@ -79,3 +80,32 @@ class User(Resource):
             abort(404, "User not found")
         else:
             return "", 204
+
+
+@api.response(403, "Forbidden", message)
+@api.route("/locales")
+class Locales(Resource):
+    """Language for user."""
+
+    def get(self):  # pylint: disable=W0622
+        """Get all languages."""
+        return {"locales": ca.config["LOCALES"]}
+
+
+@api.response(403, "Forbidden", message)
+@api.route("/users/<int:id>/locale")
+class Locale(Resource):
+    """Language for user."""
+
+    @api.expect(locale)
+    @api.marshal_with(user)
+    @api.response(404, "Not found", message)
+    def put(self, id: int):  # pylint: disable=W0622
+        """Set language."""
+        try:
+            user = usr(id)  # pylint: disable=W0621
+            return user.update(**api.payload)
+        except UserNotFound:
+            abort(404, "User not found")
+        except UserAlreadyExists:
+            abort(422, "User name is already exists, please change.")

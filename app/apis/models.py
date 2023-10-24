@@ -4,6 +4,8 @@ import qrcode.image.svg
 from flask import url_for
 from flask_restx import Model, fields
 
+from ..config import LOCALES
+
 
 class PathURI(fields.Raw):
     """Path URI."""
@@ -163,6 +165,7 @@ setting = Model(
         ),
     },
 )
+locale = Model("Locale", {"locale": fields.String(enumerate=LOCALES)})
 multiview = Model(
     "Multiview",
     {
