@@ -42,6 +42,10 @@ class User:
         return self._user.get("secret")
 
     @property
+    def locale(self):
+        return self._user.get("locale", "en")
+
+    @property
     def totp(self):
         return self._user.get("totp", False) is True
 
@@ -91,7 +95,7 @@ class User:
 
     def update(self, **kwargs) -> None:
         kwargs.pop("id", None)
-        if self.name != kwargs["name"]:
+        if (name := kwargs.get("name")) and self.name != name:
             User.checkname(self._users, kwargs["name"])
 
         if (pwd := kwargs.get("password")) is None or pwd == "":
