@@ -8,7 +8,7 @@ from flask import Blueprint, abort
 from flask import current_app as ca
 from flask import flash, redirect, render_template, request, session, url_for
 
-from ..const import USERLEVEL_MAX
+from ..const import TXT_MSG_1, TXT_MSG_2, TXT_MSG_3, USERLEVEL_MAX
 from ..helpers.decorator import auth_required
 from ..helpers.users import User, UserNotFound
 from ..helpers.utils import reverse
@@ -40,9 +40,9 @@ def register():
                 if reverse(next_page) is False:
                     abort(404)
                 return redirect(next_page)
-            flash_msg = "User or password is empty."
+            flash_msg = TXT_MSG_1
         else:
-            flash_msg = "User or password invalid."
+            flash_msg = TXT_MSG_2
 
         flash(flash_msg)
 
@@ -80,9 +80,9 @@ def login():
                     abort(404)
 
                 return redirect(next_page)
-            flash("User or password invalid.")
+            flash(TXT_MSG_2)
         except UserNotFound:
-            flash("User or password invalid.")
+            flash(TXT_MSG_2)
 
     return render_template("login.html")
 
@@ -106,7 +106,7 @@ def totpverified():
         except UserNotFound:
             pass
 
-    flash("Acccess id denied.")
+    flash(TXT_MSG_3)
 
     return render_template("totp.html", id=id, next=next)
 
