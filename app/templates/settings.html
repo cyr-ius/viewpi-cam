@@ -15,7 +15,7 @@
                         <input class="form-check-input" name="display" type="checkbox" {% if ubutton.display == 1 %}checked{%endif%}>
                     </div>
                 </div>
-                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="{{_('Name')}}" required="" type="text" value="{{ubutton.name}}" readonly></div>
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="{{_('Name')}}" required="" type="text" value="{{ubutton.name}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value="{{ubutton.macro}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value="{{ubutton.css_class}}"></div>
                 <div class="col"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text" value="{{ubutton.style}}"></div>
@@ -43,7 +43,7 @@
             <div id="users-{{user.id}}" class="row g-1 ms-2 uchange">
                 <input type="hidden" name="id" value="{{user.id}}">
                 <div class="col-auto"><button class="btn btn-sm btn-outline-{{otpclass}} otp_user" type="button"><i class="bi bi-shield-lock"></i></button></div>
-                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="{{_('Username')}}" type="text" value="{{user.name}}" required readonly></div>
+                <div class="col"><input class="form-control form-control-sm" name="name" placeholder="{{_('Username')}}" type="text" value="{{user.name}}" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="password" onfocusout="$(this).trigger('submit');" placeholder="{{_('Password')}}" type="password"></div>
                 <div class="col">
                     <select class="form-select form-select-sm" name="right" required>
@@ -52,7 +52,7 @@
                         {% endfor%}
                     </select>
                 </div>
-                <div class="col-auto" id="btn_del_button"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+                <div class="col-auto" id="btn_del_button"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
             {%endfor%}
             <div id="users-ref" class="row g-1 ms-2 needs-validation">
@@ -67,8 +67,8 @@
                         {% endfor%}
                     </select>
                 </div>
-                <div class="col-auto"><button class="btn btn-sm btn-success add_user" name="add_user" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
-                <div class="col-auto d-none"><button class="btn btn-sm btn-danger del_user" name="del_user" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
+                <div class="col-auto"><button class="btn btn-sm btn-success add_button" type="button"><i class="bi bi-plus-square-fill"></i></button></div>
+                <div class="col-auto d-none"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
             </div>
         </div>
         <hr class="mt-3">
@@ -249,7 +249,7 @@
         $.queryData({method:"delete", url:"{{ url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
     });
 
-    $('#users').on('click','.add_user', function() {
+    $('#users').on('click','.add_button', function() {
         let parent = $(this).parent().parent();
         let data = $(parent).find('input, select').serializeObject();
         let templ = $('#users-ref').clone();
@@ -259,7 +259,6 @@
             templ.find('.otp_user').prop('disabled',false);
             templ.attr('id','users-'+data["id"]);
             templ.addClass('uchange').removeClass('needs-validation was-validated');
-            templ.find('input[name="name"]').prop("readonly",true);
             templ.find('input[name="id"]').val(data["id"]);
             templ.insertBefore(parent);
             parent.find('input').val('');
@@ -270,7 +269,7 @@
             $.queryData({url:"{{url_for('api.users_users')}}",data:data, callbackSuccess:callbackSuccess});
     });
 
-    $('#users').on('click','.del_user', function() {
+    $('#users').on('click','.del_button', function() {
         let parent = $(this).parent().parent()
         let data = $(parent).find('input, select').serializeObject();
         let callbackSuccess = function(data){ parent.remove() }
@@ -298,7 +297,6 @@
             templ.find('.del_button').parent().removeClass('d-none');
             templ.attr('id','ubuttons-'+data["id"]);
             templ.addClass('uchange').removeClass('needs-validation was-validated');
-            templ.find('input[name="name"]').prop("readonly",true);
             templ.find('input[name="id"]').val(data["id"]);
             templ.insertBefore(parent);
             parent.find('input, select, textarea').val('');
