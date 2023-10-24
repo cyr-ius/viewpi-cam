@@ -19,10 +19,6 @@ bp = Blueprint("main", __name__, template_folder="templates")
 @bp.before_app_request
 def before_app_request():
     g.loglevel = ca.settings.loglevel
-    if "id" in session:
-        g.user = ca.usrmgmt.get(id=session["id"])
-    else:
-        del g.user
 
 
 @bp.route("/", methods=["GET"])
