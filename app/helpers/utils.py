@@ -91,7 +91,7 @@ def get_locale() -> str | list[str]:
     if (user := ca.usrmgmt.get(id=session.get("id"))) and hasattr(user, "locale"):
         session["locale"] = user.locale
         return user.locale
-    return request.accept_languages.best_match(["de", "fr", "en", "fr-FR", "en-US"])
+    return request.accept_languages.best_match(["de", "fr", "en"])
 
 
 def get_timezone() -> str | list[str]:
