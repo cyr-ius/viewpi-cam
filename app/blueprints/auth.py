@@ -72,9 +72,7 @@ def login():
                     session["totp"] = user.totp
                     return render_template("totp.html", next=next_page, id=user.id)
 
-                session["username"] = user.name
-                session["level"] = user.right
-                session["bearer_token"] = _generate_jwt(user)
+                _load_session(user)
 
                 if reverse(next_page) is False:
                     abort(404)
@@ -97,9 +95,7 @@ def totpverified():
             user = User(id=id)
             totp = pyotp.TOTP(user.secret)
             if totp.verify(request.form.get("secret")):
-                session["username"] = user.name
-                session["level"] = user.right
-                session["bearer_token"] = _generate_jwt(user)
+                _load_session(user)
                 if reverse(next_page) is False:
                     abort(404)
                 return redirect(next_page)
@@ -119,7 +115,7 @@ def logout():
     return redirect(url_for("auth.login"))
 
 
-def _generate_jwt(user):
+def _generate_jwt(user: User) -> str:
     lifetime = dt.now(tz=timezone.utc) + ca.config["PERMANENT_SESSION_LIFETIME"]
     return jwt.encode(
         {
@@ -131,3 +127,12 @@ def _generate_jwt(user):
         ca.config["SECRET_KEY"],
         algorithm="HS256",
     )
+
+
+def _load_session(user: User) -> None:
+    """Load session object."""
+    session["id"] = user.id
+    session["username"] = user.name
+    session["level"] = user.right
+    session["locale"] = user.locale
+    session["bearer_token"] = _generate_jwt(user)
