@@ -19,6 +19,7 @@ from .blueprints.schedule import launch_schedule
 from .blueprints.settings import bp as sets_bp
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
+from .helpers.usrmgmt import Usrmgmt
 from .helpers.utils import execute_cmd, get_locale, get_pid, get_timezone
 from .services.assets import (
     css_custom,
@@ -41,6 +42,7 @@ assets = Environment()
 babel = Babel()
 settings = Settings()
 raspiconfig = RaspiConfig()
+usrmgmt = Usrmgmt()
 
 
 # pylint: disable=E1101,W0613
@@ -92,6 +94,7 @@ def create_app(config=None):
     # !!! Important ordering !!!
     raspiconfig.init_app(app)
     settings.init_app(app)
+    usrmgmt.init_app(app)
 
     # Custom log level
     if custom_level := settings.get("loglevel"):
