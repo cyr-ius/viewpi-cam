@@ -19,7 +19,7 @@ from .blueprints.schedule import launch_schedule
 from .blueprints.settings import bp as sets_bp
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
-from .helpers.utils import execute_cmd, get_pid
+from .helpers.utils import execute_cmd, get_locale, get_pid, get_timezone
 from .services.assets import (
     css_custom,
     css_main,
@@ -87,7 +87,7 @@ def create_app(config=None):
 
     # Load app's components
     assets.init_app(app)
-    babel.init_app(app)
+    babel.init_app(app, locale_selector=get_locale, timezone_selector=get_timezone)
 
     # !!! Important ordering !!!
     raspiconfig.init_app(app)

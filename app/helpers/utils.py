@@ -6,9 +6,10 @@ from datetime import datetime as dt
 from subprocess import PIPE, Popen
 
 from flask import current_app as ca
-from flask import request
+from flask import request, session
 from psutil import process_iter
 
+from ..helpers.users import User, UserNotFound
 from ..services.handle import ViewPiCamException
 
 
@@ -85,3 +86,16 @@ def disk_usage() -> tuple[int, int, int, int, str]:
         int(percent_used),
         colour,
     )
+
+
+def get_locale() -> str | list[str]:
+    try:
+        user = User(id=session.get("id"))
+        return user.locale
+    except UserNotFound:
+        pass
+    return request.accept_languages.best_match(["de", "fr", "en", "fr-FR", "en-US"])
+
+
+def get_timezone() -> str | list[str]:
+    return ca.settings.gmt_offset
