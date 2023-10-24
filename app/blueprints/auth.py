@@ -10,7 +10,7 @@ from flask import flash, redirect, render_template, request, session, url_for
 
 from ..const import TXT_MSG_1, TXT_MSG_2, TXT_MSG_3, USERLEVEL_MAX
 from ..helpers.decorator import auth_required
-from ..helpers.users import User, UserNotFound
+from ..helpers.usrmgmt import User
 from ..helpers.utils import reverse
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
@@ -36,7 +36,7 @@ def register():
                 else url_for("main.index")
             )
             if (name := request.form["username"]) and password:
-                User.create(name=name, password=password, right=USERLEVEL_MAX)
+                ca.usrmgmt.create(name=name, password=password, right=USERLEVEL_MAX)
                 if reverse(next_page) is False:
                     abort(404)
                 return redirect(next_page)
@@ -58,8 +58,7 @@ def login():
     if ca.settings.get("users") is None or len(ca.settings.users) == 0:
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
-        try:
-            user = User(name=request.form.get("username"))
+        if user := ca.usrmgmt.get(name=request.form.get("username")):
             if user.check_password(request.form.get("password")):
                 session.clear()
                 next_page = (
@@ -79,8 +78,7 @@ def login():
 
                 return redirect(next_page)
             flash(TXT_MSG_2)
-        except UserNotFound:
-            flash(TXT_MSG_2)
+        flash(TXT_MSG_2)
 
     return render_template("login.html")
 
@@ -91,17 +89,13 @@ def totpverified():
     if session.get("totp") and request.method == "POST":
         id = int(request.form.get("id"))  # pylint: disable=W0622
         next_page = request.form.get("next")
-        try:
-            user = User(id=id)
+        if user := ca.usrmgmt.get(id=id):
             totp = pyotp.TOTP(user.secret)
             if totp.verify(request.form.get("secret")):
                 _load_session(user)
                 if reverse(next_page) is False:
                     abort(404)
                 return redirect(next_page)
-        except UserNotFound:
-            pass
-
     flash(TXT_MSG_3)
 
     return render_template("totp.html", id=id, next=next)

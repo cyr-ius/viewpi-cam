@@ -9,7 +9,6 @@ from flask import current_app as ca
 from flask import request, session
 from psutil import process_iter
 
-from ..helpers.users import User, UserNotFound
 from ..services.handle import ViewPiCamException
 
 
@@ -89,11 +88,9 @@ def disk_usage() -> tuple[int, int, int, int, str]:
 
 
 def get_locale() -> str | list[str]:
-    try:
-        user = User(id=session.get("id"))
+    if (user := ca.usrmgmt.get(id=session.get("id"))) and hasattr(user, "locale"):
+        session["locale"] = user.locale
         return user.locale
-    except UserNotFound:
-        pass
     return request.accept_languages.best_match(["de", "fr", "en", "fr-FR", "en-US"])
 
 

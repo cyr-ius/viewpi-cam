@@ -3,8 +3,7 @@ from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required, token_required
-from ..helpers.users import User as usr
-from ..helpers.users import UserAlreadyExists, UserNotFound, UsersException
+from ..helpers.usrmgmt import UserNameExists
 from .models import locale, message, user, users
 
 api = Namespace(
@@ -27,7 +26,7 @@ class Users(Resource):
     @api.marshal_with(users, as_list=True)
     def get(self):
         """List users."""
-        return ca.settings.users
+        return ca.usrmgmt.get_users()
 
     @api.expect(user)
     @api.marshal_with(users)
@@ -35,8 +34,8 @@ class Users(Resource):
     def post(self):
         """Create user."""
         try:
-            return usr.create(**api.payload)
-        except UserAlreadyExists:
+            return ca.usrmgmt.create(**api.payload)
+        except UserNameExists:
             abort(422, "User name is already exists, please change.")
 
 
@@ -49,10 +48,7 @@ class User(Resource):
     @api.response(404, "Not found", message)
     def get(self, id: int):  # pylint: disable=W0622
         """Get user."""
-        try:
-            return usr(id)
-        except UserNotFound:
-            abort(404, "User not found")
+        return ca.usrmgmt.get_user(id)
 
     @api.expect(user)
     @api.marshal_with(user)
@@ -60,11 +56,10 @@ class User(Resource):
     def put(self, id: int):  # pylint: disable=W0622
         """Set user."""
         try:
-            user = usr(id)  # pylint: disable=W0621
-            return user.update(**api.payload)
-        except UserNotFound:
+            if user := ca.usrmgmt.get(id):  # pylint: disable=W0621
+                return user.update(**api.payload)
             abort(404, "User not found")
-        except UserAlreadyExists:
+        except UserNameExists:
             abort(422, "User name is already exists, please change.")
 
     @api.response(204, "Actions is success")
@@ -73,13 +68,9 @@ class User(Resource):
         """Delete user."""
         if id == 1:
             abort(403, "Admin account cannot be deleted")
-        try:
-            user = usr(id)  # pylint: disable=W0621
-            user.delete()
-        except UsersException:
-            abort(404, "User not found")
-        else:
-            return "", 204
+
+        ca.usrmgmt.delete(id)  # pylint: disable=W0621
+        return "", 204
 
 
 @api.response(403, "Forbidden", message)
@@ -103,9 +94,8 @@ class Locale(Resource):
     def put(self, id: int):  # pylint: disable=W0622
         """Set language."""
         try:
-            user = usr(id)  # pylint: disable=W0621
-            return user.update(**api.payload)
-        except UserNotFound:
+            if user := ca.usrmgmt.get(id):  # pylint: disable=W0621
+                return user.update(**api.payload)
             abort(404, "User not found")
-        except UserAlreadyExists:
+        except UserNameExists:
             abort(422, "User name is already exists, please change.")
