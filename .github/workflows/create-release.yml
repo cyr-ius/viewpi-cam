@@ -43,6 +43,8 @@ jobs:
     permissions:
       contents: write   
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Write Version to File
       # uses: brettdorrans/write-version-to-file@4f418d37c415c2ad62716090d4539a0a0db93b5c
         uses: brettdorrans/write-version-to-file@v1.0.2
