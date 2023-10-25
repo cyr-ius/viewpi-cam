@@ -57,6 +57,15 @@ jobs:
           write-mode: overwrite
           contents: "app_version:${{ steps.tagger.outputs.tag }}"
 
+      - name: Modify version number
+        uses: mingjun97/file-regex-replace@v1
+        with:
+          regex: '"app_version":"(v[0-9\.]*)"'
+          replacement: '"app_version":"${{ steps.tagger.outputs.tag }}"'
+          include: '.version.json'    # Optional, defaults to ".*"
+          encoding: 'utf8'
+          path: '.'
+
       - name: Commit & Push changes
         uses: actions-js/push@master
         with:
