@@ -48,7 +48,7 @@ jobs:
 
       - name: Set output
         id: vars
-        run: echo "tag=$(git describe --tags)" >> $GITHUB_OUTPUT
+        run: echo "tag=$(/usr/bin/git describe --tags)" >> $GITHUB_OUTPUT
 
       - name: Overwrite Version.txt file
         uses: DamianReeves/write-file-action@v1.2
