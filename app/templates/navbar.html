@@ -101,31 +101,36 @@
 </nav>
 {% endblock %}
 {% block extrascripts%}
-<script language="javascript">
+<script>
 $('#restart_app, #restart, #shutdown, #reset').unbind();
 
 $('#restart_app').click(function(){
   $.queryData({"url":"{{url_for('api.system_restart_app')}}"})
 });
+
 $('#restart').click(function(){
   if(confirm('Are you sure to restart this host?')) {
     $.queryData({"url":"{{url_for('api.system_restart')}}"})
   }
 });
+
 $('#shutdown').click(function(){
   if(confirm('Are you sure to shutdown this host?')) {
     $.queryData({"url":"{{url_for('api.system_shutdown')}}"})
   }
 });
+
 $('#reset').click(function(){
   let callbackSuccess = function(e){setTimeout(function(){location.reload(true);}, 1000);}
   if(confirm('Are you sure to reset the settings to the default values?')) {
     $.sendCmd({cmd:"rs",params:"1",success:callbackSuccess})
   }
 });
+
 $('#toggle_stream').click(function(){
   set_stream_mode(this.value);
 });
+
 $('#display_mode').click(function(){
   set_display(this.value);
 });
