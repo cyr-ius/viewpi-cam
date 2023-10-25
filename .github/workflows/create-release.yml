@@ -45,17 +45,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set output
-        id: vars
-        run: echo "tag=$(/usr/bin/git describe --tags)" >> $GITHUB_OUTPUT
-
+      - name: Find Tag
+        id: tagger
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
       - name: Overwrite Version.txt file
         uses: DamianReeves/write-file-action@v1.2
         with:
           path: .version
           write-mode: overwrite
-          contents: "app_version:${{ steps.vars.outputs.tag }}"
+          contents: "app_version:${{ steps.tagger.outputs.tag }}"
 
       - name: Commit & Push changes
         uses: actions-js/push@master
