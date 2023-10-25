@@ -46,13 +46,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Write Version to File
-      # uses: brettdorrans/write-version-to-file@4f418d37c415c2ad62716090d4539a0a0db93b5c
         uses: brettdorrans/write-version-to-file@v1.0.2
         with:
           filename: .version
-      - name: GitHub Commit Push File
-        # You may pin to the exact commit or the version.
-        # uses: maxgfr/github-commit-push-file@66cf828b77c2348547bef9ee761af5b96b36f0ad
-        uses: maxgfr/github-commit-push-file@v0.0.3
+          placeholder: 'app_version:${VERSION}'
+      - name: Commit & Push changes
+        uses: actions-js/push@master
         with:
-          commit_name: Update version file   
+          github_token: ${{ secrets.GITHUB_TOKEN }}
