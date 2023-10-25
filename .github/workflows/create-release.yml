@@ -48,13 +48,7 @@ jobs:
 
       - name: Set output
         id: vars
-        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: Check output
-        env:
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: |
-          echo $RELEASE_VERSION
-          echo ${{ steps.vars.outputs.tag }}
+        run: echo "tag=$(git describe --tags)" >> $GITHUB_OUTPUT
 
       - name: Overwrite Version.txt file
         uses: DamianReeves/write-file-action@v1.2
