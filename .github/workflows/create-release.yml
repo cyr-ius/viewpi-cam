@@ -50,22 +50,14 @@ jobs:
         uses: jimschubert/query-tag-action@v1
         with:
           include: 'v*'
-      - name: Overwrite Version.txt file
-        uses: DamianReeves/write-file-action@v1.2
-        with:
-          path: .version
-          write-mode: overwrite
-          contents: "app_version:${{ steps.tagger.outputs.tag }}"
-
       - name: Modify version number
         uses: mingjun97/file-regex-replace@v1
         with:
           regex: '"app_version":"(v[0-9\.]*)"'
           replacement: '"app_version":"${{ steps.tagger.outputs.tag }}"'
-          include: '.version.json'    # Optional, defaults to ".*"
+          include: '.version.json'
           encoding: 'utf8'
           path: '.'
-
       - name: Commit & Push changes
         uses: actions-js/push@master
         with:
