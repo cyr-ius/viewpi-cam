@@ -50,7 +50,7 @@
 </div>
 {% endblock %}
 {% block extrascripts %}
-<script language="javascript">
+<script>
 let subdir_char = '{{raspiconfig.subdir_char}}';
 let next, next_info, prev, prev_info;
 let thumbnails = {};
@@ -221,7 +221,6 @@ $('#convert').click(function(){
     let id = $(this).val();
     $.queryData({url:`{{url_for('api.previews_previews')}}/${id}/convert`})
 });
-
 
 function fileTitle(thumbnailName) {
 	return thumbnailName.substr(thumbnailName.length - suffixLength(thumbnailName) + 1).substr(0, suffixLength(thumbnailName) - 8);

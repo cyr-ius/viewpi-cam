@@ -578,8 +578,7 @@
 </div>
 {% endblock cam_settings %}
 {% block extrascripts%}
-<script language="javascript">
-
+<script>
 $(function() {
     let at_yuv=[parseInt($('#at_y').val()),parseInt($('#at_u').val()),parseInt($('#at_v').val())]
     $('#at_yuv').val('#'+colorconv.RGB2HEX(colorconv.YUV2RGB(at_yuv)));

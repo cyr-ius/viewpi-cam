@@ -70,301 +70,300 @@
 </div>
 {% endblock %}
 {% block extrascripts %}
-<script language="javascript">
-    let mjpeg_img;
-    let halted = 0;
-    let previous_halted = 99;
-    let mjpeg_mode = {{mjpegmode}};
-    let preview_delay = 4000;
-    let btn_class_p = "btn btn-primary"
-    let btn_class_a = "btn btn-warning"
-    let elem = document.documentElement;
-    let time = new Date().getTime();
+<script>
+let mjpeg_img;
+let halted = 0;
+let previous_halted = 99;
+let mjpeg_mode = {{mjpegmode}};
+let preview_delay = 4000;
+let btn_class_p = "btn btn-primary"
+let btn_class_a = "btn btn-warning"
+let elem = document.documentElement;
+let time = new Date().getTime();
 
-    $(function(){
-        $('#main').removeClass("d-none")
-        setTimeout('init({{mjpegmode}},{{raspiconfig.video_fps}}, {{raspiconfig.divider}});', 100);
-    });
+$(function(){
+    $('#main').removeClass("d-none")
+    setTimeout('init({{mjpegmode}},{{raspiconfig.video_fps}}, {{raspiconfig.divider}});', 100);
+});
 
-    $('#main-buttons button').unbind();
-    $('#main-buttons button').click(function(){
-        $.sendCmd({'cmd':$(this).attr("aria-viewpicam-cmd"),'params':$(this).attr("aria-viewpicam-values")})
-    });
+$('#main-buttons button').unbind();
+$('#main-buttons button').click(function(){
+    $.sendCmd({'cmd':$(this).attr("aria-viewpicam-cmd"),'params':$(this).attr("aria-viewpicam-values")})
+});
 
+function hashHandler() {
+    switch(window.location.hash){
+        case '#full':
+        case '#fullscreen':
+            if (mjpeg_img !== null && $(".fullscreen").length == 0) {
+                toggle_fullscreen(mjpeg_img);
+            }
+            break;
+        case '#normal':
+        case '#normalscreen':
+            if (mjpeg_img !== null && $(".fullscreen").length != 0) {
+                toggle_fullscreen(mjpeg_img);
+            }
+            break;
+    }
+}
 
-    function hashHandler() {
-        switch(window.location.hash){
-            case '#full':
-            case '#fullscreen':
-                if (mjpeg_img !== null && $(".fullscreen").length == 0) {
-                    toggle_fullscreen(mjpeg_img);
-                }
-                break;
-            case '#normal':
-            case '#normalscreen':
-                if (mjpeg_img !== null && $(".fullscreen").length != 0) {
-                    toggle_fullscreen(mjpeg_img);
-                }
-                break;
+function reload_img () {
+    let time = new Date().getTime()
+    if(!halted) {
+        mjpeg_img.src=`{{url_for('camera.cam_pic')}}?time=${time}&delay=${preview_delay}`;
+    } else { setTimeout("reload_img()", 500);}
+}
+
+function error_img () {
+    let time = new Date().getTime()
+    setTimeout(`mjpeg_img.src="{{url_for('camera.cam_pic')}}?time=${time}";`, 100);
+}
+
+function init(mjpeg, video_fps, divider) {
+    mjpeg_img = document.getElementById("mjpeg_dest");
+    hashHandler();
+    window.onhashchange = hashHandler;
+    preview_delay = Math.floor(divider / Math.max(video_fps,1) * 1000);
+    if (mjpeg == 1) {
+        mjpegmode = 1;
+    } else {
+        mjpegmode = 0;
+        mjpeg_img.onload = reload_img;
+        mjpeg_img.onerror = error_img;
+        reload_img();
+    }
+    reload_ajax("");
+}
+
+function reload_ajax (last) {
+    $.get("{{url_for('camera.status_mjpeg')}}?last=" + last,function(response){
+        if(response == "ready") {
+            setButtonState("video_button", false, "record video start", "ca",1);
+            setButtonState("image_button", false, "record image", "im");
+            setButtonState("timelapse_button", false, "timelapse start", "tl",1);
+            setButtonState("md_button", false, "motion detection start", "md",1);
+            setButtonState("halt_button", false, "stop camera", "ru",0);
+            $("#preview_select").prop('disabled',false);
+            $("#video_button").addClass('btn_class_p');
+            $("#timelapse_button").addClass('btn_class_p');
+            $("#md_button").addClass('btn_class_p');
+            $("#image_button").addClass('btn_class_p');
+            halted = 0;
         }
-    }
-
-    function reload_img () {
-        let time = new Date().getTime()
-        if(!halted) {
-            mjpeg_img.src=`{{url_for('camera.cam_pic')}}?time=${time}&delay=${preview_delay}`;
-        } else { setTimeout("reload_img()", 500);}
-    }
-
-    function error_img () {
-        let time = new Date().getTime()
-        setTimeout(`mjpeg_img.src="{{url_for('camera.cam_pic')}}?time=${time}";`, 100);
-    }
-
-    function init(mjpeg, video_fps, divider) {
-        mjpeg_img = document.getElementById("mjpeg_dest");
-        hashHandler();
-        window.onhashchange = hashHandler;
-        preview_delay = Math.floor(divider / Math.max(video_fps,1) * 1000);
-        if (mjpeg == 1) {
-            mjpegmode = 1;
-        } else {
-            mjpegmode = 0;
-            mjpeg_img.onload = reload_img;
-            mjpeg_img.onerror = error_img;
-            reload_img();
+        else if(response == "md_ready") {
+            setButtonState("video_button", true, "record video start");
+            setButtonState("image_button", false, "record image", "im");
+            setButtonState("timelapse_button", false, "timelapse start", "tl",1);
+            setButtonState("md_button", false, "motion detection stop", "md",0);
+            setButtonState("halt_button", true, "stop camera");
+            $("#preview_select").prop('disabled',false);
+            $("#video_button").addClass('btn_class_p');
+            $("#timelapse_button").addClass('btn_class_p');
+            $("#md_button").addClass('btn_class_a');
+            $("#image_button").addClass('btn_class_p');
+            halted = 0;
         }
-        reload_ajax("");
-    }
-
-    function reload_ajax (last) {
-        $.get("{{url_for('camera.status_mjpeg')}}?last=" + last,function(response){
-            if(response == "ready") {
-                setButtonState("video_button", false, "record video start", "ca",1);
-                setButtonState("image_button", false, "record image", "im");
-                setButtonState("timelapse_button", false, "timelapse start", "tl",1);
-                setButtonState("md_button", false, "motion detection start", "md",1);
-                setButtonState("halt_button", false, "stop camera", "ru",0);
-                $("#preview_select").prop('disabled',false);
-                $("#video_button").addClass('btn_class_p');
-                $("#timelapse_button").addClass('btn_class_p');
-                $("#md_button").addClass('btn_class_p');
-                $("#image_button").addClass('btn_class_p');
-                halted = 0;
-            }
-            else if(response == "md_ready") {
-                setButtonState("video_button", true, "record video start");
-                setButtonState("image_button", false, "record image", "im");
-                setButtonState("timelapse_button", false, "timelapse start", "tl",1);
-                setButtonState("md_button", false, "motion detection stop", "md",0);
-                setButtonState("halt_button", true, "stop camera");
-                $("#preview_select").prop('disabled',false);
-                $("#video_button").addClass('btn_class_p');
-                $("#timelapse_button").addClass('btn_class_p');
-                $("#md_button").addClass('btn_class_a');
-                $("#image_button").addClass('btn_class_p');
-                halted = 0;
-            }
-            else if(response == "timelapse") {
-                setButtonState("video_button", false, "record video start", "ca",1);
-                setButtonState("image_button", true, "record image");
-                setButtonState("timelapse_button", false, "timelapse stop", "tl",0);
-                setButtonState("md_button", true, "motion detection start");
-                setButtonState("halt_button", true, "stop camera");
-                $("#preview_select").prop('disabled',false);
-                $("#video_button").addClass('btn_class_p');
-                $("#timelapse_button").addClass('btn_class_a');
-                $("#md_button").addClass('btn_class_p');
-                $("#image_button").addClass('btn_class_p');
-            }
-            else if(response == "tl_md_ready") {
-                setButtonState("video_button", true, "record video start");
-                setButtonState("image_button", false, "record image", "im");
-                setButtonState("timelapse_button", false, "timelapse stop", "tl",0);
-                setButtonState("md_button", false, "motion detection stop", "md",0);
-                setButtonState("halt_button", true, "stop camera");
-                $("#preview_select").prop('disabled',false);
-                $("#video_button").addClass('btn_class_p');
-                $("#timelapse_button").addClass('btn_class_a');
-                $("#md_button").addClass('btn_class_a');
-                $("#image_button").addClass('btn_class_p');
-                halted = 0;
-            }
-            else if(response == "video") {
-                setButtonState("video_button", false, "record video stop", "ca",0);
-                setButtonState("image_button", false, "record image", "im");
-                setButtonState("timelapse_button", false, "timelapse start", "tl",1);
-                setButtonState("md_button", true, "motion detection start");
-                setButtonState("halt_button", true, "stop camera");
-                $("#preview_select").prop('disabled',true);
-                $("#video_button").addClass('btn_class_a');
-                $("#timelapse_button").addClass('btn_class_p');
-                $("#md_button").addClass('btn_class_p');
-                $("#image_button").addClass('btn_class_p');
-            }
-            else if(response == "md_video") {
-                setButtonState("video_button", true, "record video stop");
-                setButtonState("image_button", false, "record image", "im");
-                setButtonState("timelapse_button", false, "timelapse start", "tl",1);
-                setButtonState("md_button", true, "recording video...");
-                setButtonState("halt_button", true, "stop camera");
-                $("#preview_select").prop('disabled',true);
-                $("#video_button").addClass('btn_class_a');
-                $("#timelapse_button").addClass('btn_class_p');
-                $("#md_button").addClass('btn_class_a');
-                $("#image_button").addClass('btn_class_p');
-            }
-            else if(response == "tl_video") {
-                setButtonState("video_button", false, "record video stop", "ca",0);
-                setButtonState("image_button", true, "record image");
-                setButtonState("timelapse_button", false, "timelapse stop", "tl",0);
-                setButtonState("md_button", true, "motion detection start");
-                setButtonState("halt_button", true, "stop camera");
-                $("#preview_select").prop('disabled',false);
-                $("#video_button").addClass('btn_class_a');
-                $("#timelapse_button").addClass('btn_class_a');
-                $("#md_button").addClass('btn_class_p');
-                $("#image_button").addClass('btn_class_p');
-            }
-            else if(response == "tl_md_video") {
-                setButtonState("video_button", false, "record video stop", "ca",0);
-                setButtonState("image_button", true, "record image");
-                setButtonState("timelapse_button", false, "timelapse stop", "tl",0);
-                setButtonState("md_button", true, "recording video...");
-                setButtonState("halt_button", true, "stop camera");
-                $("#preview_select").prop('disabled',false);
-                $("#video_button").addClass('btn_class_a');
-                $("#timelapse_button").addClass('btn_class_a');
-                $("#md_button").addClass('btn_class_a');
-                $("#image_button").addClass('btn_class_p');
-            }
-            else if(response == "image") {
-                setButtonState("video_button", true, "record video start");
-                setButtonState("image_button", true, "recording image");
-                setButtonState("timelapse_button", true, "timelapse start");
-                setButtonState("md_button", true, "motion detection start");
-                setButtonState("halt_button", true, "stop camera");
-                $("#preview_select").prop('disabled',false);
-                $("#image_button").addClass('btn_class_a');
-            }
-            else if(response == "halted") {
-                setButtonState("video_button", true, "record video start");
-                setButtonState("image_button", true, "record image");
-                setButtonState("timelapse_button", true, "timelapse start");
-                setButtonState("md_button", true, "motion detection start");
-                setButtonState("halt_button", false, "start camera", "ru",1);
-                $("#preview_select").prop('disabled',false);
-                $("#video_button").addClass('btn_class_p');
-                $("#timelapse_button").addClass('btn_class_p');
-                $("#md_button").addClass('btn_class_p');
-                $("#video_button").addClass('btn_class_p');
-                $("#timelapse_button").addClass('btn_class_p');
-                $("#md_button").addClass('btn_class_p');
-                $("#image_button").addClass('btn_class_p');
-                halted = 1;
-            }
-            else if(response.substr(0,5) == "Error") {
-                alert("Error in RaspiMJPEG: " + response.substr(7) + "\nRestart ViewPI Cam or the whole RPi.");
-            }
-            updatePreview();
-            reload_ajax(response);
-        })
-    }
-
-    function setButtonState(btn_id, disabled, value, cmd, values) {
-        let btn =$('#'+btn_id);
-        btn.prop('disabled', disabled)
-        btn.attr("aria-viewpicam-cmd",cmd);
-        btn.attr("aria-viewpicam-values",values);
-        btn.html(value);
-    }
-
-    function updatePreview(cycle) {
-        if (mjpegmode) {
-            if (cycle !== undefined && cycle == true) {
-                mjpeg_img.src = "{{ url_for('static', filename='img/updating.jpg') }}";
-                setTimeout(`mjpeg_img.src="{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}";`, 1000);
-                return;
-            }
-            if (previous_halted != halted) {
-                if(!halted) {
-                    mjpeg_img.src = `{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}`;
-                } else {
-                    mjpeg_img.src = "{{ url_for('static', filename='img/unavailable.jpg') }}";
-                }
-            }
-            previous_halted = halted;
+        else if(response == "timelapse") {
+            setButtonState("video_button", false, "record video start", "ca",1);
+            setButtonState("image_button", true, "record image");
+            setButtonState("timelapse_button", false, "timelapse stop", "tl",0);
+            setButtonState("md_button", true, "motion detection start");
+            setButtonState("halt_button", true, "stop camera");
+            $("#preview_select").prop('disabled',false);
+            $("#video_button").addClass('btn_class_p');
+            $("#timelapse_button").addClass('btn_class_a');
+            $("#md_button").addClass('btn_class_p');
+            $("#image_button").addClass('btn_class_p');
         }
+        else if(response == "tl_md_ready") {
+            setButtonState("video_button", true, "record video start");
+            setButtonState("image_button", false, "record image", "im");
+            setButtonState("timelapse_button", false, "timelapse stop", "tl",0);
+            setButtonState("md_button", false, "motion detection stop", "md",0);
+            setButtonState("halt_button", true, "stop camera");
+            $("#preview_select").prop('disabled',false);
+            $("#video_button").addClass('btn_class_p');
+            $("#timelapse_button").addClass('btn_class_a');
+            $("#md_button").addClass('btn_class_a');
+            $("#image_button").addClass('btn_class_p');
+            halted = 0;
+        }
+        else if(response == "video") {
+            setButtonState("video_button", false, "record video stop", "ca",0);
+            setButtonState("image_button", false, "record image", "im");
+            setButtonState("timelapse_button", false, "timelapse start", "tl",1);
+            setButtonState("md_button", true, "motion detection start");
+            setButtonState("halt_button", true, "stop camera");
+            $("#preview_select").prop('disabled',true);
+            $("#video_button").addClass('btn_class_a');
+            $("#timelapse_button").addClass('btn_class_p');
+            $("#md_button").addClass('btn_class_p');
+            $("#image_button").addClass('btn_class_p');
+        }
+        else if(response == "md_video") {
+            setButtonState("video_button", true, "record video stop");
+            setButtonState("image_button", false, "record image", "im");
+            setButtonState("timelapse_button", false, "timelapse start", "tl",1);
+            setButtonState("md_button", true, "recording video...");
+            setButtonState("halt_button", true, "stop camera");
+            $("#preview_select").prop('disabled',true);
+            $("#video_button").addClass('btn_class_a');
+            $("#timelapse_button").addClass('btn_class_p');
+            $("#md_button").addClass('btn_class_a');
+            $("#image_button").addClass('btn_class_p');
+        }
+        else if(response == "tl_video") {
+            setButtonState("video_button", false, "record video stop", "ca",0);
+            setButtonState("image_button", true, "record image");
+            setButtonState("timelapse_button", false, "timelapse stop", "tl",0);
+            setButtonState("md_button", true, "motion detection start");
+            setButtonState("halt_button", true, "stop camera");
+            $("#preview_select").prop('disabled',false);
+            $("#video_button").addClass('btn_class_a');
+            $("#timelapse_button").addClass('btn_class_a');
+            $("#md_button").addClass('btn_class_p');
+            $("#image_button").addClass('btn_class_p');
+        }
+        else if(response == "tl_md_video") {
+            setButtonState("video_button", false, "record video stop", "ca",0);
+            setButtonState("image_button", true, "record image");
+            setButtonState("timelapse_button", false, "timelapse stop", "tl",0);
+            setButtonState("md_button", true, "recording video...");
+            setButtonState("halt_button", true, "stop camera");
+            $("#preview_select").prop('disabled',false);
+            $("#video_button").addClass('btn_class_a');
+            $("#timelapse_button").addClass('btn_class_a');
+            $("#md_button").addClass('btn_class_a');
+            $("#image_button").addClass('btn_class_p');
+        }
+        else if(response == "image") {
+            setButtonState("video_button", true, "record video start");
+            setButtonState("image_button", true, "recording image");
+            setButtonState("timelapse_button", true, "timelapse start");
+            setButtonState("md_button", true, "motion detection start");
+            setButtonState("halt_button", true, "stop camera");
+            $("#preview_select").prop('disabled',false);
+            $("#image_button").addClass('btn_class_a');
+        }
+        else if(response == "halted") {
+            setButtonState("video_button", true, "record video start");
+            setButtonState("image_button", true, "record image");
+            setButtonState("timelapse_button", true, "timelapse start");
+            setButtonState("md_button", true, "motion detection start");
+            setButtonState("halt_button", false, "start camera", "ru",1);
+            $("#preview_select").prop('disabled',false);
+            $("#video_button").addClass('btn_class_p');
+            $("#timelapse_button").addClass('btn_class_p');
+            $("#md_button").addClass('btn_class_p');
+            $("#video_button").addClass('btn_class_p');
+            $("#timelapse_button").addClass('btn_class_p');
+            $("#md_button").addClass('btn_class_p');
+            $("#image_button").addClass('btn_class_p');
+            halted = 1;
+        }
+        else if(response.substr(0,5) == "Error") {
+            alert("Error in RaspiMJPEG: " + response.substr(7) + "\nRestart ViewPI Cam or the whole RPi.");
+        }
+        updatePreview();
+        reload_ajax(response);
+    })
+}
+
+function setButtonState(btn_id, disabled, value, cmd, values) {
+    let btn =$('#'+btn_id);
+    btn.prop('disabled', disabled)
+    btn.attr("aria-viewpicam-cmd",cmd);
+    btn.attr("aria-viewpicam-values",values);
+    btn.html(value);
+}
+
+function updatePreview(cycle) {
+    if (mjpegmode) {
+        if (cycle !== undefined && cycle == true) {
+            mjpeg_img.src = "{{ url_for('static', filename='img/updating.jpg') }}";
+            setTimeout(`mjpeg_img.src="{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}";`, 1000);
+            return;
+        }
+        if (previous_halted != halted) {
+            if(!halted) {
+                mjpeg_img.src = `{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}`;
+            } else {
+                mjpeg_img.src = "{{ url_for('static', filename='img/unavailable.jpg') }}";
+            }
+        }
+        previous_halted = halted;
+    }
+}
+
+function set_display(value) {
+    let d = new Date();
+    let val;
+    d.setTime(d.getTime() + (365*24*60*60*1000));
+    let expires = "expires="+d.toUTCString();
+        if (value == "On") {
+        $('#main-buttons').removeClass("d-none")
+        $('#display_mode').val("Off")
+        $('#display_mode').html("Display Off")
+    } else {
+        $('#main-buttons').addClass("d-none")
+        $('#display_mode').val("On")
+        $('#display_mode').html("Display On")
     }
 
-    function set_display(value) {
-        let d = new Date();
-        let val;
-        d.setTime(d.getTime() + (365*24*60*60*1000));
-        let expires = "expires="+d.toUTCString();
-         if (value == "On") {
-            $('#main-buttons').removeClass("d-none")
-            $('#display_mode').val("Off")
-            $('#display_mode').html("Display Off")
-        } else {
-            $('#main-buttons').addClass("d-none")
-            $('#display_mode').val("On")
-            $('#display_mode').html("Display On")
-        }
+    document.cookie="display_mode=" + value + "; " + expires;
+}
 
-        document.cookie="display_mode=" + value + "; " + expires;
+function set_stream_mode(value) {
+    let d = new Date();
+    d.setTime(d.getTime() + (365*24*60*60*1000));
+    let expires = "expires="+d.toUTCString();
+    if (value == 1) {
+        $("#toggle_stream").html("MJPEG-Stream");
+            $("#toggle_stream").val(0);
+    } else {
+        $("#toggle_stream").html("Default-Stream");
+        $("#toggle_stream").val(1);
+    }
+    document.cookie="mjpegmode=" + value + "; " + expires;
+    document.location.reload(true);
+}
+
+function openFullscreen() {
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen();
+    }
+}
+
+function closeFullscreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+        document.webkitExitFullscreen();
+    }
+}
+
+function toggle_fullscreen(event) {
+    let background = document.getElementById("background");
+
+    if(!background) {
+        background = document.createElement("div");
+        background.id = "background";
+        document.body.appendChild(background);
     }
 
-    function set_stream_mode(value) {
-        let d = new Date();
-        d.setTime(d.getTime() + (365*24*60*60*1000));
-        let expires = "expires="+d.toUTCString();
-        if (value == 1) {
-            $("#toggle_stream").html("MJPEG-Stream");
-             $("#toggle_stream").val(0);
-        } else {
-            $("#toggle_stream").html("Default-Stream");
-            $("#toggle_stream").val(1);
-        }
-        document.cookie="mjpegmode=" + value + "; " + expires;
-        document.location.reload(true);
+    if(event.className == "fullscreen") {
+        event.className = "img-fluid standard";
+        background.style.display = "none";
+        closeFullscreen();
+    } else {
+        event.className = "fullscreen";
+        background.style.display = "block";
+        openFullscreen();
     }
-
-    function openFullscreen() {
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) { /* Safari */
-            elem.webkitRequestFullscreen();
-        }
-    }
-
-    function closeFullscreen() {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) { /* Safari */
-            document.webkitExitFullscreen();
-        }
-    }
-
-    function toggle_fullscreen(event) {
-        let background = document.getElementById("background");
-
-        if(!background) {
-            background = document.createElement("div");
-            background.id = "background";
-            document.body.appendChild(background);
-        }
-
-        if(event.className == "fullscreen") {
-            event.className = "img-fluid standard";
-            background.style.display = "none";
-            closeFullscreen();
-        } else {
-            event.className = "fullscreen";
-            background.style.display = "block";
-            openFullscreen();
-        }
-    }
+}
 </script>
 {% if mode > 0 %}
     {% assets "js_pipan" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}

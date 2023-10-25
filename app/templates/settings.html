@@ -209,168 +209,168 @@
 {% include "modal_qr.html"%}
 {% endblock %}
 {%block extrascripts%}
-<script language="javascript">
-    $(function () {
-        $('#main').addClass("d-none")
-    });
+<script>
+$(function () {
+    $('#main').addClass("d-none")
+});
 
-    $('#upreset, #pilight, #pipan, #servo, #loglevel').unbind()
-    $('#upreset, #pilight, #pipan, #servo, #loglevel').on("change", function(event) {
-        let data = $(this).serializeObject({"checkboxesAsBools":true});
-        $.queryData({url:"{{url_for('api.settings_sets')}}",data:data});
-    })
+$('#upreset, #pilight, #pipan, #servo, #loglevel').unbind()
+$('#upreset, #pilight, #pipan, #servo, #loglevel').on("change", function(event) {
+    let data = $(this).serializeObject({"checkboxesAsBools":true});
+    $.queryData({url:"{{url_for('api.settings_sets')}}",data:data});
+})
 
-    $('#btn_token, #btn_api_token').unbind();
-    $('#btn_token, #btn_api_token').click(function () {
-        copyToClipboard('#'+$(this).siblings('input').prop("id"));
-    });
+$('#btn_token, #btn_api_token').unbind();
+$('#btn_token, #btn_api_token').click(function () {
+    copyToClipboard('#'+$(this).siblings('input').prop("id"));
+});
 
-    $('#get_token').unbind();
-    $('#get_token').click(function () {
-        let callbackSuccess = function(data){$('#token').val(data["cam_token"])}
-        $.queryData({url:"{{url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
-    });
+$('#get_token').unbind();
+$('#get_token').click(function () {
+    let callbackSuccess = function(data){$('#token').val(data["cam_token"])}
+    $.queryData({url:"{{url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
+});
 
-    $('#del_token').unbind();
-    $('#del_token').click(function () {
-        let callbackSuccess = function(data){$('#cam_token').val('')}
-        $.queryData({method:"delete", url:"{{ url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
-    });
+$('#del_token').unbind();
+$('#del_token').click(function () {
+    let callbackSuccess = function(data){$('#cam_token').val('')}
+    $.queryData({method:"delete", url:"{{ url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
+});
 
-    $('#get_api_token').unbind();
-    $('#get_api_token').click(function () {
-        let callbackSuccess = function(data){$('#apitoken').val(data["api_token"])}
-        $.queryData({url:"{{url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
-    });
+$('#get_api_token').unbind();
+$('#get_api_token').click(function () {
+    let callbackSuccess = function(data){$('#apitoken').val(data["api_token"])}
+    $.queryData({url:"{{url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
+});
 
-    $('#del_api_token').unbind();
-    $('#del_api_token').click(function () {
-        let callbackSuccess = function(data){$('#apitoken').val('')}
-        $.queryData({method:"delete", url:"{{ url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
-    });
+$('#del_api_token').unbind();
+$('#del_api_token').click(function () {
+    let callbackSuccess = function(data){$('#apitoken').val('')}
+    $.queryData({method:"delete", url:"{{ url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
+});
 
-    $('#users').on('click','.add_button', function() {
-        let parent = $(this).parent().parent();
-        let data = $(parent).find('input, select').serializeObject();
-        let templ = $('#users-ref').clone();
-        let callbackSuccess = function(data){
-            templ.find('.add_button').parent().addClass('d-none');
-            templ.find('.del_button').parent().removeClass('d-none');
-            templ.find('.otp_user').prop('disabled',false);
-            templ.attr('id','users-'+data["id"]);
-            templ.addClass('uchange').removeClass('needs-validation was-validated');
-            templ.find('input[name="id"]').val(data["id"]);
-            templ.insertBefore(parent);
-            parent.find('input').val('');
-            parent.removeClass('was-validated')
-        }
-        let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
-        if (this.dispatchEvent(divsubmit))
-            $.queryData({url:"{{url_for('api.users_users')}}",data:data, callbackSuccess:callbackSuccess});
-    });
-
-    $('#users').on('click','.del_button', function() {
-        let parent = $(this).parent().parent()
-        let data = $(parent).find('input, select').serializeObject();
-        let callbackSuccess = function(data){ parent.remove() }
-        $.queryData({method:"delete", url:`{{ url_for('api.users_users')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
-    });
-
-    $('#users').on('click','.otp_user', function() {
-        let parent = $(this).parent().parent();
-        let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        $('#otpmodal').attr("aria-viewpicam-modal-id", data["id"])
-        otpModal.show();
-    });
-
-    $('#users').on('change','.uchange', function(){
-        let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        $.queryData({method:"put", url:`{{url_for('api.users_users')}}/${data["id"]}`, data:data});
-    });
-
-    $('#ubuttons').on('click','.add_button', function() {
-        let parent = $(this).parent().parent();
-        let data = $(parent).find('input').serializeObject({"checkboxesAsBools":true});
-        let templ = $('#ubuttons-ref').clone();
-        let callbackSuccess = function(data){
-            templ.find('.add_button').parent().addClass('d-none');
-            templ.find('.del_button').parent().removeClass('d-none');
-            templ.attr('id','ubuttons-'+data["id"]);
-            templ.addClass('uchange').removeClass('needs-validation was-validated');
-            templ.find('input[name="id"]').val(data["id"]);
-            templ.insertBefore(parent);
-            parent.find('input, select, textarea').val('');
-            parent.removeClass('was-validated')
-        }
-        let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
-        if (this.dispatchEvent(divsubmit))
-            $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, callbackSuccess:callbackSuccess});
-
-    });
-
-    $('#ubuttons').on('click','.del_button', function() {
-        let parent = $(this).parent().parent();
-        let data = $(parent).find('input').serializeObject({"checkboxesAsBools":true});
-        let callbackSuccess = function(data){ parent.remove() }
-        $.queryData({method:"delete", url:`{{ url_for('api.settings_buttons')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
-    });
-
-    $('#ubuttons').on('change','.uchange', function(){
-        let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        $.queryData({method:"put", url:`{{url_for('api.settings_buttons')}}/${data["id"]}`, data:data});
-    });
-
-    $('#multiviews').on('click','.add_button', function() {
-        let parent = $(this).parent().parent();
-        let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
-        let templ = $('#multiviews-ref').clone();
-        let callbackSuccess = function(data){
-            templ.find('.add_button').parent().addClass('d-none');
-            templ.find('.del_button').parent().removeClass('d-none');
-            templ.attr('id','multiviews-'+data["id"]);
-            templ.addClass('uchange').removeClass('needs-validation was-validated');
-            templ.find('input[name="id"]').val(data["id"]);
-            templ.insertBefore(parent);
-            parent.find('input, select, textarea').val('');
-            parent.removeClass('was-validated')
-        }
-        let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
-        if (this.dispatchEvent(divsubmit))
-            $.queryData({url:"{{url_for('api.multiview_multiviews')}}",data:data, callbackSuccess:callbackSuccess});
-    });
-
-    $('#multiviews').on('click','.del_button', function() {
-        let parent = $(this).parent().parent();
-        let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
-        let callbackSuccess = function(data){ parent.remove() }
-        $.queryData({method:"delete", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
-    });
-
-    $('#multiviews').on('change','.uchange', function(){
-        let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        $.queryData({method:"put", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, data:data});
-    });
-
-    $('#macros').on('change','.uchange', function(){
-        let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-        $.queryData({url:"{{url_for('api.settings_macros')}}", data:data});
-    });
-
-    function send_macroUpdate(i, macro) {
-        var macrovalue = $('#'+macro).val();
-        if(! $("#"+macro+"_chk").prop("checked")) {
-            macrovalue = "-" + macrovalue;
-        }
-        $.sendCmd({'cmd':'um', 'params':[i.toString(), macrovalue]})
+$('#users').on('click','.add_button', function() {
+    let parent = $(this).parent().parent();
+    let data = $(parent).find('input, select').serializeObject();
+    let templ = $('#users-ref').clone();
+    let callbackSuccess = function(data){
+        templ.find('.add_button').parent().addClass('d-none');
+        templ.find('.del_button').parent().removeClass('d-none');
+        templ.find('.otp_user').prop('disabled',false);
+        templ.attr('id','users-'+data["id"]);
+        templ.addClass('uchange').removeClass('needs-validation was-validated');
+        templ.find('input[name="id"]').val(data["id"]);
+        templ.insertBefore(parent);
+        parent.find('input').val('');
+        parent.removeClass('was-validated')
     }
+    let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
+    if (this.dispatchEvent(divsubmit))
+        $.queryData({url:"{{url_for('api.users_users')}}",data:data, callbackSuccess:callbackSuccess});
+});
 
-    function copyToClipboard(element) {
-        var $temp = $("<input>");
-        $("body").append($temp);
-        $temp.val($(element).val()).select();
-        document.execCommand("copy");
-        $temp.remove();
+$('#users').on('click','.del_button', function() {
+    let parent = $(this).parent().parent()
+    let data = $(parent).find('input, select').serializeObject();
+    let callbackSuccess = function(data){ parent.remove() }
+    $.queryData({method:"delete", url:`{{ url_for('api.users_users')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
+});
+
+$('#users').on('click','.otp_user', function() {
+    let parent = $(this).parent().parent();
+    let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+    $('#otpmodal').attr("aria-viewpicam-modal-id", data["id"])
+    otpModal.show();
+});
+
+$('#users').on('change','.uchange', function(){
+    let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+    $.queryData({method:"put", url:`{{url_for('api.users_users')}}/${data["id"]}`, data:data});
+});
+
+$('#ubuttons').on('click','.add_button', function() {
+    let parent = $(this).parent().parent();
+    let data = $(parent).find('input').serializeObject({"checkboxesAsBools":true});
+    let templ = $('#ubuttons-ref').clone();
+    let callbackSuccess = function(data){
+        templ.find('.add_button').parent().addClass('d-none');
+        templ.find('.del_button').parent().removeClass('d-none');
+        templ.attr('id','ubuttons-'+data["id"]);
+        templ.addClass('uchange').removeClass('needs-validation was-validated');
+        templ.find('input[name="id"]').val(data["id"]);
+        templ.insertBefore(parent);
+        parent.find('input, select, textarea').val('');
+        parent.removeClass('was-validated')
     }
+    let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
+    if (this.dispatchEvent(divsubmit))
+        $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, callbackSuccess:callbackSuccess});
+
+});
+
+$('#ubuttons').on('click','.del_button', function() {
+    let parent = $(this).parent().parent();
+    let data = $(parent).find('input').serializeObject({"checkboxesAsBools":true});
+    let callbackSuccess = function(data){ parent.remove() }
+    $.queryData({method:"delete", url:`{{ url_for('api.settings_buttons')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
+});
+
+$('#ubuttons').on('change','.uchange', function(){
+    let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+    $.queryData({method:"put", url:`{{url_for('api.settings_buttons')}}/${data["id"]}`, data:data});
+});
+
+$('#multiviews').on('click','.add_button', function() {
+    let parent = $(this).parent().parent();
+    let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
+    let templ = $('#multiviews-ref').clone();
+    let callbackSuccess = function(data){
+        templ.find('.add_button').parent().addClass('d-none');
+        templ.find('.del_button').parent().removeClass('d-none');
+        templ.attr('id','multiviews-'+data["id"]);
+        templ.addClass('uchange').removeClass('needs-validation was-validated');
+        templ.find('input[name="id"]').val(data["id"]);
+        templ.insertBefore(parent);
+        parent.find('input, select, textarea').val('');
+        parent.removeClass('was-validated')
+    }
+    let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
+    if (this.dispatchEvent(divsubmit))
+        $.queryData({url:"{{url_for('api.multiview_multiviews')}}",data:data, callbackSuccess:callbackSuccess});
+});
+
+$('#multiviews').on('click','.del_button', function() {
+    let parent = $(this).parent().parent();
+    let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
+    let callbackSuccess = function(data){ parent.remove() }
+    $.queryData({method:"delete", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
+});
+
+$('#multiviews').on('change','.uchange', function(){
+    let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+    $.queryData({method:"put", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, data:data});
+});
+
+$('#macros').on('change','.uchange', function(){
+    let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+    $.queryData({url:"{{url_for('api.settings_macros')}}", data:data});
+});
+
+function send_macroUpdate(i, macro) {
+    var macrovalue = $('#'+macro).val();
+    if(! $("#"+macro+"_chk").prop("checked")) {
+        macrovalue = "-" + macrovalue;
+    }
+    $.sendCmd({'cmd':'um', 'params':[i.toString(), macrovalue]})
+}
+
+function copyToClipboard(element) {
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val($(element).val()).select();
+    document.execCommand("copy");
+    $temp.remove();
+}
 
 </script>
 {%endblock%}
