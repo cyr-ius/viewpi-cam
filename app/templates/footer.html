@@ -1,12 +1,36 @@
-    <nav class="navbar navbar-expand">
-      <div class="container-fluid">
-        <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="https://github.com/silvanmelchior/RPi_Cam_Web_Interface" target="_blank">Github</a></li>
-            <li class="nav-item"><a class="nav-link" href="http://www.raspberrypi.org/forums/viewtopic.php?f=43&amp;t=63276" target="_blank">Forum</a></li>
-            <li class="nav-item"><a class="nav-link" href="http://elinux.org/RPi-Cam-Web-Interface" target="_blank">Wiki</a></li>
-        </ul>
-        <div class="ms-auto me-1"><span class="fs-6 fw-lighter">ViewPi Cam ({{config.VERSION}})</span></div>
-        {% include "theme_languages.html"%}
-        {% include "theme_colors.html"%}
-        </div>
-    </nav>
+<nav class="navbar navbar-expand">
+  <div class="container-fluid">
+    <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="https://github.com/silvanmelchior/RPi_Cam_Web_Interface" target="_blank">Github</a></li>
+        <li class="nav-item"><a class="nav-link" href="http://www.raspberrypi.org/forums/viewtopic.php?f=43&amp;t=63276" target="_blank">Forum</a></li>
+        <li class="nav-item"><a class="nav-link" href="http://elinux.org/RPi-Cam-Web-Interface" target="_blank">Wiki</a></li>
+    </ul>
+    <div class="ms-auto me-1"><span id="check-update" class="fs-6 fw-lighter"></span></div>
+    <div class="ms-auto me-1"><span class="fs-6 fw-lighter">ViewPi Cam ({{config.VERSION}})</span></div>
+    {% include "theme_languages.html"%}
+    {% include "theme_colors.html"%}
+    </div>
+</nav>
+<script>
+$(function(){
+  let callback = function(data){
+    sessionStorage.checkUpdate = 1;
+    if (data.content) {
+      rslt = JSON.parse(atob(data.content))
+      let last_version = rslt.app_version
+      if (last_version != '{{config.VERSION}}') {
+        $('#check-update').html(`New version ${last_version} detected, please update`)
+      }
+      sessionStorage.app_version = last_version
+    } else {
+      sessionStorage.removeItem('app_version')
+    }
+  }
+  if (!sessionStorage.checkUpdate)
+    $.queryData({method:"get", url:"https://api.github.com/repos/cyr-ius/viewpi-cam/contents/.version.json?ref=main", callbackSuccess:callback, callbackError:callback});
+
+  if (sessionStorage.app_version && sessionStorage.app_version != '{{config.VERSION}}')
+    $('#check-update').html(`New version ${sessionStorage.app_version} detected, please update`)
+
+});
+</script>
