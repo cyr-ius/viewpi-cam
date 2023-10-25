@@ -78,14 +78,14 @@
         <div class="row">
             <div class="row g-1 ms-2">
                 <div class="col">
-                    <div id="cam_token" class="input-group">
-                        <input class="form-control form-control-sm" id="token" name="token" type="text" value="{{settings.cam_token}}" disabled>
+                    <div class="input-group">
+                        <input class="form-control form-control-sm" id="cam_token" type="text" value="{{settings.cam_token}}" disabled>
                         <button class="btn btn-sm btn-outline-secondary" id="btn_token" type="button"><i class="bi bi-clipboard"></i></button>
                         <button class="btn btn-sm btn-outline-secondary" id="get_token" type="button">{{_('Generate')}}</button>
                         <button class="btn btn-sm btn-outline-secondary" id="del_token" type="button">{{_('Reset')}}</button>
                     </div>
-                    <a href="{{ url_for("camera.cam_pic_new", cam_token=settings.cam_token) }}" target="_blank">{{_('Stream view')}}</a>
-                    <a href="{{ url_for("camera.cam_pic", cam_token=settings.cam_token) }}" target="_blank">{{_('Last Picture')}}</a>
+                    <a id="cam_pic_new" href="{{ url_for("camera.cam_pic_new", cam_token=settings.cam_token) }}" target="_blank">{{_('Stream view')}}</a>
+                    <a id="cam_pic" href="{{ url_for("camera.cam_pic", cam_token=settings.cam_token) }}" target="_blank">{{_('Last Picture')}}</a>
                 </div>
             </div>
         </div>
@@ -227,13 +227,22 @@ $('#btn_token, #btn_api_token').click(function () {
 
 $('#get_token').unbind();
 $('#get_token').click(function () {
-    let callbackSuccess = function(data){$('#token').val(data["cam_token"])}
+    let callbackSuccess = function(data){
+        let cam_token = data["cam_token"];
+        $('#cam_token').val(cam_token);
+        $('#cam_pic_new').attr("href",`{{ url_for("camera.cam_pic_new", cam_token=None) }}?cam_token=${cam_token}`)
+        $('#cam_pic').attr("href",`{{ url_for("camera.cam_pic", cam_token=None) }}?cam_token=${cam_token}`)
+        $('#cam_pic_new, #cam_pic').removeClass("d-none");
+    }
     $.queryData({url:"{{url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
 });
 
 $('#del_token').unbind();
 $('#del_token').click(function () {
-    let callbackSuccess = function(data){$('#cam_token').val('')}
+    let callbackSuccess = function(data){
+        $('#cam_token').val('')
+        $('#cam_pic_new, #cam_pic').addClass("d-none");
+    }
     $.queryData({method:"delete", url:"{{ url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
 });
 

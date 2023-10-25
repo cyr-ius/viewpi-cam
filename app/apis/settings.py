@@ -155,7 +155,7 @@ class APIToken(Resource):
     @api.response(204, "Actions is success")
     def delete(self):
         """Delete token."""
-        del ca.settings.token
+        del ca.settings.api_token
         ca.settings.update(api_token=None)
         return "", 204
 
