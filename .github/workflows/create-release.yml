@@ -37,3 +37,14 @@ jobs:
       packages: write
       id-token: write
     uses: ./.github/workflows/docker-publish.yml
+
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   
+    steps:
+      - name: Write Version to File
+      # uses: brettdorrans/write-version-to-file@4f418d37c415c2ad62716090d4539a0a0db93b5c
+        uses: brettdorrans/write-version-to-file@v1.0.2
+        with:
+          filename: /.version
