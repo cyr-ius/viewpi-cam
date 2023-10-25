@@ -50,3 +50,9 @@ jobs:
         uses: brettdorrans/write-version-to-file@v1.0.2
         with:
           filename: .version
+      - name: GitHub Commit Push File
+        # You may pin to the exact commit or the version.
+        # uses: maxgfr/github-commit-push-file@66cf828b77c2348547bef9ee761af5b96b36f0ad
+        uses: maxgfr/github-commit-push-file@v0.0.3
+        with:
+          commit_name: Update version file   
