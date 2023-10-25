@@ -45,12 +45,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Overwrite Version.txt file
         uses: DamianReeves/write-file-action@v1.2
         with:
           path: .version
           write-mode: overwrite
           contents: "${{ steps.versioning.outputs.version }}"
+
       - name: Commit & Push changes
         uses: actions-js/push@master
         with:
