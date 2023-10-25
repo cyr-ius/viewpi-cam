@@ -59,7 +59,8 @@ let linksBase = '{{url_for('preview.index')}}?preview=';
 let mediaBase = "{{url_for("static", filename=config['MEDIA'])}}/";
 let preview_id = '{{preview_id}}';
 
-(function() {
+(() => {
+    "use strict";
 	document.onkeyup = function () {
 		switch (event.keyCode) {
 		case 39:
