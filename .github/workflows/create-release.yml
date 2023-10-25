@@ -51,7 +51,7 @@ jobs:
         with:
           path: .version
           write-mode: overwrite
-          contents: "${{ steps.versioning.outputs.version }}"
+          contents: "${{ github.ref }}"
 
       - name: Commit & Push changes
         uses: actions-js/push@master
