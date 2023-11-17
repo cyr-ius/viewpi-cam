@@ -1,4 +1,6 @@
 """Api system."""
+import requests
+import semver
 from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
@@ -87,3 +89,31 @@ class Command(Resource):
             except RaspiConfigError as error:
                 abort(422, str(error))
         abort(404, f"Command not found {cmd}")
+
+
+@api.response(403, "Forbidden", message)
+@api.response(404, "Not found", message)
+@api.response(422, "Error", message)
+@api.route("/version")
+class Version(Resource):
+    """Version."""
+
+    def get(self):
+        """Get version."""
+        try:
+            response = requests.get(ca.config["GIT_URL"], timeout=ca.config["TIMEOUT"])
+            response.raise_for_status()
+            rjson = response.json()
+            rjson["app_version"] = rjson.get("app_version").replace("v", "")
+            current_version = ca.config["VERSION"].replace("v", "")
+            rjson.update(
+                {
+                    "current_version": current_version,
+                    "update_available": semver.compare(
+                        rjson["app_version"], current_version
+                    ),
+                }
+            )
+            return rjson
+        except requests.RequestException as error:
+            abort(422, str(error))

@@ -14,11 +14,10 @@
 <script>
 $(function(){
   let callback = function(data){
-    sessionStorage.checkUpdate = 1;
-    if (data.content) {
-      rslt = JSON.parse(atob(data.content))
-      let last_version = rslt.app_version
-      if (last_version != '{{config.VERSION}}') {
+    {# sessionStorage.checkUpdate = 1; #}
+    if (data) {
+      let last_version = data.app_version
+      if (data.update_available == 1) {
         $('#check-update').html(`New version ${last_version} detected, please update`)
       }
       sessionStorage.app_version = last_version
@@ -26,8 +25,9 @@ $(function(){
       sessionStorage.removeItem('app_version')
     }
   }
+
   if (!sessionStorage.checkUpdate)
-    $.queryData({method:"get", url:"https://api.github.com/repos/cyr-ius/viewpi-cam/contents/.version.json?ref=main", callbackSuccess:callback, callbackError:callback});
+    $.queryData({method:"get", url:"{{url_for('api.system_version')}}", callbackSuccess:callback, callbackError:callback});
 
   if (sessionStorage.app_version && sessionStorage.app_version != '{{config.VERSION}}')
     $('#check-update').html(`New version ${sessionStorage.app_version} detected, please update`)
