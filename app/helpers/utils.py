@@ -62,7 +62,7 @@ def delete_log(log_size: int) -> None:
         log_lines = open(log_file, mode="r", encoding="utf-8").readlines()
         if len(log_lines) > log_size:
             with open(log_file, mode="w", encoding="utf-8") as file:
-                file.write(log_lines[:log_size])
+                file.writelines(log_lines[:log_size])
                 file.close()
 
 
