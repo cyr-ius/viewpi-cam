@@ -32,6 +32,7 @@ jobs:
           draft: false
           prerelease: false
   publish:
+    needs: release
     permissions:
       contents: write
       packages: write
@@ -39,9 +40,10 @@ jobs:
     uses: ./.github/workflows/docker-publish.yml
 
   version:
+    needs: publish
     runs-on: ubuntu-latest
     permissions:
-      contents: write   
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
