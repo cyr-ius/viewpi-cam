@@ -2,7 +2,8 @@ name: Create release
 on:
   push:
     tags:
-      - "v*.*.*" # Push events to matching i.e. 1.0.0, 4.0.1
+      - "v[0-9]*.[0-9]*.[0-9]*" # Push events to matching i.e. 1.0.0, 4.0.1
+      - "[0-9]*.[0-9]*.[0-9]*" # Push events to matching i.e. 1.0.0, 4.0.1
   workflow_dispatch:
 jobs:
   release:
@@ -47,16 +48,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Find Tag
-        id: tagger
-        uses: jimschubert/query-tag-action@v2
-        with:
-          include: 'v*'
       - name: Modify version number
         uses: mingjun97/file-regex-replace@v1
         with:
           regex: '"app_version":"(v[0-9\.]*)"'
-          replacement: '"app_version":"${{ steps.tagger.outputs.tag }}"'
+          replacement: '"app_version":"${{ github.ref }}"'
           include: '.version.json'
           encoding: 'utf8'
           path: '.'
