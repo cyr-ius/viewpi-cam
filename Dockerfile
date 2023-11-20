@@ -44,7 +44,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
 RUN apk add --no-cache libstdc++
-RUN apk add --no-cache --virtual build build-base python3-dev make gcc linux-headers ninja git rust cargo
+RUN apk add --no-cache --virtual build build-base python3-dev cmake make gcc linux-headers ninja git rust cargo
 
 # Venv python
 RUN python3 -m venv --system-site-packages /env
