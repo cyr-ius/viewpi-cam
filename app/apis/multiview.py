@@ -42,7 +42,7 @@ class Multiviews(Resource):
 @api.response(403, "Forbidden", message)
 @api.route("/multiviews/<int:id>")
 class Multiview(Resource):
-    """Multiview objet."""
+    """Multiview object."""
 
     @api.marshal_with(multiview)
     @api.response(404, "Not found", message)

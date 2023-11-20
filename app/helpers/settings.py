@@ -7,7 +7,7 @@ from .jsondb import JsonDB
 
 @dataclass
 class Settings(JsonDB):
-    """Object fo settings."""
+    """Object for settings."""
 
     def init_app(self, app=None, path_file=None) -> None:
         path = app.config["FILE_SETTINGS"] if app else path_file

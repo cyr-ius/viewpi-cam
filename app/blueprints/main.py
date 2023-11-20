@@ -76,7 +76,7 @@ def streamlog():
                 first = True
                 while True:
                     if first:
-                        # Remove first occurence
+                        # Remove first occurrence
                         file.read()
                         first = False
                     yield f"data: {file.read()}\n\n"

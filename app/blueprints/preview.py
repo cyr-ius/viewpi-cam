@@ -132,7 +132,7 @@ def get_thumbnails(
     time_filter: int = 1,
     time_filter_max: int = 8,
 ):
-    """Return thumbnails and extra informations."""
+    """Return thumbnails and extra information."""
     media_path = ca.raspiconfig.media_path
     select_thumbs = {}
     thumbnails = []

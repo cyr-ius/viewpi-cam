@@ -20,7 +20,7 @@ from .models import date_time, day, daymode, forbidden, message, period, schedul
 api = Namespace(
     "schedule",
     path="/api",
-    description="Scheduler managment",
+    description="Scheduler management",
     decorators=[token_required, role_required("max")],
 )
 api.add_model("Error", message)
@@ -39,7 +39,7 @@ class Settings(Resource):
 
     @api.marshal_with(schedule)
     def get(self):
-        """Get settiings scheduler."""
+        """Get settings scheduler."""
         return ca.settings
 
     @api.expect(schedule)

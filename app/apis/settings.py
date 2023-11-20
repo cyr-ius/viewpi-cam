@@ -51,7 +51,7 @@ class Buttons(Resource):
 @api.response(403, "Forbidden", message)
 @api.route("/buttons/<int:id>")
 class Button(Resource):
-    """Button objet."""
+    """Button object."""
 
     @api.marshal_with(button)
     @api.response(404, "Not found", message)
@@ -99,7 +99,7 @@ class Sets(Resource):
     @api.marshal_with(setting)
     @api.response(204, "Action is success")
     def post(self):
-        """Set setttings."""
+        """Set settings."""
         ca.settings.update(**api.payload)
         if loglevel := api.payload.get("loglevel"):
             ca.logger.setLevel(loglevel)

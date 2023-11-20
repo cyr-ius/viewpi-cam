@@ -28,7 +28,7 @@ class Usrmgmt:
         return [user.__dict__ for user in self.users.values()]
 
     def get_user(self, id: int) -> dict[str, Any]:  # pylint: disable=W0622
-        """Return user dictionnary."""
+        """Return user dictionary."""
         return self.users.get(id).__dict__
 
     def save(self) -> None:
@@ -36,7 +36,7 @@ class Usrmgmt:
         ca.settings.update(users=self.users)
 
     def load(self) -> None:
-        """Load from jsondb and map to ojbect."""
+        """Load from jsondb and map to object."""
         for id, user in ca.settings.get("users", {}).items():  # pylint: disable=W0622
             self.users.update({int(id): User(**user)})
 

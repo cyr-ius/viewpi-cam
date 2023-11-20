@@ -42,7 +42,7 @@ class Users(Resource):
 @api.response(403, "Forbidden", message)
 @api.route("/users/<int:id>")
 class User(Resource):
-    """User objet."""
+    """User object."""
 
     @api.marshal_with(user)
     @api.response(404, "Not found", message)

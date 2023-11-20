@@ -10,7 +10,7 @@ from ..helpers.utils import delete_log
 from .models import forbidden, message
 
 api = Namespace(
-    "logs", path="/api", description="Log managment", decorators=[token_required]
+    "logs", path="/api", description="Log management", decorators=[token_required]
 )
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)

@@ -11,7 +11,7 @@ from .models import files, forbidden, message
 api = Namespace(
     "previews",
     path="/api",
-    description="Gallery managment",
+    description="Gallery management",
     decorators=[token_required, role_required(["medium", "max"])],
 )
 api.add_model("Error", message)

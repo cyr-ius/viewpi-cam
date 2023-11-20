@@ -12,20 +12,20 @@ class AttrDict(dict):
     """Provide dictionary with items accessible as object attributes."""
 
     def __getattr__(self, attr: str) -> Any:
-        """Get attribut."""
+        """Get attribute."""
         try:
             return self[attr]
         except KeyError as exception:
             raise AttributeError(f"AttrDict has no key {attr}") from exception
 
     def __setattr__(self, attr: str, value: Any) -> None:
-        """Set attribut and call save to json file."""
+        """Set attribute and call save to json file."""
         if isinstance(value, dict) and len(value) == 0:
             value = AttrDict()
         self[attr] = value
 
     def __delattr__(self, attr: str) -> Any:
-        """Delete attribut."""
+        """Delete attribute."""
         try:
             del self[attr]
         except KeyError as exception:
@@ -35,7 +35,7 @@ class AttrDict(dict):
 class JsonDB(AttrDict):
     """Class for store database to json file.
 
-    Exemple:
+    Example:
         json_db = JsonDB("/var/settings.json", default={"name":"Doe"})
         json_db.surnename = "Joe"
         json_db.city = {}
