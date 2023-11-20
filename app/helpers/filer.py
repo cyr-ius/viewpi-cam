@@ -2,6 +2,7 @@
 import os
 from datetime import datetime as dt
 
+import cv2
 from flask import current_app as ca
 
 
@@ -114,6 +115,17 @@ def get_file_type(file: str) -> str:
     if i > 0:
         return file[i + 1]
     return ""
+
+
+def get_file_duration(file: str) -> int:
+    """Return duration mp4."""
+    if get_file_ext(file) == "mp4":
+        video = cv2.VideoCapture(file)
+        frame_rate = video.get(cv2.CAP_PROP_FPS)
+        total_num_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
+        duration = total_num_frames / frame_rate
+        return int(duration)
+    return 0
 
 
 def get_file_index(file: str) -> str:
