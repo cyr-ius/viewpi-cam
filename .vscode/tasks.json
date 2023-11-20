@@ -24,6 +24,29 @@
         "reveal": "silent"
       },
       "problemMatcher": []
-    }
+    },
+    {
+      "label": "Docker Buildx ARMv7",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "buildx",
+        "build",
+        "--platform",
+        "linux/arm/v7",
+        "-t",
+        "cyr-ius/viewpicam:latest",
+        "--load",
+        "."
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": []
+    }    
   ]
 }

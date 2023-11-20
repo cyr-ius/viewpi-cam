@@ -47,15 +47,15 @@ RUN apk add --no-cache libstdc++
 RUN apk add --no-cache --virtual build build-base python3-dev cmake make gcc linux-headers ninja git rust cargo libressl-dev
 
 # Venv python
-RUN python3 -m venv --system-site-packages /env
+RUN python3 -m venv --system-site-packages  --upgrade-deps /env
 ENV VIRTUAL_ENV /env
 ENV PATH $PATH:/env/bin
 
 # Install pip requirements
 ADD requirements.txt /tmp/
-RUN /env/bin/pip3 install --upgrade pip
+RUN /env/bin/pip3 install --upgrade pip setuptools wheel
 RUN /env/bin/pip3 install --no-cache-dir --verbose -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
-RUN /env/bin/pip3 install opencv-python --verbose
+RUN apk add --no-cache py3-opencv
 
 # clean content
 RUN apk del build
@@ -76,6 +76,7 @@ VOLUME /app/system
 
 ARG VERSION
 ENV VERSION ${VERSION}
+ENV PYTHONPATH=/usr/lib/python3.11/site-packages
 
 ADD --chmod=744 docker-entrypoint.sh /
 EXPOSE 8000
