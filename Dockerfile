@@ -46,10 +46,16 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache libstdc++
 RUN apk add --no-cache --virtual build build-base python3-dev cmake make gcc linux-headers ninja git rust cargo
 
+# Venv python
+RUN python3 -m venv --system-site-packages /env
+ENV VIRTUAL_ENV /env
+ENV PATH $PATH:/env/bin
+
 # Install pip requirements
 ADD requirements.txt /tmp/
-RUN pip3 install --upgrade pip
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
+RUN /env/bin/pip3 install --upgrade pip
+RUN /env/bin/pip3 install --no-cache-dir -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
+RUN /env/bin/pip3 install opencv
 
 # clean content
 RUN apk del build
