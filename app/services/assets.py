@@ -13,7 +13,7 @@ css_main = Bundle(
 )
 
 css_custom = Bundle(
-    "../app/ressources/css/custom.css", filters="cssmin", output="css/custom.css"
+    "../app/resources/css/custom.css", filters="cssmin", output="css/custom.css"
 )
 
 
@@ -25,16 +25,16 @@ js_main = Bundle(
 )
 
 js_pipan = Bundle(
-    "../app/ressources/js/pipan.js", filters="jinja2,rjsmin", output="js/pipan.js"
+    "../app/resources/js/pipan.js", filters="jinja2,rjsmin", output="js/pipan.js"
 )
 
 js_colors = Bundle(
-    "../app/ressources/js/colorconverter.js",
-    "../app/ressources/js/color_modes.js",
+    "../app/resources/js/colorconverter.js",
+    "../app/resources/js/color_modes.js",
     filters="rjsmin",
     output="js/colors.js",
 )
 
 js_custom = Bundle(
-    "../app/ressources/js/custom.js", filters="jinja2,rjsmin", output="js/custom.js"
+    "../app/resources/js/custom.js", filters="jinja2,rjsmin", output="js/custom.js"
 )

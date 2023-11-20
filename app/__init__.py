@@ -54,12 +54,12 @@ def create_app(config=None):
     app.static_folder = f"{app.root_path}/../static"
 
     shutil.copytree(
-        f"{app.root_path}/ressources/css/fonts",
+        f"{app.root_path}/resources/css/fonts",
         f"{ app.static_folder}/css/fonts",
         dirs_exist_ok=True,
     )
     shutil.copytree(
-        f"{app.root_path}/ressources/img",
+        f"{app.root_path}/resources/img",
         f"{ app.static_folder}/img",
         dirs_exist_ok=True,
     )

@@ -81,7 +81,7 @@ def _get_shm_cam(preview_path=None):
         with open(preview_path, "rb") as file:
             return file.read()
     else:
-        with open("app/ressources/img/unavailable.jpg", "rb") as file:
+        with open("app/resources/img/unavailable.jpg", "rb") as file:
             return file.read()
 
 
