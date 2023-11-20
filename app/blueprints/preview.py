@@ -7,15 +7,15 @@ from datetime import datetime as dt
 from io import BytesIO
 from typing import Any
 
-from flask import Blueprint, abort
+from flask import Blueprint, abort, make_response, render_template, request, send_file
 from flask import current_app as ca
-from flask import make_response, render_template, request, send_file
 
 from ..helpers.decorator import auth_required, role_required
 from ..helpers.filer import (
     data_file_ext,
     data_file_name,
     find_lapse_files,
+    get_file_duration,
     get_file_index,
     get_file_size,
     get_file_timestamp,
@@ -160,9 +160,7 @@ def get_thumbnails(
             file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
             file_timestamp = get_file_timestamp(real_file)
             if file_type == "v":
-                duration = round(
-                    os.path.getmtime(f"{media_path}/{file}") - file_timestamp
-                )
+                duration = get_file_duration(f"{media_path}/{real_file}")
         else:
             file_timestamp = (
                 get_file_timestamp(real_file)
