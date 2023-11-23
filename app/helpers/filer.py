@@ -1,8 +1,8 @@
 """Files functions."""
 import os
+import subprocess
 from datetime import datetime as dt
 
-import cv2
 from flask import current_app as ca
 
 
@@ -120,11 +120,21 @@ def get_file_type(file: str) -> str:
 def get_file_duration(file: str) -> int:
     """Return duration mp4."""
     if get_file_ext(file) == "mp4":
-        video = cv2.VideoCapture(file)
-        frame_rate = video.get(cv2.CAP_PROP_FPS)
-        total_num_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
-        duration = total_num_frames / frame_rate
-        return int(duration)
+        result = subprocess.run(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
+                file,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        return float(result.stdout)
     return 0
 
 

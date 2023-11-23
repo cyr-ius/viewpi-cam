@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apk update && apk add --no-cache build-base git
 RUN git clone https://github.com/gpac/gpac.git gpac-master
 
-WORKDIR gpac-master
+WORKDIR /app/gpac-master
 
 RUN ./configure --static-bin --use-zlib=no --prefix=/usr/bin
 RUN make -j`nproc`
@@ -16,7 +16,7 @@ WORKDIR /app
 
 RUN apk update && apk add --no-cache build-base git cmake bash make linux-headers
 RUN git clone https://github.com/roberttidey/userland.git
-WORKDIR userland
+WORKDIR /app/userland
 RUN sed -i 's/sudo//g' buildme
 RUN /bin/bash -c ./buildme
 
@@ -55,7 +55,7 @@ ENV PATH $PATH:/env/bin
 ADD requirements.txt /tmp/
 RUN /env/bin/pip3 install --upgrade pip setuptools wheel
 RUN /env/bin/pip3 install --no-cache-dir --verbose -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
-RUN apk add --no-cache py3-opencv
+RUN apk add --no-cache ffmpeg
 
 # clean content
 RUN apk del build
