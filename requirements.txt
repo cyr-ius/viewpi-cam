@@ -14,4 +14,3 @@ qrcode==7.4.2
 requests==2.31.0
 semver==3.0.2
 suntime==1.2.5
-python-ffmpeg==2.0.4
