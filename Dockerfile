@@ -15,7 +15,7 @@ FROM alpine:3.18 AS userland_builder
 WORKDIR /app
 
 RUN apk update && apk add --no-cache build-base git cmake bash make linux-headers
-RUN git clone https://github.com/roberttidey/userland.git
+RUN git clone https://github.com/cyr-ius/userland.git
 WORKDIR /app/userland
 RUN sed -i 's/sudo//g' buildme
 RUN /bin/bash -c ./buildme
