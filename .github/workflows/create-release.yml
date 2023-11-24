@@ -54,7 +54,7 @@ jobs:
       - name: Modify version number
         uses: mingjun97/file-regex-replace@v1
         with:
-          regex: '"app_version":"([0-9\.]*)"'
+          regex: '"app_version": "([0-9\.]*)"'
           replacement: '"app_version":"${{ github.ref_name }}"'
           include: '.version.json'
           encoding: 'utf8'
