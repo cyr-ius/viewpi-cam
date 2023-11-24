@@ -64,6 +64,7 @@ def delete_mediafiles(filename: str, delete: bool = True) -> int:
             raw_file = thumb_file[: thumb_file.find(".")]
             for file in (
                 f"{media_path}/{thumb_file}.dat",
+                f"{media_path}/{thumb_file}.info",
                 f"{media_path}/{raw_file}.h264",
                 f"{media_path}/{raw_file}.h264.bad",
                 f"{media_path}/{raw_file}.h264.log",
@@ -142,15 +143,15 @@ def get_file_timestamp(file: str) -> dt:
     return dt.strptime(sdatetime, "%Y%m%d%H%M%S").timestamp()
 
 
-def list_folder_files(path: str, ext=None) -> list[str]:
+def list_folder_files(path: str, exts: list[str] | None = None) -> list[str]:
     """List files in folder path."""
-    if ext:
-        return [
-            f
-            for f in os.listdir(path)
-            if os.path.isfile(os.path.join(path, f)) and f".{ext}" in f
-        ]
-    return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+    if exts is None:
+        exts = ["jpg", "mp4"]
+    return [
+        f
+        for f in os.listdir(path)
+        if os.path.isfile(os.path.join(path, f)) and (get_file_ext(f) in exts)
+    ]
 
 
 def get_sorted_files(folder: str, ascending: bool = True) -> list[str]:
