@@ -123,6 +123,7 @@ class RaspiConfig:
             self.refresh()
 
     def stop(self) -> None:
+        """Kill raspimjpeg."""
         try:
             execute_cmd("killall raspimjpeg")
         except ViewPiCamException as error:

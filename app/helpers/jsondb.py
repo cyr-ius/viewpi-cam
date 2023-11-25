@@ -76,6 +76,7 @@ class JsonDB(AttrDict):
             self.save()
 
     def update(self, **kwargs):
+        """Update and save object."""
         try:
             for key, value in kwargs.items():
                 setattr(self, key, value)

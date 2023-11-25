@@ -10,6 +10,8 @@ from ..const import USERLEVEL_MAX
 
 
 def auth_required(function):
+    """Authenticate decorator."""
+
     @wraps(function)
     def wrapper(*args, **kwargs):
         if session.get("username"):
@@ -20,6 +22,8 @@ def auth_required(function):
 
 
 def role_required(rights: str | list[str]):
+    """Role decorator."""
+
     def decorate(function):
         @wraps(function)
         def wrapper(*args, **kwargs):
@@ -39,6 +43,8 @@ def role_required(rights: str | list[str]):
 
 
 def token_required(function):
+    """Token decorator."""
+
     @wraps(function)
     def wrapper(*args, **kwargs):
         token = session.get("bearer_token") or request.headers.get("Authorization")
@@ -59,6 +65,8 @@ def token_required(function):
 
 
 def token_cam_accept(function):
+    """Token camera decorator."""
+
     @wraps(function)
     def wrapper(*args, **kwargs):
         if cam_token := request.args.get("cam_token"):

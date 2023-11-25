@@ -3,11 +3,12 @@ import os
 
 from flask import current_app as ca
 
-from .utils import execute_cmd, write_log
 from ..services.handle import ViewPiCamException
+from .utils import execute_cmd, write_log
 
 
 def open_pipe(pipename: str):
+    """Open pipe."""
     if not os.path.exists(pipename):
         write_log(f"Making Pipe to receive capture commands {pipename}")
         execute_cmd(f"mkfifo {pipename}")
@@ -36,6 +37,7 @@ def send_motion(cmd: str) -> None:
 
 
 def check_motion(pipe):
+    """Read motion pipe."""
     if isinstance(pipe, bool):
         return ""
     try:

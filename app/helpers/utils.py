@@ -88,6 +88,7 @@ def disk_usage() -> tuple[int, int, int, int, str]:
 
 
 def get_locale() -> str | list[str]:
+    """Get locale."""
     if (user := ca.usrmgmt.get(id=session.get("id"))) and hasattr(user, "locale"):
         session["locale"] = user.locale
         return user.locale
@@ -95,4 +96,5 @@ def get_locale() -> str | list[str]:
 
 
 def get_timezone() -> str | list[str]:
+    """Get timezone."""
     return ca.settings.gmt_offset

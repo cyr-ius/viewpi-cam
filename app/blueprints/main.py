@@ -18,12 +18,14 @@ bp = Blueprint("main", __name__, template_folder="templates")
 
 @bp.before_app_request
 def before_app_request():
+    """Execute before request."""
     g.loglevel = ca.settings.loglevel
 
 
 @bp.route("/", methods=["GET"])
 @auth_required
 def index():
+    """Index page."""
     write_log(f"Logged in user: {session['username']}")
     write_log(f"UserLevel {session['level']}")
     display_mode = request.cookies.get("display_mode", "On")
@@ -58,9 +60,9 @@ def index():
 @role_required(["max"])
 @auth_required
 def log():
+    """Log page (and download if post)."""
     if request.method == "POST":
         return send_file(ca.raspiconfig.log_file, as_attachment=True)
-
     return render_template("logs.html", log=get_logs(True))
 
 
@@ -68,6 +70,7 @@ def log():
 @role_required(["max"])
 @auth_required
 def streamlog():
+    """Stream log page."""
     log_file = ca.raspiconfig.log_file
 
     def generate(log_file):
@@ -89,23 +92,27 @@ def streamlog():
 @role_required(["max"])
 @auth_required
 def debugcmd():
+    """Debug page."""
     return render_template("debug.html", raspiconfig=ca.raspiconfig.__dict__)
 
 
 @bp.route("/help", methods=["GET"])
 def helpcmd():
+    """Help page."""
     return render_template("help.html")
 
 
 @bp.route("/min", methods=["GET"])
 @auth_required
 def minview():
+    """Mini view page."""
     return render_template("min.html")
 
 
 @bp.route("/multiview", methods=["GET"])
 @auth_required
 def multiview():
+    """Camera multiview page."""
     return render_template(
         "multiview.html", multiviews=ca.settings.get("multiviews", [])
     )
@@ -114,6 +121,7 @@ def multiview():
 @bp.route("/view", methods=["GET"])
 @auth_required
 def view():
+    """Stream camera preview."""
     id = request.args.get(  # pylint: disable=W0622
         "rHost", request.args.get("pHost", 0)
     )
@@ -141,6 +149,7 @@ def view():
 @bp.route("/pipan", methods=["GET"])
 @auth_required
 def pipan():
+    """Pipan page."""
     servo_cmd = "/dev/servoblaster"
     servo_data = ca.config["SERVO_FILE"]
     min_pan = 50
@@ -206,7 +215,7 @@ def pipan():
             action = servo_data[action]
 
         servo = None
-        match (action):
+        match action:
             case "Xplus":
                 servo_data["x"] += servo_data["XStep"]
                 servo_data["x"] = min(servo_data["x"], servo_data["XMax"])
