@@ -52,7 +52,7 @@ def write_log(msg: str) -> None:
 
     mode = "w" if not os.path.isfile(log_file) else "a"
     with open(log_file, mode=mode, encoding="utf-8") as file:
-        file.write(f"{{{str_now}}} {msg}\n")
+        file.write(f'{{"datetime":{str_now},"msg":"{msg}"}}\n')
 
 
 def delete_log(log_size: int) -> None:
