@@ -2,7 +2,7 @@
 import os
 
 from flask import current_app as ca
-from flask import request
+from flask import json, request
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import token_required
@@ -47,5 +47,7 @@ def get_logs(reverse: bool) -> list[str]:
             lines = file.readlines()
             lines.sort(reverse=reverse)
             for line in lines:
-                logs.append(line.replace("\n", ""))
+                line = line.replace("\n", "")
+                line = json.loads(line)
+                logs.append(line)
     return logs

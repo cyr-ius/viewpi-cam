@@ -2,7 +2,7 @@
 {% block content %}
 <div id="streamlog" class="container-fluid overflow-auto">
     {% for line in log %}
-    <div class="row px-3">{{line}}</div>
+    <div class="row px-3">{{line.datetime}} - {{line.msg}}</div>
     {%endfor%}
 
 </div>
@@ -47,7 +47,10 @@ $('#clearlog').click(function(){
 function stream() {
     var source = new EventSource("{{ url_for('main.streamlog') }}");
     source.onmessage = function(event) {
-        $('#streamlog').prepend('<div class="row px-3">'+event.data+'</div>');
+        if (event.data) {
+            let line = JSON.parse(event.data)
+            $('#streamlog').prepend('<div class="row px-3">'+line.datetime+' - '+line.msg+'</div>');
+        }
     }
     source.onerror = (err) => {
         console.error("EventSource failed:", err);
