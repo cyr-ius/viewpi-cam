@@ -50,7 +50,7 @@
                     </div>
                     <div class="col">
                         <div class="input-group input-group-sm mb-3">
-                            <input class="form-control form-control-sm" id="MP4Box_fps" type="number" value="{{raspiconfig.MP4Box_fps}}">
+                            <input class="form-control form-control-sm" id="mp4box_fps" type="number" value="{{raspiconfig.mp4box_fps}}">
                             <span class="input-group-text">boxing</span>
                         </div>
                     </div>
@@ -527,8 +527,8 @@
             <label class="col col-form-label">MP4 Boxing mode : </label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'bo','params':this.value});">
-                    <option value="0" {% if raspiconfig.MP4Box|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="2" {% if raspiconfig.MP4Box|int == 2 %}selected{%endif%}>Background</option>
+                    <option value="0" {% if raspiconfig.mp4box|int == 0 %}selected{%endif%}>Off</option>
+                    <option value="2" {% if raspiconfig.mp4box|int == 2 %}selected{%endif%}>Background</option>
                 </select>
             </div>
         </div>
@@ -591,7 +591,7 @@ function set_preset(value) {
   $("#video_width").val(values[0]);
   $("#video_height").val(values[1]);
   $("#video_fps").val(values[2]);
-  $("#MP4Box_fps").val(values[3]);
+  $("#mp4box_fps").val(values[3]);
   $("#image_width").val(values[4]);
   $("#image_height").val(values[5]);
   set_res();
@@ -610,7 +610,7 @@ function set_motion_external(value){
 }
 
 function set_res() {
-    params = [$("#video_width").val(),$("#video_height").val(),$("#video_fps").val(),$("#MP4Box_fps").val(),$("#image_width").val(),$("#image_height").val(),$("#fps_divider").val()]
+    params = [$("#video_width").val(),$("#video_height").val(),$("#video_fps").val(),$("#mp4box_fps").val(),$("#image_width").val(),$("#image_height").val(),$("#fps_divider").val()]
     $.sendCmd({"cmd":"px","params":params});
     update_preview_delay();
     updatePreview(true);
