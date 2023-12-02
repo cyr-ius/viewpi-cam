@@ -6,7 +6,7 @@ from flask_restx import Namespace, Resource, abort
 from ..blueprints.preview import get_thumb, get_thumbnails, video_convert
 from ..helpers.decorator import role_required, token_required
 from ..helpers.filer import delete_mediafiles, lock_file, maintain_folders
-from .models import files, forbidden, message
+from .models import deletes, files, forbidden, message
 
 api = Namespace(
     "previews",
@@ -17,6 +17,7 @@ api = Namespace(
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 api.add_model("Files", files)
+api.add_model("Deletes", deletes)
 
 
 @api.response(403, "Forbidden", forbidden)
@@ -36,10 +37,20 @@ class Previews(Resource):
             time_filter=int(request.args.get("time_filter", 1)),
         )
 
+    @api.doc(description="Delete  all files or files list")
     @api.response(204, "Action is success")
+    @api.expect(deletes)
     def delete(self):
         """Delete all media files."""
-        maintain_folders(ca.raspiconfig.media_path, True, True)
+        if self.api.payload:
+            for uid in self.api.payload.get("thumb_id", []):
+                if thumb := get_thumb(uid):
+                    if id in ca.settings.get("lock_files", []):
+                        continue
+                    delete_mediafiles(thumb["file_name"])
+                    maintain_folders(ca.raspiconfig.media_path, False, False)
+        else:
+            maintain_folders(ca.raspiconfig.media_path, True, True)
         return "", 204
 
 
