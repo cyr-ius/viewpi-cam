@@ -11,6 +11,7 @@ class PathURI(fields.Raw):
     """Path URI."""
 
     def format(self, value):
+        """Form string."""
         return url_for("static", filename=value)
 
 
@@ -18,6 +19,7 @@ class UriOTP(fields.Raw):
     """totp SVG."""
 
     def output(self, key, obj, **kwargs):
+        """Display QR Code."""
         if not obj:
             return
         uri = (
@@ -187,12 +189,8 @@ multiviews = Model(
         **multiview,
     },
 )
-
-
 cam_token = Model("CamToken", {"cam_token": fields.String(required=True)})
 api_token = Model("APIToken", {"api_token": fields.String(required=True)})
-
-
 otp = Model(
     "TOTP",
     {
@@ -202,8 +200,6 @@ otp = Model(
         "totp": fields.Boolean(required=False, description="otp status"),
     },
 )
-
-
 user = Model(
     "User",
     {
@@ -214,11 +210,14 @@ user = Model(
         "totp": fields.Boolean(required=False, description="otp status"),
     },
 )
-
 users = Model(
     "Users",
     {
         "id": fields.Integer(required=True, description="Id"),
         **user,
     },
+)
+deletes = Model(
+    "Deletes",
+    {"thumb_id": fields.List(fields.String(description="id thumb"), default=None)},
 )
