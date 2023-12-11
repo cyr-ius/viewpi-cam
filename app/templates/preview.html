@@ -97,6 +97,7 @@ $('#delete').click(function(){
         let callbackSuccess = function(data) {
             $('#hide-preview').trigger('click');
             $(`#${id}`).remove();
+            free_disk();
         }
         $.queryData({method:"delete", url:`{{url_for('api.previews_previews')}}/${id}`, callbackSuccess:callbackSuccess})
     }
@@ -105,7 +106,7 @@ $('#delete').click(function(){
 $('#thumbs').on('click','button[name="delete"], #delete', function() {
     if (confirm('Are you sure you want to delete this file?')) {
         let id = $(this).val();
-        let callbackSuccess = function(data) {$(`#${id}`).remove();}
+        let callbackSuccess = function(data) {$(`#${id}`).remove();free_disk();}
         $.queryData({method:"delete", url:`{{url_for('api.previews_previews')}}/${id}`, callbackSuccess:callbackSuccess})
     }
 });
@@ -148,6 +149,7 @@ $('#deleteSel').click(function(){
         uids.forEach(function(item){   
             $(`#${item}`).remove();
         });
+        free_disk();
     };  
     $.queryData({method:"delete", url:`{{url_for('api.previews_previews')}}`, data:data, callbackSuccess:callbackSuccess})
 });
@@ -381,5 +383,12 @@ function scroll_top() {
   $('main .container-fluid')[0].scrollTop=0
 }
 
+function free_disk(){
+    let callbackSuccess = function(data) { 
+        $(".progress-bar").css("width",data.prc+"%").css("background-color",data.color)
+        $(".progress-bar span").html(`Percent: ${data.prc}%  Total: ${data.total} MB`)
+    }
+    $.queryData({method:"get", url:`{{url_for('api.system_freespace')}}`, callbackSuccess:callbackSuccess})
+}
 </script>
 {% endblock%}
