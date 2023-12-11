@@ -6,7 +6,7 @@ from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required, token_required
 from ..helpers.raspiconfig import RaspiConfigError
-from ..helpers.utils import execute_cmd
+from ..helpers.utils import disk_usage, execute_cmd
 from ..services.handle import ViewPiCamException
 from .models import command, message
 
@@ -115,5 +115,26 @@ class Version(Resource):
                 }
             )
             return rjson
+        except requests.RequestException as error:
+            abort(422, str(error))
+
+
+@api.response(403, "Forbidden", message)
+@api.response(422, "Error", message)
+@api.route("/disk/free")
+class Freespace(Resource):
+    """Free space disk."""
+
+    def get(self):
+        """Get free space."""
+        try:
+            total, used, free, prc, color = disk_usage()
+            return {
+                "total": total,
+                "used": used,
+                "free": free,
+                "prc": prc,
+                "color": color,
+            }
         except requests.RequestException as error:
             abort(422, str(error))
