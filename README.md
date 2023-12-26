@@ -37,7 +37,7 @@ For Raspberry Pi Zero W, 1, 2, 3, 4
 - /app/macros -> macros files
 - /app/system -> settings files
 
-`docker run -d --privileged -p 80:8000 -v /dev/vchiq:/dev/vchiq -v /dev/vcsm:/dev/vcsm -v /home/data/media:/app/media -v /home/data/system:/app/system -/tmp:/app/h264 ghcr.io/cyr-ius/viewpi-cam:latest`
+`docker run -d --privileged -p 80:8000 -v /dev/vchiq:/dev/vchiq -v /dev/vcsm:/dev/vcsm -v /home/data/media:/app/media -v /home/data/system:/app/system -v /tmp:/app/h264 ghcr.io/cyr-ius/viewpi-cam:latest`
 
 
 ## Using docker compose
