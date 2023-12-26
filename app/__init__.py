@@ -8,11 +8,16 @@ from flask_babel import Babel
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from . import blueprints
-from .blueprints.schedule import launch_schedule
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
 from .helpers.usrmgmt import Usrmgmt
-from .helpers.utils import execute_cmd, get_locale, get_pid, get_timezone
+from .helpers.utils import (
+    execute_cmd,
+    get_locale,
+    get_pid,
+    get_timezone,
+    launch_schedule,
+)
 from .services.assets import assets
 from .services.handle import ErrorHandler, ViewPiCamException
 

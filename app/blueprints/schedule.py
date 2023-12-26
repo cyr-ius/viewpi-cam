@@ -2,14 +2,13 @@
 import os
 import shutil
 import time
-import zoneinfo
 from datetime import datetime as dt
-from subprocess import PIPE, Popen
+from subprocess import Popen
 from typing import Any
 
-from flask import Blueprint
+import zoneinfo
+from flask import Blueprint, render_template
 from flask import current_app as ca
-from flask import render_template
 from flask.cli import with_appcontext
 
 from ..apis.schedule import dt_now, get_period, sun_info, time_offset
@@ -295,9 +294,3 @@ def is_day_active(days: dict[str, Any] | None, bool_period: int) -> bool:
         day: int = int(dt_now().strftime("%w"))
         return days[str(bool_period)][day] == 1
     return False
-
-
-def launch_schedule() -> None:
-    """Run scheduler."""
-    if not get_pid("scheduler"):
-        Popen(["flask", "scheduler", "start"], stdout=PIPE)

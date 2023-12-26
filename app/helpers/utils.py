@@ -102,3 +102,9 @@ def get_locale() -> str | list[str]:
 def get_timezone() -> str | list[str]:
     """Get timezone."""
     return ca.settings.gmt_offset
+
+
+def launch_schedule() -> None:
+    """Run scheduler."""
+    if not get_pid("scheduler"):
+        Popen(["flask", "scheduler", "start"], stdout=PIPE)
