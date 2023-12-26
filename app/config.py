@@ -13,6 +13,11 @@ VERSION = os.getenv("VERSION", "v0.0.0")
 SECRET_KEY = os.getenv("SECRET_KEY", "12345678900987654321")
 SESSION_TYPE = "filesystem"
 
+# COOKIE SECURE
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
 # The host running the application
 HOSTNAME = os.uname()[1]
 # Url and timeout to fetch version from github

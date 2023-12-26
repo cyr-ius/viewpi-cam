@@ -168,4 +168,11 @@ def create_app(config=None):
 
         return {"file_exists": file_exists}
 
+    @app.after_request
+    def set_secure_headers(response):
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        return response
+
     return app
