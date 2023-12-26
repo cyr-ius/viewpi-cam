@@ -1,5 +1,5 @@
 """Use Flask-Asssets for build and minified css and js."""
-from flask_assets import Bundle
+from flask_assets import Bundle, Environment
 
 css_main = Bundle(
     "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic",  # noqa
@@ -38,3 +38,13 @@ js_colors = Bundle(
 js_custom = Bundle(
     "../app/resources/js/custom.js", filters="jinja2,rjsmin", output="js/custom.js"
 )
+
+
+# Register Assets
+assets = Environment()
+assets.register("css_custom", css_custom)
+assets.register("css_main", css_main)
+assets.register("js_custom", js_custom)
+assets.register("js_main", js_main)
+assets.register("js_pipan", js_pipan)
+assets.register("js_colors", js_colors)
