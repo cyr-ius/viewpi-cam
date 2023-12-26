@@ -7,7 +7,7 @@ from subprocess import PIPE, Popen
 
 from flask import current_app as ca
 from flask import request, session
-from psutil import process_iter
+from psutil import ZombieProcess, process_iter
 
 from ..services.handle import ViewPiCamException
 
@@ -26,10 +26,14 @@ def reverse(url: str) -> bool:
 def get_pid(pid_type: str) -> int:
     """Return process id."""
     for proc in process_iter():
+        try:
+            cmdline = proc.cmdline()
+        except ZombieProcess:
+            cmdline = []
         if pid_type == "scheduler":
-            if "flask" and "scheduler" in proc.cmdline():
+            if "flask" and "scheduler" in cmdline:
                 return proc.pid
-        if pid_type in proc.cmdline():
+        if pid_type in cmdline:
             return proc.pid
     return 0
 
