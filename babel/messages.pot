@@ -1,0 +1,470 @@
+# Translations template for viewpicam.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the viewpicam project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: viewpicam VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-12-26 18:42+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+#: ../app/const.py:4
+msgid "AllDay"
+msgstr ""
+
+#: ../app/const.py:4
+msgid "Night"
+msgstr ""
+
+#: ../app/const.py:4
+msgid "Dawn"
+msgstr ""
+
+#: ../app/const.py:4
+msgid "Day"
+msgstr ""
+
+#: ../app/const.py:4
+msgid "Dusk"
+msgstr ""
+
+#: ../app/const.py:6
+msgid "User or password is empty."
+msgstr ""
+
+#: ../app/const.py:7
+msgid "User or password invalid."
+msgstr ""
+
+#: ../app/const.py:8
+msgid "Access id denied."
+msgstr ""
+
+#: ../app/templates/cam_settings.html:5 ../app/templates/navbar.html:18
+msgid "Camera Settings"
+msgstr ""
+
+#: ../app/templates/login.html:12 ../app/templates/totp.html:12
+msgid "Please sign in"
+msgstr ""
+
+#: ../app/templates/login.html:15 ../app/templates/settings.html:46
+#: ../app/templates/settings.html:61
+msgid "Username"
+msgstr ""
+
+#: ../app/templates/login.html:19 ../app/templates/login.html:24
+#: ../app/templates/register.html:4 ../app/templates/register.html:5
+#: ../app/templates/settings.html:47 ../app/templates/settings.html:62
+msgid "Password"
+msgstr ""
+
+#: ../app/templates/login.html:28
+msgid "Sign in"
+msgstr ""
+
+#: ../app/templates/modal_qr.html:5
+msgid "TOTP Enrollment"
+msgstr ""
+
+#: ../app/templates/modal_qr.html:27
+msgid "Close"
+msgstr ""
+
+#: ../app/templates/modal_qr.html:28
+msgid "Check OTP"
+msgstr ""
+
+#: ../app/templates/navbar.html:20 ../app/templates/navbar.html:22
+msgid "Motion Settings"
+msgstr ""
+
+#: ../app/templates/navbar.html:30
+msgid "Save Settings"
+msgstr ""
+
+#: ../app/templates/navbar.html:31
+msgid "Backup"
+msgstr ""
+
+#: ../app/templates/navbar.html:32
+msgid "Restore"
+msgstr ""
+
+#: ../app/templates/navbar.html:39
+msgid "Download Log"
+msgstr ""
+
+#: ../app/templates/navbar.html:40
+msgid "Clear Log"
+msgstr ""
+
+#: ../app/templates/navbar.html:45
+msgid "Deselect"
+msgstr ""
+
+#: ../app/templates/navbar.html:46
+msgid "Select All"
+msgstr ""
+
+#: ../app/templates/navbar.html:47
+msgid "Download Zip"
+msgstr ""
+
+#: ../app/templates/navbar.html:48
+msgid "Delete Selected"
+msgstr ""
+
+#: ../app/templates/navbar.html:49
+msgid "Delete All"
+msgstr ""
+
+#: ../app/templates/navbar.html:50
+msgid "Lock"
+msgstr ""
+
+#: ../app/templates/navbar.html:51
+msgid "Unlock"
+msgstr ""
+
+#: ../app/templates/navbar.html:56
+msgid "Download"
+msgstr ""
+
+#: ../app/templates/navbar.html:57
+msgid "Delete"
+msgstr ""
+
+#: ../app/templates/navbar.html:58
+msgid "Start convert"
+msgstr ""
+
+#: ../app/templates/navbar.html:63
+msgid "Gallery"
+msgstr ""
+
+#: ../app/templates/navbar.html:67
+msgid "System"
+msgstr ""
+
+#: ../app/templates/navbar.html:74
+msgid "Display"
+msgstr ""
+
+#: ../app/templates/navbar.html:78 ../app/templates/settings.html:5
+msgid "Settings"
+msgstr ""
+
+#: ../app/templates/navbar.html:79 ../app/templates/schedule.html:5
+msgid "Scheduler"
+msgstr ""
+
+#: ../app/templates/navbar.html:82
+msgid "Restart application"
+msgstr ""
+
+#: ../app/templates/navbar.html:83
+msgid "Restart system"
+msgstr ""
+
+#: ../app/templates/navbar.html:84
+msgid "Shutdown system"
+msgstr ""
+
+#: ../app/templates/navbar.html:85
+msgid "Reset settings"
+msgstr ""
+
+#: ../app/templates/navbar.html:87
+msgid "Show log"
+msgstr ""
+
+#: ../app/templates/navbar.html:92
+msgid "Help"
+msgstr ""
+
+#: ../app/templates/navbar.html:97
+msgid "Logout"
+msgstr ""
+
+#: ../app/templates/preview.html:12
+msgid "Prev"
+msgstr ""
+
+#: ../app/templates/preview.html:16
+msgid "Next"
+msgstr ""
+
+#: ../app/templates/preview.html:20
+msgid "Ordering"
+msgstr ""
+
+#: ../app/templates/preview.html:23
+msgid "Ascending"
+msgstr ""
+
+#: ../app/templates/preview.html:24
+msgid "Descending"
+msgstr ""
+
+#: ../app/templates/preview.html:27
+msgid "Types"
+msgstr ""
+
+#: ../app/templates/preview.html:30
+msgid "Images &amp Videos"
+msgstr ""
+
+#: ../app/templates/preview.html:31
+msgid "Images only"
+msgstr ""
+
+#: ../app/templates/preview.html:32
+msgid "Videos only"
+msgstr ""
+
+#: ../app/templates/preview.html:35
+msgid "Filter"
+msgstr ""
+
+#: ../app/templates/preview.html:38
+msgid "All"
+msgstr ""
+
+#: ../app/templates/preview.html:40 ../app/templates/preview.html:42
+msgid "hours old"
+msgstr ""
+
+#: ../app/templates/preview.html:48
+msgid "No videos/images saved"
+msgstr ""
+
+#: ../app/templates/schedule.html:8
+msgid "Time Offset"
+msgstr ""
+
+#: ../app/templates/schedule.html:9
+msgid "Sunrise"
+msgstr ""
+
+#: ../app/templates/schedule.html:10
+msgid "Sunset"
+msgstr ""
+
+#: ../app/templates/schedule.html:11
+msgid "Current"
+msgstr ""
+
+#: ../app/templates/schedule.html:12 ../app/templates/schedule.html:170
+msgid "Period"
+msgstr ""
+
+#: ../app/templates/schedule.html:15
+msgid "Motion - Fifo In"
+msgstr ""
+
+#: ../app/templates/schedule.html:19
+msgid "Control - Fifo Out"
+msgstr ""
+
+#: ../app/templates/schedule.html:25
+msgid "AutoCamera"
+msgstr ""
+
+#: ../app/templates/schedule.html:29 ../app/templates/schedule.html:36
+#: ../app/templates/schedule.html:122
+msgid "seconds"
+msgstr ""
+
+#: ../app/templates/schedule.html:32
+msgid "AutoCapture"
+msgstr ""
+
+#: ../app/templates/schedule.html:41
+msgid "Cmd Poll"
+msgstr ""
+
+#: ../app/templates/schedule.html:45
+msgid "DawnStart"
+msgstr ""
+
+#: ../app/templates/schedule.html:49 ../app/templates/schedule.html:58
+#: ../app/templates/schedule.html:75 ../app/templates/schedule.html:82
+msgid "minutes"
+msgstr ""
+
+#: ../app/templates/schedule.html:54
+msgid "DayEnd"
+msgstr ""
+
+#: ../app/templates/schedule.html:61
+msgid "Day Mode"
+msgstr ""
+
+#: ../app/templates/schedule.html:71
+msgid "DayStart"
+msgstr ""
+
+#: ../app/templates/schedule.html:78
+msgid "DuskEnd"
+msgstr ""
+
+#: ../app/templates/schedule.html:87
+msgid "Purge Video"
+msgstr ""
+
+#: ../app/templates/schedule.html:94
+msgid "GMT offset"
+msgstr ""
+
+#: ../app/templates/schedule.html:104
+msgid "Latitude"
+msgstr ""
+
+#: ../app/templates/schedule.html:108
+msgid "Longitude"
+msgstr ""
+
+#: ../app/templates/schedule.html:114
+msgid "Management command"
+msgstr ""
+
+#: ../app/templates/schedule.html:118
+msgid "Management interval"
+msgstr ""
+
+#: ../app/templates/schedule.html:127
+msgid "Max capture"
+msgstr ""
+
+#: ../app/templates/schedule.html:131
+msgid "Mode Poll"
+msgstr ""
+
+#: ../app/templates/schedule.html:137
+msgid "Purge image"
+msgstr ""
+
+#: ../app/templates/schedule.html:141 ../app/templates/schedule.html:148
+msgid "hours"
+msgstr ""
+
+#: ../app/templates/schedule.html:144
+msgid "Purge lapse"
+msgstr ""
+
+#: ../app/templates/schedule.html:153
+msgid "Purge space level"
+msgstr ""
+
+#: ../app/templates/schedule.html:157
+msgid "Purge Mode"
+msgstr ""
+
+#: ../app/templates/schedule.html:171
+msgid "Days Su-Sa"
+msgstr ""
+
+#: ../app/templates/schedule.html:172
+msgid "Motion Start"
+msgstr ""
+
+#: ../app/templates/schedule.html:173
+msgid "Motion Stop"
+msgstr ""
+
+#: ../app/templates/schedule.html:174
+msgid "Period Start"
+msgstr ""
+
+#: ../app/templates/schedule.html:177
+msgid "All Days"
+msgstr ""
+
+#: ../app/templates/settings.html:8
+msgid "Users buttons"
+msgstr ""
+
+#: ../app/templates/settings.html:18 ../app/templates/settings.html:29
+msgid "Name"
+msgstr ""
+
+#: ../app/templates/settings.html:22 ../app/templates/settings.html:33
+msgid "Other"
+msgstr ""
+
+#: ../app/templates/settings.html:39
+msgid "Users"
+msgstr ""
+
+#: ../app/templates/settings.html:76
+msgid "Token camera"
+msgstr ""
+
+#: ../app/templates/settings.html:76 ../app/templates/settings.html:94
+msgid ""
+"The generation of the token allows it to be passed as a parameter of the "
+"pages to avoid authentication."
+msgstr ""
+
+#: ../app/templates/settings.html:84 ../app/templates/settings.html:102
+msgid "Generate"
+msgstr ""
+
+#: ../app/templates/settings.html:85 ../app/templates/settings.html:103
+msgid "Reset"
+msgstr ""
+
+#: ../app/templates/settings.html:87
+msgid "Stream view"
+msgstr ""
+
+#: ../app/templates/settings.html:88
+msgid "Last Picture"
+msgstr ""
+
+#: ../app/templates/settings.html:110
+msgid "Options"
+msgstr ""
+
+#: ../app/templates/settings.html:150
+msgid "Macros"
+msgstr ""
+
+#: ../app/templates/settings.html:170
+msgid "Execute"
+msgstr ""
+
+#: ../app/templates/settings.html:175
+msgid "Multiview"
+msgstr ""
+
+#: ../app/templates/settings.html:175
+msgid "Add multiple camera display on same page"
+msgstr ""
+
+#: ../app/templates/settings.html:175
+msgid "View"
+msgstr ""
+
+#: ../app/templates/settings.html:196
+msgid "Debug"
+msgstr ""
+
+#: ../app/templates/settings.html:198
+msgid "Verbose level"
+msgstr ""
+
+#: ../app/templates/totp.html:19
+msgid "Check"
+msgstr ""
+
