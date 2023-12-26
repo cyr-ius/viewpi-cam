@@ -7,7 +7,7 @@ basedir = os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
 
 # GENERAL SETTINGS
 SITE_NAME = "ViewPI Camera"
-VERSION = os.getenv("VERSION", "v0.0.0")
+VERSION = "0.0.0"
 
 # BASIC APP CONFIG
 SECRET_KEY = os.getenv("SECRET_KEY", "12345678900987654321")
@@ -46,8 +46,7 @@ CONVERT_CMD = "/usr/bin/ffmpeg -f image2 -i i_%05d.jpg"
 USERLEVEL = LEVELS
 # Locales
 LOCALES = ["en", "fr"]
-
-# MACROS
+# Macros name files
 MACROS = [
     "error_soft",
     "error_hard",
@@ -60,9 +59,16 @@ MACROS = [
     "motion_event",
     "startstop",
 ]
+# Period day
 PERIODS = LBL_PERIODS
+# Filter number
 TIME_FILTER_MAX = 8
+# Schedule range
 SCHEDULE_TIMES_MAX = 12
+
+# Starts services
+SVC_RASPIMJPEG = os.getenv("SVC_RASPIMJPEG", "1")
+SVC_SCHEDULER = os.getenv("SVC_SCHEDULER", "1")
 
 # API Swagger documentation
 SWAGGER_UI_DOC_EXPANSION = "list"
