@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-10-24 12:04+0200\n"
+"POT-Creation-Date: 2023-12-26 18:42+0100\n"
 "PO-Revision-Date: 2023-10-23 20:00+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -16,455 +16,456 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.14.0\n"
 
-#: app/const.py:4
+#: ../app/const.py:4
 msgid "AllDay"
 msgstr "Tous les jours"
 
-#: app/const.py:4
+#: ../app/const.py:4
 msgid "Night"
 msgstr "Nuit"
 
-#: app/const.py:4
+#: ../app/const.py:4
 msgid "Dawn"
 msgstr "Aube"
 
-#: app/const.py:4
+#: ../app/const.py:4
 msgid "Day"
 msgstr "Jour"
 
-#: app/const.py:4
+#: ../app/const.py:4
 msgid "Dusk"
 msgstr "Crépuscule"
 
-#: app/const.py:6
+#: ../app/const.py:6
 msgid "User or password is empty."
 msgstr "Utilisateur ou mot de passe manquant"
 
-#: app/const.py:7
+#: ../app/const.py:7
 msgid "User or password invalid."
 msgstr "Utilisateur ou mot de passe incorrecte"
 
-#: app/const.py:8
+#: ../app/const.py:8
 msgid "Access id denied."
 msgstr "Accès refusé"
 
-#: app/templates/cam_settings.html:5 app/templates/navbar.html:18
+#: ../app/templates/cam_settings.html:5 ../app/templates/navbar.html:18
 msgid "Camera Settings"
 msgstr "Paramètres caméra"
 
-#: app/templates/login.html:12 app/templates/totp.html:12
+#: ../app/templates/login.html:12 ../app/templates/totp.html:12
 msgid "Please sign in"
 msgstr "Une signature"
 
-#: app/templates/login.html:15 app/templates/settings.html:46
-#: app/templates/settings.html:61
+#: ../app/templates/login.html:15 ../app/templates/settings.html:46
+#: ../app/templates/settings.html:61
 msgid "Username"
 msgstr "Utilisateur"
 
-#: app/templates/login.html:19 app/templates/login.html:24
-#: app/templates/register.html:4 app/templates/register.html:5
-#: app/templates/settings.html:47 app/templates/settings.html:62
+#: ../app/templates/login.html:19 ../app/templates/login.html:24
+#: ../app/templates/register.html:4 ../app/templates/register.html:5
+#: ../app/templates/settings.html:47 ../app/templates/settings.html:62
 msgid "Password"
 msgstr "Mot de passe"
 
-#: app/templates/login.html:28
+#: ../app/templates/login.html:28
 msgid "Sign in"
 msgstr "Connection"
 
-#: app/templates/modal_qr.html:5
+#: ../app/templates/modal_qr.html:5
 msgid "TOTP Enrollment"
 msgstr "Enrolement OTP"
 
-#: app/templates/modal_qr.html:27
+#: ../app/templates/modal_qr.html:27
 msgid "Close"
 msgstr "Fermer"
 
-#: app/templates/modal_qr.html:28
+#: ../app/templates/modal_qr.html:28
 msgid "Check OTP"
 msgstr "Vérification du code"
 
-#: app/templates/navbar.html:20 app/templates/navbar.html:22
+#: ../app/templates/navbar.html:20 ../app/templates/navbar.html:22
 msgid "Motion Settings"
 msgstr "Paramètres du mouvement"
 
-#: app/templates/navbar.html:30
+#: ../app/templates/navbar.html:30
 msgid "Save Settings"
 msgstr "Enregistrer"
 
-#: app/templates/navbar.html:31
+#: ../app/templates/navbar.html:31
 msgid "Backup"
 msgstr "Sauvegarder"
 
-#: app/templates/navbar.html:32
+#: ../app/templates/navbar.html:32
 msgid "Restore"
 msgstr "Restaurer"
 
-#: app/templates/navbar.html:39
+#: ../app/templates/navbar.html:39
 msgid "Download Log"
 msgstr "Télécharger"
 
-#: app/templates/navbar.html:40
+#: ../app/templates/navbar.html:40
 msgid "Clear Log"
 msgstr "Nettoyer"
 
-#: app/templates/navbar.html:45
+#: ../app/templates/navbar.html:45
 msgid "Deselect"
 msgstr "Déselectionner"
 
-#: app/templates/navbar.html:46
+#: ../app/templates/navbar.html:46
 msgid "Select All"
 msgstr "Tous sélectionner"
 
-#: app/templates/navbar.html:47
+#: ../app/templates/navbar.html:47
 msgid "Download Zip"
 msgstr "Télécharger Zip"
 
-#: app/templates/navbar.html:48
+#: ../app/templates/navbar.html:48
 msgid "Delete Selected"
 msgstr "Effacer sélection"
 
-#: app/templates/navbar.html:49
+#: ../app/templates/navbar.html:49
 msgid "Delete All"
 msgstr "Tous effacer"
 
-#: app/templates/navbar.html:50
+#: ../app/templates/navbar.html:50
 msgid "Lock"
 msgstr "Verrouillé"
 
-#: app/templates/navbar.html:51
+#: ../app/templates/navbar.html:51
 msgid "Unlock"
 msgstr "Déverrouillé"
 
-#: app/templates/navbar.html:56
+#: ../app/templates/navbar.html:56
 msgid "Download"
 msgstr "Télécharger"
 
-#: app/templates/navbar.html:57
+#: ../app/templates/navbar.html:57
 msgid "Delete"
 msgstr "Effacer"
 
-#: app/templates/navbar.html:58
+#: ../app/templates/navbar.html:58
 msgid "Start convert"
 msgstr "Démarré conversion"
 
-#: app/templates/navbar.html:63
+#: ../app/templates/navbar.html:63
 msgid "Gallery"
 msgstr "Galerie"
 
-#: app/templates/navbar.html:67
+#: ../app/templates/navbar.html:67
 msgid "System"
 msgstr "Système"
 
-#: app/templates/navbar.html:74
+#: ../app/templates/navbar.html:74
 msgid "Display"
 msgstr "Affichage"
 
-#: app/templates/navbar.html:78 app/templates/settings.html:5
+#: ../app/templates/navbar.html:78 ../app/templates/settings.html:5
 msgid "Settings"
 msgstr "Paramètres"
 
-#: app/templates/navbar.html:79 app/templates/schedule.html:5
+#: ../app/templates/navbar.html:79 ../app/templates/schedule.html:5
 msgid "Scheduler"
 msgstr "Plannificateur"
 
-#: app/templates/navbar.html:82
+#: ../app/templates/navbar.html:82
 msgid "Restart application"
 msgstr "Redémarrage applicatif"
 
-#: app/templates/navbar.html:83
+#: ../app/templates/navbar.html:83
 msgid "Restart system"
 msgstr "Redémarrage système"
 
-#: app/templates/navbar.html:84
+#: ../app/templates/navbar.html:84
 msgid "Shutdown system"
 msgstr "Arrêt"
 
-#: app/templates/navbar.html:85
+#: ../app/templates/navbar.html:85
 msgid "Reset settings"
 msgstr "Réinitialiser paramètres"
 
-#: app/templates/navbar.html:87
+#: ../app/templates/navbar.html:87
 msgid "Show log"
 msgstr "Voir log"
 
-#: app/templates/navbar.html:92
+#: ../app/templates/navbar.html:92
 msgid "Help"
 msgstr "Aide"
 
-#: app/templates/navbar.html:97
+#: ../app/templates/navbar.html:97
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: app/templates/preview.html:12
+#: ../app/templates/preview.html:12
 msgid "Prev"
 msgstr "Précédent"
 
-#: app/templates/preview.html:16
+#: ../app/templates/preview.html:16
 msgid "Next"
 msgstr "Suivant"
 
-#: app/templates/preview.html:20
+#: ../app/templates/preview.html:20
 msgid "Ordering"
 msgstr "Trier"
 
-#: app/templates/preview.html:23
+#: ../app/templates/preview.html:23
 msgid "Ascending"
 msgstr "Ascendant"
 
-#: app/templates/preview.html:24
+#: ../app/templates/preview.html:24
 msgid "Descending"
 msgstr "Descendant"
 
-#: app/templates/preview.html:27
+#: ../app/templates/preview.html:27
 msgid "Types"
 msgstr ""
 
-#: app/templates/preview.html:30
+#: ../app/templates/preview.html:30
 msgid "Images &amp Videos"
 msgstr "Images &amp vidéos"
 
-#: app/templates/preview.html:31
+#: ../app/templates/preview.html:31
 msgid "Images only"
 msgstr "Images"
 
-#: app/templates/preview.html:32
+#: ../app/templates/preview.html:32
 msgid "Videos only"
 msgstr "Vidéos"
 
-#: app/templates/preview.html:35
+#: ../app/templates/preview.html:35
 msgid "Filter"
 msgstr "Filtrer"
 
-#: app/templates/preview.html:38
+#: ../app/templates/preview.html:38
 msgid "All"
 msgstr "Tous"
 
-#: app/templates/preview.html:40 app/templates/preview.html:42
+#: ../app/templates/preview.html:40 ../app/templates/preview.html:42
 msgid "hours old"
 msgstr "heures"
 
-#: app/templates/preview.html:48
+#: ../app/templates/preview.html:48
 msgid "No videos/images saved"
 msgstr "Aucunes vidéos/images"
 
-#: app/templates/schedule.html:8
+#: ../app/templates/schedule.html:8
 msgid "Time Offset"
 msgstr "Décalage horaire"
 
-#: app/templates/schedule.html:9
+#: ../app/templates/schedule.html:9
 msgid "Sunrise"
 msgstr "Lever du soleil"
 
-#: app/templates/schedule.html:10
+#: ../app/templates/schedule.html:10
 msgid "Sunset"
 msgstr "Coucher du soleil"
 
-#: app/templates/schedule.html:11
+#: ../app/templates/schedule.html:11
 msgid "Current"
 msgstr "Actuel"
 
-#: app/templates/schedule.html:12 app/templates/schedule.html:170
+#: ../app/templates/schedule.html:12 ../app/templates/schedule.html:170
 msgid "Period"
 msgstr "Période"
 
-#: app/templates/schedule.html:15
+#: ../app/templates/schedule.html:15
 msgid "Motion - Fifo In"
 msgstr ""
 
-#: app/templates/schedule.html:19
+#: ../app/templates/schedule.html:19
 msgid "Control - Fifo Out"
 msgstr ""
 
-#: app/templates/schedule.html:25
+#: ../app/templates/schedule.html:25
 msgid "AutoCamera"
 msgstr "Caméra auto."
 
-#: app/templates/schedule.html:29 app/templates/schedule.html:36
-#: app/templates/schedule.html:122
+#: ../app/templates/schedule.html:29 ../app/templates/schedule.html:36
+#: ../app/templates/schedule.html:122
 msgid "seconds"
 msgstr "secondes"
 
-#: app/templates/schedule.html:32
+#: ../app/templates/schedule.html:32
 msgid "AutoCapture"
 msgstr "Capture auto."
 
-#: app/templates/schedule.html:41
+#: ../app/templates/schedule.html:41
 msgid "Cmd Poll"
 msgstr ""
 
-#: app/templates/schedule.html:45
+#: ../app/templates/schedule.html:45
 msgid "DawnStart"
 msgstr "Début de l'aube"
 
-#: app/templates/schedule.html:49 app/templates/schedule.html:58
-#: app/templates/schedule.html:75 app/templates/schedule.html:82
+#: ../app/templates/schedule.html:49 ../app/templates/schedule.html:58
+#: ../app/templates/schedule.html:75 ../app/templates/schedule.html:82
 msgid "minutes"
 msgstr ""
 
-#: app/templates/schedule.html:54
+#: ../app/templates/schedule.html:54
 msgid "DayEnd"
 msgstr "Fin du jour"
 
-#: app/templates/schedule.html:61
+#: ../app/templates/schedule.html:61
 msgid "Day Mode"
 msgstr "Mode"
 
-#: app/templates/schedule.html:71
+#: ../app/templates/schedule.html:71
 msgid "DayStart"
 msgstr "Début du jour"
 
-#: app/templates/schedule.html:78
+#: ../app/templates/schedule.html:78
 msgid "DuskEnd"
 msgstr "Fin du Crépuscule"
 
-#: app/templates/schedule.html:87
+#: ../app/templates/schedule.html:87
 msgid "Purge Video"
 msgstr ""
 
-#: app/templates/schedule.html:94
+#: ../app/templates/schedule.html:94
 msgid "GMT offset"
 msgstr "Fuseau horaire"
 
-#: app/templates/schedule.html:104
+#: ../app/templates/schedule.html:104
 msgid "Latitude"
 msgstr ""
 
-#: app/templates/schedule.html:108
+#: ../app/templates/schedule.html:108
 msgid "Longitude"
 msgstr ""
 
-#: app/templates/schedule.html:114
+#: ../app/templates/schedule.html:114
 msgid "Management command"
 msgstr ""
 
-#: app/templates/schedule.html:118
+#: ../app/templates/schedule.html:118
 msgid "Management interval"
 msgstr ""
 
-#: app/templates/schedule.html:127
+#: ../app/templates/schedule.html:127
 msgid "Max capture"
 msgstr "Captures max."
 
-#: app/templates/schedule.html:131
+#: ../app/templates/schedule.html:131
 msgid "Mode Poll"
 msgstr ""
 
-#: app/templates/schedule.html:137
+#: ../app/templates/schedule.html:137
 msgid "Purge image"
 msgstr ""
 
-#: app/templates/schedule.html:141 app/templates/schedule.html:148
+#: ../app/templates/schedule.html:141 ../app/templates/schedule.html:148
 msgid "hours"
 msgstr "heures"
 
-#: app/templates/schedule.html:144
+#: ../app/templates/schedule.html:144
 msgid "Purge lapse"
 msgstr ""
 
-#: app/templates/schedule.html:153
+#: ../app/templates/schedule.html:153
 msgid "Purge space level"
 msgstr ""
 
-#: app/templates/schedule.html:157
+#: ../app/templates/schedule.html:157
 msgid "Purge Mode"
 msgstr "Mode de purge"
 
-#: app/templates/schedule.html:171
+#: ../app/templates/schedule.html:171
 msgid "Days Su-Sa"
 msgstr "Jours Sam-Dim"
 
-#: app/templates/schedule.html:172
+#: ../app/templates/schedule.html:172
 msgid "Motion Start"
 msgstr "Actions - début détection"
 
-#: app/templates/schedule.html:173
+#: ../app/templates/schedule.html:173
 msgid "Motion Stop"
 msgstr "Actions - fin détection"
 
-#: app/templates/schedule.html:174
+#: ../app/templates/schedule.html:174
 msgid "Period Start"
 msgstr "Actions - début période"
 
-#: app/templates/schedule.html:177
+#: ../app/templates/schedule.html:177
 msgid "All Days"
 msgstr "Tous les jours"
 
-#: app/templates/settings.html:8
+#: ../app/templates/settings.html:8
 msgid "Users buttons"
 msgstr "Boutons utilisateurs"
 
-#: app/templates/settings.html:18 app/templates/settings.html:29
+#: ../app/templates/settings.html:18 ../app/templates/settings.html:29
 msgid "Name"
 msgstr "Nom"
 
-#: app/templates/settings.html:22 app/templates/settings.html:33
+#: ../app/templates/settings.html:22 ../app/templates/settings.html:33
 msgid "Other"
 msgstr "Autre"
 
-#: app/templates/settings.html:39
+#: ../app/templates/settings.html:39
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: app/templates/settings.html:76
+#: ../app/templates/settings.html:76
 msgid "Token camera"
 msgstr "Jeton caméra"
 
-#: app/templates/settings.html:76 app/templates/settings.html:94
+#: ../app/templates/settings.html:76 ../app/templates/settings.html:94
 msgid ""
 "The generation of the token allows it to be passed as a parameter of the "
 "pages to avoid authentication."
 msgstr ""
 
-#: app/templates/settings.html:84 app/templates/settings.html:102
+#: ../app/templates/settings.html:84 ../app/templates/settings.html:102
 msgid "Generate"
 msgstr "Générer"
 
-#: app/templates/settings.html:85 app/templates/settings.html:103
+#: ../app/templates/settings.html:85 ../app/templates/settings.html:103
 msgid "Reset"
 msgstr "Réinitialiser"
 
-#: app/templates/settings.html:87
+#: ../app/templates/settings.html:87
 msgid "Stream view"
 msgstr "Live"
 
-#: app/templates/settings.html:88
+#: ../app/templates/settings.html:88
 msgid "Last Picture"
 msgstr "Dernière image"
 
-#: app/templates/settings.html:110
+#: ../app/templates/settings.html:110
 msgid "Options"
 msgstr ""
 
-#: app/templates/settings.html:150
+#: ../app/templates/settings.html:150
 msgid "Macros"
 msgstr ""
 
-#: app/templates/settings.html:170
+#: ../app/templates/settings.html:170
 msgid "Execute"
 msgstr "Executer"
 
-#: app/templates/settings.html:175
+#: ../app/templates/settings.html:175
 msgid "Multiview"
 msgstr "Voir"
 
-#: app/templates/settings.html:175
+#: ../app/templates/settings.html:175
 msgid "Add multiple camera display on same page"
 msgstr "Ajouter plusieurs caméras sur une page"
 
-#: app/templates/settings.html:175
+#: ../app/templates/settings.html:175
 msgid "View"
 msgstr "Voir"
 
-#: app/templates/settings.html:196
+#: ../app/templates/settings.html:196
 msgid "Debug"
 msgstr ""
 
-#: app/templates/settings.html:198
+#: ../app/templates/settings.html:198
 msgid "Verbose level"
 msgstr "Niveau"
 
-#: app/templates/totp.html:19
+#: ../app/templates/totp.html:19
 msgid "Check"
 msgstr "Vérifier"
+
