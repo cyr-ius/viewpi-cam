@@ -1,4 +1,5 @@
 __pycache__
+*_cache
 .webassets-cache
 .venv
 *.code-workspace
@@ -6,3 +7,5 @@ __pycache__
 static/
 media/
 system/
+macros/
+h264/
