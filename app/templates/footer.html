@@ -18,7 +18,7 @@ $(function(){
     if (data) {
       let last_version = data.app_version
       if (data.update_available == 1) {
-        $('#check-update').html(`New version ${last_version} detected, please update`)
+        $('#check-update').html(`New version detected, please restart to update to ${last_version}`)
       }
       sessionStorage.app_version = last_version
     } else {
@@ -30,7 +30,7 @@ $(function(){
     $.queryData({method:"get", url:"{{url_for('api.system_version')}}", callbackSuccess:callback, callbackError:callback});
 
   if (sessionStorage.app_version && sessionStorage.app_version != '{{config.VERSION}}')
-    $('#check-update').html(`New version ${sessionStorage.app_version} detected, please update`)
+    $('#check-update').html(`New version detected, please restart to update to ${last_version}`)
 
 });
 </script>

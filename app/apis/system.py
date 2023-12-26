@@ -104,7 +104,7 @@ class Version(Resource):
             response = requests.get(ca.config["GIT_URL"], timeout=ca.config["TIMEOUT"])
             response.raise_for_status()
             rjson = response.json()
-            rjson["app_version"] = rjson.get("app_version").replace("v", "")
+            rjson["app_version"] = rjson.get("tag_name").replace("v", "")
             current_version = ca.config["VERSION"].replace("v", "")
             rjson.update(
                 {

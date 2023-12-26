@@ -16,7 +16,7 @@ SESSION_TYPE = "filesystem"
 # The host running the application
 HOSTNAME = os.uname()[1]
 # Url and timeout to fetch version from github
-GIT_URL = "https://raw.githubusercontent.com/cyr-ius/viewpi-cam/main/.version.json"
+GIT_URL = "https://api.github.com/repos/cyr-ius/viewpi-cam/releases/latest"
 TIMEOUT = 10
 # Name of this camera
 CAM_NAME = "mycam"
