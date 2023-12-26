@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Docker Buildx ARM",
+      "label": "Docker Buildx ARMvx",
       "type": "shell",
       "command": "docker",
       "args": [
@@ -13,10 +13,11 @@
         "--platform",
         "linux/arm/v6,linux/arm/v7",
         "-t",
-        "viewpicam:arm",
+        "cyrius44/viewpicam:latest",   
+        "--push",
         "."
       ],
-      "group": {
+      "group": { 
         "kind": "build",
         "isDefault": true
       },
@@ -35,7 +36,7 @@
         "--platform",
         "linux/arm/v7",
         "-t",
-        "cyr-ius/viewpicam:latest",
+        "cyr-ius/viewpicam:armhf-latest",
         "--load",
         "."
       ],
@@ -47,6 +48,29 @@
         "reveal": "silent"
       },
       "problemMatcher": []
-    }    
+    },
+    {
+      "label": "Docker Buildx ARMv6",
+      "type": "shell",
+      "command": "docker",
+      "args": [  
+        "buildx",
+        "build",
+        "--platform",
+        "linux/arm/v6",
+        "-t",
+        "cyr-ius/viewpicam:armv6-latest",
+        "--load",
+        "."
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": []
+    }            
   ]
 }
