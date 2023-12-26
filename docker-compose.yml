@@ -1,20 +1,14 @@
-version: "3.6"
+version: "3.7"
 services:
   viewpicam:
-    image: cyr-ius/viewpicam:latest
-    # build:
-    #   context: .
-    #   dockerfile: ./Dockerfile
+    image: cyrius44/viewpicam:latest
     container_name: viewpicam
     restart: unless-stopped
     environment:
       - SECRET_KEY=123456789
-    ports:
-      - 8000:8000/tcp
     volumes:
       - static_volume:/app/static
       - ./medias:/app/media:rw
-      - /opt/vc:/opt/vc
       - /dev/vchiq:/dev/vchiq
       - /dev/vcsm:/dev/vcsm
   web:
@@ -32,6 +26,7 @@ services:
 
 volumes:
   static_volume:
+
 # Onliner
 # mkdir -p /mnt/data/media /mnt/data/h264 /mnt/data/macros /mnt/data/system
 # docker pull ghcr.io/cyr-ius/viewpi-cam:latest

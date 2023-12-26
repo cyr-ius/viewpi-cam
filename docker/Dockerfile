@@ -2,7 +2,7 @@ FROM alpine:3.18 AS builder
 
 WORKDIR /app
 
-RUN apk update && apk add --no-cache build-base git
+RUN apk update && apk add --no-cache build-base git cmake bash make linux-headers
 RUN git clone https://github.com/gpac/gpac.git gpac-master
 
 WORKDIR /app/gpac-master
@@ -12,12 +12,11 @@ RUN make -j`nproc`
 
 WORKDIR /app
 
-RUN apk update && apk add --no-cache build-base git cmake bash make linux-headers
-RUN git clone --branch 5.10.3 https://github.com/cyr-ius/userland.git
+RUN git clone --branch 5.10.3 https://github.com/cyr-ius/userland.git userland
+
 WORKDIR /app/userland
 RUN sed -i 's/sudo//g' buildme
 RUN /bin/bash -c ./buildme
-
 
 FROM python:3.11-alpine
 WORKDIR /app
@@ -60,9 +59,9 @@ RUN apk del build
 # Create folders
 RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
 
-ADD raspimjpeg /etc/
-ADD --chmod=744 macros/* /app/macros/
-
+ADD docker/raspimjpeg /etc/
+ADD --chmod=744 docker/macros/* /app/macros/
+ADD --chmod=744 docker/docker-entrypoint.sh /
 ADD app ./app/
 
 VOLUME /app/static
@@ -71,9 +70,7 @@ VOLUME /app/media
 VOLUME /app/h264
 VOLUME /app/system
 
-ARG VERSION
-ENV VERSION ${VERSION}
-
-ADD --chmod=744 docker-entrypoint.sh /
-EXPOSE 8000
+EXPOSE 8000/tcp
+HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1/"]
 ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["gunicorn","app:create_app()"]

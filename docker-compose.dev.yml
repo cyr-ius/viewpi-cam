@@ -1,11 +1,10 @@
 version: "3.6"
 services:
   viewpicam:
-    image: cyr-ius/viewpicam:latest
     container_name: viewpicam
-    # build:
-    #   context: .
-    #   dockerfile: ./Dockerfile
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
     entrypoint:
       [
         "sh",

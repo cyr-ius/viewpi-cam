@@ -15,6 +15,8 @@
         "-t",
         "cyrius44/viewpicam:latest",   
         "--push",
+        "--file",
+        "./docker/Dockerfile",        
         "."
       ],
       "group": { 
@@ -38,6 +40,8 @@
         "-t",
         "cyr-ius/viewpicam:armhf-latest",
         "--load",
+        "--file",
+        "./docker/Dockerfile",        
         "."
       ],
       "group": {
@@ -61,6 +65,8 @@
         "-t",
         "cyr-ius/viewpicam:armv6-latest",
         "--load",
+        "--file",
+        "./docker/Dockerfile",
         "."
       ],
       "group": {
