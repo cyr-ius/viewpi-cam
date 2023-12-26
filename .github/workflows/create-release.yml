@@ -40,27 +40,3 @@ jobs:
       packages: write
       id-token: write
     uses: ./.github/workflows/docker-publish.yml
-
-  version:
-    needs: publish
-    if: ${{ !contains(github.ref_name,'-') }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Modify version number
-        uses: mingjun97/file-regex-replace@v1
-        with:
-          regex: '"app_version": "([0-9\.]*)"'
-          replacement: '"app_version": "${{ github.ref_name }}"'
-          include: '.version.json'
-          encoding: 'utf8'
-          path: '.'
-
-      - name: Commit & Push changes
-        uses: actions-js/push@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
