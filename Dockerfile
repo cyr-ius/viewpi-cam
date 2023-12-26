@@ -1,4 +1,4 @@
-FROM alpine:3.18 AS gpac_builder
+FROM alpine:3.18 AS builder
 
 WORKDIR /app
 
@@ -9,8 +9,6 @@ WORKDIR /app/gpac-master
 
 RUN ./configure --static-bin --use-zlib=no --prefix=/usr/bin
 RUN make -j`nproc`
-
-FROM alpine:3.18 AS userland_builder
 
 WORKDIR /app
 
@@ -25,10 +23,10 @@ FROM python:3.11-alpine
 WORKDIR /app
 
 # Add binaries
-COPY --from=gpac_builder /app/gpac-master/bin/gcc/MP4Box /usr/bin
-COPY --from=gpac_builder /app/gpac-master/bin/gcc/gpac /usr/bin
-COPY --from=userland_builder /app/userland/build/bin /usr/bin
-COPY --from=userland_builder /app/userland/build/lib /usr/lib
+COPY --from=builder /app/gpac-master/bin/gcc/MP4Box /usr/bin
+COPY --from=builder /app/gpac-master/bin/gcc/gpac /usr/bin
+COPY --from=builder /app/userland/build/bin /usr/bin
+COPY --from=builder /app/userland/build/lib /usr/lib
 
 # set version label
 LABEL org.opencontainers.image.source https://github.com/cyr-ius/viewpi-cam
@@ -47,7 +45,7 @@ RUN apk add --no-cache libstdc++
 RUN apk add --no-cache --virtual build build-base python3-dev cmake make gcc linux-headers ninja git rust cargo libressl-dev
 
 # Venv python
-RUN python3 -m venv --system-site-packages  --upgrade-deps /env
+RUN python3 -m venv --system-site-packages --upgrade-deps /env
 ENV VIRTUAL_ENV /env
 ENV PATH $PATH:/env/bin
 
@@ -75,7 +73,6 @@ VOLUME /app/system
 
 ARG VERSION
 ENV VERSION ${VERSION}
-ENV PYTHONPATH=/usr/lib/python3.11/site-packages
 
 ADD --chmod=744 docker-entrypoint.sh /
 EXPOSE 8000
