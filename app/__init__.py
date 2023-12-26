@@ -65,9 +65,6 @@ def create_app(config=None):
     if "FLASK_CONF" in os.environ:
         app.config.from_envvar("FLASK_CONF")
 
-    # Load config from environment variables
-    app.config.from_prefixed_env()
-
     # Load app's components
     assets.init_app(app)
     babel.init_app(app, locale_selector=get_locale, timezone_selector=get_timezone)
@@ -112,11 +109,13 @@ def create_app(config=None):
             app.logger.error(error)
 
     # Start raspimjpeg
-    if "NO_RASPIMJPEG" not in os.environ and not get_pid(app.config["RASPI_BINARY"]):
+    if bool(int(app.config["SVC_RASPIMJPEG"])) and not get_pid(
+        app.config["RASPI_BINARY"]
+    ):
         app.raspiconfig.start()
 
     # Start scheduler
-    if "NO_SCHEDULER" not in os.environ:
+    if bool(int(app.config["SVC_SCHEDULER"])):
         launch_schedule()
 
     @app.context_processor
