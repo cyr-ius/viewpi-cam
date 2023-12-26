@@ -4,45 +4,23 @@ import os
 import shutil
 
 from flask import Flask
-from flask_assets import Environment
 from flask_babel import Babel
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from .apis import bp as api_bp
-from .blueprints.auth import bp as auth_bp
-from .blueprints.camera import bp as cam_bp
-from .blueprints.main import bp as main_bp
-from .blueprints.motion import bp as motion_bp
-from .blueprints.preview import bp as pview_bp
-from .blueprints.schedule import bp as sch_bp
+from . import blueprints
 from .blueprints.schedule import launch_schedule
-from .blueprints.settings import bp as sets_bp
 from .helpers.raspiconfig import RaspiConfig
 from .helpers.settings import Settings
 from .helpers.usrmgmt import Usrmgmt
 from .helpers.utils import execute_cmd, get_locale, get_pid, get_timezone
-from .services.assets import (
-    css_custom,
-    css_main,
-    js_colors,
-    js_custom,
-    js_main,
-    js_pipan,
-)
-from .services.handle import (
-    ViewPiCamException,
-    handle_access_forbidden,
-    handle_bad_gateway,
-    handle_bad_request,
-    handle_internal_server_error,
-    handle_page_not_found,
-)
+from .services.assets import assets
+from .services.handle import ErrorHandler, ViewPiCamException
 
-assets = Environment()
 babel = Babel()
 settings = Settings()
 raspiconfig = RaspiConfig()
 usrmgmt = Usrmgmt()
+errorhandler = ErrorHandler()
 
 
 # pylint: disable=E1101,W0613
@@ -87,9 +65,14 @@ def create_app(config=None):
     if "FLASK_CONF" in os.environ:
         app.config.from_envvar("FLASK_CONF")
 
+    # Load config from environment variables
+    app.config.from_prefixed_env()
+
     # Load app's components
     assets.init_app(app)
     babel.init_app(app, locale_selector=get_locale, timezone_selector=get_timezone)
+    blueprints.init_app(app)
+    errorhandler.init_app(app)
 
     # !!! Important ordering !!!
     raspiconfig.init_app(app)
@@ -101,31 +84,6 @@ def create_app(config=None):
         app.logger.setLevel(custom_level.upper())
     else:
         settings["loglevel"] = os.environ.get("LOG_LEVEL", "INFO").upper()
-
-    # Register Assets
-    assets.register("css_custom", css_custom)
-    assets.register("css_main", css_main)
-    assets.register("js_custom", js_custom)
-    assets.register("js_main", js_main)
-    assets.register("js_pipan", js_pipan)
-    assets.register("js_colors", js_colors)
-
-    # Create app blueprints
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(cam_bp)
-    app.register_blueprint(main_bp)
-    app.register_blueprint(motion_bp)
-    app.register_blueprint(pview_bp)
-    app.register_blueprint(sch_bp)
-    app.register_blueprint(sets_bp)
-    app.register_blueprint(api_bp)
-
-    # Register error handler
-    app.register_error_handler(400, handle_bad_request)
-    app.register_error_handler(403, handle_access_forbidden)
-    app.register_error_handler(404, handle_page_not_found)
-    app.register_error_handler(500, handle_internal_server_error)
-    app.register_error_handler(502, handle_bad_gateway)
 
     # Register filter
     app.jinja_env.add_extension("jinja2.ext.debug")
