@@ -19,8 +19,8 @@ SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 # Allowed extension for mask file
-ALLOWED_EXTENSIONS = ["jpg", "jpeg"]
-MASK_FILENAME = "mask.jpg"
+ALLOWED_EXTENSIONS = ["pgm"]
+MASK_FILENAME = "motionmask.pgm"
 # The host running the application
 HOSTNAME = os.uname()[1]
 # Url and timeout to fetch version from github
