@@ -47,8 +47,8 @@
             <label class="col col-form-label">Mask Image:</label>
             <div class="col">
                 <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_image" type="text" value="{{raspiconfig.motion_image}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'mi','params':$('#motion_image').val()});">OK</button>
+                    <input class="form-control form-control-sm" id="motion_image" type="file" value="{{raspiconfig.motion_image}}">
+                    <button id="mask_image" class="btn btn-sm btn-outline-secondary">OK</button>
                 </div>
             </div>
         </div>
@@ -91,3 +91,41 @@
     </div>
 </div>
 {% endblock motion_settings %}
+{% block extrascript %}
+<script>
+$('#mask_image').unbind();
+$('#mask_image').click(function () {
+
+    let fd = new FormData();
+    let files = $('#motion_image')[0].files;
+    let filename = files[0].name
+    fd.append('file',files[0]);
+    
+    success = function(data) { 
+        $.spinner({ status: false });
+        $("#toast").addClass("text-bg-primary");
+        if (data && data.responseJSON)
+            $("#toast .toast-body").html(data.responseJSON["message"]);        
+        $.sendCmd({'cmd':'mi','params':'mask.jpg'});
+    }
+    error = function(data) { 
+        $.spinner({ status: false });
+        $("#toast").removeClass("text-bg-primary").addClass("text-bg-danger");
+        $("#toast .toast-body").html(data.status + " - " + data["message"]);        
+        if (data.responseJSON)
+            $("#toast .toast-body").html(data.responseJSON["message"]);        
+    }   
+
+    $.ajax({
+        url: '{{ url_for("main.image_mask") }}',
+        type: "POST",
+        data: fd,
+        contentType: false,
+        cache: false,
+        processData:false,
+        success: success,
+        error: error         
+    });
+});
+</script>
+{%endblock%}
