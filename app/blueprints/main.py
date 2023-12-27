@@ -5,12 +5,21 @@ import urllib
 
 from flask import Blueprint, Response, abort
 from flask import current_app as ca
-from flask import g, json, render_template, request, send_file, session
+from flask import (
+    g,
+    json,
+    jsonify,
+    make_response,
+    render_template,
+    request,
+    send_file,
+    session,
+)
 
 from ..apis.logs import get_logs
 from ..const import PRESETS
 from ..helpers.decorator import auth_required, role_required
-from ..helpers.utils import write_log
+from ..helpers.utils import allowed_file, write_log
 from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
@@ -243,3 +252,18 @@ def pipan():
             file.close()
 
     return status_mjpeg()
+
+
+@bp.route("/mask", methods=["POST"])
+@auth_required
+def image_mask():
+    """Load image mask."""
+    if "file" not in request.files:
+        return make_response(jsonify({"message": "No file part"}), 422)
+    file = request.files["file"]
+    if file.filename == "":
+        return make_response(jsonify({"message": "No selected file"}), 422)
+    if file and allowed_file(file.filename):
+        file.save(os.path.join(ca.config["SYSTEM_FOLDER"], "mask.jpg"))
+        return "", 204
+    return make_response(jsonify({"message": "Format is incorrect"}), 422)
