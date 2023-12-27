@@ -20,6 +20,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 # Allowed extension for mask file
 ALLOWED_EXTENSIONS = ["jpg", "jpeg"]
+MASK_FILENAME = "mask.jpg"
 # The host running the application
 HOSTNAME = os.uname()[1]
 # Url and timeout to fetch version from github
