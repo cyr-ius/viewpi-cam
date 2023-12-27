@@ -599,7 +599,7 @@ function set_preset(value) {
 
 function set_motion_external(value){
     callbackSuccess = function(data) {
-        if (data.type != "error") {
+        if (!data) {
             if (value == "0")
                 $('#motion-mode').prop("href","#motionSetting")
             if (value == "1")
