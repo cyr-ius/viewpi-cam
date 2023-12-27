@@ -8,6 +8,7 @@ basedir = os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
 # GENERAL SETTINGS
 SITE_NAME = "ViewPI Camera"
 VERSION = "0.0.0"
+SYSTEM_FOLDER = f"{basedir}/../system"
 
 # BASIC APP CONFIG
 SECRET_KEY = os.getenv("SECRET_KEY", "12345678900987654321")
@@ -17,7 +18,8 @@ SESSION_TYPE = "filesystem"
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
-
+# Allowed extension for mask file
+ALLOWED_EXTENSIONS = ["jpg", "jpeg"]
 # The host running the application
 HOSTNAME = os.uname()[1]
 # Url and timeout to fetch version from github
@@ -37,9 +39,9 @@ THUMBNAIL_EXT = ".th.jpg"
 # Select size metho 0=python , 1=stats
 FILESIZE_METHOD = 0
 # File for settings
-FILE_SETTINGS = f"{basedir}/../system/settings.json"
-SERVO_FILE = f"{basedir}/../system/servo"
-PIPAN_FILE = f"{basedir}/../system/pipan"
+FILE_SETTINGS = f"{SYSTEM_FOLDER}/settings.json"
+SERVO_FILE = f"{SYSTEM_FOLDER}/servo"
+PIPAN_FILE = f"{SYSTEM_FOLDER}/pipan"
 # Convert command
 CONVERT_CMD = "/usr/bin/ffmpeg -f image2 -i i_%05d.jpg"
 # Userlevel
