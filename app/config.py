@@ -7,7 +7,7 @@ basedir = os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
 
 # GENERAL SETTINGS
 SITE_NAME = "ViewPI Camera"
-VERSION = "0.0.0"
+VERSION = os.getenv("VERSION", "0.0.0")
 SYSTEM_FOLDER = f"{basedir}/../system"
 
 # BASIC APP CONFIG
