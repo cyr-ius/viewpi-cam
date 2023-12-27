@@ -108,3 +108,11 @@ def launch_schedule() -> None:
     """Run scheduler."""
     if not get_pid("scheduler"):
         Popen(["flask", "scheduler", "start"], stdout=PIPE)
+
+
+def allowed_file(filename):
+    """Check allowed file extension."""
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower() in ca.config["ALLOWED_EXTENSIONS"]
+    )
