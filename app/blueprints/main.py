@@ -22,6 +22,7 @@ from ..apis.logs import get_logs
 from ..const import PRESETS
 from ..helpers.decorator import auth_required, role_required
 from ..helpers.utils import allowed_file, write_log
+from ..helpers.raspiconfig import RaspiConfigError
 from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
@@ -266,6 +267,11 @@ def image_mask():
     if file.filename == "":
         return make_response(jsonify({"message": "No selected file"}), 422)
     if file and allowed_file(file.filename):
-        file.save(os.path.join(ca.config["SYSTEM_FOLDER"], ca.config["MASK_FILENAME"]))
+        file_path = os.path.join(ca.config["SYSTEM_FOLDER"], ca.config["MASK_FILENAME"])
+        file.save(file_path)
+        try:
+            ca.raspiconfig.send(f"mi {file_path}")
+        except RaspiConfigError as error:
+            return make_response(jsonify({"message": error.args[0].strerror}), 422)
         return "", 204
     return make_response(jsonify({"message": "Format is incorrect"}), 422)
