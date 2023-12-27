@@ -70,6 +70,9 @@ VOLUME /app/media
 VOLUME /app/h264
 VOLUME /app/system
 
+ARG VERSION
+ENV VERSION ${VERSION}
+
 EXPOSE 8000/tcp
 HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1/"]
 ENTRYPOINT ["/docker-entrypoint.sh"]
