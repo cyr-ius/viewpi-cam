@@ -3,9 +3,10 @@ import os
 import time
 import urllib
 
-from flask import Blueprint, Response, abort
-from flask import current_app as ca
 from flask import (
+    Blueprint,
+    Response,
+    abort,
     g,
     json,
     jsonify,
@@ -15,6 +16,7 @@ from flask import (
     send_file,
     session,
 )
+from flask import current_app as ca
 
 from ..apis.logs import get_logs
 from ..const import PRESETS
@@ -264,6 +266,6 @@ def image_mask():
     if file.filename == "":
         return make_response(jsonify({"message": "No selected file"}), 422)
     if file and allowed_file(file.filename):
-        file.save(os.path.join(ca.config["SYSTEM_FOLDER"], "mask.jpg"))
+        file.save(os.path.join(ca.config["SYSTEM_FOLDER"], ca.config["MASK_FILENAME"]))
         return "", 204
     return make_response(jsonify({"message": "Format is incorrect"}), 422)
