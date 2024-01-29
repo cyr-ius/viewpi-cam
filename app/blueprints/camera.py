@@ -1,4 +1,5 @@
 """Blueprint for Camera."""
+
 import glob
 import os
 import time

@@ -1,4 +1,5 @@
 """Use Flask-Asssets for build and minified css and js."""
+
 from flask_assets import Bundle, Environment
 
 css_main = Bundle(

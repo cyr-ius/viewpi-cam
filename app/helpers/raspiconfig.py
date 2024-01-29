@@ -1,4 +1,5 @@
 """Class for raspimjpeg file."""
+
 import os
 import time
 from subprocess import Popen

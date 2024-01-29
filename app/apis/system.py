@@ -1,4 +1,5 @@
 """Api system."""
+
 import requests
 import semver
 from flask import current_app as ca

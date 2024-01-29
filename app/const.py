@@ -1,4 +1,5 @@
 """Constants."""
+
 from flask_babel import lazy_gettext as _
 
 LBL_PERIODS = [_("AllDay"), _("Night"), _("Dawn"), _("Day"), _("Dusk")]

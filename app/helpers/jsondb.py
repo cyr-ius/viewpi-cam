@@ -1,4 +1,5 @@
 """Class to save properties object to json file."""
+
 import json
 import logging
 import os

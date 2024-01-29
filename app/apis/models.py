@@ -1,4 +1,5 @@
 """Error handler."""
+
 import qrcode
 import qrcode.image.svg
 from flask import url_for

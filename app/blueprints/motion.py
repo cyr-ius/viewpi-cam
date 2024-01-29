@@ -1,4 +1,5 @@
 """Blueprint for Motion (external capture)."""
+
 import os
 import time
 from typing import Any

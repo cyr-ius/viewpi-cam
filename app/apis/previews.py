@@ -1,4 +1,5 @@
 """Api gallery."""
+
 from flask import current_app as ca
 from flask import request
 from flask_restx import Namespace, Resource, abort

@@ -1,4 +1,5 @@
 """Blueprint Settings."""
+
 from flask import Blueprint
 from flask import current_app as ca
 from flask import render_template

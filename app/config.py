@@ -1,4 +1,5 @@
 """Confilg file."""
+
 import os
 
 from .const import LBL_PERIODS, LEVELS

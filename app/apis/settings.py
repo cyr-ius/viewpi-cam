@@ -1,4 +1,5 @@
 """Blueprint Settings API."""
+
 import random
 from datetime import datetime as dt
 from datetime import timezone
