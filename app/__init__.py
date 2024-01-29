@@ -1,4 +1,5 @@
 """ViewPI Camera."""
+
 import logging
 import os
 import shutil

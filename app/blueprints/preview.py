@@ -1,4 +1,5 @@
 """Blueprint preview."""
+
 import os
 import shutil
 import time

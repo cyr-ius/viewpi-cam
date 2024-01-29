@@ -1,4 +1,5 @@
 """Blueprint Authentication."""
+
 from datetime import datetime as dt
 from datetime import timezone
 
