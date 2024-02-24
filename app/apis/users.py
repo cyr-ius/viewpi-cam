@@ -4,7 +4,7 @@ from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required, token_required
-from ..helpers.usrmgmt import UserNameExists
+from ..services.usrmgmt import UserNameExists
 from .models import locale, message, user, users
 
 api = Namespace(

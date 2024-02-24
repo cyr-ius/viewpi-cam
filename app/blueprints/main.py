@@ -8,7 +8,6 @@ from flask import (
     Blueprint,
     Response,
     abort,
-    g,
     json,
     jsonify,
     make_response,
@@ -22,17 +21,11 @@ from flask import current_app as ca
 from ..apis.logs import get_logs
 from ..const import PRESETS
 from ..helpers.decorator import auth_required, role_required
+from ..services.raspiconfig import RaspiConfigError
 from ..helpers.utils import allowed_file, write_log
-from ..helpers.raspiconfig import RaspiConfigError
 from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
-
-
-@bp.before_app_request
-def before_app_request():
-    """Execute before request."""
-    g.loglevel = ca.settings.loglevel
 
 
 @bp.route("/", methods=["GET"])

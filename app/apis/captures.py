@@ -5,7 +5,7 @@ from flask import request
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required, token_required
-from ..helpers.raspiconfig import RaspiConfigError
+from ..services.raspiconfig import RaspiConfigError
 from .models import forbidden, message
 
 api = Namespace(

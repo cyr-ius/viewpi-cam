@@ -6,9 +6,9 @@ from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required, token_required
-from ..helpers.raspiconfig import RaspiConfigError
+from ..services.raspiconfig import RaspiConfigError
 from ..helpers.utils import disk_usage, execute_cmd
-from ..services.handle import ViewPiCamException
+from ..helpers.exceptions import ViewPiCamException
 from .models import command, message
 
 api = Namespace(

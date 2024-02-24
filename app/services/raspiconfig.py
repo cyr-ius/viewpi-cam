@@ -5,8 +5,8 @@ import time
 from subprocess import Popen
 from typing import Any
 
-from ..services.handle import ViewPiCamException
-from .utils import execute_cmd, write_log
+from ..helpers.exceptions import ViewPiCamException
+from ..helpers.utils import execute_cmd, write_log
 
 
 # pylint: disable=E1101
@@ -67,6 +67,16 @@ class RaspiConfig:
 
         for key, value in config.items():
             setattr(self, key, value)
+
+        self._generate_folder()
+
+    def _generate_folder(self) -> None:
+        """Create files & folders."""
+        os.makedirs(os.path.dirname(self.status_file), exist_ok=True)
+        os.makedirs(os.path.dirname(self.control_file), exist_ok=True)
+        os.makedirs(self.media_path, exist_ok=True)
+        os.makedirs(self.macros_path, exist_ok=True)
+        os.makedirs(self.boxing_path, exist_ok=True)
 
     def set_config(self, config: dict[str, Any]) -> None:
         """Set raspimjpeg config."""

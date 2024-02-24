@@ -24,7 +24,7 @@ from ..helpers.filer import (
     list_folder_files,
 )
 from ..helpers.utils import disk_usage, execute_cmd, write_log
-from ..services.handle import ViewPiCamException
+from ..helpers.exceptions import ViewPiCamException
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 

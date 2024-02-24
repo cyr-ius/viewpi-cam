@@ -10,7 +10,7 @@ from flask import current_app as ca
 from flask import request, session
 from psutil import ZombieProcess, process_iter
 
-from ..services.handle import ViewPiCamException
+from .exceptions import ViewPiCamException
 
 
 def reverse(url: str) -> bool:

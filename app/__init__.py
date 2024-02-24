@@ -4,29 +4,11 @@ import logging
 import os
 import shutil
 
-from flask import Flask
-from flask_babel import Babel
+from flask import Flask, g
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from . import blueprints
-from .helpers.raspiconfig import RaspiConfig
-from .helpers.settings import Settings
-from .helpers.usrmgmt import Usrmgmt
-from .helpers.utils import (
-    execute_cmd,
-    get_locale,
-    get_pid,
-    get_timezone,
-    launch_schedule,
-)
-from .services.assets import assets
-from .services.handle import ErrorHandler, ViewPiCamException
-
-babel = Babel()
-settings = Settings()
-raspiconfig = RaspiConfig()
-usrmgmt = Usrmgmt()
-errorhandler = ErrorHandler()
+from . import apis, blueprints, services
+from .helpers.utils import get_pid, launch_schedule
 
 
 # pylint: disable=E1101,W0613
@@ -36,6 +18,10 @@ def create_app(config=None):
 
     # Create static folder outside app folder
     app.static_folder = f"{app.root_path}/../static"
+    os.makedirs(app.static_folder, exist_ok=True)
+
+    app.system_folder = f"{app.root_path}/../system"
+    os.makedirs(app.system_folder, exist_ok=True)
 
     shutil.copytree(
         f"{app.root_path}/resources/css/fonts",
@@ -71,48 +57,14 @@ def create_app(config=None):
     if "FLASK_CONF" in os.environ:
         app.config.from_envvar("FLASK_CONF")
 
-    # Load app's components
-    assets.init_app(app)
-    babel.init_app(app, locale_selector=get_locale, timezone_selector=get_timezone)
-    blueprints.init_app(app)
-    errorhandler.init_app(app)
-
-    # !!! Important ordering !!!
-    raspiconfig.init_app(app)
-    settings.init_app(app)
-    usrmgmt.init_app(app)
-
-    # Custom log level
-    if custom_level := settings.get("loglevel"):
-        app.logger.setLevel(custom_level.upper())
-    else:
-        settings["loglevel"] = os.environ.get("LOG_LEVEL", "INFO").upper()
-
     # Register filter
     app.jinja_env.add_extension("jinja2.ext.debug")
     app.jinja_env.add_extension("jinja2.ext.i18n")
 
-    # Create files & folders
-    os.makedirs(os.path.dirname(app.raspiconfig.status_file), exist_ok=True)
-    os.makedirs(os.path.dirname(app.raspiconfig.control_file), exist_ok=True)
-
-    app.system_folder = f"{app.root_path}/../system"
-    if os.path.isdir(app.system_folder) is False:
-        os.makedirs(app.system_folder, exist_ok=True)
-
-    if (media := app.raspiconfig.media_path) != "":
-        os.makedirs(media, exist_ok=True)
-    if (macros := app.raspiconfig.macros_path) != "":
-        os.makedirs(macros, exist_ok=True)
-    if (boxing := app.raspiconfig.boxing_path) != "":
-        os.makedirs(boxing, exist_ok=True)
-
-    # Set timezone
-    if offset := settings.get("gmt_offset"):
-        try:
-            execute_cmd(f"ln -sf /usr/share/zoneinfo/{offset} /etc/localtime")
-        except ViewPiCamException as error:
-            app.logger.error(error)
+    # Load app's components
+    apis.init_app(app)
+    blueprints.init_app(app)
+    services.init_app(app)
 
     # Start raspimjpeg
     if bool(int(app.config["SVC_RASPIMJPEG"])) and not get_pid(
@@ -137,5 +89,10 @@ def create_app(config=None):
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         return response
+
+    @app.before_request
+    def before_app_request():
+        """Execute before request."""
+        g.loglevel = app.settings.loglevel
 
     return app

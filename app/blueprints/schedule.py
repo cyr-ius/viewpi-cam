@@ -23,7 +23,7 @@ from ..helpers.filer import (
     is_thumbnail,
     list_folder_files,
 )
-from ..helpers.raspiconfig import RaspiConfigError
+from ..services.raspiconfig import RaspiConfigError
 from ..helpers.utils import delete_log, get_pid, write_log
 
 bp = Blueprint(

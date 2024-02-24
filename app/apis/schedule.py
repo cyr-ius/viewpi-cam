@@ -15,7 +15,7 @@ from ..const import SCHEDULE_RESET
 from ..helpers.decorator import role_required, token_required
 from ..helpers.fifo import send_motion
 from ..helpers.utils import execute_cmd, get_pid, write_log
-from ..services.handle import ViewPiCamException
+from ..helpers.exceptions import ViewPiCamException
 from .models import date_time, day, daymode, forbidden, message, period, schedule
 
 api = Namespace(

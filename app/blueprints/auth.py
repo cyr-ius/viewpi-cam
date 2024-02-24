@@ -11,7 +11,7 @@ from flask import flash, redirect, render_template, request, session, url_for
 
 from ..const import TXT_MSG_1, TXT_MSG_2, TXT_MSG_3, USERLEVEL_MAX
 from ..helpers.decorator import auth_required
-from ..helpers.usrmgmt import User
+from ..services.usrmgmt import User
 from ..helpers.utils import reverse
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
