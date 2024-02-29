@@ -57,18 +57,20 @@ RUN /env/bin/pip3 install --no-cache-dir --verbose -r /tmp/requirements.txt && r
 RUN apk del build
 
 # Create folders
-RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css
+RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css /app/db
 
 ADD docker/raspimjpeg /etc/
 ADD --chmod=744 docker/macros/* /app/macros/
 ADD --chmod=744 docker/docker-entrypoint.sh /
 ADD app ./app/
+ADD migrations ./migrations/
 
 VOLUME /app/static
 VOLUME /app/macros
 VOLUME /app/media
 VOLUME /app/h264
 VOLUME /app/system
+VOLUME /app/db
 
 ARG VERSION
 ENV VERSION ${VERSION}
