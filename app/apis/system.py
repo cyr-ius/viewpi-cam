@@ -115,7 +115,7 @@ class Version(Resource):
                 }
             )
             return rjson
-        except requests.RequestException as error:
+        except (ValueError, requests.RequestException) as error:
             abort(422, str(error))
 
 
