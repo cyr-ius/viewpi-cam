@@ -9,11 +9,11 @@ from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required, token_required
+from ..models import Settings, Ubuttons, db
 from .models import api_token, button, buttons, cam_token, macros, message, setting
 
 api = Namespace(
     "settings",
-    path="/api",
     description="Change settings",
     decorators=[token_required, role_required("max")],
 )
@@ -27,6 +27,30 @@ api.add_model("Buttons", buttons)
 
 
 @api.response(403, "Forbidden", message)
+@api.route("/")
+class Sets(Resource):
+    """Settings."""
+
+    @api.marshal_with(setting)
+    def get(self):
+        """Get settings."""
+        return Settings.query.get(1)
+
+    @api.expect(setting)
+    @api.marshal_with(setting)
+    @api.response(204, "Action is success")
+    def post(self):
+        """Set settings."""
+        if settings := Settings.query.get(1):
+            settings.update(**api.payload)
+            db.session.commit()
+            if loglevel := api.payload.get("loglevel"):
+                ca.logger.setLevel(loglevel)
+            return "", 204
+        abort(404, "settings not found")
+
+
+@api.response(403, "Forbidden", message)
 @api.route("/buttons")
 class Buttons(Resource):
     """List buttons."""
@@ -34,19 +58,17 @@ class Buttons(Resource):
     @api.marshal_with(buttons, as_list=True)
     def get(self):
         """List buttons."""
-        return ca.settings.get("ubuttons", [])
+        return Ubuttons.query.all()
 
     @api.expect(button)
     @api.marshal_with(buttons)
     def post(self):
         """Create button."""
-        if ca.settings.get("ubuttons") is None:
-            ca.settings.ubuttons = []
-        ids = [button["id"] for button in ca.settings.ubuttons]
-        api.payload["id"] = 1 if len(ids) == 0 else max(ids) + 1
-        ca.settings.ubuttons.append(api.payload)
-        ca.settings.update(ubuttons=ca.settings.ubuttons)
-        return api.payload
+        api.payload.pop("id", None)
+        ubutton = Ubuttons(**api.payload)
+        db.session.add(ubutton)
+        db.session.commit()
+        return ubutton
 
 
 @api.response(403, "Forbidden", message)
@@ -56,55 +78,30 @@ class Button(Resource):
 
     @api.marshal_with(button)
     @api.response(404, "Not found", message)
-    def get(self, id: int):  # pylint: disable=W0622
+    def get(self, id: int):
         """Get button."""
-        if button_dict := ca.settings.get_object("ubuttons", id):
-            return button_dict
-        abort(404, "Button not found")
+        return db.get_or_404(Ubuttons, id)
 
     @api.expect(button)
     @api.marshal_with(button)
     @api.response(404, "Not found", message)
-    def put(self, id: int):  # pylint: disable=W0622
+    def put(self, id: int):
         """Set button."""
-        if dict_button := ca.settings.get_object("ubuttons", id):
-            ca.settings.ubuttons.remove(dict_button)
-            api.payload["id"] = id
-            ca.settings.ubuttons.append(api.payload)
-            ca.settings.update(ubuttons=ca.settings.ubuttons)
-            return api.payload
+        if ubutton := db.get_or_404(Ubuttons, id):
+            ubutton.update(**api.payload)
+            db.session.commit()
+            return "", 204
         abort(404, "Button not found")
 
     @api.response(204, "Actions is success")
     @api.response(404, "Not found", message)
-    def delete(self, id: int):  # pylint: disable=W0622
+    def delete(self, id: int):
         """Delete button."""
-        if dict_button := ca.settings.get_object("ubuttons", id):
-            ca.settings.ubuttons.remove(dict_button)
-            ca.settings.update(ubuttons=ca.settings.ubuttons)
+        if ubutton := db.get_or_404(Ubuttons, id):
+            db.session.delete(ubutton)
+            db.session.commit()
             return "", 204
         abort(404, "Button not found")
-
-
-@api.response(403, "Forbidden", message)
-@api.route("/settings")
-class Sets(Resource):
-    """Settings."""
-
-    @api.marshal_with(setting)
-    def get(self):
-        """Get settings."""
-        return ca.settings
-
-    @api.expect(setting)
-    @api.marshal_with(setting)
-    @api.response(204, "Action is success")
-    def post(self):
-        """Set settings."""
-        ca.settings.update(**api.payload)
-        if loglevel := api.payload.get("loglevel"):
-            ca.logger.setLevel(loglevel)
-        return "", 204
 
 
 @api.response(403, "Forbidden", message)
@@ -115,20 +112,24 @@ class Token(Resource):
     @api.marshal_with(cam_token)
     def get(self):
         """Get token."""
-        return {"cam_token": ca.settings.get("cam_token")}
+        settings = Settings.query.get(1)
+        return {"cam_token": settings.cam_token}
 
     @api.marshal_with(cam_token)
     def post(self):
         """Create token."""
+        settings = Settings.query.get(1)
         secure_token = f"B{random.getrandbits(256)}"
-        ca.settings.update(cam_token=secure_token)
+        settings.cam_token = secure_token
+        db.session.commit()
         return {"cam_token": secure_token}
 
     @api.response(204, "Actions is success")
     def delete(self):
         """Delete token."""
-        del ca.settings.cam_token
-        ca.settings.update(cam_token=None)
+        settings = Settings.query.get(1)
+        settings.cam_token = None
+        db.session.commit()
         return "", 204
 
 
@@ -140,24 +141,27 @@ class APIToken(Resource):
     @api.marshal_with(api_token)
     def get(self):
         """Get token."""
-        return {"api_token": ca.settings.get("token")}
+        settings = Settings.query.get(1)
+        return {"api_token": settings.api_token}
 
     @api.marshal_with(api_token)
     def post(self):
         """Create token."""
+        settings = Settings.query.get(1)
         secure_token = jwt.encode(
             {"iss": "system", "id": 0, "iat": dt.now(tz=timezone.utc)},
             ca.config["SECRET_KEY"],
             algorithm="HS256",
         )
-        ca.settings.update(api_token=secure_token)
+        settings.api_token = secure_token
         return {"api_token": secure_token}
 
     @api.response(204, "Actions is success")
     def delete(self):
         """Delete token."""
-        del ca.settings.api_token
-        ca.settings.update(api_token=None)
+        settings = Settings.query.get(1)
+        settings.api_token = None
+        db.session.commit()
         return "", 204
 
 

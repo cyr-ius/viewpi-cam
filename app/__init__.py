@@ -7,8 +7,11 @@ import shutil
 from flask import Flask, g
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from . import apis, blueprints, services
-from .helpers.utils import get_pid, launch_schedule
+from . import apis, blueprints, models, services
+from .helpers.exceptions import ViewPiCamException
+from .helpers.utils import execute_cmd, get_pid, launch_schedule
+from .models import Settings as settings_db
+from .models import db
 
 
 # pylint: disable=E1101,W0613
@@ -21,6 +24,9 @@ def create_app(config=None):
     os.makedirs(app.static_folder, exist_ok=True)
 
     app.system_folder = f"{app.root_path}/../system"
+    os.makedirs(app.system_folder, exist_ok=True)
+
+    app.db_folder = f"{app.root_path}/../db"
     os.makedirs(app.system_folder, exist_ok=True)
 
     shutil.copytree(
@@ -57,6 +63,8 @@ def create_app(config=None):
     if "FLASK_CONF" in os.environ:
         app.config.from_envvar("FLASK_CONF")
 
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{app.db_folder}/app.db"
+
     # Register filter
     app.jinja_env.add_extension("jinja2.ext.debug")
     app.jinja_env.add_extension("jinja2.ext.i18n")
@@ -65,6 +73,7 @@ def create_app(config=None):
     apis.init_app(app)
     blueprints.init_app(app)
     services.init_app(app)
+    models.init_app(app)
 
     # Start raspimjpeg
     if bool(int(app.config["SVC_RASPIMJPEG"])) and not get_pid(
@@ -90,9 +99,26 @@ def create_app(config=None):
         response.headers["X-XSS-Protection"] = "1; mode=block"
         return response
 
-    @app.before_request
-    def before_app_request():
-        """Execute before request."""
-        g.loglevel = app.settings.loglevel
+    with app.app_context():
+        if db.inspect(db.engine).has_table("Settings"):
+            settings = settings_db.query.get(1)
+
+            @app.before_request
+            def before_app_request():
+                """Execute before request."""
+                g.loglevel = settings.loglevel
+
+            # Custom log level
+            if custom_level := settings.loglevel:
+                app.logger.setLevel(custom_level.upper())
+            else:
+                settings["loglevel"] = os.environ.get("LOG_LEVEL", "INFO").upper()
+
+            # Set timezone
+            if offset := settings.gmt_offset:
+                try:
+                    execute_cmd(f"ln -sf /usr/share/zoneinfo/{offset} /etc/localtime")
+                except ViewPiCamException as error:
+                    app.logger.error(error)
 
     return app

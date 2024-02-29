@@ -1,11 +1,10 @@
 """Blueprint Settings."""
 
-from flask import Blueprint
-from flask import current_app as ca
-from flask import render_template
+from flask import Blueprint, render_template
 
 from ..apis.settings import Macros
 from ..helpers.decorator import auth_required, role_required
+from ..models import Multiviews, Presets, Settings, Ubuttons, Users
 
 bp = Blueprint(
     "settings", __name__, template_folder="templates", url_prefix="/settings"
@@ -17,4 +16,17 @@ bp = Blueprint(
 @role_required("max")
 def index():
     macros = Macros().get_config()
-    return render_template("settings.html", settings=ca.settings, macros=macros)
+    users = Users.query.all()
+    ubuttons = Ubuttons.query.all()
+    multiviews = Multiviews.query.all()
+    settings = Settings.query.get(1)
+    presets = Presets.query.add_column(Presets.mode).group_by("mode").all()
+    return render_template(
+        "settings.html",
+        settings=settings,
+        users=users,
+        macros=macros,
+        ubuttons=ubuttons,
+        multiviews=multiviews,
+        presets=dict(presets).values(),
+    )

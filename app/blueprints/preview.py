@@ -25,6 +25,7 @@ from ..helpers.filer import (
 )
 from ..helpers.utils import disk_usage, execute_cmd, write_log
 from ..helpers.exceptions import ViewPiCamException
+from ..models import LockFiles
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
@@ -142,7 +143,7 @@ def get_thumbnails(
         real_file = data_file_name(file)
         file_id = real_file[:-4].replace("_", "")
         file_number = get_file_index(file)
-        file_lock = file_id in ca.settings.get("lock_files", [])
+        file_lock = LockFiles.query.get(file_id) is not None
         file_size = 0
         lapse_count = 0
         duration = 0

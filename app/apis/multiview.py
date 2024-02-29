@@ -1,14 +1,14 @@
 """Blueprint Multiview API."""
 
-from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required, token_required
+from ..models import Multiviews as multiviews_db
+from ..models import db
 from .models import message, multiview, multiviews
 
 api = Namespace(
     "multiview",
-    path="/api",
     description="Multiviews",
     decorators=[token_required, role_required("max")],
 )
@@ -18,60 +18,54 @@ api.add_model("Multiviews", multiviews)
 
 
 @api.response(403, "Forbidden", message)
-@api.route("/multiviews")
+@api.route("/")
 class Multiviews(Resource):
     """List hosts."""
 
     @api.marshal_with(multiview, as_list=True)
     def get(self):
         """List hosts."""
-        return ca.settings.get("multiviews", [])
+        return multiviews_db.query.all()
 
     @api.expect(multiview)
     @api.marshal_with(multiviews)
     def post(self):
         """Create host."""
-        if ca.settings.get("multiviews") is None:
-            ca.settings.multiviews = []
-        ids = [multiview["id"] for multiview in ca.settings.multiviews]
-        api.payload["id"] = 1 if len(ids) == 0 else max(ids) + 1
-        ca.settings.multiviews.append(api.payload)
-        ca.settings.update(multiviews=ca.settings.multiviews)
-        return api.payload
+        api.payload.pop("id", None)
+        multiview = multiviews_db(**api.payload)
+        db.session.add(multiview)
+        db.session.commit()
+        return multiview
 
 
 @api.response(403, "Forbidden", message)
-@api.route("/multiviews/<int:id>")
+@api.route("/<int:id>")
 class Multiview(Resource):
     """Multiview object."""
 
     @api.marshal_with(multiview)
     @api.response(404, "Not found", message)
-    def get(self, id: int):  # pylint: disable=W0622
+    def get(self, id: int):
         """Get multiview."""
-        if stm := ca.settings.get_object("multiviews", id):
-            return stm
-        abort(404, "Host not found")
+        return db.get_or_404(multiviews_db, id)
 
     @api.expect(multiviews)
     @api.marshal_with(multiview)
     @api.response(404, "Not found", message)
-    def put(self, id: int):  # pylint: disable=W0622
+    def put(self, id: int):
         """Set multiview."""
-        api.payload["id"] = id
-        if stm := ca.settings.get_object("multiviews", id):
-            ca.settings.multiviews.remove(stm)
-            ca.settings.multiviews.append(api.payload)
-            ca.settings.update(multiviews=ca.settings.multiviews)
-            return api.payload
+        if multiview := db.get_or_404(multiviews_db, id):
+            multiview.update(**api.payload)
+            db.session.commit()
+            return "", 204
         abort(404, "Host not found")
 
     @api.response(204, "Actions is success")
     @api.response(404, "Not found", message)
-    def delete(self, id: int):  # pylint: disable=W0622
+    def delete(self, id: int):
         """Delete multiview."""
-        if stm := ca.settings.get_object("multiviews", id):
-            ca.settings.multiviews.remove(stm)
-            ca.settings.update(multiviews=ca.settings.multiviews)
+        if multiview := db.get_or_404(multiviews_db, id):
+            db.session.delete(multiview)
+            db.session.commit()
             return "", 204
         abort(404, "Host not found")

@@ -13,7 +13,6 @@ from .models import command, message
 
 api = Namespace(
     "system",
-    path="/api",
     description="Host command",
     decorators=[token_required, role_required("max")],
 )
@@ -24,7 +23,7 @@ api.add_model("Command", command)
 @api.response(204, "Action is success")
 @api.response(403, "Forbidden", message)
 @api.response(422, "Error", message)
-@api.route("/system/restart")
+@api.route("/restart")
 class Restart(Resource):
     """Restart host."""
 
@@ -41,7 +40,7 @@ class Restart(Resource):
 @api.response(204, "Action is success")
 @api.response(403, "Forbidden", message)
 @api.response(422, "Error", message)
-@api.route("/system/shutdown")
+@api.route("/shutdown")
 class Shutdown(Resource):
     """Restart application."""
 
@@ -58,7 +57,7 @@ class Shutdown(Resource):
 @api.response(204, "Action is success")
 @api.response(403, "Forbidden", message)
 @api.response(422, "Error", message)
-@api.route("/system/restart/app", endpoint="system_restart_app")
+@api.route("/restart/app", endpoint="system_restart_app")
 class RestartApp(Resource):
     """Restart application."""
 

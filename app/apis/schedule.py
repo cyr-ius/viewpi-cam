@@ -6,21 +6,23 @@ from datetime import timezone
 from subprocess import PIPE, Popen
 
 import pytz
-from flask import current_app as ca
 from flask import request
 from flask_restx import Namespace, Resource, abort
 from suntime import Sun
 
 from ..const import SCHEDULE_RESET
 from ..helpers.decorator import role_required, token_required
+from ..helpers.exceptions import ViewPiCamException
 from ..helpers.fifo import send_motion
 from ..helpers.utils import execute_cmd, get_pid, write_log
-from ..helpers.exceptions import ViewPiCamException
+from ..models import Calendar as calendar_db
+from ..models import Scheduler as scheduler_db
+from ..models import Settings as settings_db
+from ..models import db
 from .models import date_time, day, daymode, forbidden, message, period, schedule
 
 api = Namespace(
     "schedule",
-    path="/api",
     description="Scheduler management",
     decorators=[token_required, role_required("max")],
 )
@@ -33,7 +35,7 @@ api.add_model("Daymode", daymode)
 api.add_model("Period", period)
 
 
-@api.route("/schedule")
+@api.route("/")
 @api.response(403, "Forbidden", forbidden)
 class Settings(Resource):
     """Schedule."""
@@ -41,16 +43,20 @@ class Settings(Resource):
     @api.marshal_with(schedule)
     def get(self):
         """Get settings scheduler."""
-        return ca.settings
+        return settings_db.query.get(1)
 
     @api.expect(schedule)
     @api.marshal_with(message)
     @api.response(204, "Action is success")
     def put(self):
         """Set settings."""
-        cur_tz = ca.settings.gmt_offset
-        ca.settings.update(**api.payload)
-        if (new_tz := ca.settings.gmt_offset) != cur_tz:
+        settings = settings_db.query.get(1)
+        cur_tz = settings.gmt_offset
+
+        settings.update(**api.payload)
+        db.session.commit()
+
+        if (new_tz := settings.gmt_offset) != cur_tz:
             try:
                 execute_cmd(f"ln -fs /usr/share/zoneinfo/{new_tz} /etc/localtime")
                 write_log(f"Set timezone {new_tz}")
@@ -60,11 +66,43 @@ class Settings(Resource):
         return "", 204
 
 
-@api.route("/schedule/actions", doc=False)
-@api.route("/schedule/actions/stop", endpoint="schedule_stop")
-@api.route("/schedule/actions/start", endpoint="schedule_start")
-@api.route("/schedule/actions/backup", endpoint="schedule_backup")
-@api.route("/schedule/actions/restore", endpoint="schedule_restore")
+@api.route("/scheduler")
+@api.response(403, "Forbidden", forbidden)
+class Scheduler(Resource):
+    """Schedule."""
+
+    @api.marshal_with(schedule)
+    def get(self):
+        """Get settings scheduler."""
+        return scheduler_db.query.all()
+
+    @api.expect(schedule)
+    @api.marshal_with(message)
+    @api.response(204, "Success")
+    def put(self):
+        """Set settings."""
+        for sch_id, scheduler in api.payload.items():
+            id = int(sch_id)
+            my_schedule = scheduler_db.query.get(id)
+            my_schedule.command_on = scheduler["commands_on"]
+            my_schedule.command_off = scheduler["commands_off"]
+            my_schedule.mode = scheduler["modes"]
+            my_schedule.calendars = []
+            for key, value in scheduler["calendar"].items():
+                if value:
+                    cal = calendar_db.query.filter_by(name=key)
+                    my_schedule.calendars.append(cal.scalar())
+            db.session.commit()
+
+        send_motion(SCHEDULE_RESET)
+        return "", 204
+
+
+@api.route("/actions", doc=False)
+@api.route("/actions/stop", endpoint="schedule_stop")
+@api.route("/actions/start", endpoint="schedule_start")
+@api.route("/actions/backup", endpoint="schedule_backup")
+@api.route("/actions/restore", endpoint="schedule_restore")
 @api.response(204, "Action is success")
 @api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
@@ -88,15 +126,15 @@ class Actions(Resource):
                     return abort(422, error)
                 return "", 204
             case "api.schedule_backup":
-                ca.settings.backup()
+                # ca.settings.backup()
                 return "", 204
             case "api.schedule_restore":
-                ca.settings.restore()
+                # ca.settings.restore()
                 return "", 204
         abort(404, "Action not found")
 
 
-@api.route("/schedule/period")
+@api.route("/period")
 @api.response(403, "Forbidden", forbidden)
 class Period(Resource):
     """Sunrise."""
@@ -105,7 +143,7 @@ class Period(Resource):
     @api.expect(daymode)
     def post(self):
         """Post day mode and return period."""
-        return {"period": get_period(ca.settings.daymode)}
+        return {"period": get_calendar(api.payload["daymode"])}
 
 
 @api.route("/sun/sunrise")
@@ -147,9 +185,10 @@ def utc_offset(offset) -> timezone:
 
 def dt_now(minute: bool = False) -> dt | int:
     """Get current local time."""
+    settings = settings_db.query.get(1)
     now = dt.utcnow()
-    if ca.settings.gmt_offset:
-        offset = time_offset(ca.settings.gmt_offset)
+    if settings.gmt_offset:
+        offset = time_offset(settings.gmt_offset)
         now = (now + offset).replace(tzinfo=utc_offset(offset.seconds))
     if minute:
         return now.hour * 60 + now.minute
@@ -158,8 +197,9 @@ def dt_now(minute: bool = False) -> dt | int:
 
 def sun_info(mode: str) -> dt:
     """Return sunset or sunrise datetime."""
-    offset = time_offset(ca.settings.gmt_offset)
-    sun = Sun(ca.settings.latitude, ca.settings.longitude)
+    settings = settings_db.query.get(1)
+    offset = time_offset(settings.gmt_offset)
+    sun = Sun(settings.latitude, settings.longitude)
     if mode.lower() == "sunset":
         sun_time = sun.get_sunset_time()
     else:
@@ -167,38 +207,57 @@ def sun_info(mode: str) -> dt:
     return sun_time.replace(tzinfo=utc_offset(offset.seconds)) + offset
 
 
-def get_period(daymode: int) -> int:
-    """Get period."""
+def get_calendar(daymode: int) -> int:
+    """Get calendar."""
+    settings = settings_db.query.get(1)
     now = dt_now()
     sunrise = sun_info("sunrise")
     sunset = sun_info("sunset")
 
     match daymode:
         case 0:
-            if now < (sunrise + td(minutes=ca.settings.dawnstart_minutes)):
-                int_period = 1
-            elif now < (sunrise + td(minutes=ca.settings.daystart_minutes)):
-                int_period = 2
-            elif now > (sunset + td(minutes=ca.settings.duskend_minutes)):
-                int_period = 1
-            elif now > (sunset + td(minutes=ca.settings.dayend_minutes)):
-                int_period = 4
+            if now < (sunrise + td(minutes=settings.dawnstart_minutes)):
+                # Night
+                mem_sch = scheduler_db.query.filter_by(
+                    period="night", daysmode_id=daymode
+                ).one()
+            elif now < (sunrise + td(minutes=settings.daystart_minutes)):
+                # Dawn
+                mem_sch = scheduler_db.query.filter_by(
+                    period="dawn", daysmode_id=daymode
+                ).one()
+            elif now > (sunset + td(minutes=settings.duskend_minutes)):
+                # Night
+                mem_sch = scheduler_db.query.filter_by(
+                    period="night", daysmode_id=daymode
+                ).one()
+            elif now > (sunset + td(minutes=settings.dayend_minutes)):
+                # Dusk
+                mem_sch = scheduler_db.query.filter_by(
+                    period="dusk", daysmode_id=daymode
+                ).one()
             else:
-                int_period = 3
+                # Day
+                mem_sch = scheduler_db.query.filter_by(
+                    period="day", daysmode_id=daymode
+                ).one()
         case 1:
-            int_period = 0
+            # AllDay
+            mem_sch = scheduler_db.query.filter_by(
+                period="allday", daysmode_id=daymode
+            ).one()
         case 2:
-            int_period = len(ca.settings.times) - 1
+            # Times
+            schedulers = scheduler_db.query.filter_by(daysmode_id=2).all()
             max_less_v = -1
-            for str_time in ca.settings.times:
+            for scheduler in schedulers:
+                str_time = scheduler.period
                 f_mins = dt.strptime(str_time, "%H:%M")
                 if (
                     f_mins.time() < now.time()
                     and (f_mins.hour * 60 + f_mins.minute) > max_less_v
                 ):
                     max_less_v = f_mins.hour * 60 + f_mins.minute
-                    int_period = ca.settings.times.index(str_time)
+                    mem_sch = scheduler
 
-            int_period = int_period + 5
-
-    return int_period
+    return mem_sch.period

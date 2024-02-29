@@ -5,14 +5,23 @@ from datetime import timezone
 
 import jwt
 import pyotp
-from flask import Blueprint, abort
+from flask import (
+    Blueprint,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask import current_app as ca
-from flask import flash, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..const import TXT_MSG_1, TXT_MSG_2, TXT_MSG_3, USERLEVEL_MAX
 from ..helpers.decorator import auth_required
-from ..services.usrmgmt import User
 from ..helpers.utils import reverse
+from ..models import Users, db
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -20,16 +29,14 @@ bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth"
 @bp.before_app_request
 def before_app_request():
     """Execute before request."""
-    if hasattr(ca.settings, "users") and len(ca.settings.users) == 0:
+    if Users.query.count() == 0:
         session.clear()
 
 
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     """Register page."""
-    if request.method == "POST" and (
-        ca.settings.get("users") is None or len(ca.settings.users) == 0
-    ):
+    if request.method == "POST" and Users.query.count() == 0:
         if (password := request.form.get("password")) == request.form.get("password_2"):
             next_page = (
                 next_page
@@ -37,7 +44,13 @@ def register():
                 else url_for("main.index")
             )
             if (name := request.form["username"]) and password:
-                ca.usrmgmt.create(name=name, password=password, right=USERLEVEL_MAX)
+                user = Users(
+                    name=name,
+                    secret=generate_password_hash(password),
+                    right=USERLEVEL_MAX,
+                )
+                db.session.add(user)
+                db.session.commit()
                 if reverse(next_page) is False:
                     abort(404)
                 return redirect(next_page)
@@ -47,7 +60,7 @@ def register():
 
         flash(flash_msg)
 
-    has_registered = ca.settings.get("users") is None or len(ca.settings.users) == 0
+    has_registered = Users.query.count() == 0
     return render_template(
         "login.html", register=has_registered, next=request.args.get("next")
     )
@@ -56,11 +69,11 @@ def register():
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     """Login page."""
-    if ca.settings.get("users") is None or len(ca.settings.users) == 0:
+    if Users.query.count() == 0:
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
-        if user := ca.usrmgmt.get(name=request.form.get("username")):
-            if user.check_password(request.form.get("password")):
+        if user := Users.query.filter_by(name=request.form.get("username")).one():
+            if check_password_hash(user.secret, request.form.get("password")):
                 session.clear()
                 next_page = (
                     next_page
@@ -90,7 +103,7 @@ def totpverified():
     if session.get("totp") and request.method == "POST":
         id = int(request.form.get("id"))  # pylint: disable=W0622
         next_page = request.form.get("next")
-        if user := ca.usrmgmt.get(id=id):
+        if user := db.get_or_404(Users, id):
             totp = pyotp.TOTP(user.secret)
             if totp.verify(request.form.get("secret")):
                 _load_session(user)
@@ -110,7 +123,7 @@ def logout():
     return redirect(url_for("auth.login"))
 
 
-def _generate_jwt(user: User) -> str:
+def _generate_jwt(user: Users) -> str:
     lifetime = dt.now(tz=timezone.utc) + ca.config["PERMANENT_SESSION_LIFETIME"]
     return jwt.encode(
         {
@@ -124,7 +137,7 @@ def _generate_jwt(user: User) -> str:
     )
 
 
-def _load_session(user: User) -> None:
+def _load_session(user: Users) -> None:
     """Load session object."""
     session["id"] = user.id
     session["username"] = user.name

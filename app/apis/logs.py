@@ -10,15 +10,13 @@ from ..helpers.decorator import token_required
 from ..helpers.utils import delete_log
 from .models import forbidden, message
 
-api = Namespace(
-    "logs", path="/api", description="Log management", decorators=[token_required]
-)
+api = Namespace("logs", description="Log management", decorators=[token_required])
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 
 
 @api.response(403, "Forbidden", forbidden)
-@api.route("/logs")
+@api.route("/")
 class Content(Resource):
     """Get log."""
 

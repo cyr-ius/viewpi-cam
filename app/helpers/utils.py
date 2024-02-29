@@ -10,6 +10,8 @@ from flask import current_app as ca
 from flask import request, session
 from psutil import ZombieProcess, process_iter
 
+from ..models import Settings as settings_db
+from ..models import Users
 from .exceptions import ViewPiCamException
 
 
@@ -94,7 +96,7 @@ def disk_usage() -> tuple[int, int, int, int, str]:
 
 def get_locale() -> str | list[str]:
     """Get locale."""
-    if (user := ca.usrmgmt.get(id=session.get("id"))) and hasattr(user, "locale"):
+    if (user := Users.query.get(session.get("id"))) and hasattr(user, "locale"):
         session["locale"] = user.locale
         return user.locale
     return request.accept_languages.best_match(["de", "fr", "en"])
@@ -102,7 +104,8 @@ def get_locale() -> str | list[str]:
 
 def get_timezone() -> str | list[str]:
     """Get timezone."""
-    return ca.settings.gmt_offset
+    settings = settings_db.query.get(1)
+    return settings.gmt_offset
 
 
 def launch_schedule() -> None:

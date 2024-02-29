@@ -100,7 +100,7 @@ macros = Model(
     },
 )
 message = Model("Error", {"message": fields.String(required=True)})
-period = Model("Period", {"period": fields.Integer(description="period")})
+period = Model("Period", {"period": fields.String(description="period")})
 schedule = Model(
     "Schedule",
     {

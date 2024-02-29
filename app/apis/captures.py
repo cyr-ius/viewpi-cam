@@ -10,7 +10,6 @@ from .models import forbidden, message
 
 api = Namespace(
     "captures",
-    path="/api",
     description="Stop/Start capture and preview camera/images",
     decorators=[token_required, role_required("max")],
 )
@@ -21,8 +20,8 @@ api.add_model("Forbidden", forbidden)
 @api.response(204, "Action execute")
 @api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
-@api.route("/captures/video/start", endpoint="captures_video_start")
-@api.route("/captures/video/stop", endpoint="captures_video_stop")
+@api.route("/video/start", endpoint="captures_video_start")
+@api.route("/video/stop", endpoint="captures_video_stop")
 class Camera(Resource):
     """Camera."""
 
@@ -41,7 +40,7 @@ class Camera(Resource):
 @api.response(204, "Action execute")
 @api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
-@api.route("/captures/image")
+@api.route("/image")
 class Image(Resource):
     """Image."""
 
@@ -57,8 +56,8 @@ class Image(Resource):
 @api.response(204, "Action execute")
 @api.response(422, "Error", message)
 @api.response(403, "Forbidden", forbidden)
-@api.route("/captures/timelapse/start", endpoint="captures_timelapse_start")
-@api.route("/captures/timelapse/stop", endpoint="captures_timelapse_stop")
+@api.route("/timelapse/start", endpoint="captures_timelapse_start")
+@api.route("/timelapse/stop", endpoint="captures_timelapse_stop")
 class Timelapse(Resource):
     """Timelapse."""
 

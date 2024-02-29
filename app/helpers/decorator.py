@@ -6,7 +6,7 @@ import jwt
 from flask import abort
 from flask import current_app as ca
 from flask import redirect, request, session, url_for
-
+from ..models import Settings as settings_db
 from ..const import USERLEVEL_MAX
 
 
@@ -71,7 +71,8 @@ def token_cam_accept(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
         if cam_token := request.args.get("cam_token"):
-            if ca.settings.get("cam_token") == cam_token:
+            settings = settings_db.query.get(1)
+            if settings.get("cam_token") == cam_token:
                 return function.__wrapped__(*args, **kwargs)
             abort(403, "The provided Camera token is not valid")
         return function(*args, **kwargs)

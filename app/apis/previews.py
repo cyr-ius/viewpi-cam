@@ -6,12 +6,13 @@ from flask_restx import Namespace, Resource, abort
 
 from ..blueprints.preview import get_thumb, get_thumbnails, video_convert
 from ..helpers.decorator import role_required, token_required
-from ..helpers.filer import delete_mediafiles, lock_file, maintain_folders
+from ..helpers.filer import delete_mediafiles, maintain_folders
+from ..models import LockFiles as lockfiles_db
+from ..models import db
 from .models import deletes, files, forbidden, message
 
 api = Namespace(
     "previews",
-    path="/api",
     description="Gallery management",
     decorators=[token_required, role_required(["medium", "max"])],
 )
@@ -22,7 +23,7 @@ api.add_model("Deletes", deletes)
 
 
 @api.response(403, "Forbidden", forbidden)
-@api.route("/previews")
+@api.route("/")
 class Previews(Resource):
     """Previews."""
 
@@ -46,7 +47,7 @@ class Previews(Resource):
         if self.api.payload:
             for uid in self.api.payload.get("thumb_id", []):
                 if thumb := get_thumb(uid):
-                    if id in ca.settings.get("lock_files", []):
+                    if lockfiles_db.query.get(uid):
                         continue
                     delete_mediafiles(thumb["file_name"])
                     maintain_folders(ca.raspiconfig.media_path, False, False)
@@ -55,13 +56,13 @@ class Previews(Resource):
         return "", 204
 
 
-@api.route("/previews/<string:id>")
+@api.route("/<string:id>")
 @api.response(403, "Forbidden", forbidden)
 class Preview(Resource):
     """Preview."""
 
     @api.marshal_with(files)
-    def get(self, id: str):  # pylint: disable=W0622
+    def get(self, id: str):
         """Get file information."""
         return get_thumb(id)
 
@@ -69,10 +70,10 @@ class Preview(Resource):
     @api.response(204, "Action is success")
     @api.response(404, "Not found", message)
     @api.response(422, "Error", message)
-    def delete(self, id: str):  # pylint: disable=W0622
+    def delete(self, id: str):
         """Delete file."""
         if thumb := get_thumb(id):
-            if id in ca.settings.get("lock_files", []):
+            if lockfiles_db.query.get(id):
                 abort(422, f"Protected thumbnail ({id})")
             delete_mediafiles(thumb["file_name"])
             maintain_folders(ca.raspiconfig.media_path, False, False)
@@ -80,52 +81,49 @@ class Preview(Resource):
         abort(404, "Thumb not found")
 
 
-@api.route("/previews/<string:id>/lock")
+@api.route("/<string:id>/lock")
 @api.response(204, "Action is success")
 @api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
 class Lock(Resource):
     """Lock file."""
 
-    def post(self, id: str):  # pylint: disable=W0622
+    def post(self, id: str):
         """Lock."""
-        if thumb := get_thumb(id):
-            lock_file(
-                thumb["file_name"],
-                thumb["id"],
-                True,
-            )
+        thumb = get_thumb(id)
+        if thumb and lockfiles_db.query.get(thumb["id"]) is None:
+            lockfile = lockfiles_db(id=thumb["id"], name=thumb["file_name"])
+            db.session.add(lockfile)
+            db.session.commit()
             return "", 204
         abort(404, f"Thumb not found ({id})")
 
 
-@api.route("/previews/<string:id>/unlock")
+@api.route("/<string:id>/unlock")
 @api.response(204, "Action is success")
 @api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
 class Unlock(Resource):
     """Unock file."""
 
-    def post(self, id: str):  # pylint: disable=W0622
+    def post(self, id: str):
         """Unlock."""
-        if thumb := get_thumb(id):
-            lock_file(
-                thumb["file_name"],
-                thumb["id"],
-                request.endpoint == "api.previews_lock",
-            )
+        thumb = get_thumb(id)
+        if thumb and (lockfile := lockfiles_db.query.get(thumb["id"])):
+            db.session.delete(lockfile)
+            db.session.commit()
             return "", 204
         abort(404, f"Thumb not found ({id})")
 
 
-@api.route("/previews/<string:id>/convert")
+@api.route("/<string:id>/convert")
 @api.response(204, "Action is success")
 @api.response(404, "Not found", message)
 @api.response(403, "Forbidden", forbidden)
 class Convert(Resource):
     """Convert timelapse file to mp4."""
 
-    def post(self, id: str):  # pylint: disable=W0622
+    def post(self, id: str):
         """Coonvert timelapse."""
         if thumb := get_thumb(id):
             video_convert(thumb["file_name"])

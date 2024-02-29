@@ -19,10 +19,13 @@ from flask import (
 from flask import current_app as ca
 
 from ..apis.logs import get_logs
-from ..const import PRESETS
 from ..helpers.decorator import auth_required, role_required
-from ..services.raspiconfig import RaspiConfigError
 from ..helpers.utils import allowed_file, write_log
+from ..models import Multiviews as multiviews_db
+from ..models import Presets as presets_db
+from ..models import Settings as settings_db
+from ..models import Ubuttons as ubuttons_db
+from ..services.raspiconfig import RaspiConfigError
 from .camera import status_mjpeg
 
 bp = Blueprint("main", __name__, template_folder="templates")
@@ -32,6 +35,7 @@ bp = Blueprint("main", __name__, template_folder="templates")
 @auth_required
 def index():
     """Index page."""
+    settings = settings_db.query.get(1)
     write_log(f"Logged in user: {session['username']}")
     write_log(f"UserLevel {session['level']}")
     display_mode = request.cookies.get("display_mode", "On")
@@ -46,19 +50,22 @@ def index():
             pipan_sck = file.read().decode("utf-8")
             cam_pos = pipan_sck.split(" ")
             file.close()
-    if ca.settings.servo:
+
+    if settings.servo:
         mode = 2
+
+    presets = presets_db.query.filter_by(mode=settings.upreset).all()
 
     return render_template(
         "main.html",
         mode=mode,
         cam_pos=cam_pos,
-        user_buttons=ca.settings.get("ubuttons", []),
+        user_buttons=ubuttons_db.query.all(),
         raspiconfig=ca.raspiconfig,
         display_mode=display_mode,
         mjpegmode=mjpegmode,
-        preset=ca.settings.get("upreset", "v2"),
-        presets=PRESETS,
+        preset=settings.upreset,
+        presets=presets,
     )
 
 
@@ -119,9 +126,8 @@ def minview():
 @auth_required
 def multiview():
     """Camera multiview page."""
-    return render_template(
-        "multiview.html", multiviews=ca.settings.get("multiviews", [])
-    )
+    multiviews = multiviews_db.query.all()
+    return render_template("multiview.html", multiviews=multiviews)
 
 
 @bp.route("/view", methods=["GET"])
@@ -131,7 +137,8 @@ def view():
     id = request.args.get(  # pylint: disable=W0622
         "rHost", request.args.get("pHost", 0)
     )
-    if (host := ca.settings.get_object("multiviews", int(id))) is None:
+
+    if (host := multiviews_db.query.get(int(id))) is None:
         abort(404)
 
     def _gather_img(url, delay):

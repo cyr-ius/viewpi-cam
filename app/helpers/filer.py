@@ -5,6 +5,9 @@ from datetime import datetime as dt
 
 from flask import current_app as ca
 
+from ..models import LockFiles as lockfiles_db
+from ..models import db
+
 
 def find_lapse_files(filename: str) -> list[str]:
     """Return lapse files."""
@@ -168,7 +171,7 @@ def get_sorted_files(folder: str, ascending: bool = True) -> list[str]:
 def maintain_folders(
     path, delete_main_files, delete_sub_files, root: bool = True
 ) -> bool:
-    """Sanatize media folders."""
+    """Sanitize media folders."""
     empty = True
     for folder in list_folder_files(path):
         if os.path.isdir(folder):
@@ -185,15 +188,15 @@ def maintain_folders(
 def lock_file(filename: str, id: str, lock: bool) -> None:  # pylint: disable=W0622
     """Lock file (remove w via chmod)."""
     media_path = ca.raspiconfig.media_path
-    lock_files = ca.settings.get("lock_files", [])
-    if lock == 1:
+    if lock == 1 and lockfiles_db.query.get(id) is None:
         attr = 0o444
-        lock_files.append(id)
+        lockfile = lockfiles_db(id=id, name=filename)
+        db.session.add(lockfile)
     else:
         attr = 0o644
-        if id in lock_files:
-            lock_files.remove(id)
-    ca.settings.update(lock_files=lock_files)
+        if lockfile := lockfiles_db.query.get(id):
+            db.session.delete(lockfile)
+    db.session.commit()
     file_type = get_file_type(filename)
     if file_type == "t":
         #  For time lapse lock all from this batch

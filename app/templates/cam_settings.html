@@ -12,8 +12,8 @@
             <div class="col">
                 <select class="form-select form-select-sm" onchange="set_preset(this.value)">
                     <option value="">Select option...</option>
-                    {% for k,v in presets[preset].items()%}
-                    <option value="{{v}}">{{k}}</option>
+                    {% for preset in presets%}
+                    <option value="{{preset.width}} {{preset.height}} {{preset.fps}} {{preset.i_rate}} {{preset.i_width}} {{preset.i_height}}">{{preset.name}}</option>
                     {%endfor%}
                 </select>
             </div>
