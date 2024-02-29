@@ -15,7 +15,7 @@ THREADS="${THREADS:-4}"
 GUNICORN_ARGS="-t ${GUNICORN_TIMEOUT} --workers ${GUNICORN_WORKERS} --bind ${BIND_ADDRESS} --log-level ${GUNICORN_LOGLEVEL} --worker-class ${WORKER_CLASS} --threads ${THREADS}"
 
 if [ "$1" == gunicorn ]; then
-    # /bin/sh -c "flask db upgrade"
+    /bin/sh -c "flask db upgrade"
     exec "$@" $GUNICORN_ARGS
 
 else
