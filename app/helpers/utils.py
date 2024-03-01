@@ -96,7 +96,7 @@ def disk_usage() -> tuple[int, int, int, int, str]:
 
 def get_locale() -> str | list[str]:
     """Get locale."""
-    if (user := Users.query.get(session.get("id"))) and hasattr(user, "locale"):
+    if (id := session.get("id")) and (user := Users.query.get(id)):
         session["locale"] = user.locale
         return user.locale
     return request.accept_languages.best_match(["de", "fr", "en"])
