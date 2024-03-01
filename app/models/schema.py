@@ -66,11 +66,11 @@ class Multiviews(db.Model):
 class Users(db.Model):
     __tablename__ = "users"
     id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    locale: db.Mapped[str] = db.mapped_column(db.String(2))
+    locale: db.Mapped[str] = db.mapped_column(db.String(2), default="en")
     name: db.Mapped[str] = db.mapped_column(db.String, unique=True)
-    right = db.mapped_column(db.ForeignKey("roles.id"), nullable=False)
     secret: db.Mapped[str] = db.mapped_column(db.String)
     totp: db.Mapped[str] = db.mapped_column(db.String)
+    right = db.mapped_column(db.ForeignKey("roles.id"))
 
     roles: db.Mapped["Roles"] = db.relationship(back_populates="users")
 
@@ -129,8 +129,12 @@ class Ubuttons(db.Model):
 scheduler_calendar = db.Table(
     "scheduler_calendar",
     db.Model.metadata,
-    db.Column("scheduler_id", db.Integer, db.ForeignKey("scheduler.id")),
-    db.Column("calendar_id", db.Integer, db.ForeignKey("calendar.id")),
+    db.Column(
+        "scheduler_id", db.Integer, db.ForeignKey("scheduler.id"), primary_key=True
+    ),
+    db.Column(
+        "calendar_id", db.Integer, db.ForeignKey("calendar.id"), primary_key=True
+    ),
 )
 
 
