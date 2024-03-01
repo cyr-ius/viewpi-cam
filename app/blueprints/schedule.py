@@ -125,7 +125,7 @@ def scheduler() -> None:
                     schedule = scheduler_db.query.filter_by(
                         period=last_day_period
                     ).one()
-                    send = settings.command_off
+                    send = schedule.command_off
                     settings.last_detection_stop = str(dt_now())
                     db.session.commit()
                     if send:
