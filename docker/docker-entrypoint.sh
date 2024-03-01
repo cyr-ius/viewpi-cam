@@ -3,7 +3,7 @@ set -euo pipefail
 cd /app
 
 # Add link media to static folder
-ln -s /app/media/ /app/static/
+ln -s -f /app/media/ /app/static/
 
 GUNICORN_TIMEOUT="${GUNICORN_TIMEOUT:-120}"
 GUNICORN_WORKERS="${GUNICORN_WORKERS:-1}"
