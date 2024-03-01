@@ -100,7 +100,7 @@ def scheduler() -> None:
         write_log("Scheduler loop is started")
         db.session.remove()
         settings = settings_db.query.get(1)
-        last_on_cmd = -1
+        last_on_cmd = None
         last_day_period = None
         poll_time = settings.cmd_poll
         slow_poll = 0
@@ -120,7 +120,7 @@ def scheduler() -> None:
             time.sleep(poll_time)
             cmd = check_motion(motion_fifo_in)
             if cmd == SCHEDULE_STOP and autocapture == 0:
-                if last_on_cmd >= 0:
+                if last_on_cmd:
                     write_log("Stop capture requested")
                     schedule = scheduler_db.query.filter_by(
                         period=last_day_period
@@ -130,7 +130,7 @@ def scheduler() -> None:
                     db.session.commit()
                     if send:
                         send_cmds(str_cmd=send, days=schedule.calendars)
-                        last_on_cmd = -1
+                        last_on_cmd = None
                 else:
                     write_log("Stop capture request ignored, already stopped")
             elif cmd == SCHEDULE_START or autocapture == 1:
@@ -165,7 +165,7 @@ def scheduler() -> None:
                 slow_poll = 10
                 timenow = dt.timestamp(dt_now())
                 force_period_check = 0
-                if last_on_cmd >= 0:
+                if last_on_cmd:
                     if settings.max_capture > 0:
                         if (timenow - capture_start) >= settings.max_capture:
                             write_log("Maximum Capture reached. Sending off command")
@@ -173,13 +173,13 @@ def scheduler() -> None:
                                 period=last_day_period
                             ).one()
                             send_cmds(str_cmd=schedule.command_off)
-                            last_on_cmd = -1
+                            last_on_cmd = None
                             autocapture = 0
                             force_period_check = 1
                 if timenow > modechecktime or force_period_check == 1:
                     modechecktime = timenow + settings.mode_poll
                     force_period_check = 0
-                    if last_on_cmd < 0:
+                    if last_on_cmd is None:
                         new_day_period = get_calendar(settings.daymode)
                         if new_day_period != last_day_period:
                             write_log(f"New period detected {new_day_period}")
