@@ -154,6 +154,7 @@ class APIToken(Resource):
             algorithm="HS256",
         )
         settings.api_token = secure_token
+        db.session.commit()
         return {"api_token": secure_token}
 
     @api.response(204, "Actions is success")
