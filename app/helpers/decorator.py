@@ -3,11 +3,11 @@
 from functools import wraps
 
 import jwt
-from flask import abort
+from flask import abort, redirect, request, session, url_for
 from flask import current_app as ca
-from flask import redirect, request, session, url_for
-from ..models import Settings as settings_db
+
 from ..const import USERLEVEL_MAX
+from ..models import Settings as settings_db
 
 
 def auth_required(function):
