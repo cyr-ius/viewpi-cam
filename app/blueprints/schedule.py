@@ -101,7 +101,7 @@ def scheduler() -> None:
         db.session.remove()
         settings = settings_db.query.get(1)
         last_on_cmd = -1
-        last_day_period = -1
+        last_day_period = None
         poll_time = settings.cmd_poll
         slow_poll = 0
         managechecktime = dt.timestamp(dt_now())
@@ -134,7 +134,7 @@ def scheduler() -> None:
                 else:
                     write_log("Stop capture request ignored, already stopped")
             elif cmd == SCHEDULE_START or autocapture == 1:
-                if last_day_period >= 0:
+                if last_day_period:
                     if autocapture == 1:
                         autocapture = 2
                         write_log("Start triggered by autocapture")
