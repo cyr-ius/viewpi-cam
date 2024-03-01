@@ -73,7 +73,9 @@ def login():
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
         if user := Users.query.filter_by(name=request.form.get("username")).one():
+            ca.logger.debug(f"User: {user.name}")
             if check_password_hash(user.secret, request.form.get("password")):
+                ca.logger.debug("Password is correct")
                 session.clear()
                 next_page = (
                     next_page
@@ -86,6 +88,7 @@ def login():
                     return render_template("totp.html", next=next_page, id=user.id)
 
                 _load_session(user)
+                ca.logger.debug("Session loaded")
 
                 if reverse(next_page) is False:
                     abort(404)
