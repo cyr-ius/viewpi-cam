@@ -71,7 +71,7 @@ def token_cam_accept(function):
     def wrapper(*args, **kwargs):
         if cam_token := request.args.get("cam_token"):
             settings = settings_db.query.get(1)
-            if settings.count() == 1 and settings.cam_token == cam_token:
+            if settings.cam_token == cam_token:
                 return function.__wrapped__(*args, **kwargs)
             abort(403, "The provided Camera token is not valid")
         return function(*args, **kwargs)
