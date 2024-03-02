@@ -120,3 +120,14 @@ def allowed_file(filename):
         "." in filename
         and filename.rsplit(".", 1)[1].lower() in ca.config["ALLOWED_EXTENSIONS"]
     )
+
+
+def set_timezone(timezone: str) -> None:
+    """Set localtime and timezone."""
+    try:
+        execute_cmd(f"ln -fs /usr/share/zoneinfo/{timezone} /etc/localtime")
+        with open("/etc/timezone", mode="w", encoding="utf-8") as file:
+            file.writelines(timezone)
+            file.close()
+    except Exception as error:
+        ca.logger.error(error)
