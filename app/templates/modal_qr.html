@@ -77,6 +77,4 @@ $('#otp_del_btn').click(function () {
     $.queryData({"method":"delete", "url":`{{ url_for('api.users_totp')}}/${data["id"]}`,  "callbackSuccess":callback});
   }
 });
-
-
 </script>

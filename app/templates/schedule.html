@@ -165,71 +165,30 @@
                 </select>
             </div>
         </div>
-        </form>
+    </form>
         <div id="period_scheduler" class="row mx-auto mt-5">
             <div class="row row-cols-5 row-cols-md-5 text-center p-1 ">
                 <span class="col-2">{{ _('Period')}}</span>
-                <span class="col-2">{{ _('Days Su-Sa')}}</span>
+                <span class="col-2">{{ _('Mon - - Wed - - Sun')}}</span>
                 <span class="col-2">{{ _('Motion Start')}}</span>
                 <span class="col-2">{{ _('Motion Stop')}}</span>
                 <span class="col-2">{{ _('Period Start')}}</span>
             </div>
-            <form id="form_schedule" class="row needs-validation day d-none">
-            <input type="hidden" name="daymode" value="{{settings.daymode}}">
-            <input type="hidden" name="sch_id" value="{{scheduler[0].id}}">
-            <div class="row row-cols-5 row-cols-md-5 gy-1 gx-2">
-                <div class="col" data-time="{{scheduler[0].period}}"><label class="col-form-label-sm">{{ _('All Days')}}</label></div>
-                <div class="col text-center">
-                    {% for day in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]%}
-                    {% set i = loop.index0 %}
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="scheduler[{{scheduler[0].id}}][{{day}}]" {%if scheduler[0].days[i] %} checked="checked" {%endif%}>
-                    {%endfor%}
-                </div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="scheduler[{{scheduler[0].id}}][commands_on]" value="{{scheduler[0].command_on}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="scheduler[{{scheduler[0].id}}][commands_off]" value="{{scheduler[0].command_off}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="scheduler[{{scheduler[0].id}}][modes]" value="{{scheduler[0].mode}}"></div>
-            </div>
-            </form>
-            <form id="form_schedule" class="row needs-validation sun d-none">
-            <input type="hidden" name="daymode" value="{{settings.daymode}}">
-            {% for d_mode in ["Night","Dawn","Day","Dusk"]%}
-            {% set index = loop.index0 + 1%}
-            {% if scheduler[index] %}
-            <input type="hidden" name="sch_id" value="{{scheduler[index].id}}">
-            <div class="row row-cols-5 row-cols-md-5 gy-1 gx-2">
-                <div class="col" data-time="{{scheduler[index].period}}"><label class="col-form-label-sm">{{d_mode}}</label></div>
-                <div class="col text-center">
-                    {% for day in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]%}
-                    {% set i = loop.index0 %}
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="scheduler[{{scheduler[index].id}}][{{day}}]" {%if scheduler[index].days[i] %} checked="checked" {%endif%}>
-                    {%endfor%}
-                </div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="scheduler[{{scheduler[index].id}}][commands_on]" value="{{scheduler[index].command_on}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="scheduler[{{scheduler[index].id}}][commands_off]" value="{{scheduler[index].command_off}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="scheduler[{{scheduler[index].id}}][modes]" value="{{scheduler[index].mode}}"></div>
-            </div>
-            {%endif%}
-            {%endfor%}
-            </form>
-            <form id="form_schedule" class="row needs-validation fixed d-none">
+            <form id="form_schedule" class="row needs-validation">
             <input type="hidden" name="daymode" value="{{settings.daymode}}">   
-            {% for time in range(0, 24) %}
-            {% set index = loop.index0 + 5 %}
-            {% if scheduler[index] %}
-            <input type="hidden" name="sch_id" value="{{scheduler[index].id}}">
+            {% for item in scheduler %}
             <div class="row row-cols-5 row-cols-md-5 gy-1 gx-2">
-                <div class="col-1" data-time="{{scheduler[index].period}}"><label class="col-form-label-sm">{{scheduler[index].period}}</label></div>
+                <div class="col-1" data-time="{{item.period}}"><label class="col-form-label-sm">{{item.period}}</label></div>
                 <div class="col text-center">
                     {% for day in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]%}
                     {% set i = loop.index0 %}
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="scheduler[{{scheduler[index].id}}][{{day}}]" {%if scheduler[index].days[i] %} checked="checked" {%endif%}>
+                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="scheduler[{{item.id}}][{{day}}]" {%if item.days[i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="scheduler[{{scheduler[index].id}}][commands_on]" value="{{scheduler[index].command_on}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="scheduler[{{scheduler[index].id}}][commands_off]" value="{{scheduler[index].command_off}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" autocomplete="off" name="scheduler[{{scheduler[index].id}}][modes]" value="{{scheduler[index].mode}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_on]" value="{{item.command_on}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_off]" value="{{item.command_off}}"></div>
+                <div class="col"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][modes]" value="{{item.mode}}"></div>
             </div>
-            {%endif%}
             {%endfor%}
             </form>
         </div>
@@ -241,7 +200,15 @@
 $(function(){
     $("#main").addClass("d-none")
     $("#schedule").removeClass("d-none")
-    $("#daymode").trigger("click");
+
+    let daymode = parseInt($("#daymode").val());
+    let callbackSuccess = function(data) {
+        let period = data["period"]       
+        $('#period').html(`Period: <b>${period}</b>`)
+        let line = $("#period_scheduler").find(`[data-time="${period}"]`)
+        $(line).css("background-color","LightGreen").css("color","black")
+    }
+    $.queryData({"url":"{{ url_for('api.schedule_period')}}", "data": {"daymode": daymode}, "callbackSuccess":callbackSuccess})    
 })
 
 $('#sch_save').unbind();
@@ -255,10 +222,10 @@ $('#sch_save').click(function(){
     }
 
     if (!document.getElementById('form_schedule').checkValidity()) {
-        $("#form_schedule.enabled").addClass('was-validated')
+        $("#form_schedule").addClass('was-validated')
     } else {
-        $("#form_schedule.enabled").removeClass('was-validated')
-        data = $("#form_schedule.enabled").serializeObject({'checkboxesAsBools': true});    
+        $("#form_schedule").removeClass('was-validated')
+        data = $("#form_schedule").serializeObject({'checkboxesAsBools': true});    
 
         // Format days field
         var schedulers = new Object();
@@ -270,7 +237,7 @@ $('#sch_save').click(function(){
             for (const match of matchs) {
                 let sch_id = parseInt(match[1]);
                 if (schedulers[sch_id] == null){
-                    schedulers[sch_id] = {}
+                    schedulers[sch_id] = {"daymode": data["daymode"]}
                     schedulers[sch_id]["calendar"] = {}
                 }
                 const str = match[2];
@@ -282,9 +249,7 @@ $('#sch_save').click(function(){
                 delete data[key]
             }
         }
-
-        let callbackSuccess = function(e){$("#daymode").trigger("click");}
-        $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_scheduler')}}","data": schedulers,"callbackSuccess": callbackSuccess})
+        $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_scheduler')}}","data": schedulers})
     }
 });
 
@@ -320,29 +285,12 @@ $('#schedule').on('click','#stop', function(){
 });
 
 $('#daymode').unbind();
-$('#daymode').click(function(){
-    let mode = parseInt($("#daymode").val());
-    let callbackSuccess = function(data) {
-        let period = data["period"]       
-        $('#period').html(`Period: <b>${period}</b>`)
-        let line = $("#period_scheduler").find(`[data-time="${period}"]`)
-        $(line).css("background-color","LightGreen")
-    }
-    $.queryData({"url":"{{ url_for('api.schedule_period')}}", "data":{"daymode":mode}, "callbackSuccess":callbackSuccess})
-
-    $('.sun').addClass("d-none").removeClass("enabled");
-    $('.day').addClass("d-none").removeClass("enabled");
-    $('.fixed').addClass("d-none").removeClass("enabled");
-
-    if (mode == 0) {
-        $('.sun').removeClass("d-none").addClass("enabled");
-    }
-    if (mode == 1) {
-        $('.day').removeClass("d-none").addClass("enabled");
-    }
-    if (mode == 2) {
-        $('.fixed').removeClass("d-none").addClass("enabled");
-    }
+$('#daymode').change(function(){
+    let data = {"daymode": parseInt($("#daymode").val())}
+    let callbackSuccess = function(e){ location.reload(true); }
+    $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data, "callbackSuccess": callbackSuccess})
 });
+
+
 </script>
 {% endblock%}

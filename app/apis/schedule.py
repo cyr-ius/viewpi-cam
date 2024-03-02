@@ -63,7 +63,7 @@ class Settings(Resource):
             except ViewPiCamException as error:
                 write_log(error)
 
-        send_motion(ca.config["SCHEDULE_RESET"])
+        # send_motion(ca.config["SCHEDULE_RESET"])
         return "", 204
 
 
@@ -83,11 +83,12 @@ class Scheduler(Resource):
     def put(self):
         """Set settings."""
         for sch_id, scheduler in api.payload.items():
-            id = int(sch_id)
-            my_schedule = scheduler_db.query.get(id)
+            my_schedule = scheduler_db.query.filter_by(
+                daysmode_id=scheduler["daymode"], id=int(sch_id)
+            )
+            my_schedule = my_schedule.scalar()
             my_schedule.command_on = scheduler["commands_on"]
             my_schedule.command_off = scheduler["commands_off"]
-            my_schedule.mode = scheduler["modes"]
             my_schedule.calendars = []
             for key, value in scheduler["calendar"].items():
                 if value:
@@ -141,7 +142,6 @@ class Period(Resource):
     """Sunrise."""
 
     @api.marshal_with(period)
-    @api.expect(daymode)
     def post(self):
         """Post day mode and return period."""
         return {"period": get_calendar(api.payload["daymode"])}

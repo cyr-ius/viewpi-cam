@@ -44,13 +44,16 @@ bp.cli.short_help = "Stop/Start scheduler"
 def index():
     """Index page."""
     settings = settings_db.query.get(1)
-    schedulers = []
-    for scheduler in scheduler_db.query.all():
+    schedulers = scheduler_db.query.filter_by(daysmode_id=settings.daymode)
+
+    selected_scheduler = []
+    for scheduler in schedulers:
         days = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
         for day in scheduler.calendars:
             days[int(day.id)] = 1
         scheduler.days = days
-        schedulers.append(scheduler)
+        selected_scheduler.append(scheduler)
+
     return render_template(
         "schedule.html",
         control_file=ca.raspiconfig.control_file,
@@ -63,7 +66,7 @@ def index():
         sunrise=sun_info("sunrise").strftime("%H:%M"),
         sunset=sun_info("sunset").strftime("%H:%M"),
         timezones=zoneinfo.available_timezones(),
-        scheduler=schedulers,
+        scheduler=selected_scheduler,
     )
 
 
