@@ -42,7 +42,7 @@ def get_logs(reverse: bool) -> list[str]:
     log_file = ca.raspiconfig.log_file
     logs = []
     if os.path.isfile(log_file):
-        with open(log_file, mode="r", encoding="utf-8") as file:
+        with open(log_file, encoding="utf-8") as file:
             lines = file.readlines()
             lines.sort(reverse=reverse)
             for line in lines:

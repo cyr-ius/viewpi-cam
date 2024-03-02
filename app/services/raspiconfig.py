@@ -40,7 +40,7 @@ class RaspiConfig:
     ) -> dict[str, Any]:
         config = {} if not config else config
         if os.path.isfile(filename):
-            with open(filename, mode="r", encoding="utf-8") as file:
+            with open(filename, encoding="utf-8") as file:
                 for line in file.read().split("\n"):
                     if len(line) and line[0:1] != "#":
                         index = line.find(" ")
@@ -122,7 +122,7 @@ class RaspiConfig:
         """Send command to pipe."""
         try:
             pipe = os.open(self.control_file, os.O_WRONLY | os.O_NONBLOCK)
-            os.write(pipe, f"{cmd}\n".encode("utf-8"))
+            os.write(pipe, f"{cmd}\n".encode())
             os.close(pipe)
             write_log(f"Control - Send {cmd}")
         except Exception as error:  # pylint: disable=W0718

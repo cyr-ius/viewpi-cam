@@ -30,7 +30,7 @@ def send_motion(cmd: str) -> None:
     """Send command to pipe."""
     try:
         pipe = os.open(ca.raspiconfig.motion_pipe, os.O_WRONLY | os.O_NONBLOCK)
-        os.write(pipe, f"{cmd}\n".encode("utf-8"))
+        os.write(pipe, f"{cmd}\n".encode())
         os.close(pipe)
         write_log(f"Motion - Send {cmd}")
     except Exception as error:  # pylint: disable=W0718

@@ -46,7 +46,7 @@ def index():
     pipan_file = ca.config["PIPAN_FILE"]
     if os.path.isfile(pipan_file):
         mode = 1
-        with open(pipan_file, mode="r", encoding="utf-8") as file:
+        with open(pipan_file, encoding="utf-8") as file:
             pipan_sck = file.read().decode("utf-8")
             cam_pos = pipan_sck.split(" ")
             file.close()
@@ -88,7 +88,7 @@ def streamlog():
 
     def generate(log_file):
         if os.path.isfile(log_file):
-            with open(log_file, mode="r", encoding="utf-8") as file:
+            with open(log_file, encoding="utf-8") as file:
                 first = True
                 while True:
                     if first:
@@ -214,7 +214,7 @@ def pipan():
 
     if action := request.args.get("action"):
         try:
-            with open(servo_data, mode="r", encoding="utf-8") as file:
+            with open(servo_data, encoding="utf-8") as file:
                 servo_file = json.load(file)
 
                 for key in servo_data:

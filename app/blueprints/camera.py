@@ -61,9 +61,7 @@ def status_mjpeg():
     """Return status_mjpeg."""
     file_content = ""
     for _ in range(0, 30):
-        with open(
-            current_app.raspiconfig.status_file, mode="r", encoding="utf-8"
-        ) as file:
+        with open(current_app.raspiconfig.status_file, encoding="utf-8") as file:
             file_content = file.read()
             if file_content != request.args.get("last"):
                 break

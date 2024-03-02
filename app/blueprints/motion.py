@@ -75,7 +75,7 @@ def motion():
                     json.dump(backup, file)
             case "restore":
                 if os.path.isfile(MOTION_CONFIGBACKUP):
-                    with open(MOTION_CONFIGBACKUP, mode="r", encoding="utf-8") as file:
+                    with open(MOTION_CONFIGBACKUP, encoding="utf-8") as file:
                         restore = json.load(file)
                         motions = restore(MOTION_PARS)
                         for key, value in motions.items():
@@ -116,7 +116,7 @@ def restart_motion():
 def _get_file_config(filename, config: dict[str, Any] | None = None):
     config = {} if not config else config
     if os.path.isfile(filename):
-        with open(filename, mode="r", encoding="utf-8") as file:
+        with open(filename, encoding="utf-8") as file:
             for line in file.read().split("\n"):
                 if len(line) and line[0:1] != "#":
                     index = line.find(" ")

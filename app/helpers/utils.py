@@ -66,7 +66,7 @@ def delete_log(log_size: int) -> None:
     """Delete log."""
     log_file = ca.raspiconfig.log_file
     if os.path.isfile(log_file):
-        log_lines = open(log_file, mode="r", encoding="utf-8").readlines()
+        log_lines = open(log_file, encoding="utf-8").readlines()
         if len(log_lines) > log_size:
             with open(log_file, mode="w", encoding="utf-8") as file:
                 file.writelines(log_lines[:log_size])

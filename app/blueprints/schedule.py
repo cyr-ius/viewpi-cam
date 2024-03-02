@@ -209,9 +209,7 @@ def scheduler() -> None:
                 if settings.autocamera_interval > 0 and timenow > autocameratime:
                     autocameratime = timenow + 2
                     mod_time = os.path.getmtime(ca.raspiconfig.status_file)
-                    with open(
-                        ca.raspiconfig.status_file, mode="r", encoding="utf-8"
-                    ) as file:
+                    with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
                         content = file.read()
                         file.close()
                     if content == "halted":
