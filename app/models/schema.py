@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set
 
 from .base import db
 
@@ -38,7 +38,7 @@ class Settings(db.Model):
         db.ForeignKey("presets.mode"), nullable=False
     )
 
-    presets: db.Mapped["Presets"] = db.relationship(back_populates="settings")
+    presets: db.Mapped[Set["Presets"]] = db.relationship(back_populates="settings")
     daysmode: db.Mapped["DaysMode"] = db.relationship()
 
     def __repr__(self):
@@ -70,7 +70,9 @@ class Users(db.Model):
     name: db.Mapped[str] = db.mapped_column(db.String, unique=True)
     secret: db.Mapped[str] = db.mapped_column(db.String)
     totp: db.Mapped[str] = db.mapped_column(db.String)
-    right = db.mapped_column(db.ForeignKey("roles.id"))
+    right: db.Mapped[str] = db.mapped_column(
+        db.ForeignKey("roles.level"), nullable=False
+    )
 
     roles: db.Mapped["Roles"] = db.relationship(back_populates="users")
 
@@ -82,9 +84,8 @@ class Users(db.Model):
 
 class Roles(db.Model):
     __tablename__ = "roles"
-    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
+    level: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
     name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    level: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
 
     users: db.Mapped["Users"] = db.relationship(back_populates="roles")
 
@@ -129,12 +130,8 @@ class Ubuttons(db.Model):
 scheduler_calendar = db.Table(
     "scheduler_calendar",
     db.Model.metadata,
-    db.Column(
-        "scheduler_id", db.Integer, db.ForeignKey("scheduler.id"), primary_key=True
-    ),
-    db.Column(
-        "calendar_id", db.Integer, db.ForeignKey("calendar.id"), primary_key=True
-    ),
+    db.Column("scheduler_id", db.Integer, db.ForeignKey("scheduler.id")),
+    db.Column("calendar_id", db.Integer, db.ForeignKey("calendar.id")),
 )
 
 
@@ -160,8 +157,10 @@ class Scheduler(db.Model):
     command_off: db.Mapped[str] = db.mapped_column(db.String)
     mode: db.Mapped[str] = db.mapped_column(db.String)
     enabled: db.Mapped[bool] = db.mapped_column(db.Boolean)
-    daysmode_id: db.Mapped[int] = db.mapped_column(db.ForeignKey("daysmode.id"))
     period: db.Mapped[str] = db.mapped_column(db.String)
+    daysmode_id: db.Mapped[int] = db.mapped_column(
+        db.ForeignKey("daysmode.id"), nullable=False
+    )
 
     daysmode: db.Mapped["DaysMode"] = db.relationship(back_populates="scheduler")
     calendars: db.Mapped[List["Calendar"]] = db.relationship(
