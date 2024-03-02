@@ -6,15 +6,15 @@ from datetime import timezone
 from subprocess import PIPE, Popen
 
 import pytz
+from flask import current_app as ca
 from flask import request
 from flask_restx import Namespace, Resource, abort
 from suntime import Sun
 
-from ..const import SCHEDULE_RESET
 from ..helpers.decorator import role_required, token_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.fifo import send_motion
-from ..helpers.utils import execute_cmd, get_pid, write_log
+from ..helpers.utils import execute_cmd, get_pid, set_timezone, write_log
 from ..models import Calendar as calendar_db
 from ..models import Scheduler as scheduler_db
 from ..models import Settings as settings_db
@@ -58,11 +58,12 @@ class Settings(Resource):
 
         if (new_tz := settings.gmt_offset) != cur_tz:
             try:
-                execute_cmd(f"ln -fs /usr/share/zoneinfo/{new_tz} /etc/localtime")
+                set_timezone(new_tz)
                 write_log(f"Set timezone {new_tz}")
             except ViewPiCamException as error:
                 write_log(error)
-        send_motion(SCHEDULE_RESET)
+
+        send_motion(ca.config["SCHEDULE_RESET"])
         return "", 204
 
 
@@ -94,7 +95,7 @@ class Scheduler(Resource):
                     my_schedule.calendars.append(cal.scalar())
             db.session.commit()
 
-        send_motion(SCHEDULE_RESET)
+        send_motion(ca.config["SCHEDULE_RESET"])
         return "", 204
 
 

@@ -2,8 +2,6 @@
 
 import os
 
-from .const import LBL_PERIODS, LEVELS
-
 basedir = os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
 
 # GENERAL SETTINGS
@@ -19,6 +17,7 @@ SESSION_TYPE = "filesystem"
 # SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
+
 # Allowed extension for mask file
 ALLOWED_EXTENSIONS = ["pgm"]
 MASK_FILENAME = "motionmask.pgm"
@@ -41,13 +40,23 @@ THUMBNAIL_EXT = ".th.jpg"
 # Select size metho 0=python , 1=stats
 FILESIZE_METHOD = 0
 # File for settings
-FILE_SETTINGS = f"{SYSTEM_FOLDER}/settings.json"
 SERVO_FILE = f"{SYSTEM_FOLDER}/servo"
 PIPAN_FILE = f"{SYSTEM_FOLDER}/pipan"
 # Convert command
 CONVERT_CMD = "/usr/bin/ffmpeg -f image2 -i i_%05d.jpg"
 # Userlevel
-USERLEVEL = LEVELS
+USERLEVEL_MIN = 1
+USERLEVEL_MINP = 2
+USERLEVEL_MEDIUM = 4
+USERLEVEL_MAX = 8
+
+USERLEVEL = {
+    "min": USERLEVEL_MIN,
+    "preview": USERLEVEL_MINP,
+    "medium": USERLEVEL_MEDIUM,
+    "max": USERLEVEL_MAX,
+}
+
 # Locales
 LOCALES = ["en", "fr"]
 # Macros name files
@@ -63,12 +72,9 @@ MACROS = [
     "motion_event",
     "startstop",
 ]
-# Period day
-PERIODS = LBL_PERIODS
 # Filter number
 TIME_FILTER_MAX = 8
-# Schedule range
-SCHEDULE_TIMES_MAX = 12
+
 
 # Starts services
 SVC_RASPIMJPEG = os.getenv("SVC_RASPIMJPEG", "1")
@@ -80,47 +86,7 @@ SWAGGER_UI_OPERATION_ID = True
 SWAGGER_UI_REQUEST_DURATION = True
 RESTX_MASK_SWAGGER = False
 
-# Default settings
-DEFAULT_INIT = {
-    "autocamera_interval": 0,
-    "autocapture_interval": 0,
-    "cmd_poll": 0.03,
-    "commands_off": ["ca 0", "", "", "ca 0", "", "", "", "", "", "", ""],
-    "commands_on": ["ca 1", "", "", "ca 1", "", "", "", "", "", "", ""],
-    "dawnstart_minutes": -180,
-    "dayend_minutes": 0,
-    "daymode": 1,
-    "days": {f"{i}": [1, 1, 1, 1, 1, 1, 1] for i in range(0, SCHEDULE_TIMES_MAX + 5)},
-    "daystart_minutes": 0,
-    "duskend_minutes": 180,
-    "gmt_offset": "Etc/UTC",
-    "latitude": 52.00,
-    "longitude": 0.00,
-    "management_command": "",
-    "management_interval": 3600,
-    "max_capture": 0,
-    "modes": [
-        "",
-        "em night",
-        "md 1;em night",
-        "em auto",
-        "md 0;em night",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-    ],
-    "mode_poll": 10,
-    "purgeimage_hours": 0,
-    "purgelapse_hours": 0,
-    "purgespace_level": 10,
-    "purgespace_modeex": 0,
-    "purgevideo_hours": 0,
-    "times": [f"{i + 9:02d}:00" for i in range(0, SCHEDULE_TIMES_MAX)],
-    "pipan": 0,
-    "servo": 0,
-    "pilight": 0,
-    "upreset": "v2",
-}
+# Schedule state
+SCHEDULE_RESET = "9"
+SCHEDULE_START = "1"
+SCHEDULE_STOP = "0"

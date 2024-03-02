@@ -13,7 +13,6 @@ from flask import current_app as ca
 from flask.cli import with_appcontext
 
 from ..apis.schedule import dt_now, get_calendar, sun_info, time_offset
-from ..const import SCHEDULE_RESET, SCHEDULE_START, SCHEDULE_STOP
 from ..helpers.decorator import auth_required, role_required
 from ..helpers.fifo import check_motion, open_pipe
 from ..helpers.filer import (
@@ -119,7 +118,7 @@ def scheduler() -> None:
         while timeout_max == 0 or timeout < timeout_max:
             time.sleep(poll_time)
             cmd = check_motion(motion_fifo_in)
-            if cmd == SCHEDULE_STOP and autocapture == 0:
+            if cmd == ca.config["SCHEDULE_STOP"] and autocapture == 0:
                 if last_on_cmd:
                     write_log("Stop capture requested")
                     schedule = scheduler_db.query.filter_by(
@@ -133,7 +132,7 @@ def scheduler() -> None:
                         last_on_cmd = None
                 else:
                     write_log("Stop capture request ignored, already stopped")
-            elif cmd == SCHEDULE_START or autocapture == 1:
+            elif cmd == ca.config["SCHEDULE_START"] or autocapture == 1:
                 if last_day_period:
                     if autocapture == 1:
                         autocapture = 2
@@ -154,7 +153,7 @@ def scheduler() -> None:
                     write_log(
                         "Start capture request ignored, day period not initialised yet"
                     )
-            elif cmd == SCHEDULE_RESET:
+            elif cmd == ca.config["SCHEDULE_RESET"]:
                 write_log("Reload parameters command requested")
                 break
             elif cmd != "":

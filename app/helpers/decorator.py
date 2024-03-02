@@ -6,7 +6,6 @@ import jwt
 from flask import abort, redirect, request, session, url_for
 from flask import current_app as ca
 
-from ..const import USERLEVEL_MAX
 from ..models import Settings as settings_db
 
 
@@ -58,7 +57,7 @@ def token_required(function):
                 abort(422, "API token expired")
             else:
                 if content.get("iis") == "system":
-                    session["level"] = USERLEVEL_MAX
+                    session["level"] = ca.config["USERLEVEL"]["max"]
                 return function(*args, **kwargs)
         abort(422, "Please provide an API token")
 
