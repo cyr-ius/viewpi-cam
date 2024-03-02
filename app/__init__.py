@@ -8,8 +8,7 @@ from flask import Flask, g
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from . import apis, blueprints, models, services
-from .helpers.exceptions import ViewPiCamException
-from .helpers.utils import execute_cmd, get_pid, launch_schedule
+from .helpers.utils import get_pid, launch_schedule, set_timezone
 from .models import Settings as settings_db
 from .models import db
 
@@ -92,6 +91,11 @@ def create_app(config=None):
 
         return {"file_exists": file_exists}
 
+    @app.before_request
+    def before_app_request():
+        """Execute before request."""
+        g.loglevel = settings.loglevel
+
     @app.after_request
     def set_secure_headers(response):
         response.headers["X-Content-Type-Options"] = "nosniff"
@@ -101,24 +105,15 @@ def create_app(config=None):
 
     with app.app_context():
         if db.inspect(db.engine).has_table("Settings"):
+            # Get settings
             settings = settings_db.query.get(1)
-
-            @app.before_request
-            def before_app_request():
-                """Execute before request."""
-                g.loglevel = settings.loglevel
 
             # Custom log level
             if custom_level := settings.loglevel:
                 app.logger.setLevel(custom_level.upper())
-            else:
-                settings["loglevel"] = os.environ.get("LOG_LEVEL", "INFO").upper()
 
             # Set timezone
             if offset := settings.gmt_offset:
-                try:
-                    execute_cmd(f"ln -sf /usr/share/zoneinfo/{offset} /etc/localtime")
-                except ViewPiCamException as error:
-                    app.logger.error(error)
+                set_timezone(offset)
 
     return app
