@@ -1,14 +1,14 @@
 # Translations template for viewpicam.
-# Copyright (C) 2023 ORGANIZATION
+# Copyright (C) 2024 ORGANIZATION
 # This file is distributed under the same license as the viewpicam project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: viewpicam VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-12-26 19:09+0100\n"
+"POT-Creation-Date: 2024-03-02 12:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,35 +17,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.14.0\n"
 
-#: ../app/const.py:4
-msgid "AllDay"
-msgstr ""
-
-#: ../app/const.py:4
-msgid "Night"
-msgstr ""
-
-#: ../app/const.py:4
-msgid "Dawn"
-msgstr ""
-
-#: ../app/const.py:4
-msgid "Day"
-msgstr ""
-
-#: ../app/const.py:4
-msgid "Dusk"
-msgstr ""
-
-#: ../app/const.py:6
+#: ../app/blueprints/auth.py:57
 msgid "User or password is empty."
 msgstr ""
 
-#: ../app/const.py:7
+#: ../app/blueprints/auth.py:59 ../app/blueprints/auth.py:98
+#: ../app/blueprints/auth.py:99
 msgid "User or password invalid."
 msgstr ""
 
-#: ../app/const.py:8
+#: ../app/blueprints/auth.py:117
 msgid "Access id denied."
 msgstr ""
 
@@ -264,7 +245,7 @@ msgstr ""
 msgid "Current"
 msgstr ""
 
-#: ../app/templates/schedule.html:12 ../app/templates/schedule.html:170
+#: ../app/templates/schedule.html:12 ../app/templates/schedule.html:171
 msgid "Period"
 msgstr ""
 
@@ -370,23 +351,23 @@ msgstr ""
 msgid "Purge Mode"
 msgstr ""
 
-#: ../app/templates/schedule.html:171
+#: ../app/templates/schedule.html:172
 msgid "Days Su-Sa"
 msgstr ""
 
-#: ../app/templates/schedule.html:172
+#: ../app/templates/schedule.html:173
 msgid "Motion Start"
 msgstr ""
 
-#: ../app/templates/schedule.html:173
+#: ../app/templates/schedule.html:174
 msgid "Motion Stop"
 msgstr ""
 
-#: ../app/templates/schedule.html:174
+#: ../app/templates/schedule.html:175
 msgid "Period Start"
 msgstr ""
 
-#: ../app/templates/schedule.html:177
+#: ../app/templates/schedule.html:181
 msgid "All Days"
 msgstr ""
 
@@ -436,31 +417,31 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: ../app/templates/settings.html:150
+#: ../app/templates/settings.html:148
 msgid "Macros"
 msgstr ""
 
-#: ../app/templates/settings.html:170
+#: ../app/templates/settings.html:168
 msgid "Execute"
 msgstr ""
 
-#: ../app/templates/settings.html:175
+#: ../app/templates/settings.html:173
 msgid "Multiview"
 msgstr ""
 
-#: ../app/templates/settings.html:175
+#: ../app/templates/settings.html:173
 msgid "Add multiple camera display on same page"
 msgstr ""
 
-#: ../app/templates/settings.html:175
+#: ../app/templates/settings.html:173
 msgid "View"
 msgstr ""
 
-#: ../app/templates/settings.html:196
+#: ../app/templates/settings.html:194
 msgid "Debug"
 msgstr ""
 
-#: ../app/templates/settings.html:198
+#: ../app/templates/settings.html:196
 msgid "Verbose level"
 msgstr ""
 

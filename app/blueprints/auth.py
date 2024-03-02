@@ -16,9 +16,9 @@ from flask import (
     url_for,
 )
 from flask import current_app as ca
+from flask_babel import lazy_gettext as _
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from ..const import TXT_MSG_1, TXT_MSG_2, TXT_MSG_3, USERLEVEL_MAX
 from ..helpers.decorator import auth_required
 from ..helpers.utils import reverse
 from ..models import Users, db
@@ -47,16 +47,16 @@ def register():
                 user = Users(
                     name=name,
                     secret=generate_password_hash(password),
-                    right=USERLEVEL_MAX,
+                    right=ca.config["USERLEVEL"]["max"],
                 )
                 db.session.add(user)
                 db.session.commit()
                 if reverse(next_page) is False:
                     abort(404)
                 return redirect(next_page)
-            flash_msg = TXT_MSG_1
+            flash_msg = _("User or password is empty.")
         else:
-            flash_msg = TXT_MSG_2
+            flash_msg = _("User or password invalid.")
 
         flash(flash_msg)
 
@@ -72,8 +72,10 @@ def login():
     if Users.query.count() == 0:
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
-        if user := Users.query.filter_by(name=request.form.get("username")).one():
-            ca.logger.debug(f"User: {user.name}")
+        if (
+            user := Users.query.filter_by(name=request.form.get("username"))
+        ) and user.count() == 1:
+            user = user.one()
             if check_password_hash(user.secret, request.form.get("password")):
                 ca.logger.debug("Password is correct")
                 session.clear()
@@ -88,14 +90,13 @@ def login():
                     return render_template("totp.html", next=next_page, id=user.id)
 
                 _load_session(user)
-                ca.logger.debug("Session loaded")
 
                 if reverse(next_page) is False:
                     abort(404)
 
                 return redirect(next_page)
-            flash(TXT_MSG_2)
-        flash(TXT_MSG_2)
+            flash(_("User or password invalid."))
+        flash(_("User or password invalid."))
 
     return render_template("login.html")
 
@@ -113,7 +114,7 @@ def totpverified():
                 if reverse(next_page) is False:
                     abort(404)
                 return redirect(next_page)
-    flash(TXT_MSG_3)
+    flash(_("Access id denied."))
 
     return render_template("totp.html", id=id, next=next)
 

@@ -1,13 +1,9 @@
-# French translations for PROJECT.
-# Copyright (C) 2023 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
-#
+
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-12-26 19:09+0100\n"
+"POT-Creation-Date: 2024-03-02 12:40+0100\n"
 "PO-Revision-Date: 2023-10-23 20:00+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -18,35 +14,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.14.0\n"
 
-#: ../app/const.py:4
-msgid "AllDay"
-msgstr "Tous les jours"
-
-#: ../app/const.py:4
-msgid "Night"
-msgstr "Nuit"
-
-#: ../app/const.py:4
-msgid "Dawn"
-msgstr "Aube"
-
-#: ../app/const.py:4
-msgid "Day"
-msgstr "Jour"
-
-#: ../app/const.py:4
-msgid "Dusk"
-msgstr "Crépuscule"
-
-#: ../app/const.py:6
+#: ../app/blueprints/auth.py:57
 msgid "User or password is empty."
 msgstr "Utilisateur ou mot de passe manquant"
 
-#: ../app/const.py:7
+#: ../app/blueprints/auth.py:59 ../app/blueprints/auth.py:98
+#: ../app/blueprints/auth.py:99
 msgid "User or password invalid."
 msgstr "Utilisateur ou mot de passe incorrecte"
 
-#: ../app/const.py:8
+#: ../app/blueprints/auth.py:117
 msgid "Access id denied."
 msgstr "Accès refusé"
 
@@ -265,7 +242,7 @@ msgstr "Coucher du soleil"
 msgid "Current"
 msgstr "Actuel"
 
-#: ../app/templates/schedule.html:12 ../app/templates/schedule.html:170
+#: ../app/templates/schedule.html:12 ../app/templates/schedule.html:171
 msgid "Period"
 msgstr "Période"
 
@@ -371,23 +348,23 @@ msgstr ""
 msgid "Purge Mode"
 msgstr "Mode de purge"
 
-#: ../app/templates/schedule.html:171
+#: ../app/templates/schedule.html:172
 msgid "Days Su-Sa"
 msgstr "Jours Sam-Dim"
 
-#: ../app/templates/schedule.html:172
+#: ../app/templates/schedule.html:173
 msgid "Motion Start"
 msgstr "Actions - début détection"
 
-#: ../app/templates/schedule.html:173
+#: ../app/templates/schedule.html:174
 msgid "Motion Stop"
 msgstr "Actions - fin détection"
 
-#: ../app/templates/schedule.html:174
+#: ../app/templates/schedule.html:175
 msgid "Period Start"
 msgstr "Actions - début période"
 
-#: ../app/templates/schedule.html:177
+#: ../app/templates/schedule.html:181
 msgid "All Days"
 msgstr "Tous les jours"
 
@@ -416,6 +393,8 @@ msgid ""
 "The generation of the token allows it to be passed as a parameter of the "
 "pages to avoid authentication."
 msgstr ""
+"La génération du token permet de le passer en paramètre des pages pour "
+"éviter l'authentification."
 
 #: ../app/templates/settings.html:84 ../app/templates/settings.html:102
 msgid "Generate"
@@ -437,35 +416,50 @@ msgstr "Dernière image"
 msgid "Options"
 msgstr ""
 
-#: ../app/templates/settings.html:150
+#: ../app/templates/settings.html:148
 msgid "Macros"
 msgstr ""
 
-#: ../app/templates/settings.html:170
+#: ../app/templates/settings.html:168
 msgid "Execute"
 msgstr "Executer"
 
-#: ../app/templates/settings.html:175
+#: ../app/templates/settings.html:173
 msgid "Multiview"
 msgstr "Voir"
 
-#: ../app/templates/settings.html:175
+#: ../app/templates/settings.html:173
 msgid "Add multiple camera display on same page"
 msgstr "Ajouter plusieurs caméras sur une page"
 
-#: ../app/templates/settings.html:175
+#: ../app/templates/settings.html:173
 msgid "View"
 msgstr "Voir"
 
-#: ../app/templates/settings.html:196
+#: ../app/templates/settings.html:194
 msgid "Debug"
 msgstr ""
 
-#: ../app/templates/settings.html:198
+#: ../app/templates/settings.html:196
 msgid "Verbose level"
 msgstr "Niveau"
 
 #: ../app/templates/totp.html:19
 msgid "Check"
 msgstr "Vérifier"
+
+#~ msgid "AllDay"
+#~ msgstr "Tous les jours"
+
+#~ msgid "Night"
+#~ msgstr "Nuit"
+
+#~ msgid "Dawn"
+#~ msgstr "Aube"
+
+#~ msgid "Day"
+#~ msgstr "Jour"
+
+#~ msgid "Dusk"
+#~ msgstr "Crépuscule"
 
