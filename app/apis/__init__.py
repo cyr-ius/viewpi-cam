@@ -1,4 +1,5 @@
 """Apis viewpicam."""
+
 from .base import api, bp
 from .captures import api as captures
 from .logs import api as logs
