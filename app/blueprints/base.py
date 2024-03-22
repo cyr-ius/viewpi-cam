@@ -42,11 +42,11 @@ def handle_unauthorized_access(error):
 
 
 @login_manager.user_loader
-def load_user(id):
+def load_user(user_id):
     """
     This will be current_user
     """
-    return Users.query.get(int(id))
+    return Users.query.filter_by(alternative_id=user_id).first()
 
 
 @login_manager.unauthorized_handler

@@ -1,3 +1,7 @@
+""" Schema database."""
+
+import random
+import uuid
 from datetime import datetime as dt
 from datetime import timezone
 from typing import List
@@ -5,6 +9,7 @@ from typing import List
 import jwt
 import pyotp
 from flask import current_app as ca
+from flask_restx import abort
 from sqlalchemy.dialects.sqlite import JSON
 from sqlalchemy.ext.mutable import MutableDict
 from werkzeug.security import check_password_hash
@@ -35,7 +40,9 @@ class Multiviews(db.Model):
 class Users(db.Model):
     __tablename__ = "users"
     id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    alternate_id: db.Mapped[int] = db.mapped_column(db.String)
+    alternative_id: db.Mapped[int] = db.mapped_column(
+        db.String, default=str(uuid.uuid4())
+    )
     enabled: db.Mapped[bool] = db.mapped_column(db.Boolean, default=True)
     locale: db.Mapped[str] = db.mapped_column(db.String(2), default="en")
     name: db.Mapped[str] = db.mapped_column(db.String, unique=True)
@@ -68,20 +75,43 @@ class Users(db.Model):
         return int(self.right)
 
     def get_id(self):
-        return str(self.id)
+        return str(self.alternative_id)
 
-    def set_secret(self) -> None:
+    def set_otp_secret(self) -> None:
         """Set otp code."""
         if self.otp_confirmed is None:
             self.otp_secret = pyotp.random_base32()
             db.session.commit()
 
-    def delete_secret(self) -> None:
+    def delete_otp_secret(self) -> None:
         """Remove otp code."""
         if self.otp_confirmed:
             self.otp_secret = None
             self.otp_confirmed = False
             db.session.commit()
+
+    def set_camera_token(self) -> str:
+        """Set otp code."""
+        self.cam_token = f"B{random.getrandbits(256)}"
+        db.session.commit()
+        return self.cam_token
+
+    def delete_camera_token(self) -> None:
+        self.cam_token = None
+        db.session.commit()
+
+    def set_api_token(self) -> str:
+        self.api_token = jwt.encode(
+            payload={"iss": self.name, "id": self.id, "iat": dt.now(tz=timezone.utc)},
+            key=ca.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
+        db.session.commit()
+        return self.api_token
+
+    def delete_api_token(self) -> None:
+        self.api_token = None
+        db.session.commit()
 
     def check_otp_secret(self, code: str) -> bool:
         """Validate otp code."""
@@ -104,6 +134,14 @@ class Users(db.Model):
             key=ca.config["SECRET_KEY"],
             algorithm="HS256",
         )
+
+    def create_user(self) -> None:
+        user = Users.query.filter(str(Users.name).lower() == self.name.lower()).first()
+        if user:
+            abort(422, "User name is already exists, please change.")
+
+        db.session.add(self)
+        db.session.commit()
 
 
 class Roles(db.Model):

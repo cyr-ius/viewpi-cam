@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash
 from ..helpers.decorator import role_required
 from ..models import Users as users_db
 from ..models import db
-from .models import locale, message, user, users
+from .models import api_token, cam_token, locale, message, user, users
 
 api = Namespace(
     "users",
@@ -20,6 +20,8 @@ api.add_model("Error", message)
 api.add_model("User", user)
 api.add_model("Users", users)
 api.add_model("Locale", locale)
+api.add_model("CamToken", cam_token)
+api.add_model("APIToken", api_token)
 
 
 @api.response(403, "Forbidden", message)
@@ -42,8 +44,7 @@ class Users(Resource):
             api.payload.pop("id", None)
             api.payload["secret"] = generate_password_hash(password)
             user = users_db(**api.payload)
-            db.session.add(user)
-            db.session.commit()
+            user.create_user()
             return user
         except IntegrityError:
             abort(422, "User name is already exists, please change.")
@@ -121,3 +122,56 @@ class Locale(Resource):
             db.session.commit()
             return "", 204
         abort(404, "User not found")
+
+
+@api.response(403, "Forbidden", message)
+@api.route("/ctoken")
+class Token(Resource):
+    """Token."""
+
+    @api.marshal_with(cam_token)
+    def get(self):
+        """Get token."""
+        user = users_db.query.get(0)
+        return {"cam_token": user.cam_token}
+
+    @api.marshal_with(cam_token)
+    def post(self):
+        """Create token."""
+        user = users_db.query.get(0)
+        cam_token = user.set_camera_token()
+        return {"cam_token": cam_token}
+
+    @api.response(204, "Actions is success")
+    def delete(self):
+        """Delete token."""
+        user = users_db.query.get(0)
+        user.delete_camera_token()
+        return "", 204
+
+
+@api.response(403, "Forbidden", message)
+@api.route("/token", doc=False)
+class APIToken(Resource):
+    """Token."""
+
+    @api.marshal_with(api_token)
+    def get(self):
+        """Get token."""
+        user = users_db.query.get(0)
+        api_token = user.set_api_token()
+        return {"api_token": api_token}
+
+    @api.marshal_with(api_token)
+    def post(self):
+        """Create token."""
+        user = users_db.query.get(0)
+        api_token = user.set_api_token()
+        return {"api_token": api_token}
+
+    @api.response(204, "Actions is success")
+    def delete(self):
+        """Delete token."""
+        user = users_db.query.get(0)
+        user.delete_api_token()
+        return "", 204

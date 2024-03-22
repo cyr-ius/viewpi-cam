@@ -510,14 +510,22 @@ def seed_data():
     users = sa.sql.table(
         "users",
         sa.sql.column("id", sa.Integer),
-        sa.sql.column("alternate_id", sa.String),
+        sa.sql.column("alternative_id", sa.String),
         sa.sql.column("enabled", sa.Boolean),
         sa.sql.column("name", sa.String),
         sa.sql.column("right", sa.Integer),
     )
     op.bulk_insert(
         users,
-        [{"id": 0, "alternate_id": 0, "enabled": False, "name": "system", "right": 8}],
+        [
+            {
+                "id": 0,
+                "alternative_id": 0,
+                "enabled": False,
+                "name": "system",
+                "right": 8,
+            }
+        ],
     )
 
     settings = sa.sql.table(
@@ -599,7 +607,7 @@ def upgrade():
     op.create_table(
         "users",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("alternate_id", sa.String(), nullable=False),
+        sa.Column("alternative_id", sa.String(), nullable=False),
         sa.Column("enabled", sa.Boolean),
         sa.Column("locale", sa.String(length=2)),
         sa.Column("name", sa.String()),
@@ -612,7 +620,7 @@ def upgrade():
         sa.PrimaryKeyConstraint("id"),
         sa.ForeignKey("right", "roles.id"),
         sa.UniqueConstraint("id"),
-        sa.UniqueConstraint("alternate_id"),
+        sa.UniqueConstraint("alternative_id"),
         sa.UniqueConstraint("name"),
     )
     op.create_table(

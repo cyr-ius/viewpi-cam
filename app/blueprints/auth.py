@@ -1,11 +1,10 @@
 """Blueprint Authentication."""
 
-import uuid
-
 from flask import (
     Blueprint,
     abort,
     flash,
+    g,
     make_response,
     redirect,
     render_template,
@@ -37,11 +36,8 @@ def register():
                     name=name,
                     secret=generate_password_hash(password),
                     right=ca.config["USERLEVEL"]["max"],
-                    alternate_id=str(uuid.uuid1()),
-                    enabled=True,
                 )
-                db.session.add(user)
-                db.session.commit()
+                user.create_user()
 
                 return redirect(url_for("main.index", next=next))
 
@@ -66,19 +62,24 @@ def login():
         next = request.form.get("next")
         if next and reverse(next) is False:
             abort(404)
+        remember = request.form.get("remember") == "on"
 
         if (
             user := Users.query.filter_by(name=request.form.get("username"))
         ) and user.count() == 1:
             user = user.one()
             if user.check_password(request.form.get("password")):
-                if user.otp_confirmed:
-                    return render_template("totp.html", next=next, id=user.id)
+                g.first_auth = True
 
-                login_user(user)
+                if user.otp_confirmed:
+                    return render_template(
+                        "totp.html", next=next, id=user.id, remember=remember
+                    )
+
+                login_user(user, remember=remember)
                 response = make_response(redirect(next or url_for("main.index")))
                 response.set_cookie(
-                    "JWToken",
+                    "api_token",
                     value=user.generate_jwt(),
                     httponly=True,
                     samesite="strict",
@@ -95,7 +96,7 @@ def login():
 @bp.route("/totp-verified", methods=["GET", "POST"])
 def totpverified():
     """Totop verified."""
-    if request.method == "POST":
+    if g.first_auth and request.method == "POST":
         id = int(request.form.get("id"))  # pylint: disable=W0622
         next = request.form.get("next")
         if next and reverse(next) is False:
@@ -107,7 +108,7 @@ def totpverified():
             login_user(user)
             response = make_response(redirect(next or url_for("main.index")))
             response.set_cookie(
-                "JWToken", value=user.generate_jwt(), httponly=True, samesite="strict"
+                "api_token", value=user.generate_jwt(), httponly=True, samesite="strict"
             )
             return response
         flash(_("Access id denied."))
@@ -121,5 +122,5 @@ def logout():
     """Logout  button."""
     logout_user()
     response = make_response(redirect(url_for("auth.login")))
-    response.set_cookie("JWToken", "", expires=0)
+    response.set_cookie("api_token", "", expires=0)
     return response

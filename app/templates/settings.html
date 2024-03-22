@@ -79,7 +79,7 @@
             <div class="row g-1 ms-2">
                 <div class="col">
                     <div class="input-group">
-                        <input class="form-control form-control-sm" id="cam_token" type="text" value="{{settings.cam_token}}" disabled>
+                        <input class="form-control form-control-sm" id="cam_token" type="text" value="{{camera_token}}" disabled>
                         <button class="btn btn-sm btn-outline-secondary" id="btn_token" type="button" title="add to clipboard"><i class="bi bi-clipboard"></i></button>
                         <button class="btn btn-sm btn-outline-secondary" id="get_token" type="button">{{_('Generate')}}</button>
                         <button class="btn btn-sm btn-outline-secondary" id="del_token" type="button">{{_('Reset')}}</button>
@@ -97,7 +97,7 @@
             <div class="row g-1 ms-2">
                 <div class="col">
                     <div class="input-group">
-                        <input class="form-control form-control-sm" id="apitoken" name="apitoken" type="text" value="{{settings.api_token}}" disabled>
+                        <input class="form-control form-control-sm" id="apitoken" name="apitoken" type="text" value="{{api_token}}" disabled>
                         <button class="btn btn-sm btn-outline-secondary" id="btn_api_token" type="button" title="add to clipboard"><i class="bi bi-clipboard"></i></button>
                         <button class="btn btn-sm btn-outline-secondary" id="get_api_token" type="button">{{_('Generate')}}</button>
                         <button class="btn btn-sm btn-outline-secondary" id="del_api_token" type="button">{{_('Reset')}}</button>
@@ -235,7 +235,7 @@ $('#get_token').click(function () {
         $('#cam_pic').attr("href",`{{ url_for("camera.cam_pic", cam_token=None) }}?cam_token=${cam_token}`)
         $('#cam_pic_new, #cam_pic').removeClass("d-none");
     }
-    $.queryData({url:"{{url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
+    $.queryData({url:"{{url_for('api.users_token')}}",callbackSuccess:callbackSuccess});
 });
 
 $('#del_token').unbind();
@@ -244,19 +244,19 @@ $('#del_token').click(function () {
         $('#cam_token').val('')
         $('#cam_pic_new, #cam_pic').addClass("d-none");
     }
-    $.queryData({method:"delete", url:"{{ url_for('api.settings_token')}}",callbackSuccess:callbackSuccess});
+    $.queryData({method:"delete", url:"{{ url_for('api.users_token')}}",callbackSuccess:callbackSuccess});
 });
 
 $('#get_api_token').unbind();
 $('#get_api_token').click(function () {
     let callbackSuccess = function(data){$('#apitoken').val(data["api_token"])}
-    $.queryData({url:"{{url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
+    $.queryData({url:"{{url_for('api.users_api_token')}}",callbackSuccess:callbackSuccess});
 });
 
 $('#del_api_token').unbind();
 $('#del_api_token').click(function () {
     let callbackSuccess = function(data){$('#apitoken').val('')}
-    $.queryData({method:"delete", url:"{{ url_for('api.settings_api_token')}}",callbackSuccess:callbackSuccess});
+    $.queryData({method:"delete", url:"{{ url_for('api.users_api_token')}}",callbackSuccess:callbackSuccess});
 });
 
 $('#users').on('click','.add_button', function() {

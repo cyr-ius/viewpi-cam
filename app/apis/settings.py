@@ -1,10 +1,5 @@
 """Blueprint Settings API."""
 
-import random
-from datetime import datetime as dt
-from datetime import timezone
-
-import jwt
 from flask import current_app as ca
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
@@ -12,7 +7,7 @@ from flask_restx import Namespace, Resource, abort
 from ..helpers.decorator import role_required
 from ..models import Settings as settting_db
 from ..models import Ubuttons, db
-from .models import api_token, button, buttons, cam_token, macros, message, setting
+from .models import button, buttons, macros, message, setting
 
 api = Namespace(
     "settings",
@@ -22,8 +17,6 @@ api = Namespace(
 api.add_model("Error", message)
 api.add_model("Set", setting)
 api.add_model("Macros", macros)
-api.add_model("CamToken", cam_token)
-api.add_model("APIToken", api_token)
 api.add_model("Button", button)
 api.add_model("Buttons", buttons)
 
@@ -104,68 +97,6 @@ class Button(Resource):
             db.session.commit()
             return "", 204
         abort(404, "Button not found")
-
-
-@api.response(403, "Forbidden", message)
-@api.route("/ctoken")
-class Token(Resource):
-    """Token."""
-
-    @api.marshal_with(cam_token)
-    def get(self):
-        """Get token."""
-        settings = settting_db.query.first()
-        return {"cam_token": settings.data["cam_token"]}
-
-    @api.marshal_with(cam_token)
-    def post(self):
-        """Create token."""
-        secure_token = f"B{random.getrandbits(256)}"
-        settings = settting_db.query.first()
-        settings.data["cam_token"] = secure_token
-        db.session.commit()
-        return {"cam_token": secure_token}
-
-    @api.response(204, "Actions is success")
-    def delete(self):
-        """Delete token."""
-        settings = settting_db.query.first()
-        settings.data.pop("cam_token", None)
-        db.session.commit()
-        return "", 204
-
-
-@api.response(403, "Forbidden", message)
-@api.route("/token", doc=False)
-class APIToken(Resource):
-    """Token."""
-
-    @api.marshal_with(api_token)
-    def get(self):
-        """Get token."""
-        settings = settting_db.query.first()
-        return {"api_token": settings.data["api_token"]}
-
-    @api.marshal_with(api_token)
-    def post(self):
-        """Create token."""
-        secure_token = jwt.encode(
-            {"iss": "system", "id": 0, "iat": dt.now(tz=timezone.utc)},
-            ca.config["SECRET_KEY"],
-            algorithm="HS256",
-        )
-        settings = settting_db.query.first()
-        settings.data["api_token"] = secure_token
-        db.session.commit()
-        return {"api_token": secure_token}
-
-    @api.response(204, "Actions is success")
-    def delete(self):
-        """Delete token."""
-        settings = settting_db.query.first()
-        settings.data.pop(api_token, None)
-        db.session.commit()
-        return "", 204
 
 
 @api.response(403, "Forbidden", message)

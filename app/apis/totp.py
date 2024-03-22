@@ -29,7 +29,7 @@ class Totp(Resource):
     def get(self, id: int):
         """Get OTP for a user."""
         if user := db.get_or_404(users_db, id):
-            user.set_secret()
+            user.set_otp_secret()
             return user
         abort(404, "User not found")
 
@@ -61,6 +61,6 @@ class Totp(Resource):
     def delete(self, id: int):
         """Delete OTP infos for a user."""
         if user := db.get_or_404(users_db, id):
-            user.delete_secret()
+            user.delete_otp_secret()
             return "", 204
         abort(404, "User not found")

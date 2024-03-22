@@ -17,6 +17,7 @@ bp = Blueprint(
 @role_required("max")
 def index():
     macros = Macros().get_config()
+    sys_user = Users.query.get(0)
     users = Users.query.filter(Users.id > 0).all()
     ubuttons = Ubuttons.query.all()
     multiviews = Multiviews.query.all()
@@ -30,4 +31,6 @@ def index():
         ubuttons=ubuttons,
         multiviews=multiviews,
         presets=dict(presets).values(),
+        camera_token=sys_user.cam_token,
+        api_token=sys_user.api_token,
     )
