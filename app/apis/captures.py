@@ -2,16 +2,17 @@
 
 from flask import current_app as ca
 from flask import request
+from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import role_required, token_required
+from ..helpers.decorator import role_required
 from ..services.raspiconfig import RaspiConfigError
 from .models import forbidden, message
 
 api = Namespace(
     "captures",
     description="Stop/Start capture and preview camera/images",
-    decorators=[token_required, role_required("max")],
+    decorators=[role_required("max"), login_required],
 )
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)

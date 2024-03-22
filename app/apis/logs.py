@@ -1,16 +1,17 @@
 """Api logs."""
 
 import os
+from json.decoder import JSONDecodeError
 
 from flask import current_app as ca
 from flask import json, request
+from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import token_required
 from ..helpers.utils import delete_log
 from .models import forbidden, message
 
-api = Namespace("logs", description="Log management", decorators=[token_required])
+api = Namespace("logs", description="Log management", decorators=[login_required])
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
 
@@ -47,6 +48,9 @@ def get_logs(reverse: bool) -> list[str]:
             lines.sort(reverse=reverse)
             for line in lines:
                 line = line.replace("\n", "")
-                line = json.loads(line)
+                try:
+                    line = json.loads(line)
+                except JSONDecodeError:
+                    pass
                 logs.append(line)
     return logs

@@ -23,9 +23,7 @@ class UriOTP(fields.Raw):
         """Display QR Code."""
         if not obj:
             return
-        uri = (
-            f"otpauth://totp/viewpicam:{obj.name}?secret={obj.secret}&issuer=viewpicam"
-        )
+        uri = f"otpauth://totp/viewpicam:{obj.name}?secret={obj.otp_secret}&issuer=viewpicam"
         qr = qrcode.QRCode(image_factory=qrcode.image.svg.SvgPathImage)
         qr.make(fit=True)
         qr.add_data(uri)
@@ -198,7 +196,7 @@ otp = Model(
         "id": fields.Integer(required=True, description="Id"),
         "name": fields.String(required=True, description="The user name"),
         "otp_svg": UriOTP(required=False),
-        "totp": fields.Boolean(required=False, description="otp status"),
+        "otp_confirmed": fields.Boolean(required=False, description="otp status"),
     },
 )
 user = Model(

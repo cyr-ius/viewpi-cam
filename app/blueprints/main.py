@@ -14,12 +14,12 @@ from flask import (
     render_template,
     request,
     send_file,
-    session,
 )
 from flask import current_app as ca
+from flask_login import login_required, current_user
 
 from ..apis.logs import get_logs
-from ..helpers.decorator import auth_required, role_required
+from ..helpers.decorator import role_required
 from ..helpers.utils import allowed_file, write_log
 from ..models import Multiviews as multiviews_db
 from ..models import Presets as presets_db
@@ -32,12 +32,12 @@ bp = Blueprint("main", __name__, template_folder="templates")
 
 
 @bp.route("/", methods=["GET"])
-@auth_required
+@login_required
 def index():
     """Index page."""
-    settings = settings_db.query.get(1)
-    write_log(f"Logged in user: {session['username']}")
-    write_log(f"UserLevel {session['level']}")
+    settings = settings_db.query.first()
+    write_log(f"Logged in user: {current_user.name}")
+    write_log(f"UserLevel {current_user.right}")
     display_mode = request.cookies.get("display_mode", "On")
     mjpegmode = int(request.cookies.get("mjpegmode", 0))
 
@@ -51,10 +51,10 @@ def index():
             cam_pos = pipan_sck.split(" ")
             file.close()
 
-    if settings.servo:
+    if settings.data.get("servo"):
         mode = 2
 
-    presets = presets_db.query.filter_by(mode=settings.upreset).all()
+    presets = presets_db.query.filter_by(mode=settings.data["upreset"]).all()
 
     return render_template(
         "main.html",
@@ -64,14 +64,14 @@ def index():
         raspiconfig=ca.raspiconfig,
         display_mode=display_mode,
         mjpegmode=mjpegmode,
-        preset=settings.upreset,
+        preset=settings.data["upreset"],
         presets=presets,
     )
 
 
 @bp.route("/log", methods=["GET", "POST"])
+@login_required
 @role_required(["max"])
-@auth_required
 def log():
     """Log page (and download if post)."""
     if request.method == "POST":
@@ -80,8 +80,8 @@ def log():
 
 
 @bp.route("/streamlog", methods=["GET"])
+@login_required
 @role_required(["max"])
-@auth_required
 def streamlog():
     """Stream log page."""
     log_file = ca.raspiconfig.log_file
@@ -102,8 +102,8 @@ def streamlog():
 
 
 @bp.route("/debug", methods=["GET"])
+@login_required
 @role_required(["max"])
-@auth_required
 def debugcmd():
     """Debug page."""
     return render_template("debug.html", raspiconfig=ca.raspiconfig.__dict__)
@@ -116,14 +116,14 @@ def helpcmd():
 
 
 @bp.route("/min", methods=["GET"])
-@auth_required
+@login_required
 def minview():
     """Mini view page."""
     return render_template("min.html")
 
 
 @bp.route("/multiview", methods=["GET"])
-@auth_required
+@login_required
 def multiview():
     """Camera multiview page."""
     multiviews = multiviews_db.query.all()
@@ -131,7 +131,7 @@ def multiview():
 
 
 @bp.route("/view", methods=["GET"])
-@auth_required
+@login_required
 def view():
     """Stream camera preview."""
     id = request.args.get(  # pylint: disable=W0622
@@ -160,7 +160,7 @@ def view():
 
 
 @bp.route("/pipan", methods=["GET"])
-@auth_required
+@login_required
 def pipan():
     """Pipan page."""
     servo_cmd = "/dev/servoblaster"
@@ -259,7 +259,7 @@ def pipan():
 
 
 @bp.route("/mask", methods=["POST"])
-@auth_required
+@login_required
 def image_mask():
     """Load image mask."""
     if "file" not in request.files:

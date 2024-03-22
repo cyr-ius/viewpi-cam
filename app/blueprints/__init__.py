@@ -6,6 +6,7 @@ from .base import (
     handle_bad_request,
     handle_internal_server_error,
     handle_page_not_found,
+    login_manager,
 )
 from .camera import bp as cam_bp
 from .main import bp as main_bp
@@ -17,6 +18,9 @@ from .settings import bp as sets_bp
 
 def init_app(app):
     """Init Blueprint."""
+    login_manager.init_app(app)
+    login_manager.login_view = "auth.login"
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(cam_bp)
     app.register_blueprint(main_bp)

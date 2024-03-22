@@ -8,10 +8,11 @@ from subprocess import PIPE, Popen
 import pytz
 from flask import current_app as ca
 from flask import request
+from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 from suntime import Sun
 
-from ..helpers.decorator import role_required, token_required
+from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.fifo import send_motion
 from ..helpers.utils import execute_cmd, get_pid, set_timezone, write_log
@@ -24,7 +25,7 @@ from .models import date_time, day, daymode, forbidden, message, period, schedul
 api = Namespace(
     "schedule",
     description="Scheduler management",
-    decorators=[token_required, role_required("max")],
+    decorators=[role_required("max"), login_required],
 )
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)
@@ -43,20 +44,20 @@ class Settings(Resource):
     @api.marshal_with(schedule)
     def get(self):
         """Get settings scheduler."""
-        return settings_db.query.get(1)
+        settings = settings_db.query.first()
+        return settings.data
 
     @api.expect(schedule)
     @api.marshal_with(message)
     @api.response(204, "Action is success")
     def put(self):
         """Set settings."""
-        settings = settings_db.query.get(1)
-        cur_tz = settings.gmt_offset
-
-        settings.update(**api.payload)
+        settings = settings_db.query.first()
+        cur_tz = settings.data["gmt_offset"]
+        settings.data.update(**api.payload)
         db.session.commit()
 
-        if (new_tz := settings.gmt_offset) != cur_tz:
+        if (new_tz := settings.data["gmt_offset"]) != cur_tz:
             try:
                 set_timezone(new_tz)
                 write_log(f"Set timezone {new_tz}")
@@ -186,10 +187,10 @@ def utc_offset(offset) -> timezone:
 
 def dt_now(minute: bool = False) -> dt | int:
     """Get current local time."""
-    settings = settings_db.query.get(1)
     now = dt.utcnow()
-    if settings.gmt_offset:
-        offset = time_offset(settings.gmt_offset)
+    settings = settings_db.query.first()
+    if settings.data["gmt_offset"]:
+        offset = time_offset(settings.data["gmt_offset"])
         now = (now + offset).replace(tzinfo=utc_offset(offset.seconds))
     if minute:
         return now.hour * 60 + now.minute
@@ -198,9 +199,9 @@ def dt_now(minute: bool = False) -> dt | int:
 
 def sun_info(mode: str) -> dt:
     """Return sunset or sunrise datetime."""
-    settings = settings_db.query.get(1)
-    offset = time_offset(settings.gmt_offset)
-    sun = Sun(settings.latitude, settings.longitude)
+    settings = settings_db.query.first()
+    offset = time_offset(settings.data["gmt_offset"])
+    sun = Sun(settings.data["latitude"], settings.data["longitude"])
     if mode.lower() == "sunset":
         sun_time = sun.get_sunset_time()
     else:
@@ -210,29 +211,29 @@ def sun_info(mode: str) -> dt:
 
 def get_calendar(daymode: int) -> int:
     """Get calendar."""
-    settings = settings_db.query.get(1)
     now = dt_now()
     sunrise = sun_info("sunrise")
     sunset = sun_info("sunset")
+    settings = settings_db.query.first()
 
     match daymode:
         case 0:
-            if now < (sunrise + td(minutes=settings.dawnstart_minutes)):
+            if now < (sunrise + td(minutes=settings.data["dawnstart_minutes"])):
                 # Night
                 mem_sch = scheduler_db.query.filter_by(
                     period="night", daysmode_id=daymode
                 ).one()
-            elif now < (sunrise + td(minutes=settings.daystart_minutes)):
+            elif now < (sunrise + td(minutes=settings.data["daystart_minutes"])):
                 # Dawn
                 mem_sch = scheduler_db.query.filter_by(
                     period="dawn", daysmode_id=daymode
                 ).one()
-            elif now > (sunset + td(minutes=settings.duskend_minutes)):
+            elif now > (sunset + td(minutes=settings.data["duskend_minutes"])):
                 # Night
                 mem_sch = scheduler_db.query.filter_by(
                     period="night", daysmode_id=daymode
                 ).one()
-            elif now > (sunset + td(minutes=settings.dayend_minutes)):
+            elif now > (sunset + td(minutes=settings.data["dayend_minutes"])):
                 # Dusk
                 mem_sch = scheduler_db.query.filter_by(
                     period="dusk", daysmode_id=daymode

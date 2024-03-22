@@ -5,8 +5,8 @@ import time
 from typing import Any
 
 from flask import Blueprint, json, request
+from flask_login import login_required
 
-from ..helpers.decorator import auth_required
 from ..helpers.utils import get_pid
 
 MOTION_URL = "http://127.0.0.1:6642/0"
@@ -41,7 +41,7 @@ bp = Blueprint("motion", __name__, url_prefix="/motion")
 
 
 @bp.route("/motion", methods=["GET", "POST"])
-@auth_required
+@login_required
 def motion():
     # motion_ready = check_motion()
     # show_all = False

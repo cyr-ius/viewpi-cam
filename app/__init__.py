@@ -94,7 +94,8 @@ def create_app(config=None):
     @app.before_request
     def before_app_request():
         """Execute before request."""
-        g.loglevel = settings.loglevel
+        settings = settings_db.query.first()
+        g.loglevel = settings.data["loglevel"]
 
     @app.after_request
     def set_secure_headers(response):
@@ -104,16 +105,16 @@ def create_app(config=None):
         return response
 
     with app.app_context():
-        if db.inspect(db.engine).has_table("Settings"):
+        if db.inspect(db.engine).has_table("Setting"):
             # Get settings
-            settings = settings_db.query.get(1)
+            settings = settings_db.query.first()
 
             # Custom log level
-            if custom_level := settings.loglevel:
+            if custom_level := settings.data.get("loglevel"):
                 app.logger.setLevel(custom_level.upper())
 
             # Set timezone
-            if offset := settings.gmt_offset:
+            if offset := settings.data.get("gmt_offset"):
                 set_timezone(offset)
 
     return app

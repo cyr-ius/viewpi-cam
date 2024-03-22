@@ -1,53 +1,22 @@
-from typing import List, Set
+from datetime import datetime as dt
+from datetime import timezone
+from typing import List
+
+import jwt
+import pyotp
+from flask import current_app as ca
+from sqlalchemy.dialects.sqlite import JSON
+from sqlalchemy.ext.mutable import MutableDict
+from werkzeug.security import check_password_hash
 
 from .base import db
 
 
 class Settings(db.Model):
     __tablename__ = "settings"
-    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    api_token: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
-    cam_token: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
-    autocamera_interval: db.Mapped[int] = db.mapped_column(db.Integer)
-    autocapture_interval: db.Mapped[int] = db.mapped_column(db.Integer)
-    cmd_poll: db.Mapped[float] = db.mapped_column(db.Float)
-    dawnstart_minutes: db.Mapped[int] = db.mapped_column(db.Integer)
-    duskend_minutes: db.Mapped[int] = db.mapped_column(db.Integer)
-    dayend_minutes: db.Mapped[int] = db.mapped_column(db.Integer)
-    daystart_minutes: db.Mapped[int] = db.mapped_column(db.Integer)
-    daymode: db.Mapped[int] = db.mapped_column(
-        db.ForeignKey("daysmode.id"), nullable=False
-    )
-    gmt_offset: db.Mapped[str] = db.mapped_column(db.String)
-    loglevel: db.Mapped[str] = db.mapped_column(db.String)
-    latitude: db.Mapped[float] = db.mapped_column(db.Float)
-    longitude: db.Mapped[float] = db.mapped_column(db.Float)
-    management_command: db.Mapped[str] = db.mapped_column(db.String)
-    management_interval: db.Mapped[int] = db.mapped_column(db.Integer)
-    max_capture: db.Mapped[int] = db.mapped_column(db.Integer)
-    mode_poll: db.Mapped[int] = db.mapped_column(db.Integer)
-    pilight: db.Mapped[bool] = db.mapped_column(db.Boolean)
-    pipan: db.Mapped[bool] = db.mapped_column(db.Boolean)
-    servo: db.Mapped[bool] = db.mapped_column(db.Boolean)
-    purgeimage_hours: db.Mapped[int] = db.mapped_column(db.Integer)
-    purgelapse_hours: db.Mapped[int] = db.mapped_column(db.Integer)
-    purgespace_level: db.Mapped[int] = db.mapped_column(db.Integer)
-    purgespace_modeex: db.Mapped[int] = db.mapped_column(db.Integer)
-    purgevideo_hours: db.Mapped[int] = db.mapped_column(db.Integer)
-    upreset: db.Mapped[str] = db.mapped_column(
-        db.ForeignKey("presets.mode"), nullable=False
-    )
 
-    presets: db.Mapped[Set["Presets"]] = db.relationship(back_populates="settings")
-    daysmode: db.Mapped["DaysMode"] = db.relationship()
-
-    def __repr__(self):
-        return "<Settings {0}r>".format(self.name)
-
-    def update(self, **kwargs):
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
+    id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(MutableDict.as_mutable(JSON))
 
 
 class Multiviews(db.Model):
@@ -66,10 +35,15 @@ class Multiviews(db.Model):
 class Users(db.Model):
     __tablename__ = "users"
     id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
+    alternate_id: db.Mapped[int] = db.mapped_column(db.String)
+    enabled: db.Mapped[bool] = db.mapped_column(db.Boolean, default=True)
     locale: db.Mapped[str] = db.mapped_column(db.String(2), default="en")
     name: db.Mapped[str] = db.mapped_column(db.String, unique=True)
     secret: db.Mapped[str] = db.mapped_column(db.String)
-    totp: db.Mapped[str] = db.mapped_column(db.String)
+    otp_secret: db.Mapped[str] = db.mapped_column(db.String)
+    otp_confirmed: db.Mapped[str] = db.mapped_column(db.Boolean, default=False)
+    api_token: db.Mapped[str] = db.mapped_column(db.String)
+    cam_token: db.Mapped[str] = db.mapped_column(db.String)
     right: db.Mapped[str] = db.mapped_column(
         db.ForeignKey("roles.level"), nullable=False
     )
@@ -80,6 +54,56 @@ class Users(db.Model):
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return self.enabled
+
+    def is_anonymous(self):
+        return False
+
+    def level(self):
+        return int(self.right)
+
+    def get_id(self):
+        return str(self.id)
+
+    def set_secret(self) -> None:
+        """Set otp code."""
+        if self.otp_confirmed is None:
+            self.otp_secret = pyotp.random_base32()
+            db.session.commit()
+
+    def delete_secret(self) -> None:
+        """Remove otp code."""
+        if self.otp_confirmed:
+            self.otp_secret = None
+            self.otp_confirmed = False
+            db.session.commit()
+
+    def check_otp_secret(self, code: str) -> bool:
+        """Validate otp code."""
+        otp = pyotp.TOTP(self.otp_secret)
+        return otp.verify(code)
+
+    def check_password(self, password: str) -> bool:
+        return check_password_hash(self.secret, password)
+
+    def generate_jwt(self) -> str:
+        dt_now = dt.now(tz=timezone.utc)
+        dt_lifetime = dt_now + ca.config["PERMANENT_SESSION_LIFETIME"]
+        return jwt.encode(
+            payload={
+                "iis": self.name,
+                "id": self.id,
+                "iat": dt_now,
+                "exp": dt_lifetime,
+            },
+            key=ca.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
 
 
 class Roles(db.Model):
@@ -101,8 +125,6 @@ class Presets(db.Model):
     i_width: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
     i_height: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
     i_rate: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-
-    settings: db.Mapped["Settings"] = db.relationship(back_populates="presets")
 
 
 class LockFiles(db.Model):
@@ -147,7 +169,6 @@ class DaysMode(db.Model):
     name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
 
     scheduler: db.Mapped["Scheduler"] = db.relationship(back_populates="daysmode")
-    settings: db.Mapped["Settings"] = db.relationship(back_populates="daysmode")
 
 
 class Scheduler(db.Model):

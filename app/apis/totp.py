@@ -1,8 +1,9 @@
 """Blueprint API."""
 
+from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import role_required, token_required
+from ..helpers.decorator import role_required
 from ..models import Users as users_db
 from ..models import db
 from .models import message, otp
@@ -10,7 +11,7 @@ from .models import message, otp
 api = Namespace(
     "otps",
     description="Manage TOTP token.",
-    decorators=[token_required, role_required("max")],
+    decorators=[role_required("max"), login_required],
 )
 api.add_model("Error", message)
 api.add_model("TOTP", otp)
@@ -50,7 +51,7 @@ class Totp(Resource):
     def put(self, id: int):
         """Check and create OTP Code for a user."""
         if user := db.get_or_404(users_db, id):
-            if user.validate_secret(api.payload["secret"]):
+            if user.check_otp_secret(api.payload["secret"]):
                 return "", 204
             abort(422, "OTP incorrect")
         abort(404, "User not found")

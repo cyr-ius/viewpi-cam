@@ -1,11 +1,12 @@
 """Blueprint Users API."""
 
 from flask import current_app as ca
+from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
 
-from ..helpers.decorator import role_required, token_required
+from ..helpers.decorator import role_required
 from ..models import Users as users_db
 from ..models import db
 from .models import locale, message, user, users
@@ -13,7 +14,7 @@ from .models import locale, message, user, users
 api = Namespace(
     "users",
     description="Create, update and delete users.",
-    decorators=[token_required, role_required("max")],
+    decorators=[role_required("max"), login_required],
 )
 api.add_model("Error", message)
 api.add_model("User", user)
@@ -29,7 +30,7 @@ class Users(Resource):
     @api.marshal_with(users, as_list=True)
     def get(self):
         """List users."""
-        return users_db.query.all()
+        return users_db.query.filter(users_db.id > 0).all()
 
     @api.expect(user)
     @api.marshal_with(users)
@@ -57,6 +58,8 @@ class User(Resource):
     @api.response(404, "Not found", message)
     def get(self, id: int):
         """Get user."""
+        if id == 0:
+            abort(403, "System account cannot be read")
         return db.get_or_404(users_db, id)
 
     @api.expect(user)
@@ -65,6 +68,8 @@ class User(Resource):
     @api.response(404, "Not found", message)
     def put(self, id: int):
         """Set user."""
+        if id == 0:
+            abort(403, "System account cannot be modified")
         if user := db.get_or_404(users_db, id):
             if password := api.payload.pop("password", None):
                 api.payload["secret"] = generate_password_hash(password)
@@ -77,7 +82,7 @@ class User(Resource):
     @api.response(404, "Not found", message)
     def delete(self, id: int):
         """Delete user."""
-        if id == 1:
+        if id in [0, 1]:
             abort(403, "Admin account cannot be deleted")
 
         if user := db.get_or_404(users_db, id):
@@ -108,6 +113,9 @@ class Locale(Resource):
     @api.response(404, "Not found", message)
     def put(self, id: int):
         """Set language."""
+        if id == 0:
+            abort(403, "System account cannot be modified")
+
         if user := db.get_or_404(users_db, id):
             user.update(**api.payload)
             db.session.commit()

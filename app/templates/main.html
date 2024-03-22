@@ -25,12 +25,12 @@
             class="img-fluid standard" onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.jpg') }}">
     </div>
     <div id="main-buttons" class="my-2 {% if display_mode == "Off" %}d-none{%endif%}">
-        {% if session["level"] >= config.USERLEVEL.medium%}
+        {% if current_user.right >= config.USERLEVEL.medium%}
         <button id="video_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
         <button id="image_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
         <button id="timelapse_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
         {%endif%}
-        {% if session["level"] >= config.USERLEVEL.max%}
+        {% if current_user.right >= config.USERLEVEL.max%}
         <button id="md_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
         <button id="halt_button" type="button" class="btn btn-sm btn-danger"></button>
         {%endif%}

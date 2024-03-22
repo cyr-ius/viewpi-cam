@@ -1,8 +1,9 @@
 """Blueprint Multiview API."""
 
+from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import role_required, token_required
+from ..helpers.decorator import role_required
 from ..models import Multiviews as multiviews_db
 from ..models import db
 from .models import message, multiview, multiviews
@@ -10,7 +11,7 @@ from .models import message, multiview, multiviews
 api = Namespace(
     "multiview",
     description="Multiviews",
-    decorators=[token_required, role_required("max")],
+    decorators=[role_required("max"), login_required],
 )
 api.add_model("Error", message)
 api.add_model("Multiview", multiview)

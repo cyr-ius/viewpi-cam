@@ -10,8 +10,10 @@ from typing import Any
 
 from flask import Blueprint, abort, make_response, render_template, request, send_file
 from flask import current_app as ca
+from flask_login import login_required
 
-from ..helpers.decorator import auth_required, role_required
+from ..helpers.decorator import role_required
+from ..helpers.exceptions import ViewPiCamException
 from ..helpers.filer import (
     data_file_ext,
     data_file_name,
@@ -24,14 +26,13 @@ from ..helpers.filer import (
     list_folder_files,
 )
 from ..helpers.utils import disk_usage, execute_cmd, write_log
-from ..helpers.exceptions import ViewPiCamException
 from ..models import LockFiles
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
 
 @bp.route("/", methods=["GET"])
-@auth_required
+@login_required
 @role_required(["preview", "medium", "max"])
 def index():
     """Index page."""
@@ -58,8 +59,8 @@ def index():
 
 
 @bp.route("/download", methods=["POST"])
+@login_required
 @role_required(["preview", "medium", "max"])
-@auth_required
 def download():
     """Download File."""
     media_path = ca.raspiconfig.media_path
@@ -83,8 +84,8 @@ def download():
 
 
 @bp.route("/zipfile", methods=["POST"])
+@login_required
 @role_required(["preview", "medium", "max"])
-@auth_required
 def zipdata():
     """ZIP File."""
     check_list = request.json.get("check_list", [])

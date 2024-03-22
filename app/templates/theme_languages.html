@@ -8,7 +8,7 @@
   </button>
   <ul id="language" class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="theme-language-text">
     {%- for locale in config.LOCALES %}
-    <li><button class="dropdown-item" value="{{locale}}"><i class="bi bi-check {% if session.locale != locale %}d-none{%endif%}" style="color: green;"></i>{{locale|capitalize}}</button></li>
+    <li><button class="dropdown-item" value="{{locale}}"><i class="bi bi-check {% if current_user.locale != locale %}d-none{%endif%}" style="color: green;"></i>{{locale|capitalize}}</button></li>
     {%-endfor%}
   </ul>
 </div>
@@ -17,6 +17,6 @@ $('#language').unbind()
 $('#language').on('click', 'button', function(){
   let data = {"locale":$(this).val()}
   let callback = function(data){setTimeout(location.reload(),100)}
-  $.queryData({method:"put", url:"{{url_for('api.users_locale',id=session.id)}}", data:data, callbackSuccess:callback});
+  $.queryData({method:"put", url:"{{url_for('api.users_locale',id=current_user.id)}}", data:data, callbackSuccess:callback});
 })
 </script>

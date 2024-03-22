@@ -7,11 +7,11 @@ from datetime import datetime as dt
 from subprocess import PIPE, Popen
 
 from flask import current_app as ca
-from flask import request, session
+from flask import request
+from flask_login import current_user
 from psutil import ZombieProcess, process_iter
 
 from ..models import Settings as settings_db
-from ..models import Users
 from .exceptions import ViewPiCamException
 
 
@@ -96,16 +96,15 @@ def disk_usage() -> tuple[int, int, int, int, str]:
 
 def get_locale() -> str | list[str]:
     """Get locale."""
-    if (id := session.get("id")) and (user := Users.query.get(id)):
-        session["locale"] = user.locale
-        return user.locale
+    if current_user.is_authenticated:
+        return current_user.locale
     return request.accept_languages.best_match(["de", "fr", "en"])
 
 
 def get_timezone() -> str | list[str]:
     """Get timezone."""
-    settings = settings_db.query.get(1)
-    return settings.gmt_offset
+    settings = settings_db.query.first()
+    return settings.data["gmt_offset"]
 
 
 def launch_schedule() -> None:
@@ -127,7 +126,7 @@ def set_timezone(timezone: str) -> None:
     try:
         execute_cmd(f"ln -fs /usr/share/zoneinfo/{timezone} /etc/localtime")
         with open("/etc/timezone", mode="w", encoding="utf-8") as file:
-            file.writelines(timezone)
+            file.writelines(f"{timezone}\n")
             file.close()
     except Exception as error:
         ca.logger.error(error)

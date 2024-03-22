@@ -6,16 +6,18 @@ from datetime import timezone
 
 import jwt
 from flask import current_app as ca
+from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import role_required, token_required
-from ..models import Settings, Ubuttons, db
+from ..helpers.decorator import role_required
+from ..models import Settings as settting_db
+from ..models import Ubuttons, db
 from .models import api_token, button, buttons, cam_token, macros, message, setting
 
 api = Namespace(
     "settings",
     description="Change settings",
-    decorators=[token_required, role_required("max")],
+    decorators=[role_required("max"), login_required],
 )
 api.add_model("Error", message)
 api.add_model("Set", setting)
@@ -34,20 +36,20 @@ class Sets(Resource):
     @api.marshal_with(setting)
     def get(self):
         """Get settings."""
-        return Settings.query.get(1)
+        settings = settting_db.query.first()
+        return settings.data
 
     @api.expect(setting)
     @api.marshal_with(setting)
     @api.response(204, "Action is success")
     def post(self):
         """Set settings."""
-        if settings := Settings.query.get(1):
-            settings.update(**api.payload)
-            db.session.commit()
-            if loglevel := api.payload.get("loglevel"):
-                ca.logger.setLevel(loglevel)
-            return "", 204
-        abort(404, "settings not found")
+        settings = settting_db.query.first()
+        settings.data.update(**api.payload)
+        db.session.commit()
+        if loglevel := api.payload.get("loglevel"):
+            ca.logger.setLevel(loglevel)
+        return "", 204
 
 
 @api.response(403, "Forbidden", message)
@@ -112,23 +114,23 @@ class Token(Resource):
     @api.marshal_with(cam_token)
     def get(self):
         """Get token."""
-        settings = Settings.query.get(1)
-        return {"cam_token": settings.cam_token}
+        settings = settting_db.query.first()
+        return {"cam_token": settings.data["cam_token"]}
 
     @api.marshal_with(cam_token)
     def post(self):
         """Create token."""
-        settings = Settings.query.get(1)
         secure_token = f"B{random.getrandbits(256)}"
-        settings.cam_token = secure_token
+        settings = settting_db.query.first()
+        settings.data["cam_token"] = secure_token
         db.session.commit()
         return {"cam_token": secure_token}
 
     @api.response(204, "Actions is success")
     def delete(self):
         """Delete token."""
-        settings = Settings.query.get(1)
-        settings.cam_token = None
+        settings = settting_db.query.first()
+        settings.data.pop("cam_token", None)
         db.session.commit()
         return "", 204
 
@@ -141,27 +143,27 @@ class APIToken(Resource):
     @api.marshal_with(api_token)
     def get(self):
         """Get token."""
-        settings = Settings.query.get(1)
-        return {"api_token": settings.api_token}
+        settings = settting_db.query.first()
+        return {"api_token": settings.data["api_token"]}
 
     @api.marshal_with(api_token)
     def post(self):
         """Create token."""
-        settings = Settings.query.get(1)
         secure_token = jwt.encode(
             {"iss": "system", "id": 0, "iat": dt.now(tz=timezone.utc)},
             ca.config["SECRET_KEY"],
             algorithm="HS256",
         )
-        settings.api_token = secure_token
+        settings = settting_db.query.first()
+        settings.data["api_token"] = secure_token
         db.session.commit()
         return {"api_token": secure_token}
 
     @api.response(204, "Actions is success")
     def delete(self):
         """Delete token."""
-        settings = Settings.query.get(1)
-        settings.api_token = None
+        settings = settting_db.query.first()
+        settings.data.pop(api_token, None)
         db.session.commit()
         return "", 204
 

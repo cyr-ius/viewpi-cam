@@ -1,4 +1,5 @@
 """Apis viewpicam."""
+
 from flask import Blueprint
 from flask_restx import Api
 
@@ -11,7 +12,7 @@ api = Api(
     description="Apis for Viewpi Cam",
     doc="/doc",
     authorizations={
-        "Bearer": {"type": "apiKey", "in": "header", "name": "Authorization"}
+        "api_token": {"type": "apiKey", "in": "header", "name": "X-API-KEY"}
     },
-    security="Bearer",
+    security="api_token",
 )

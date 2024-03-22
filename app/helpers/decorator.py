@@ -2,23 +2,9 @@
 
 from functools import wraps
 
-import jwt
-from flask import abort, redirect, request, session, url_for
+from flask import abort
 from flask import current_app as ca
-
-from ..models import Settings as settings_db
-
-
-def auth_required(function):
-    """Authenticate decorator."""
-
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        if session.get("username"):
-            return function(*args, **kwargs)
-        return redirect(url_for("auth.login", next=request.url))
-
-    return wrapper
+from flask_login import current_user
 
 
 def role_required(rights: str | list[str]):
@@ -33,47 +19,11 @@ def role_required(rights: str | list[str]):
                 for item in listrights
                 if item in ca.config["USERLEVEL"].keys()
             ]
-            if session.get("level") in values:
+            if current_user and current_user.right in values:
                 return function(*args, **kwargs)
-            abort(403, "Access is denied")
+
+            abort(401, "Access is denied")
 
         return wrapper
 
     return decorate
-
-
-def token_required(function):
-    """Token decorator."""
-
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        token = session.get("bearer_token") or request.headers.get("Authorization")
-        if token:
-            try:
-                content = jwt.decode(
-                    token, ca.config["SECRET_KEY"], algorithms=["HS256"]
-                )
-            except (jwt.ImmatureSignatureError, jwt.ExpiredSignatureError):
-                abort(422, "API token expired")
-            else:
-                if content.get("iis") == "system":
-                    session["level"] = ca.config["USERLEVEL"]["max"]
-                return function(*args, **kwargs)
-        abort(422, "Please provide an API token")
-
-    return wrapper
-
-
-def token_cam_accept(function):
-    """Token camera decorator."""
-
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        if cam_token := request.args.get("cam_token"):
-            settings = settings_db.query.get(1)
-            if settings.cam_token == cam_token:
-                return function.__wrapped__(*args, **kwargs)
-            abort(403, "The provided Camera token is not valid")
-        return function(*args, **kwargs)
-
-    return wrapper

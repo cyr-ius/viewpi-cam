@@ -1,4 +1,14 @@
+from http import HTTPStatus
+
+import jwt
+from flask import current_app as ca
 from flask import redirect, render_template, request, session, url_for
+from flask_login import LoginManager
+from flask_restx import abort
+
+from ..models.schema import Users
+
+login_manager = LoginManager()
 
 
 def handle_bad_request(error):
@@ -29,3 +39,45 @@ def handle_bad_gateway(error):
 def handle_unauthorized_access(error):
     session["next"] = request.script_root + request.path
     return redirect(url_for("auth.login"))
+
+
+@login_manager.user_loader
+def load_user(id):
+    """
+    This will be current_user
+    """
+    return Users.query.get(int(id))
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    if request.blueprint == "api":
+        abort(HTTPStatus.UNAUTHORIZED, "API token is incorrect.")
+    return redirect(url_for("auth.login"))
+
+
+@login_manager.request_loader
+def load_user_from_request(request):
+    cam_token = request.args.get("cam_token")
+    if cam_token and request.blueprint == "camera":
+        user = Users.query.filter_by(id=0, cam_token=cam_token).first()
+        if user:
+            return user
+
+    api_token = request.headers.get("X-API-KEY") or request.cookies.get("JWToken")
+    if api_token and request.blueprint == "api":
+        try:
+            jwt_content = jwt.decode(
+                api_token, ca.config["SECRET_KEY"], algorithms=["HS256"]
+            )
+        except (jwt.ImmatureSignatureError, jwt.ExpiredSignatureError):
+            abort(422, "API token expired")
+        except jwt.DecodeError:
+            abort(401, "API token is incorrect.")
+
+        user = Users.query.filter_by(id=0, name=jwt_content.get("iss")).first()
+        if user:
+            return user
+
+    # finally, return None if both methods did not login the user
+    return None

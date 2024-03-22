@@ -1,9 +1,10 @@
 """Blueprint Settings."""
 
 from flask import Blueprint, render_template
+from flask_login import login_required
 
 from ..apis.settings import Macros
-from ..helpers.decorator import auth_required, role_required
+from ..helpers.decorator import role_required
 from ..models import Multiviews, Presets, Settings, Ubuttons, Users
 
 bp = Blueprint(
@@ -12,18 +13,18 @@ bp = Blueprint(
 
 
 @bp.route("/", methods=["GET"])
-@auth_required
+@login_required
 @role_required("max")
 def index():
     macros = Macros().get_config()
-    users = Users.query.all()
+    users = Users.query.filter(Users.id > 0).all()
     ubuttons = Ubuttons.query.all()
     multiviews = Multiviews.query.all()
-    settings = Settings.query.get(1)
     presets = Presets.query.add_column(Presets.mode).group_by("mode").all()
+    settings = Settings.query.first()
     return render_template(
         "settings.html",
-        settings=settings,
+        settings=settings.data,
         users=users,
         macros=macros,
         ubuttons=ubuttons,

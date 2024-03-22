@@ -2,10 +2,11 @@
 
 from flask import current_app as ca
 from flask import request
+from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
 from ..blueprints.preview import get_thumb, get_thumbnails, video_convert
-from ..helpers.decorator import role_required, token_required
+from ..helpers.decorator import role_required
 from ..helpers.filer import delete_mediafiles, maintain_folders
 from ..models import LockFiles as lockfiles_db
 from ..models import db
@@ -14,7 +15,7 @@ from .models import deletes, files, forbidden, message
 api = Namespace(
     "previews",
     description="Gallery management",
-    decorators=[token_required, role_required(["medium", "max"])],
+    decorators=[role_required(["medium", "max"]), login_required],
 )
 api.add_model("Error", message)
 api.add_model("Forbidden", forbidden)

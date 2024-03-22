@@ -11,9 +11,10 @@ import zoneinfo
 from flask import Blueprint, render_template
 from flask import current_app as ca
 from flask.cli import with_appcontext
+from flask_login import login_required
 
 from ..apis.schedule import dt_now, get_calendar, sun_info, time_offset
-from ..helpers.decorator import auth_required, role_required
+from ..helpers.decorator import role_required
 from ..helpers.fifo import check_motion, open_pipe
 from ..helpers.filer import (
     delete_mediafiles,
@@ -39,12 +40,12 @@ bp.cli.short_help = "Stop/Start scheduler"
 
 
 @bp.route("/", methods=["GET"])
+@login_required
 @role_required(["max"])
-@auth_required
 def index():
     """Index page."""
-    settings = settings_db.query.get(1)
-    schedulers = scheduler_db.query.filter_by(daysmode_id=settings.daymode)
+    settings = settings_db.query.first()
+    schedulers = scheduler_db.query.filter_by(daysmode_id=settings.data["daymode"])
 
     selected_scheduler = []
     for scheduler in schedulers:
@@ -59,10 +60,10 @@ def index():
         control_file=ca.raspiconfig.control_file,
         current_time=dt_now().strftime("%H:%M"),
         motion_pipe=ca.raspiconfig.motion_pipe,
-        offset=time_offset(settings.gmt_offset),
-        period=get_calendar(settings.daymode),
+        offset=time_offset(settings.data["gmt_offset"]),
+        period=get_calendar(settings.data["daymode"]),
         schedule_pid=get_pid("scheduler"),
-        settings=settings,
+        settings=settings.data,
         sunrise=sun_info("sunrise").strftime("%H:%M"),
         sunset=sun_info("sunset").strftime("%H:%M"),
         timezones=zoneinfo.available_timezones(),
@@ -101,16 +102,16 @@ def scheduler() -> None:
     while timeout_max == 0 or timeout < timeout_max:
         write_log("Scheduler loop is started")
         db.session.remove()
-        settings = settings_db.query.get(1)
+        settings = settings_db.query.first()
         last_on_cmd = None
         last_day_period = None
-        poll_time = settings.cmd_poll
+        poll_time = settings.data["cmd_poll"]
         slow_poll = 0
         managechecktime = dt.timestamp(dt_now())
         autocameratime = managechecktime
         modechecktime = managechecktime
 
-        if settings.autocapture_interval > settings.max_capture:
+        if settings.data["autocapture_interval"] > settings.data["max_capture"]:
             autocapturetime = managechecktime
             autocapture = 2
         else:
@@ -128,7 +129,7 @@ def scheduler() -> None:
                         period=last_day_period
                     ).one()
                     send = schedule.command_off
-                    settings.last_detection_stop = str(dt_now())
+                    settings.data["last_detection_stop"] = str(dt_now())
                     db.session.commit()
                     if send:
                         send_cmds(str_cmd=send, days=schedule.calendars)
@@ -142,7 +143,7 @@ def scheduler() -> None:
                         write_log("Start triggered by autocapture")
                     else:
                         write_log("Start capture requested from Pipe")
-                        settings.last_detection_start = str(dt_now())
+                        settings.data["last_detection_start"] = str(dt_now())
                         db.session.commit()
                     schedule = scheduler_db.query.filter_by(
                         period=last_day_period
@@ -168,8 +169,8 @@ def scheduler() -> None:
                 timenow = dt.timestamp(dt_now())
                 force_period_check = 0
                 if last_on_cmd:
-                    if settings.max_capture > 0:
-                        if (timenow - capture_start) >= settings.max_capture:
+                    if settings.data["max_capture"] > 0:
+                        if (timenow - capture_start) >= settings.data["max_capture"]:
                             write_log("Maximum Capture reached. Sending off command")
                             schedule = scheduler_db.query.filter_by(
                                 period=last_day_period
@@ -179,10 +180,10 @@ def scheduler() -> None:
                             autocapture = 0
                             force_period_check = 1
                 if timenow > modechecktime or force_period_check == 1:
-                    modechecktime = timenow + settings.mode_poll
+                    modechecktime = timenow + settings.data["mode_poll"]
                     force_period_check = 0
                     if last_on_cmd is None:
-                        new_day_period = get_calendar(settings.daymode)
+                        new_day_period = get_calendar(settings.data["daymode"])
                         if new_day_period != last_day_period:
                             write_log(f"New period detected {new_day_period}")
                             schedule = scheduler_db.query.filter_by(
@@ -191,25 +192,28 @@ def scheduler() -> None:
                             send_cmds(str_cmd=schedule.mode, days=schedule.calendars)
                             last_day_period = new_day_period
                 if timenow > managechecktime:
-                    managechecktime = timenow + settings.management_interval
+                    managechecktime = timenow + settings.data["management_interval"]
                     write_log(f"Scheduled tasks. Next at {time.ctime(managechecktime)}")
                     purge_files(
-                        settings.purgevideo_hours,
-                        settings.purgeimage_hours,
-                        settings.purgelapse_hours,
-                        settings.purgespace_level,
-                        settings.purgespace_modeex,
+                        settings.data["purgevideo_hours"],
+                        settings.data["purgeimage_hours"],
+                        settings.data["purgelapse_hours"],
+                        settings.data["purgespace_level"],
+                        settings.data["purgespace_modeex"],
                     )
-                    cmd = settings.management_command
+                    cmd = settings.data["management_command"]
                     if cmd and cmd != "":
                         write_log(f"exec_macro: {cmd}")
                         send_cmds(str_cmd=f"sy {cmd}")
                     delete_log(int(ca.raspiconfig.log_size))
                 if autocapturetime > 0 and (timenow > autocapturetime):
-                    autocapturetime = timenow + settings.autocapture_interval
+                    autocapturetime = timenow + settings.data["autocapture_interval"]
                     write_log("Autocapture request.")
                     autocapture = 1
-                if settings.autocamera_interval > 0 and timenow > autocameratime:
+                if (
+                    settings.data["autocamera_interval"] > 0
+                    and timenow > autocameratime
+                ):
                     autocameratime = timenow + 2
                     mod_time = os.path.getmtime(ca.raspiconfig.status_file)
                     with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
@@ -220,7 +224,7 @@ def scheduler() -> None:
                             write_log("Autocamera startup")
                             send_cmds(str_cmd="ru 1")
                     else:
-                        if (timenow - mod_time) > settings.autocamera_interval:
+                        if (timenow - mod_time) > settings.data["autocamera_interval"]:
                             write_log("Autocamera shutdown")
                             send_cmds(str_cmd="md 0;ru 0")
                             last_status_time = timenow + 5

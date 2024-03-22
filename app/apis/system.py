@@ -3,18 +3,19 @@
 import requests
 import semver
 from flask import current_app as ca
+from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
-from ..helpers.decorator import role_required, token_required
-from ..services.raspiconfig import RaspiConfigError
-from ..helpers.utils import disk_usage, execute_cmd
+from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
+from ..helpers.utils import disk_usage, execute_cmd
+from ..services.raspiconfig import RaspiConfigError
 from .models import command, message
 
 api = Namespace(
     "system",
     description="Host command",
-    decorators=[token_required, role_required("max")],
+    decorators=[role_required("max"), login_required],
 )
 api.add_model("Error", message)
 api.add_model("Command", command)
