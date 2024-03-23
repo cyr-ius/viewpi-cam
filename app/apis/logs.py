@@ -9,14 +9,12 @@ from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.utils import delete_log
-from .models import forbidden, message
+from .models import message
 
 api = Namespace("logs", description="Log management", decorators=[login_required])
-api.add_model("Error", message)
-api.add_model("Forbidden", forbidden)
 
 
-@api.response(403, "Forbidden", forbidden)
+@api.response(401, "Unauthorized", message)
 @api.route("/")
 class Content(Resource):
     """Get log."""
@@ -27,7 +25,7 @@ class Content(Resource):
         reverse = request.args.get("reverse", True) is True
         return get_logs(reverse)
 
-    @api.response(204, "Action is success")
+    @api.response(204, "Success")
     @api.response(422, "Error", message)
     def delete(self):
         """Delete log."""

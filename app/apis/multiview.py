@@ -13,12 +13,11 @@ api = Namespace(
     description="Multiviews",
     decorators=[role_required("max"), login_required],
 )
-api.add_model("Error", message)
 api.add_model("Multiview", multiview)
 api.add_model("Multiviews", multiviews)
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/")
 class Multiviews(Resource):
     """List hosts."""
@@ -39,20 +38,20 @@ class Multiviews(Resource):
         return multiview
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
+@api.response(404, "NotFound", message)
 @api.route("/<int:id>")
 class Multiview(Resource):
     """Multiview object."""
 
     @api.marshal_with(multiview)
-    @api.response(404, "Not found", message)
     def get(self, id: int):
         """Get multiview."""
         return db.get_or_404(multiviews_db, id)
 
+    @api.response(204, "Success")
     @api.expect(multiviews)
     @api.marshal_with(multiview)
-    @api.response(404, "Not found", message)
     def put(self, id: int):
         """Set multiview."""
         if multiview := db.get_or_404(multiviews_db, id):
@@ -61,8 +60,7 @@ class Multiview(Resource):
             return "", 204
         abort(404, "Host not found")
 
-    @api.response(204, "Actions is success")
-    @api.response(404, "Not found", message)
+    @api.response(204, "Success")
     def delete(self, id: int):
         """Delete multiview."""
         if multiview := db.get_or_404(multiviews_db, id):

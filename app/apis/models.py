@@ -86,9 +86,6 @@ files = Model(
         "uri": PathURI(attribute="file_name", example="string"),
     },
 )
-forbidden = Model(
-    "Forbidden", {"message": fields.String(default="The provided API key is not valid")}
-)
 macros = Model(
     "Macros",
     {
@@ -97,7 +94,7 @@ macros = Model(
         "state": fields.Boolean(required=True, description="Enable", default=False),
     },
 )
-message = Model("Error", {"message": fields.String(required=True)})
+message = Model("Msg", {"message": fields.String(required=True)})
 period = Model("Period", {"period": fields.String(description="period")})
 schedule = Model(
     "Schedule",

@@ -17,12 +17,11 @@ api = Namespace(
     description="Host command",
     decorators=[role_required("max"), login_required],
 )
-api.add_model("Error", message)
 api.add_model("Command", command)
 
 
-@api.response(204, "Action is success")
-@api.response(403, "Forbidden", message)
+@api.response(204, "Success")
+@api.response(401, "Unauthorized", message)
 @api.response(422, "Error", message)
 @api.route("/restart")
 class Restart(Resource):
@@ -38,8 +37,8 @@ class Restart(Resource):
         return "", 204
 
 
-@api.response(204, "Action is success")
-@api.response(403, "Forbidden", message)
+@api.response(204, "Success")
+@api.response(401, "Unauthorized", message)
 @api.response(422, "Error", message)
 @api.route("/shutdown")
 class Shutdown(Resource):
@@ -55,8 +54,8 @@ class Shutdown(Resource):
         return "", 204
 
 
-@api.response(204, "Action is success")
-@api.response(403, "Forbidden", message)
+@api.response(204, "Success")
+@api.response(401, "Unauthorized", message)
 @api.response(422, "Error", message)
 @api.route("/restart/app", endpoint="system_restart_app")
 class RestartApp(Resource):
@@ -71,7 +70,7 @@ class RestartApp(Resource):
         return "", 204
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.response(404, "Not found", message)
 @api.response(422, "Error", message)
 @api.route("/command")
@@ -92,8 +91,7 @@ class Command(Resource):
         abort(404, f"Command not found {cmd}")
 
 
-@api.response(403, "Forbidden", message)
-@api.response(404, "Not found", message)
+@api.response(401, "Unauthorized", message)
 @api.response(422, "Error", message)
 @api.route("/version")
 class Version(Resource):
@@ -120,7 +118,7 @@ class Version(Resource):
             abort(422, str(error))
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.response(422, "Error", message)
 @api.route("/disk/free")
 class Freespace(Resource):

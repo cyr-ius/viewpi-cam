@@ -16,7 +16,6 @@ api = Namespace(
     description="Create, update and delete users.",
     decorators=[role_required("max"), login_required],
 )
-api.add_model("Error", message)
 api.add_model("User", user)
 api.add_model("Users", users)
 api.add_model("Locale", locale)
@@ -24,7 +23,7 @@ api.add_model("CamToken", cam_token)
 api.add_model("APIToken", api_token)
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/")
 class Users(Resource):
     """List users."""
@@ -50,12 +49,13 @@ class Users(Resource):
             abort(422, "User name is already exists, please change.")
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/<int:id>")
 class User(Resource):
     """User object."""
 
     @api.marshal_with(user)
+    @api.response(403, "Forbidden", message)
     @api.response(404, "Not found", message)
     def get(self, id: int):
         """Get user."""
@@ -66,6 +66,7 @@ class User(Resource):
     @api.expect(user)
     @api.marshal_with(user)
     @api.response(204, "Success")
+    @api.response(403, "Forbidden", message)
     @api.response(404, "Not found", message)
     def put(self, id: int):
         """Set user."""
@@ -80,6 +81,7 @@ class User(Resource):
         abort(404, "User not found")
 
     @api.response(204, "Success")
+    @api.response(403, "Forbidden", message)
     @api.response(404, "Not found", message)
     def delete(self, id: int):
         """Delete user."""
@@ -93,7 +95,7 @@ class User(Resource):
         abort(404, "User not found")
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/locales")
 class Locales(Resource):
     """Language for user."""
@@ -104,14 +106,15 @@ class Locales(Resource):
 
 
 @api.response(204, "Success")
+@api.response(401, "Unauthorized", message)
 @api.response(403, "Forbidden", message)
+@api.response(404, "Not found", message)
 @api.route("/<int:id>/locale")
 class Locale(Resource):
     """Language for user."""
 
     @api.expect(locale)
     @api.marshal_with(user)
-    @api.response(404, "Not found", message)
     def put(self, id: int):
         """Set language."""
         if id == 0:
@@ -124,7 +127,7 @@ class Locale(Resource):
         abort(404, "User not found")
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/ctoken")
 class Token(Resource):
     """Token."""
@@ -142,7 +145,7 @@ class Token(Resource):
         cam_token = user.set_camera_token()
         return {"cam_token": cam_token}
 
-    @api.response(204, "Actions is success")
+    @api.response(204, "Success")
     def delete(self):
         """Delete token."""
         user = users_db.query.get(0)
@@ -150,7 +153,7 @@ class Token(Resource):
         return "", 204
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/token", doc=False)
 class APIToken(Resource):
     """Token."""
@@ -169,7 +172,7 @@ class APIToken(Resource):
         api_token = user.set_api_token()
         return {"api_token": api_token}
 
-    @api.response(204, "Actions is success")
+    @api.response(204, "Success")
     def delete(self):
         """Delete token."""
         user = users_db.query.get(0)

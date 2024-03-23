@@ -20,15 +20,13 @@ from ..models import Calendar as calendar_db
 from ..models import Scheduler as scheduler_db
 from ..models import Settings as settings_db
 from ..models import db
-from .models import date_time, day, daymode, forbidden, message, period, schedule
+from .models import date_time, day, daymode, message, period, schedule
 
 api = Namespace(
     "schedule",
     description="Scheduler management",
     decorators=[role_required("max"), login_required],
 )
-api.add_model("Error", message)
-api.add_model("Forbidden", forbidden)
 api.add_model("Datetime", date_time)
 api.add_model("Schedule", schedule)
 api.add_model("Day", day)
@@ -37,7 +35,7 @@ api.add_model("Period", period)
 
 
 @api.route("/")
-@api.response(403, "Forbidden", forbidden)
+@api.response(401, "Unauthorized", message)
 class Settings(Resource):
     """Schedule."""
 
@@ -49,7 +47,7 @@ class Settings(Resource):
 
     @api.expect(schedule)
     @api.marshal_with(message)
-    @api.response(204, "Action is success")
+    @api.response(204, "Success")
     def put(self):
         """Set settings."""
         settings = settings_db.query.first()
@@ -69,7 +67,7 @@ class Settings(Resource):
 
 
 @api.route("/scheduler")
-@api.response(403, "Forbidden", forbidden)
+@api.response(401, "Unauthorized", message)
 class Scheduler(Resource):
     """Schedule."""
 
@@ -106,10 +104,9 @@ class Scheduler(Resource):
 @api.route("/actions/start", endpoint="schedule_start")
 @api.route("/actions/backup", endpoint="schedule_backup")
 @api.route("/actions/restore", endpoint="schedule_restore")
-@api.response(204, "Action is success")
+@api.response(204, "Success")
 @api.response(404, "Not found", message)
-@api.response(403, "Forbidden", forbidden)
-@api.response(422, "Error", message)
+@api.response(401, "Unauthorized", message)
 class Actions(Resource):
     """Actions."""
 
@@ -138,7 +135,7 @@ class Actions(Resource):
 
 
 @api.route("/period")
-@api.response(403, "Forbidden", forbidden)
+@api.response(401, "Unauthorized", message)
 class Period(Resource):
     """Sunrise."""
 

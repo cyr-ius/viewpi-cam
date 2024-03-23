@@ -14,14 +14,13 @@ api = Namespace(
     description="Change settings",
     decorators=[role_required("max"), login_required],
 )
-api.add_model("Error", message)
 api.add_model("Set", setting)
 api.add_model("Macros", macros)
 api.add_model("Button", button)
 api.add_model("Buttons", buttons)
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/")
 class Sets(Resource):
     """Settings."""
@@ -34,7 +33,7 @@ class Sets(Resource):
 
     @api.expect(setting)
     @api.marshal_with(setting)
-    @api.response(204, "Action is success")
+    @api.response(204, "Success")
     def post(self):
         """Set settings."""
         settings = settting_db.query.first()
@@ -45,7 +44,7 @@ class Sets(Resource):
         return "", 204
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/buttons")
 class Buttons(Resource):
     """List buttons."""
@@ -66,7 +65,7 @@ class Buttons(Resource):
         return ubutton
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/buttons/<int:id>")
 class Button(Resource):
     """Button object."""
@@ -79,6 +78,7 @@ class Button(Resource):
 
     @api.expect(button)
     @api.marshal_with(button)
+    @api.response(204, "Success")
     @api.response(404, "Not found", message)
     def put(self, id: int):
         """Set button."""
@@ -99,7 +99,7 @@ class Button(Resource):
         abort(404, "Button not found")
 
 
-@api.response(403, "Forbidden", message)
+@api.response(401, "Unauthorized", message)
 @api.route("/macros")
 class Macros(Resource):
     """Macros."""
@@ -123,7 +123,7 @@ class Macros(Resource):
 
     @api.expect(macros)
     @api.marshal_with(macros)
-    @api.response(204, "Action is success")
+    @api.response(204, "Success")
     def post(self):
         """Set macro."""
         if api.payload:

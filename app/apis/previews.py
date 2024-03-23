@@ -10,20 +10,18 @@ from ..helpers.decorator import role_required
 from ..helpers.filer import delete_mediafiles, maintain_folders
 from ..models import LockFiles as lockfiles_db
 from ..models import db
-from .models import deletes, files, forbidden, message
+from .models import deletes, files, message
 
 api = Namespace(
     "previews",
     description="Gallery management",
     decorators=[role_required(["medium", "max"]), login_required],
 )
-api.add_model("Error", message)
-api.add_model("Forbidden", forbidden)
 api.add_model("Files", files)
 api.add_model("Deletes", deletes)
 
 
-@api.response(403, "Forbidden", forbidden)
+@api.response(401, "Unauthorized", message)
 @api.route("/")
 class Previews(Resource):
     """Previews."""
@@ -41,7 +39,7 @@ class Previews(Resource):
         )
 
     @api.doc(description="Delete  all files or files list")
-    @api.response(204, "Action is success")
+    @api.response(204, "Success")
     @api.expect(deletes)
     def delete(self):
         """Delete all media files."""
@@ -58,7 +56,7 @@ class Previews(Resource):
 
 
 @api.route("/<string:id>")
-@api.response(403, "Forbidden", forbidden)
+@api.response(401, "Unauthorized", message)
 class Preview(Resource):
     """Preview."""
 
@@ -68,14 +66,14 @@ class Preview(Resource):
         return get_thumb(id)
 
     @api.doc(description="Delete file")
-    @api.response(204, "Action is success")
+    @api.response(204, "Success")
     @api.response(404, "Not found", message)
     @api.response(422, "Error", message)
     def delete(self, id: str):
         """Delete file."""
+        if lockfiles_db.query.get(id):
+            abort(422, f"Protected thumbnail ({id})")
         if thumb := get_thumb(id):
-            if lockfiles_db.query.get(id):
-                abort(422, f"Protected thumbnail ({id})")
             delete_mediafiles(thumb["file_name"])
             maintain_folders(ca.raspiconfig.media_path, False, False)
             return "", 204
@@ -83,9 +81,9 @@ class Preview(Resource):
 
 
 @api.route("/<string:id>/lock")
-@api.response(204, "Action is success")
+@api.response(204, "Success")
+@api.response(401, "Unauthorized", message)
 @api.response(404, "Not found", message)
-@api.response(403, "Forbidden", forbidden)
 class Lock(Resource):
     """Lock file."""
 
@@ -101,9 +99,9 @@ class Lock(Resource):
 
 
 @api.route("/<string:id>/unlock")
-@api.response(204, "Action is success")
+@api.response(204, "Success")
+@api.response(401, "Unauthorized", message)
 @api.response(404, "Not found", message)
-@api.response(403, "Forbidden", forbidden)
 class Unlock(Resource):
     """Unock file."""
 
@@ -118,9 +116,9 @@ class Unlock(Resource):
 
 
 @api.route("/<string:id>/convert")
-@api.response(204, "Action is success")
+@api.response(204, "Success")
+@api.response(401, "Unauthorized", message)
 @api.response(404, "Not found", message)
-@api.response(403, "Forbidden", forbidden)
 class Convert(Resource):
     """Convert timelapse file to mp4."""
 

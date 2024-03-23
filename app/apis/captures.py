@@ -7,20 +7,18 @@ from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required
 from ..services.raspiconfig import RaspiConfigError
-from .models import forbidden, message
+from .models import message
 
 api = Namespace(
     "captures",
     description="Stop/Start capture and preview camera/images",
     decorators=[role_required("max"), login_required],
 )
-api.add_model("Error", message)
-api.add_model("Forbidden", forbidden)
 
 
 @api.response(204, "Action execute")
+@api.response(401, "Unauthorized", message)
 @api.response(422, "Error", message)
-@api.response(403, "Forbidden", forbidden)
 @api.route("/video/start", endpoint="captures_video_start")
 @api.route("/video/stop", endpoint="captures_video_stop")
 class Camera(Resource):
@@ -39,8 +37,8 @@ class Camera(Resource):
 
 
 @api.response(204, "Action execute")
+@api.response(401, "Unauthorized", message)
 @api.response(422, "Error", message)
-@api.response(403, "Forbidden", forbidden)
 @api.route("/image")
 class Image(Resource):
     """Image."""
@@ -55,8 +53,8 @@ class Image(Resource):
 
 
 @api.response(204, "Action execute")
+@api.response(401, "Unauthorized", message)
 @api.response(422, "Error", message)
-@api.response(403, "Forbidden", forbidden)
 @api.route("/timelapse/start", endpoint="captures_timelapse_start")
 @api.route("/timelapse/stop", endpoint="captures_timelapse_stop")
 class Timelapse(Resource):
