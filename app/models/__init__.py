@@ -1,6 +1,4 @@
-from flask_migrate import Migrate
-
-from .base import db
+from .base import db, migrate
 from .schema import (  # noqa
     Calendar,
     DaysMode,
@@ -16,4 +14,4 @@ from .schema import (  # noqa
 
 def init_app(app):
     db.init_app(app)
-    _migrate = Migrate(app, db)  # lgtm [py/unused-local-variable]
+    migrate.init_app(app, db)
