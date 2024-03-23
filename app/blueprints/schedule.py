@@ -201,7 +201,7 @@ def scheduler() -> None:
                         settings.data["purgespace_level"],
                         settings.data["purgespace_modeex"],
                     )
-                    cmd = settings.data["management_command"]
+                    cmd = settings.data.get("management_command")
                     if cmd and cmd != "":
                         write_log(f"exec_macro: {cmd}")
                         send_cmds(str_cmd=f"sy {cmd}")
