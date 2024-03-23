@@ -39,11 +39,11 @@ $(document).on('shown.bs.modal','#otpmodal',function(event){
     $('#userid').val(id);
 
     let callbackSuccess = function(data){
-      if (!data["totp"]) {
-      $('.modal-body p').html("Please scan QR Code and input code to first onboarding.")
-      $('#otp_svg, #otp_secret, #otp_btn').show()
-      $('#otpmodal input[name="secret"]').val('');
-      $('#otp_svg').html(data["otp_svg"]);
+      if (!data["otp_confirmed"]) {
+        $('.modal-body p').html("Please scan QR Code and input code to first onboarding.")
+        $('#otp_svg, #otp_secret, #otp_btn').show()
+        $('#otpmodal input[name="secret"]').val('');
+        $('#otp_svg').html(data["otp_svg"]);
       } else {
         $('.modal-body p').html("Click on button to delete OTP enrollement.")
         $('#otp_del_btn').show()
@@ -63,7 +63,7 @@ $('#otp_btn').click(function () {
     $('#otp_svg, #otp_secret, #otp_btn, #otp_del_btn').hide()
     otpModal.hide();
   }
-  $.queryData({method:"put", url:`{{ url_for('api.users_totp')}}/${data["id"]}`,data:data, "callbackSuccess":callback});
+  $.queryData({method:"post", url:`{{ url_for('api.users_totp')}}/${data["id"]}`,data:data, "callbackSuccess":callback});
 });
 
 $('#otp_del_btn').unbind();

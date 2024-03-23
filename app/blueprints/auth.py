@@ -4,11 +4,11 @@ from flask import (
     Blueprint,
     abort,
     flash,
-    g,
     make_response,
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 from flask import current_app as ca
@@ -17,7 +17,7 @@ from flask_login import login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash
 
 from ..helpers.utils import reverse
-from ..models import Users, db
+from ..models import Users
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -62,21 +62,17 @@ def login():
         next = request.form.get("next")
         if next and reverse(next) is False:
             abort(404)
-        remember = request.form.get("remember") == "on"
+        session["remember"] = request.form.get("remember") == "on"
 
         if (
             user := Users.query.filter_by(name=request.form.get("username"))
         ) and user.count() == 1:
             user = user.one()
             if user.check_password(request.form.get("password")):
-                g.first_auth = True
-
+                session["first_auth"] = True
                 if user.otp_confirmed:
-                    return render_template(
-                        "totp.html", next=next, id=user.id, remember=remember
-                    )
-
-                login_user(user, remember=remember)
+                    return render_template("totp.html", next=next, id=user.id)
+                login_user(user, remember=session["remember"])
                 response = make_response(redirect(next or url_for("main.index")))
                 response.set_cookie(
                     "api_token",
@@ -96,16 +92,18 @@ def login():
 @bp.route("/totp-verified", methods=["GET", "POST"])
 def totpverified():
     """Totop verified."""
-    if g.first_auth and request.method == "POST":
+    if session["first_auth"] is True and request.method == "POST":
         id = int(request.form.get("id"))  # pylint: disable=W0622
         next = request.form.get("next")
         if next and reverse(next) is False:
             abort(404)
 
-        if (user := db.get_or_404(Users, id)) and user.check_otp_secret(
+        if (user := Users.query.get(id)) and user.check_otp_secret(
             request.form.get("secret")
         ):
-            login_user(user)
+            login_user(user, remember=session["remember"])
+            session.pop("first_auth")
+            session.pop("remember")
             response = make_response(redirect(next or url_for("main.index")))
             response.set_cookie(
                 "api_token", value=user.generate_jwt(), httponly=True, samesite="strict"

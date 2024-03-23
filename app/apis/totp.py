@@ -5,7 +5,6 @@ from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required
 from ..models import Users as users_db
-from ..models import db
 from .models import message, otp
 
 api = Namespace(
@@ -28,8 +27,10 @@ class Totp(Resource):
     @api.response(422, "Error", message)
     def get(self, id: int):
         """Get OTP for a user."""
-        if user := db.get_or_404(users_db, id):
-            user.set_otp_secret()
+        user = users_db.query.get(id)
+        if user:
+            if not user.otp_confirmed:
+                user.set_otp_secret()
             return user
         abort(404, "User not found")
 
@@ -37,20 +38,8 @@ class Totp(Resource):
     @api.response(404, "Not found", message)
     def post(self, id: int):
         """Check OTP code."""
-        if user := db.get_or_404(users_db, id):
-            if user.totp is True:
-                if user.check_totp(api.payload["secret"]):
-                    return "", 204
-                abort(422, "OTP incorrect")
-            abort(422, "OTP not enabled")
-        abort(404, "User not found")
-
-    @api.response(204, "Action is success")
-    @api.response(404, "Not found", message)
-    @api.response(422, "Error", message)
-    def put(self, id: int):
-        """Check and create OTP Code for a user."""
-        if user := db.get_or_404(users_db, id):
+        user = users_db.query.get(id)
+        if user:
             if user.check_otp_secret(api.payload["secret"]):
                 return "", 204
             abort(422, "OTP incorrect")
@@ -60,7 +49,8 @@ class Totp(Resource):
     @api.response(404, "Not found", message)
     def delete(self, id: int):
         """Delete OTP infos for a user."""
-        if user := db.get_or_404(users_db, id):
+        user = users_db.query.get(id)
+        if user:
             user.delete_otp_secret()
             return "", 204
         abort(404, "User not found")

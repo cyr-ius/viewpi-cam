@@ -39,7 +39,7 @@
         <div class="row">{{_('Users')}}</div>
         <div id="users" class="row">
             {%for user in users%}
-            {% if user.totp %}{% set otpclass="danger"%}{%else%}{% set otpclass="success"%}{%endif%}
+            {% if user.otp_confirmed %}{% set otpclass="danger"%}{%else%}{% set otpclass="success"%}{%endif%}
             <div id="users-{{user.id}}" class="row g-1 ms-2 uchange">
                 <input type="hidden" name="id" value="{{user.id}}">
                 <div class="col-auto"><button class="btn btn-sm btn-outline-{{otpclass}} otp_user" type="button"><i class="bi bi-shield-lock"></i></button></div>

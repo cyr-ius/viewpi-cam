@@ -79,7 +79,7 @@ class Users(db.Model):
 
     def set_otp_secret(self) -> None:
         """Set otp code."""
-        if self.otp_confirmed is None:
+        if not self.otp_confirmed:
             self.otp_secret = pyotp.random_base32()
             db.session.commit()
 
@@ -116,7 +116,9 @@ class Users(db.Model):
     def check_otp_secret(self, code: str) -> bool:
         """Validate otp code."""
         otp = pyotp.TOTP(self.otp_secret)
-        return otp.verify(code)
+        self.otp_confirmed = otp.verify(code)
+        db.session.commit()
+        return self.otp_confirmed
 
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.secret, password)

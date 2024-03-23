@@ -206,7 +206,7 @@ user = Model(
         "right": fields.Integer(
             required=True, description="The user rights", enum=[1, 2, 4, 8]
         ),
-        "totp": fields.Boolean(required=False, description="otp status"),
+        "otp_confirmed": fields.Boolean(required=False, description="otp status"),
     },
 )
 users = Model(
