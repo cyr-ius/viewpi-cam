@@ -5,7 +5,7 @@ from flask_login import login_required
 
 from ..apis.settings import Macros, Sets
 from ..helpers.decorator import role_required
-from ..models import Multiviews, Presets, Settings, Ubuttons, Users
+from ..models import Multiviews, Presets, Ubuttons, Users
 
 bp = Blueprint(
     "settings", __name__, template_folder="templates", url_prefix="/settings"
@@ -27,7 +27,6 @@ def index():
     ubuttons = Ubuttons.query.all()
     multiviews = Multiviews.query.all()
     presets = Presets.query.add_column(Presets.mode).group_by("mode").all()
-    settings = Settings.query.first()
     return render_template(
         "settings.html",
         settings=settings,
