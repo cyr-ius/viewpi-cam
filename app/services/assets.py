@@ -2,6 +2,13 @@
 
 from flask_assets import Bundle
 
+
+def clean_map(_in, out, **kw):
+    out.write(
+        _in.read().replace("//# sourceMappingURL=bootstrap.bundle.min.js.map", "")
+    )
+
+
 css_main = Bundle(
     "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic",  # noqa
     "https://fonts.googleapis.com/css?family=Roboto+Mono:400,300,700",
@@ -22,6 +29,7 @@ js_main = Bundle(
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.5/js.cookie.min.js",
+    filters=clean_map,
     output="js/main.js",
 )
 
