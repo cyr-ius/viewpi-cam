@@ -88,6 +88,7 @@ class Scheduler(Resource):
             my_schedule = my_schedule.scalar()
             my_schedule.command_on = scheduler["commands_on"]
             my_schedule.command_off = scheduler["commands_off"]
+            my_schedule.mode = scheduler["modes"]
             my_schedule.calendars = []
             for key, value in scheduler["calendar"].items():
                 if value:
