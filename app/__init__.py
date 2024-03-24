@@ -38,6 +38,10 @@ def create_app(config=None):
         f"{ app.static_folder}/img",
         dirs_exist_ok=True,
     )
+    shutil.copy(
+        f"{app.root_path}/resources/js/bootstrap.bundle.min.js.map",
+        f"{ app.static_folder}/js/bootstrap.bundle.min.js.map",
+    )
 
     # Set log level
     log_level = logging.getLevelName(os.environ.get("LOG_LEVEL", "INFO").upper())
