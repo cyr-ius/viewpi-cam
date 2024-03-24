@@ -8,7 +8,17 @@ from datetime import datetime as dt
 from io import BytesIO
 from typing import Any
 
-from flask import Blueprint, abort, make_response, render_template, request, send_file
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    make_response,
+    render_template,
+    request,
+    send_file,
+    stream_template,
+    stream_with_context,
+)
 from flask import current_app as ca
 from flask_login import login_required
 
@@ -26,7 +36,7 @@ from ..helpers.filer import (
     list_folder_files,
 )
 from ..helpers.utils import disk_usage, execute_cmd, write_log
-from ..models import LockFiles
+from ..models import LockFiles, db
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
@@ -56,6 +66,29 @@ def index():
     )
 
     return response
+
+
+@bp.route("/thumb", methods=["GET"])
+@login_required
+@role_required(["preview", "medium", "max"])
+def thumb():
+    @stream_with_context
+    def generate():
+        display = []
+
+        while True:
+            show_types = request.cookies.get("show_types", "both")
+            sort_order = request.cookies.get("sort_order", "desc")
+            time_filter = int(request.cookies.get("time_filter", 1))
+
+            thumbs = get_thumbnails(sort_order, show_types, time_filter)
+            for thumb in thumbs:
+                if thumb["id"] not in display:
+                    display.append(thumb["id"])
+                    yield thumb
+            time.sleep(5)
+
+    return Response(stream_template("thumb.html", thumbs=generate()))
 
 
 @bp.route("/download", methods=["POST"])
@@ -88,7 +121,7 @@ def download():
 @role_required(["preview", "medium", "max"])
 def zipdata():
     """ZIP File."""
-    check_list = request.json.get("check_list", [])
+    check_list = request.json.get("thumb_id", [])
     if isinstance(check_list, str):
         check_list = [request.json["check_list"]]
     if check_list:
@@ -98,6 +131,7 @@ def zipdata():
             zip_list.append(thumb["file_name"])
 
         return get_zip(zip_list)
+    abort(404, {"message": "List empty"})
 
 
 def get_zip(files: list):
@@ -212,7 +246,7 @@ def get_thumbnails(
         select_thumbs = dict(sorted(select_thumbs.items(), reverse=True))
 
     thumbnails = list(select_thumbs.values())
-
+    db.session.close()
     return thumbnails
 
 

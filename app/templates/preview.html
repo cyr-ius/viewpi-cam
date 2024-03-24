@@ -53,14 +53,16 @@
 <script>
 let subdir_char = '{{raspiconfig.subdir_char}}';
 let next, next_info, prev, prev_info;
-let thumbnails = {};
+let thumbnails = [];
 let dataCarousel = [];
-let linksBase = '{{url_for('preview.index')}}?preview=';
+let linksBase = '{{url_for('preview.index', preview='')}}';
 let mediaBase = "{{url_for("static", filename=config['MEDIA'])}}/";
 let preview_id = '{{preview_id}}';
+let streamRequest;
+$(function(){
+    $('#main').addClass("d-none")
+    $('#gallery').removeClass("d-none")
 
-(() => {
-    "use strict";
 	document.onkeyup = function () {
 		switch (event.keyCode) {
 		case 39:
@@ -75,19 +77,12 @@ let preview_id = '{{preview_id}}';
 		    break;
 		}
 	};
-})();
 
-$(function(){
-    $('#main').addClass("d-none")
-    $('#gallery').removeClass("d-none")
-    let callbackSuccess=function(data){
-        load_thumbs(data);
-        if (preview_id != ''){
-            load_preview(preview_id);
-        }
-    }
-    let data = {"show_types": Cookies.get('show_types') || "both" , "sort_order": Cookies.get('sort_order') || "desc", "time_filter": Cookies.get('time_filter') || 1}
-    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}", data:data, callbackSuccess: callbackSuccess})
+    stream()      
+});
+
+window.addEventListener("beforeunload", function(e){
+    streamRequest.abort();
 });
 
 $('#delete').unbind()
@@ -99,7 +94,8 @@ $('#delete').click(function(){
             $(`#${id}`).remove();
             free_disk();
         }
-        $.queryData({method:"delete", url:`{{url_for('api.previews_previews')}}/${id}`, callbackSuccess:callbackSuccess})
+    
+        $.queryData({method:"delete", url:"{{url_for('api.previews_thumb', id=0)}}".replace(0,id), callbackSuccess:callbackSuccess})
     }
 })
 
@@ -107,17 +103,21 @@ $('#thumbs').on('click','button[name="delete"], #delete', function() {
     if (confirm('Are you sure you want to delete this file?')) {
         let id = $(this).val();
         let callbackSuccess = function(data) {$(`#${id}`).remove();free_disk();}
-        $.queryData({method:"delete", url:`{{url_for('api.previews_previews')}}/${id}`, callbackSuccess:callbackSuccess})
+
+        $.queryData({method:"delete", url:"{{url_for('api.previews_thumb', id=0)}}".replace(0,id), callbackSuccess:callbackSuccess})
     }
 });
 
 $('#time_filter, #show_types, #sort_order').on('change', function() {
     let data = $('#filtering input,#filtering select,#filtering textarea').serializeObject();
-    let callbackSuccess=function(event){
-        $.each(data,function(index,value){Cookies.set(index,value)})
-        load_thumbs(event);
-    }
-    $.queryData({method:"get",url: "{{url_for('api.previews_previews')}}",data:data, callbackSuccess: callbackSuccess})
+
+    $.each(data,function(index,value){
+        Cookies.set(index,value, { sameSite: 'strict' })
+    });
+
+    streamRequest.abort();
+    $('#thumbs').empty();
+    stream();
 })
 
 $('#hide-preview').unbind()
@@ -144,26 +144,33 @@ $('#deleteSel').click(function(){
     if (typeof data.thumb_id === 'string' || data.thumb_id instanceof String)
         data.thumb_id = [data.thumb_id]
     
-    uids = data.thumb_id
     let callbackSuccess = function(data) { 
-        uids.forEach(function(item){   
+        data.forEach(function(item){   
             $(`#${item}`).remove();
         });
         free_disk();
-    };  
-    $.queryData({method:"delete", url:`{{url_for('api.previews_previews')}}`, data:data, callbackSuccess:callbackSuccess})
+    };
+
+    $.queryData({method:"delete", url:'{{url_for("api.previews_thumbs")}}', data:data, callbackSuccess:callbackSuccess})
 });
 
 $('#lockSel, #unlockSel').unbind();
 $('#lockSel, #unlockSel').click(function(){
     let data = $('#thumbs input').serializeObject();
-    let action = $(this).prop('id') == "lockSel" ?"lock" : "unlock";
+    let state = $(this).prop('id')
+
+    let lock_url = '{{url_for("api.previews_lock", id=0)}}'
+    let unlock_url = '{{url_for("api.previews_unlock", id=0)}}'
+
+    let url = state == "lockSel" ?lock_url : unlock_url;
+    
     if (typeof data.thumb_id === 'string' || data.thumb_id instanceof String)
         data.thumb_id = [data.thumb_id]
+
     data.thumb_id.forEach(function(item){
         let callbackSuccess = function(data) {
             $(`#${item} input:checkbox`).prop('checked',false)
-            if (action=="unlock") {
+            if (state != "lockSel") {
                 $(`#${item} #icon_lock`).addClass('d-none');
                 $(`#${item} button[name="delete"]`).prop('disabled', '');
             } else {
@@ -171,7 +178,8 @@ $('#lockSel, #unlockSel').click(function(){
                 $(`#${item} button[name="delete"]`).prop('disabled', 'disabled');
             }
         }
-        $.queryData({url:`{{url_for('api.previews_previews')}}/${item}/${action}`, callbackSuccess:callbackSuccess})
+
+        $.queryData({url:url.replace(0,item), callbackSuccess:callbackSuccess})
     });
 
 });
@@ -226,7 +234,7 @@ $('#download').click(function(){
 $('#convert').unbind();
 $('#convert').click(function(){
     let id = $(this).val();
-    $.queryData({url:`{{url_for('api.previews_previews')}}/${id}/convert`})
+    $.queryData({url: "{{url_for("api.previews_convert",id=0)}}".replace(0,id)})
 });
 
 function fileTitle(thumbnailName) {
@@ -328,57 +336,6 @@ function load_preview(id) {
 	}
 }
 
-function thumbs(thumb){
-    let size=""
-    let lapse_count=""
-    let duration=""
-    let icon="bi-camera"
-    let lock="d-none"
-    let date = new Date(thumb.file_datetime)
-    if (thumb.file_type == "v") icon="bi-camera-reels"
-    if (thumb.file_type == "t") icon="bi-images"
-    if (thumb.file_type == "i") icon="bi-camera"
-    if (thumb.file_lock) lock=""
-    if (thumb.file_size > 1024) {size=`${Math.round(thumb.file_size/1024)} MB`} else {size=`${thumb.file_size} KB`}
-    if (thumb.lapse_count) lapse_count=thumb.lapse_count
-    if (thumb.duration) duration=`${thumb.duration}s`
-    let string=`\
-    <div id="${thumb.id}" class="col-6 col-md-4 col-lg-4 col-xl-2 col-xxl-1">
-        <div class="card shadow-sm">
-            <a id="load_preview" title="${thumb.real_file}" href="#" onclick="load_preview('${thumb.id}');scroll_top();">
-                <img class="mx-auto d-block card-img-top" loading="lazy" src="{{ url_for('static', filename=config['MEDIA']) }}/${thumb.file_name}"/>
-            </a>
-            <div class="card-img-overlay" style="height:5px;">
-                <i class="float-start ${icon}" style="font-size: 16px;color: white;"></i>
-                <i id="icon_lock" class="float-start bi bi-lock-fill ${lock}" style="font-size: 16px;color: rgb(209, 182, 28);position: absolute;right: 5px;"></i>
-            </div>
-            <div class="card-body">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="btn-check-${thumb.id}}" name="thumb_id" value="${thumb.id}">
-                    <label class="form-check-label" for="${thumb.id}">${date.toLocaleDateString()} - ${date.toLocaleTimeString()}</label>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mt-2">
-                    <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="${thumb.id}"><i class="bi bi-trash"></i></button>
-                    <small class="text-body-secondary">${size} ${lapse_count} ${duration}</small>
-                </div>
-            </div>
-        </div>
-    </div>`;
-    return string;
-}
-
-function load_thumbs(data){
-    $('#thumbs').html('');
-    thumbnails = data;
-    dataCarousel= []
-    let stringAppend="";
-    data.forEach(function(item){
-         dataCarousel.push(item['id']);
-         stringAppend += thumbs(item);
-    });
-    $('#thumbs').append(stringAppend);
-}
-
 function scroll_top() {
   $('main .container-fluid')[0].scrollTop=0
 }
@@ -389,6 +346,33 @@ function free_disk(){
         $(".progress-bar span").html(`Percent: ${data.prc}%  Total: ${data.total} MB`)
     }
     $.queryData({method:"get", url:`{{url_for('api.system_freespace')}}`, callbackSuccess:callbackSuccess})
+}
+
+function stream(){
+    streamRequest = $.ajax({
+        type: 'get',
+        url: '{{ url_for("preview.thumb")}}',
+        processData: false,
+        xhrFields: {
+            // Getting on progress streaming response       
+            onprogress: function(event)
+            {
+                var response = event.currentTarget.response;
+                $('#thumbs').html(response);
+
+                $('#thumbs').children().each(function(e){
+                    let id = $(this).attr('id')
+                    if ($.inArray(id, dataCarousel) == -1) {
+                        dataCarousel.push(id);
+                        thumbnails.push({"id":id,"file_name":$(this).attr("data-bs-name")})
+                    }
+                })
+                if (preview_id != ''){
+                    load_preview(preview_id);
+                } 
+            }
+        }
+    });
 }
 </script>
 {% endblock%}

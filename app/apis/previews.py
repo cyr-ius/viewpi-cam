@@ -23,7 +23,7 @@ api.add_model("Deletes", deletes)
 
 @api.response(401, "Unauthorized", message)
 @api.route("/")
-class Previews(Resource):
+class Thumbs(Resource):
     """Previews."""
 
     @api.marshal_list_with(files)
@@ -39,10 +39,10 @@ class Previews(Resource):
         )
 
     @api.doc(description="Delete  all files or files list")
-    @api.response(204, "Success")
     @api.expect(deletes)
     def delete(self):
         """Delete all media files."""
+        deleted_ids = []
         if self.api.payload:
             for uid in self.api.payload.get("thumb_id", []):
                 if thumb := get_thumb(uid):
@@ -50,14 +50,16 @@ class Previews(Resource):
                         continue
                     delete_mediafiles(thumb["file_name"])
                     maintain_folders(ca.raspiconfig.media_path, False, False)
+                    deleted_ids.append(uid)
         else:
             maintain_folders(ca.raspiconfig.media_path, True, True)
-        return "", 204
+        db.session.close()
+        return deleted_ids
 
 
 @api.route("/<string:id>")
 @api.response(401, "Unauthorized", message)
-class Preview(Resource):
+class Thumb(Resource):
     """Preview."""
 
     @api.marshal_with(files)
@@ -90,11 +92,13 @@ class Lock(Resource):
     def post(self, id: str):
         """Lock."""
         thumb = get_thumb(id)
-        if thumb and lockfiles_db.query.get(thumb["id"]) is None:
-            lockfile = lockfiles_db(id=thumb["id"], name=thumb["file_name"])
-            db.session.add(lockfile)
-            db.session.commit()
-            return "", 204
+        if thumb:
+            if lockfiles_db.query.get(thumb["id"]) is None:
+                lockfile = lockfiles_db(id=thumb["id"], name=thumb["file_name"])
+                db.session.add(lockfile)
+                db.session.commit()
+                return "", 204
+            return "Thumb is already locked", 204
         abort(404, f"Thumb not found ({id})")
 
 
@@ -108,10 +112,12 @@ class Unlock(Resource):
     def post(self, id: str):
         """Unlock."""
         thumb = get_thumb(id)
-        if thumb and (lockfile := lockfiles_db.query.get(thumb["id"])):
-            db.session.delete(lockfile)
-            db.session.commit()
-            return "", 204
+        if thumb:
+            if lockfile := lockfiles_db.query.get(thumb["id"]):
+                db.session.delete(lockfile)
+                db.session.commit()
+                return "", 204
+            return "Thumb is already unlocked", 204
         abort(404, f"Thumb not found ({id})")
 
 

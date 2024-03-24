@@ -244,7 +244,7 @@ def purge_files(
     purge_count = 0
     if sch_purgevideohours > 0 or sch_purgeimagehours > 0 or sch_purgelapsehours > 0:
         files = list_folder_files(media_path)
-        current_hours = dt.utcnow().timestamp() / 3600
+        current_hours = dt.now().timestamp()
         for file in files:
             if file != "." and file != ".." and is_thumbnail(file):
                 f_type = get_file_type(file)
@@ -257,18 +257,16 @@ def purge_files(
                     case "v":
                         purge_hours = sch_purgevideohours
                 if purge_hours > 0:
-                    f_mod_hours: dt = os.path.getmtime(f"{media_path}/{file}").hour()
-                    if f_mod_hours > 0 and (current_hours - f_mod_hours) > purge_hours:
+                    f_mod_hours: dt = os.path.getmtime(f"{media_path}/{file}")
+                    diff_hours: dt = dt.fromtimestamp(current_hours - f_mod_hours).hour
+                    if f_mod_hours > 0 and diff_hours > purge_hours:
                         os.remove(f"{media_path}/{file}")
                         purge_count += 1
             elif sch_purgevideohours > 0:
                 if ".zip" in file:
-                    f_mod_hours = os.path.getmtime(f"{media_path}/{file}").hour()
-                    if (
-                        f_mod_hours > 0
-                        and (current_hours - f_mod_hours)  # noqa: W503
-                        > sch_purgevideohours  # noqa: W503
-                    ):
+                    f_mod_hours = os.path.getmtime(f"{media_path}/{file}")
+                    diff_hours: dt = dt.fromtimestamp(current_hours - f_mod_hours).hour
+                    if f_mod_hours > 0 and diff_hours > sch_purgevideohours:
                         os.remove(f"{media_path}/{file}")
                         write_log("Purged orphan zip file")
 

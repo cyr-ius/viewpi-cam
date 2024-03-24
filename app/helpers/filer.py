@@ -213,3 +213,4 @@ def lock_file(filename: str, id: str, lock: bool) -> None:  # pylint: disable=W0
             os.chmod(f"{media_path}/{thumb_file}.h264", attr)
 
     os.chmod(f"{media_path}/{filename}", attr)
+    db.session.close()
