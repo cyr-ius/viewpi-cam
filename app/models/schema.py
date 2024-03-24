@@ -156,7 +156,7 @@ class Roles(db.Model):
 
 class Presets(db.Model):
     __tablename__ = "presets"
-    id: db.Mapped[int] = db.mapped_column(db.String, primary_key=True)
+    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
     mode: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
     name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
     width: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
