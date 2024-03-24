@@ -27,9 +27,9 @@ class Settings(db.Model):
 class Multiviews(db.Model):
     __tablename__ = "multiviews"
     id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    delay: db.Mapped[int] = db.mapped_column(db.Integer)
-    state: db.Mapped[int] = db.mapped_column(db.Integer)
-    url: db.Mapped[str] = db.mapped_column(db.String)
+    delay: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
+    state: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
+    url: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
 
     def update(self, **kwargs):
         for key, value in kwargs.items():
@@ -41,11 +41,11 @@ class Users(db.Model):
     __tablename__ = "users"
     id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
     alternative_id: db.Mapped[int] = db.mapped_column(
-        db.String, default=str(uuid.uuid4())
+        db.String, default=str(uuid.uuid4(), nullable=False)
     )
-    enabled: db.Mapped[bool] = db.mapped_column(db.Boolean, default=True)
+    enabled: db.Mapped[bool] = db.mapped_column(db.Boolean, nullable=False, default=True)
     locale: db.Mapped[str] = db.mapped_column(db.String(2), default="en")
-    name: db.Mapped[str] = db.mapped_column(db.String, unique=True)
+    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False, unique=True)
     secret: db.Mapped[str] = db.mapped_column(db.String)
     otp_secret: db.Mapped[str] = db.mapped_column(db.String)
     otp_confirmed: db.Mapped[str] = db.mapped_column(db.Boolean, default=False)
@@ -149,7 +149,7 @@ class Users(db.Model):
 class Roles(db.Model):
     __tablename__ = "roles"
     level: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
+    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False, unique=True)
 
     users: db.Mapped["Users"] = db.relationship(back_populates="roles")
 
@@ -181,7 +181,7 @@ class Ubuttons(db.Model):
     style: db.Mapped[str] = db.mapped_column(db.String)
     other: db.Mapped[str] = db.mapped_column(db.String)
     css_class: db.Mapped[str] = db.mapped_column(db.String)
-    display: db.Mapped[bool] = db.mapped_column(db.Boolean)
+    display: db.Mapped[bool] = db.mapped_column(db.Boolean, nullable=False, default=False)
 
     def update(self, **kwargs):
         for key, value in kwargs.items():
@@ -214,11 +214,11 @@ class DaysMode(db.Model):
 class Scheduler(db.Model):
     __tablename__ = "scheduler"
     id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    command_on: db.Mapped[str] = db.mapped_column(db.String)
-    command_off: db.Mapped[str] = db.mapped_column(db.String)
-    mode: db.Mapped[str] = db.mapped_column(db.String)
-    enabled: db.Mapped[bool] = db.mapped_column(db.Boolean)
-    period: db.Mapped[str] = db.mapped_column(db.String)
+    command_on: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
+    command_off: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
+    mode: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
+    enabled: db.Mapped[bool] = db.mapped_column(db.Boolean, nullable=False)
+    period: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
     daysmode_id: db.Mapped[int] = db.mapped_column(
         db.ForeignKey("daysmode.id"), nullable=False
     )
