@@ -71,12 +71,15 @@ def _get_shm_cam(preview_path=None):
     preview_path = (
         current_app.raspiconfig.preview_path if preview_path is None else preview_path
     )
-    if os.path.isfile(preview_path):
-        with open(preview_path, "rb") as file:
-            return file.read()
-    else:
-        with open("app/resources/img/unavailable.jpg", "rb") as file:
-            return file.read()
+
+    display_path = (
+        preview_path
+        if os.path.isfile(preview_path)
+        else "app/resources/img/unavailable.jpg"
+    )
+
+    with open(display_path, "rb") as file:
+        return file.read()
 
 
 def _gather_img(preview_path, delay=0.1):
