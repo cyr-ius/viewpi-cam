@@ -512,8 +512,10 @@ def seed_data():
         sa.sql.column("id", sa.Integer),
         sa.sql.column("alternative_id", sa.String),
         sa.sql.column("enabled", sa.Boolean),
+        sa.sql.column("locale", sa.String),
         sa.sql.column("name", sa.String),
         sa.sql.column("right", sa.Integer),
+        sa.sql.column("otp_confirmed", sa.Boolean),
     )
     op.bulk_insert(
         users,
@@ -522,8 +524,10 @@ def seed_data():
                 "id": 0,
                 "alternative_id": 0,
                 "enabled": False,
+                "locale": "en",
                 "name": "system",
                 "right": 8,
+                "otp_confirmed": False,
             }
         ],
     )
@@ -603,11 +607,11 @@ def upgrade():
         sa.Column("id", sa.Integer(), primary_key=True),
         sa.Column("alternative_id", sa.String(), nullable=False, unique=True),
         sa.Column("enabled", sa.Boolean(), nullable=False),
-        sa.Column("locale", sa.String(length=2), nullable=True),
+        sa.Column("locale", sa.String(length=2), nullable=False),
         sa.Column("name", sa.String(), nullable=False, unique=True),
         sa.Column("secret", sa.String(), nullable=True),
         sa.Column("otp_secret", sa.String(), nullable=True),
-        sa.Column("otp_confirmed", sa.Boolean(), nullable=True),
+        sa.Column("otp_confirmed", sa.Boolean(), nullable=False),
         sa.Column("api_token", sa.String(), nullable=True),
         sa.Column("cam_token", sa.String(), nullable=True),
         sa.Column("right", sa.Integer(), nullable=False),
@@ -622,10 +626,10 @@ def upgrade():
         sa.Column("id", sa.Integer(), primary_key=True),
         sa.Column("name", sa.String(), unique=True, nullable=False),
         sa.Column("macro", sa.String(), nullable=False),
-        sa.Column("css_class", sa.String()),
-        sa.Column("style", sa.String()),
-        sa.Column("other", sa.String()),
-        sa.Column("display", sa.Boolean()),
+        sa.Column("css_class", sa.String(), nullable=True),
+        sa.Column("style", sa.String(), nullable=True),
+        sa.Column("other", sa.String(), nullable=True),
+        sa.Column("display", sa.Boolean(), nullable=False),
     )
     op.create_table(
         "scheduler",

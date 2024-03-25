@@ -46,13 +46,17 @@ class Users(db.Model):
     enabled: db.Mapped[bool] = db.mapped_column(
         db.Boolean, nullable=False, default=True
     )
-    locale: db.Mapped[str] = db.mapped_column(db.String(2), default="en")
+    locale: db.Mapped[str] = db.mapped_column(
+        db.String(2), default="en", nullable=False
+    )
     name: db.Mapped[str] = db.mapped_column(db.String, nullable=False, unique=True)
-    secret: db.Mapped[str] = db.mapped_column(db.String)
-    otp_secret: db.Mapped[str] = db.mapped_column(db.String)
-    otp_confirmed: db.Mapped[str] = db.mapped_column(db.Boolean, default=False)
-    api_token: db.Mapped[str] = db.mapped_column(db.String)
-    cam_token: db.Mapped[str] = db.mapped_column(db.String)
+    secret: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
+    otp_secret: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
+    otp_confirmed: db.Mapped[str] = db.mapped_column(
+        db.Boolean, default=False, nullable=False
+    )
+    api_token: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
+    cam_token: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
     right: db.Mapped[str] = db.mapped_column(
         db.ForeignKey("roles.level"), nullable=False
     )
@@ -180,11 +184,13 @@ class Ubuttons(db.Model):
     id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
     name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
     macro: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    style: db.Mapped[str] = db.mapped_column(db.String)
-    other: db.Mapped[str] = db.mapped_column(db.String)
-    css_class: db.Mapped[str] = db.mapped_column(db.String)
+    style: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
+    other: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
+    css_class: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
     display: db.Mapped[bool] = db.mapped_column(
-        db.Boolean, nullable=False, default=False
+        db.Boolean,
+        default=False,
+        nullable=False,
     )
 
     def update(self, **kwargs):
@@ -196,8 +202,10 @@ class Ubuttons(db.Model):
 scheduler_calendar = db.Table(
     "scheduler_calendar",
     db.Model.metadata,
-    db.Column("scheduler_id", db.Integer, db.ForeignKey("scheduler.id")),
-    db.Column("calendar_id", db.Integer, db.ForeignKey("calendar.id")),
+    db.Column(
+        "scheduler_id", db.Integer, db.ForeignKey("scheduler.id"), nullable=False
+    ),
+    db.Column("calendar_id", db.Integer, db.ForeignKey("calendar.id"), nullable=False),
 )
 
 
