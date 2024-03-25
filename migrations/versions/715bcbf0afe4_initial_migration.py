@@ -24,7 +24,7 @@ def seed_data():
         sa.sql.column("name", sa.String),
         sa.sql.column("width", sa.Integer),
         sa.sql.column("height", sa.Integer),
-        sa.sql.Column("fps", sa.Integer),
+        sa.sql.column("fps", sa.Integer),
         sa.sql.column("i_width", sa.Integer),
         sa.sql.column("i_height", sa.Integer),
         sa.sql.column("i_rate", sa.Integer),
