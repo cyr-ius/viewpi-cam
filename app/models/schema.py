@@ -41,9 +41,11 @@ class Users(db.Model):
     __tablename__ = "users"
     id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
     alternative_id: db.Mapped[int] = db.mapped_column(
-        db.String, default=str(uuid.uuid4(), nullable=False)
+        db.String, default=str(uuid.uuid4()), nullable=False
     )
-    enabled: db.Mapped[bool] = db.mapped_column(db.Boolean, nullable=False, default=True)
+    enabled: db.Mapped[bool] = db.mapped_column(
+        db.Boolean, nullable=False, default=True
+    )
     locale: db.Mapped[str] = db.mapped_column(db.String(2), default="en")
     name: db.Mapped[str] = db.mapped_column(db.String, nullable=False, unique=True)
     secret: db.Mapped[str] = db.mapped_column(db.String)
@@ -181,7 +183,9 @@ class Ubuttons(db.Model):
     style: db.Mapped[str] = db.mapped_column(db.String)
     other: db.Mapped[str] = db.mapped_column(db.String)
     css_class: db.Mapped[str] = db.mapped_column(db.String)
-    display: db.Mapped[bool] = db.mapped_column(db.Boolean, nullable=False, default=False)
+    display: db.Mapped[bool] = db.mapped_column(
+        db.Boolean, nullable=False, default=False
+    )
 
     def update(self, **kwargs):
         for key, value in kwargs.items():
