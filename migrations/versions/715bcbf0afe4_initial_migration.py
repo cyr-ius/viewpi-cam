@@ -24,7 +24,7 @@ def seed_data():
         sa.sql.column("name", sa.String),
         sa.sql.column("width", sa.Integer),
         sa.sql.column("height", sa.Integer),
-        sa.Column("fps", sa.Integer),
+        sa.sql.Column("fps", sa.Integer),
         sa.sql.column("i_width", sa.Integer),
         sa.sql.column("i_height", sa.Integer),
         sa.sql.column("i_rate", sa.Integer),
@@ -596,20 +596,20 @@ def upgrade():
     op.create_table(
         "roles",
         sa.Column("level", sa.Integer(), primary_key=True),
-        sa.Column("name", sa.String(), nullable=False),
+        sa.Column("name", sa.String(), nullable=False, unique=True),
     )
     op.create_table(
         "users",
         sa.Column("id", sa.Integer(), primary_key=True),
-        sa.Column("alternative_id", sa.String(), unique=True, nullable=False),
+        sa.Column("alternative_id", sa.String(), nullable=False, unique=True),
         sa.Column("enabled", sa.Boolean(), nullable=False),
-        sa.Column("locale", sa.String(length=2)),
-        sa.Column("name", sa.String(), unique=True, nullable=False),
-        sa.Column("secret", sa.String()),
-        sa.Column("otp_secret", sa.String()),
-        sa.Column("otp_confirmed", sa.Boolean()),
-        sa.Column("api_token", sa.String()),
-        sa.Column("cam_token", sa.String()),
+        sa.Column("locale", sa.String(length=2), nullable=True),
+        sa.Column("name", sa.String(), nullable=False, unique=True),
+        sa.Column("secret", sa.String(), nullable=True),
+        sa.Column("otp_secret", sa.String(), nullable=True),
+        sa.Column("otp_confirmed", sa.Boolean(), nullable=True),
+        sa.Column("api_token", sa.String(), nullable=True),
+        sa.Column("cam_token", sa.String(), nullable=True),
         sa.Column("right", sa.Integer(), nullable=False),
     )
     op.create_table(
@@ -620,7 +620,7 @@ def upgrade():
     op.create_table(
         "ubuttons",
         sa.Column("id", sa.Integer(), primary_key=True),
-        sa.Column("name", sa.String(), nullable=False),
+        sa.Column("name", sa.String(), unique=True, nullable=False),
         sa.Column("macro", sa.String(), nullable=False),
         sa.Column("css_class", sa.String()),
         sa.Column("style", sa.String()),
@@ -639,7 +639,7 @@ def upgrade():
     )
     op.create_table(
         "daysmode",
-        sa.Column("id", sa.String(), primary_key=True),
+        sa.Column("id", sa.Integer(), primary_key=True),
         sa.Column("name", sa.String(), nullable=False),
     )
     op.create_table(
@@ -654,14 +654,14 @@ def upgrade():
     )
 
     with op.batch_alter_table("users", schema=None) as batch_op:
-        batch_op.create_foreign_key("None", "roles", ["right"], ["level"])
+        batch_op.create_foreign_key("Roles", "roles", ["right"], ["level"])
 
-    with op.b("scheduler", schema=None) as batch_op:
-        batch_op.create_foreign_key("None", "daysmode", ["daysmode_id"], ["id"])
+    with op.batch_alter_table("scheduler", schema=None) as batch_op:
+        batch_op.create_foreign_key("Daysmode", "daysmode", ["daysmode_id"], ["id"])
 
     with op.batch_alter_table("scheduler_calendar", schema=None) as batch_op:
-        batch_op.create_foreign_key("None", "calendar", ["calendar_id"], ["id"])
-        batch_op.create_foreign_key("None", "scheduler", ["scheduler_id"], ["id"])
+        batch_op.create_foreign_key("Calendar", "calendar", ["calendar_id"], ["id"])
+        batch_op.create_foreign_key("Scheduler", "scheduler", ["scheduler_id"], ["id"])
 
     # ### end Alembic commands ###
 
