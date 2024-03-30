@@ -24,11 +24,11 @@ from ..helpers.filer import (
     data_file_ext,
     data_file_name,
     find_lapse_files,
-    get_file_duration,
+    get_file_id,
     get_file_index,
-    get_file_size,
-    get_file_timestamp,
+    get_file_info,
     get_file_type,
+    is_thumbnail,
     list_folder_files,
 )
 from ..helpers.utils import disk_usage, execute_cmd, write_log
@@ -45,9 +45,15 @@ def index():
     """Index page."""
     time_filter_max = ca.config["TIME_FILTER_MAX"]
     preview_id = request.args.get("preview", "")
-    show_types = request.cookies.get("show_types", "both")
     sort_order = request.cookies.get("sort_order", "desc")
+    show_types = request.cookies.get("show_types", "both")
     time_filter = int(request.cookies.get("time_filter", 1))
+
+    # Update database
+    update_img_db()
+
+    # Get thumbnails from database
+    thumbs = get_thumbs(sort_order, show_types, time_filter)
 
     response = make_response(
         render_template(
@@ -59,7 +65,7 @@ def index():
             sort_order=sort_order,
             time_filter_max=time_filter_max,
             time_filter=time_filter,
-            thumbs=get_thumbs(sort_order, show_types, time_filter),
+            thumbs=thumbs,
         )
     )
 
@@ -136,66 +142,6 @@ def get_zip(files: list):
         as_attachment=True,
         download_name=zipname,
     )
-
-
-def list_thumbnails():
-    """Return thumbnails and extra information from folder."""
-    media_path = ca.raspiconfig.media_path
-    thumbs = []
-    ids = []
-    for file in list_folder_files(media_path):
-        type = get_file_type(file)
-        realname = data_file_name(file)
-        id = realname[:-4].replace("_", "")
-        number = get_file_index(file)
-        locked = True if (thumb := files_db.query.get(id)) and thumb.locked else False
-        size = 0
-        lapse_count = 0
-        duration = 0
-        realname_path = f"{media_path}/{realname}"
-
-        match type:
-            case "v":
-                icon = "bi-camera-reels"
-            case "t":
-                icon = "bi-images"
-                lapse_count = len(find_lapse_files(file))
-            case "i":
-                icon = "bi-camera"
-            case _:
-                icon = "bi-camera"
-
-        if os.path.isfile(realname_path):
-            size = round(get_file_size(realname_path) / 1024)
-            timestamp = get_file_timestamp(realname)
-            if type == "v":
-                duration = get_file_duration(realname_path)
-        else:
-            timestamp = (
-                get_file_timestamp(realname)
-                if realname != ""
-                else get_file_timestamp(file)
-            )
-
-        if type and (id not in ids):
-            ids.append(id)
-            thumbs.append(
-                {
-                    "id": id,
-                    "name": file,
-                    "type": type,
-                    "size": size,
-                    "icon": icon,
-                    "datetime": dt.fromtimestamp(timestamp),
-                    "locked": locked,
-                    "realname": realname,
-                    "number": number,
-                    "lapse_count": lapse_count,
-                    "duration": duration,
-                }
-            )
-    db.session.close()
-    return thumbs
 
 
 def check_media_path(filename):
@@ -276,3 +222,16 @@ def get_thumbs(sort_order: str, show_types: str, time_filter: int):
         ).order_by(order)
 
     return files.all()
+
+
+def update_img_db() -> None:
+    """Add thumb to database."""
+    media_path = ca.raspiconfig.media_path
+    files = db.session.execute(db.Select(files_db.id)).scalars().all()
+    for thumb in list_folder_files(media_path):
+        if is_thumbnail(thumb) and (get_file_id(thumb) not in files):
+            info = get_file_info(thumb)
+            file = files_db(**info)
+            db.session.add(file)
+            write_log(f"Add {file.id} to database")
+    db.session.commit()
