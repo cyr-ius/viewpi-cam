@@ -142,6 +142,7 @@ def list_thumbnails():
     """Return thumbnails and extra information from folder."""
     media_path = ca.raspiconfig.media_path
     thumbs = []
+    ids = []
     for file in list_folder_files(media_path):
         type = get_file_type(file)
         realname = data_file_name(file)
@@ -176,7 +177,8 @@ def list_thumbnails():
                 else get_file_timestamp(file)
             )
 
-        if type:
+        if type and (id not in ids):
+            ids.append(id)
             thumbs.append(
                 {
                     "id": id,
