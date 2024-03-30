@@ -24,12 +24,10 @@ from ..helpers.filer import (
     list_folder_files,
 )
 from ..helpers.utils import delete_log, get_pid, write_log
-from ..models import Files as files_db
 from ..models import Scheduler as scheduler_db
 from ..models import Settings as settings_db
 from ..models import db
 from ..services.raspiconfig import RaspiConfigError
-from .preview import list_thumbnails
 
 bp = Blueprint(
     "schedule",
@@ -136,7 +134,6 @@ def scheduler() -> None:
                     if send:
                         send_cmds(str_cmd=send, days=schedule.calendars)
                         last_on_cmd = None
-                    update_img_db()
                 else:
                     write_log("Stop capture request ignored, already stopped")
             elif cmd == ca.config["SCHEDULE_START"] or autocapture == 1:
@@ -204,7 +201,6 @@ def scheduler() -> None:
                         settings.data["purgespace_level"],
                         settings.data["purgespace_modeex"],
                     )
-                    update_img_db()
                     cmd = settings.data.get("management_command")
                     if cmd and cmd != "":
                         write_log(f"exec_macro: {cmd}")
@@ -325,18 +321,3 @@ def is_day_active(days: dict[str, Any] | None) -> bool:
             if day.name == now_day:
                 return True
     return False
-
-
-def update_img_db():
-    """Add thumb to database."""
-    files = db.session.execute(db.Select(files_db.id)).scalars().all()
-    thumbs = list_thumbnails()
-
-    for thumb in thumbs:
-        if thumb["id"] not in files:
-            file = files_db(**thumb)
-            db.session.add(file)
-            write_log(f"Add {file.id} to database")
-
-    db.session.commit()
-    db.session.close()
