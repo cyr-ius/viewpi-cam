@@ -31,10 +31,10 @@ class Multiviews(db.Model):
     state: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
     url: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
 
-    def update(self, **kwargs):
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
+    def delete(self):
+        """Delete."""
+        db.session.delete(self)
+        db.session.commit()
 
 
 class Users(db.Model):
@@ -62,11 +62,6 @@ class Users(db.Model):
     )
 
     roles: db.Mapped["Roles"] = db.relationship(back_populates="users")
-
-    def update(self, **kwargs):
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
 
     def is_authenticated(self):
         return True
@@ -151,6 +146,11 @@ class Users(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        """Delete."""
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Roles(db.Model):
     __tablename__ = "roles"
@@ -187,10 +187,10 @@ class Ubuttons(db.Model):
         nullable=False,
     )
 
-    def update(self, **kwargs):
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
+    def delete(self):
+        """Delete."""
+        db.session.delete(self)
+        db.session.commit()
 
 
 scheduler_calendar = db.Table(
@@ -234,11 +234,6 @@ class Scheduler(db.Model):
         secondary=scheduler_calendar
     )
 
-    def update(self, **kwargs):
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-
 
 class Files(db.Model):
     __tablename__ = "files"
@@ -257,3 +252,8 @@ class Files(db.Model):
     number: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
     lapse_count: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
     duration: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
+
+    def delete(self):
+        """Delete file in database."""
+        db.session.delete(self)
+        db.session.commit()
