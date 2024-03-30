@@ -24,10 +24,12 @@ from ..helpers.filer import (
     list_folder_files,
 )
 from ..helpers.utils import delete_log, get_pid, write_log
+from ..models import Files as files_db
 from ..models import Scheduler as scheduler_db
 from ..models import Settings as settings_db
 from ..models import db
 from ..services.raspiconfig import RaspiConfigError
+from .preview import list_thumbnails
 
 bp = Blueprint(
     "schedule",
@@ -131,6 +133,7 @@ def scheduler() -> None:
                     send = schedule.command_off
                     settings.data["last_detection_stop"] = str(dt_now())
                     db.session.commit()
+                    update_img_db()
                     if send:
                         send_cmds(str_cmd=send, days=schedule.calendars)
                         last_on_cmd = None
@@ -201,6 +204,7 @@ def scheduler() -> None:
                         settings.data["purgespace_level"],
                         settings.data["purgespace_modeex"],
                     )
+                    update_img_db()
                     cmd = settings.data.get("management_command")
                     if cmd and cmd != "":
                         write_log(f"exec_macro: {cmd}")
@@ -244,7 +248,7 @@ def purge_files(
     purge_count = 0
     if sch_purgevideohours > 0 or sch_purgeimagehours > 0 or sch_purgelapsehours > 0:
         files = list_folder_files(media_path)
-        current_hours = dt.now().timestamp()
+        timenow = dt.timestamp(dt_now())
         for file in files:
             if file != "." and file != ".." and is_thumbnail(file):
                 f_type = get_file_type(file)
@@ -258,14 +262,14 @@ def purge_files(
                         purge_hours = sch_purgevideohours
                 if purge_hours > 0:
                     f_mod_hours: dt = os.path.getmtime(f"{media_path}/{file}")
-                    diff_hours: dt = dt.fromtimestamp(current_hours - f_mod_hours).hour
+                    diff_hours: dt = dt.fromtimestamp(timenow - f_mod_hours).hour
                     if f_mod_hours > 0 and diff_hours > purge_hours:
                         os.remove(f"{media_path}/{file}")
                         purge_count += 1
             elif sch_purgevideohours > 0:
                 if ".zip" in file:
                     f_mod_hours = os.path.getmtime(f"{media_path}/{file}")
-                    diff_hours: dt = dt.fromtimestamp(current_hours - f_mod_hours).hour
+                    diff_hours: dt = dt.fromtimestamp(timenow - f_mod_hours).hour
                     if f_mod_hours > 0 and diff_hours > sch_purgevideohours:
                         os.remove(f"{media_path}/{file}")
                         write_log("Purged orphan zip file")
@@ -314,9 +318,24 @@ def send_cmds(str_cmd: str, days: dict[str, Any] | None = None) -> None:
 
 
 def is_day_active(days: dict[str, Any] | None) -> bool:
+    """Return boolean if active day."""
     if days:
         now_day: str = dt_now().strftime("%a")
         for day in days:
             if day.name == now_day:
                 return True
     return False
+
+
+def update_img_db():
+    """Add thumb to database."""
+    files = db.session.execute(db.Select(files_db.id)).scalars().all()
+    thumbs = list_thumbnails()
+
+    for thumb in thumbs:
+        if thumb["id"] not in files:
+            file = files_db(**thumb)
+            db.session.add(file)
+
+    db.session.commit()
+    db.session.close()

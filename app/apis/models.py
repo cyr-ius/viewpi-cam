@@ -67,25 +67,26 @@ files = Model(
     "Files",
     {
         "id": fields.String(required=True, description="Id"),
-        "file_name": fields.String(required=True, description="File name"),
-        "file_type": fields.String(required=True, description="I/T/V"),
-        "file_size": fields.Integer(required=True, description="Size"),
+        "name": fields.String(required=True, description="File name"),
+        "type": fields.String(required=True, description="I/T/V"),
+        "size": fields.Integer(required=True, description="Size"),
         # "file_icon": fields.String(required=False, description="Icon"),
-        "file_datetime": fields.DateTime(required=False, description="DateTime"),
-        "file_lock": fields.Boolean(
-            required=True, description="Read/Write right on disk"
+        "datetime": fields.DateTime(required=False, description="DateTime"),
+        "lock": fields.Boolean(
+            required=True, description="Read/Write right on disk", default=False
         ),
-        "real_file": fields.String(required=True, description="Original name"),
-        "file_number": fields.String(required=True, description="Index"),
-        "lapse_count": fields.Integer(
+        "realname": fields.String(required=True, description="Original name"),
+        "number": fields.String(required=True, description="Index"),
+        "lcount": fields.Integer(
             required=False, description="image numbers of timelapse"
         ),
         "duration": fields.Float(
             required=False, description="image numbers of timelapse"
         ),
-        "uri": PathURI(attribute="file_name", example="string"),
+        "uri": PathURI(attribute="name", example="string"),
     },
 )
+
 macros = Model(
     "Macros",
     {

@@ -45,7 +45,11 @@
         <div class="col-auto ms-auto"><button id="hide-preview" class="btn d-none" style="border-style: none;"><i class="bi bi-arrow-bar-up"></i></button></div>
     </div>
     <div id="thumbs" class="row g-3 m-1">
-        <p>{{_('No videos/images saved')}}</p>
+        {% if thumbs %}
+            {% include "thumb.html" %}
+        {% else %}
+            <p>{{_('No videos/images saved')}}</p>
+        {%endif%}
     </div>
 </div>
 {% endblock %}
@@ -55,35 +59,39 @@ let subdir_char = '{{raspiconfig.subdir_char}}';
 let next, next_info, prev, prev_info;
 let thumbnails = [];
 let dataCarousel = [];
-let linksBase = '{{url_for('preview.index', preview='')}}';
-let mediaBase = "{{url_for("static", filename=config['MEDIA'])}}/";
+let linksBase = '{{url_for("preview.index", preview='')}}';
+let mediaBase = '{{url_for("static", filename=config["MEDIA"])}}/';
 let preview_id = '{{preview_id}}';
-let streamRequest;
+
 $(function(){
     $('#main').addClass("d-none")
     $('#gallery').removeClass("d-none")
 
 	document.onkeyup = function () {
 		switch (event.keyCode) {
-		case 39:
-		    if (next) {
-		    	load_preview(next);
-		    }
-		    break;
-		case 37:
-		    if (prev) {
-		    	load_preview(prev);
-		    }
-		    break;
+            case 39:
+                if (next) {
+                    load_preview(next);
+                }
+                break;
+            case 37:
+                if (prev) {
+                    load_preview(prev);
+                }
+                break;
 		}
 	};
-
-    stream()      
+    update_list()
+    load_preview(preview_id);
 });
 
-window.addEventListener("beforeunload", function(e){
-    streamRequest.abort();
-});
+$('#time_filter, #show_types, #sort_order').on('change', function() {
+    let data = $('#filtering input,#filtering select,#filtering textarea').serializeObject();
+    $.each(data,function(index,value){
+        Cookies.set(index,value, { sameSite: 'strict' })
+    });
+    location.reload();
+})
 
 $('#delete').unbind()
 $('#delete').click(function(){
@@ -93,31 +101,11 @@ $('#delete').click(function(){
             $('#hide-preview').trigger('click');
             $(`#${id}`).remove();
             free_disk();
+            update_list();
         }
     
         $.queryData({method:"delete", url:"{{url_for('api.previews_thumb', id=0)}}".replace(0,id), callbackSuccess:callbackSuccess})
     }
-})
-
-$('#thumbs').on('click','button[name="delete"], #delete', function() {
-    if (confirm('Are you sure you want to delete this file?')) {
-        let id = $(this).val();
-        let callbackSuccess = function(data) {$(`#${id}`).remove();free_disk();}
-
-        $.queryData({method:"delete", url:"{{url_for('api.previews_thumb', id=0)}}".replace(0,id), callbackSuccess:callbackSuccess})
-    }
-});
-
-$('#time_filter, #show_types, #sort_order').on('change', function() {
-    let data = $('#filtering input,#filtering select,#filtering textarea').serializeObject();
-
-    $.each(data,function(index,value){
-        Cookies.set(index,value, { sameSite: 'strict' })
-    });
-
-    streamRequest.abort();
-    $('#thumbs').empty();
-    stream();
 })
 
 $('#hide-preview').unbind()
@@ -149,6 +137,7 @@ $('#deleteSel').click(function(){
             $(`#${item}`).remove();
         });
         free_disk();
+        update_list();
     };
 
     $.queryData({method:"delete", url:'{{url_for("api.previews_thumbs")}}', data:data, callbackSuccess:callbackSuccess})
@@ -234,7 +223,20 @@ $('#download').click(function(){
 $('#convert').unbind();
 $('#convert').click(function(){
     let id = $(this).val();
-    $.queryData({url: "{{url_for("api.previews_convert",id=0)}}".replace(0,id)})
+    $.queryData({url: "{{url_for('api.previews_convert',id=0)}}".replace(0,id)})
+});
+
+$('#thumbs').on('click','button[name="delete"], #delete', function() {
+    if (confirm('Are you sure you want to delete this file?')) {
+        let id = $(this).val();
+        let callbackSuccess = function(data) {
+            $(`#${id}`).remove();
+            free_disk();
+            update_list();
+        }
+
+        $.queryData({method:"delete", url:"{{url_for('api.previews_thumb', id=0)}}".replace(0,id), callbackSuccess:callbackSuccess})
+    }
 });
 
 function fileTitle(thumbnailName) {
@@ -276,7 +278,7 @@ function load_preview(id) {
     if (typeof(info) == "undefined") {
         return;
     };
-    let thumbnail = info.file_name;
+    let thumbnail = info.name;
     let media_content;
     history.pushState(null, null, linksBase + id);
     $("#gallery").addClass("d-none");
@@ -294,8 +296,8 @@ function load_preview(id) {
         $('#prev').unbind();
         $('#prev').click(function(){load_preview(prev);});
         prev_info = search_media(prev)
-        if (fileExtension(imageFromThumbnail(prev_info.file_name)) == 'jpg') {
-            preloadImage(mediaBase + imageFromThumbnail(prev_info.file_name));
+        if (fileExtension(imageFromThumbnail(prev_info.name)) == 'jpg') {
+            preloadImage(mediaBase + imageFromThumbnail(prev_info.name));
         }
 	} else {
         prev = null;
@@ -309,8 +311,8 @@ function load_preview(id) {
         $('#next').unbind();
         $('#next').click(function(){load_preview(next);});
         next_info = search_media(next)
-        if (fileExtension(imageFromThumbnail(next_info.file_name)) == 'jpg') {
-            preloadImage(mediaBase + imageFromThumbnail(next_info.file_name));
+        if (fileExtension(imageFromThumbnail(next_info.name)) == 'jpg') {
+            preloadImage(mediaBase + imageFromThumbnail(next_info.name));
         }
 	} else {
         next = null;
@@ -348,31 +350,16 @@ function free_disk(){
     $.queryData({method:"get", url:`{{url_for('api.system_freespace')}}`, callbackSuccess:callbackSuccess})
 }
 
-function stream(){
-    streamRequest = $.ajax({
-        type: 'get',
-        url: '{{ url_for("preview.thumb")}}',
-        processData: false,
-        xhrFields: {
-            // Getting on progress streaming response       
-            onprogress: function(event)
-            {
-                var response = event.currentTarget.response;
-                $('#thumbs').html(response);
-
-                $('#thumbs').children().each(function(e){
-                    let id = $(this).attr('id')
-                    if ($.inArray(id, dataCarousel) == -1) {
-                        dataCarousel.push(id);
-                        thumbnails.push({"id":id,"file_name":$(this).attr("data-bs-name")})
-                    }
-                })
-                if (preview_id != ''){
-                    load_preview(preview_id);
-                } 
-            }
+function update_list(){
+    dataCarousel = []
+    thumbnails = []
+    $("#thumbs").children().each(
+        function(index, value){
+            id = $(this).attr('id')
+            dataCarousel.push(id)
+            thumbnails.push({"id":id,"name":$(this).attr("data-bs-name")})
         }
-    });
+    );
 }
 </script>
 {% endblock%}

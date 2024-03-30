@@ -6,18 +6,14 @@ import time
 import zipfile
 from datetime import datetime as dt
 from io import BytesIO
-from typing import Any
 
 from flask import (
     Blueprint,
-    Response,
     abort,
     make_response,
     render_template,
     request,
     send_file,
-    stream_template,
-    stream_with_context,
 )
 from flask import current_app as ca
 from flask_login import login_required
@@ -36,7 +32,8 @@ from ..helpers.filer import (
     list_folder_files,
 )
 from ..helpers.utils import disk_usage, execute_cmd, write_log
-from ..models import LockFiles, db
+from ..models import Files as files_db
+from ..models import db
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
@@ -62,33 +59,11 @@ def index():
             sort_order=sort_order,
             time_filter_max=time_filter_max,
             time_filter=time_filter,
+            thumbs=get_thumbs(sort_order, show_types, time_filter),
         )
     )
 
     return response
-
-
-@bp.route("/thumb", methods=["GET"])
-@login_required
-@role_required(["preview", "medium", "max"])
-def thumb():
-    @stream_with_context
-    def generate():
-        display = []
-
-        while True:
-            show_types = request.cookies.get("show_types", "both")
-            sort_order = request.cookies.get("sort_order", "desc")
-            time_filter = int(request.cookies.get("time_filter", 1))
-
-            thumbs = get_thumbnails(sort_order, show_types, time_filter)
-            for thumb in thumbs:
-                if thumb["id"] not in display:
-                    display.append(thumb["id"])
-                    yield thumb
-            time.sleep(5)
-
-    return Response(stream_template("thumb.html", thumbs=generate()))
 
 
 @bp.route("/download", methods=["POST"])
@@ -127,8 +102,8 @@ def zipdata():
     if check_list:
         zip_list = []
         for id in check_list:
-            thumb = get_thumb(id)
-            zip_list.append(thumb["file_name"])
+            thumb = files_db.query.get(id)
+            zip_list.append(thumb["name"])
 
         return get_zip(zip_list)
     abort(404, {"message": "List empty"})
@@ -163,100 +138,62 @@ def get_zip(files: list):
     )
 
 
-def get_thumbnails(
-    sort_order: str = "asc",
-    show_types: str = "both",
-    time_filter: int = 1,
-    time_filter_max: int = 8,
-):
-    """Return thumbnails and extra information."""
+def list_thumbnails():
+    """Return thumbnails and extra information from folder."""
     media_path = ca.raspiconfig.media_path
-    select_thumbs = {}
-    thumbnails = []
+    thumbs = []
     for file in list_folder_files(media_path):
-        file_type = get_file_type(file)
-        real_file = data_file_name(file)
-        file_id = real_file[:-4].replace("_", "")
-        file_number = get_file_index(file)
-        file_lock = LockFiles.query.get(file_id) is not None
-        file_size = 0
+        type = get_file_type(file)
+        realname = data_file_name(file)
+        id = realname[:-4].replace("_", "")
+        number = get_file_index(file)
+        locked = True if (thumb := files_db.query.get(id)) and thumb.locked else False
+        size = 0
         lapse_count = 0
         duration = 0
+        realname_path = f"{media_path}/{realname}"
 
-        match file_type:
+        match type:
             case "v":
-                file_icon = "bi-camera-reels"
+                icon = "bi-camera-reels"
             case "t":
-                file_icon = "bi-images"
+                icon = "bi-images"
                 lapse_count = len(find_lapse_files(file))
             case "i":
-                file_icon = "bi-camera"
+                icon = "bi-camera"
             case _:
-                file_icon = "bi-camera"
-        if os.path.isfile(f"{media_path}/{real_file}"):
-            file_size = round(get_file_size(f"{media_path}/{real_file}") / 1024)
-            file_timestamp = get_file_timestamp(real_file)
-            if file_type == "v":
-                duration = get_file_duration(f"{media_path}/{real_file}")
+                icon = "bi-camera"
+
+        if os.path.isfile(realname_path):
+            size = round(get_file_size(realname_path) / 1024)
+            timestamp = get_file_timestamp(realname)
+            if type == "v":
+                duration = get_file_duration(realname_path)
         else:
-            file_timestamp = (
-                get_file_timestamp(real_file)
-                if real_file != ""
+            timestamp = (
+                get_file_timestamp(realname)
+                if realname != ""
                 else get_file_timestamp(file)
             )
 
-        if time_filter == 1:
-            include = True
-        else:
-            time_delta = dt.now().timestamp() - file_timestamp
-            if time_filter == time_filter_max:
-                include = time_delta >= (86400 * (time_filter - 2))
-            else:
-                include = time_delta >= (86400 * (time_filter - 2)) and (
-                    time_delta < ((time_filter - 1) * 86400)
-                )
-
-        if include and file_type:
-            if (
-                (show_types == "both" and (file_type in ["v", "i", "t"]))
-                or (show_types == "image" and (file_type in ["i", "t"]))
-                or (show_types == "video" and file_type == "v")
-            ):
-                select_thumbs.update(
-                    {
-                        file_timestamp: {
-                            "id": file_id,
-                            "file_name": file,
-                            "file_type": file_type,
-                            "file_size": file_size,
-                            "file_icon": file_icon,
-                            "file_datetime": dt.fromtimestamp(file_timestamp),
-                            "file_lock": file_lock,
-                            "real_file": real_file,
-                            "file_number": file_number,
-                            "lapse_count": lapse_count,
-                            "duration": duration,
-                        }
-                    }
-                )
-
-    if sort_order == "asc":
-        select_thumbs = dict(sorted(select_thumbs.items()))
-    else:
-        select_thumbs = dict(sorted(select_thumbs.items(), reverse=True))
-
-    thumbnails = list(select_thumbs.values())
+        if type:
+            thumbs.append(
+                {
+                    "id": id,
+                    "name": file,
+                    "type": type,
+                    "size": size,
+                    "icon": icon,
+                    "datetime": dt.fromtimestamp(timestamp),
+                    "locked": locked,
+                    "realname": realname,
+                    "number": number,
+                    "lapse_count": lapse_count,
+                    "duration": duration,
+                }
+            )
     db.session.close()
-    return thumbnails
-
-
-def get_thumb(
-    id: str | None = None,  # pylint: disable=W0622
-) -> dict[str, Any] | list[dict[str, Any]]:
-    """Get file name and real name."""
-    for thumb in get_thumbnails():
-        if thumb["id"] == id:
-            return thumb
+    return thumbs
 
 
 def check_media_path(filename):
@@ -305,3 +242,33 @@ def video_convert(filename: str) -> None:
                 write_log("Convert finished")
             except ViewPiCamException as error:
                 write_log(f"Error converting ({error})")
+
+
+def get_thumbs(sort_order: str, show_types: str, time_filter: int):
+    """Return thumbnails from database."""
+    order = files_db.id.desc() if sort_order == "desc" else files_db.id.asc()
+    match show_types:
+        case "both":
+            show_types = ["i", "t", "v"]
+        case "image":
+            show_types = ["i", "t"]
+        case _:
+            show_types = ["v"]
+
+    if (time_filter := int(time_filter)) == 1:
+        files = files_db.query.filter(files_db.type.in_(show_types)).order_by(order)
+    elif time_filter == ca.config.get("TIME_FILTER_MAX"):
+        dt_search = dt.fromtimestamp(dt.now().timestamp() - (86400 * (time_filter - 2)))
+        files = files_db.query.filter(
+            files_db.type.in_(show_types), files_db.datetime <= dt_search
+        ).order_by(order)
+    else:
+        dt_lw = dt.fromtimestamp(dt.now().timestamp() + (86400 * (time_filter - 2)))
+        dt_gt = dt.fromtimestamp(dt.now().timestamp() - (time_filter - 1) * 86400)
+        files = files_db.query.filter(
+            files_db.type.in_(show_types),
+            files_db.datetime < dt_lw,
+            files_db.datetime >= dt_gt,
+        ).order_by(order)
+
+    return files.all()

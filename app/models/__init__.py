@@ -2,7 +2,7 @@ from .base import db, migrate
 from .schema import (  # noqa
     Calendar,
     DaysMode,
-    LockFiles,
+    Files,
     Multiviews,
     Presets,
     Scheduler,

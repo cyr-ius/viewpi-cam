@@ -5,7 +5,7 @@ from datetime import datetime as dt
 
 from flask import current_app as ca
 
-from ..models import LockFiles as lockfiles_db
+from ..models import Files as files_db
 from ..models import db
 
 
@@ -76,6 +76,12 @@ def delete_mediafiles(filename: str, delete: bool = True) -> int:
                 compute_delete_file(file, size, delete)
 
     compute_delete_file(f"{media_path}/{filename}", size, delete)
+
+    # Remove database
+    id = data_file_name(filename)[:-4].replace("_", "")
+    file_db = files_db.query.get(id)
+    db.session.delete(file_db)
+    db.session.commit()
 
     return round(size / 1024)
 
@@ -183,34 +189,3 @@ def maintain_folders(
             else:
                 empty = False
     return empty and not root and os.rmdir(path)
-
-
-def lock_file(filename: str, id: str, lock: bool) -> None:  # pylint: disable=W0622
-    """Lock file (remove w via chmod)."""
-    media_path = ca.raspiconfig.media_path
-    if lock == 1 and lockfiles_db.query.get(id) is None:
-        attr = 0o444
-        lockfile = lockfiles_db(id=id, name=filename)
-        db.session.add(lockfile)
-    else:
-        attr = 0o644
-        if lockfile := lockfiles_db.query.get(id):
-            db.session.delete(lockfile)
-    db.session.commit()
-    file_type = get_file_type(filename)
-    if file_type == "t":
-        #  For time lapse lock all from this batch
-        files = find_lapse_files(filename)
-        for file in files:
-            os.chmod(file, attr)
-    else:
-        thumb_file = data_file_name(filename)
-        if os.path.isfile(f"{media_path}/{thumb_file}"):
-            os.chmod(f"{media_path}/{thumb_file}", attr)
-        if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.dat"):
-            os.chmod(f"{media_path}/{thumb_file}.dat", attr)
-        if file_type == "v" and os.path.isfile(f"{media_path}/{thumb_file}.h264"):
-            os.chmod(f"{media_path}/{thumb_file}.h264", attr)
-
-    os.chmod(f"{media_path}/{filename}", attr)
-    db.session.close()

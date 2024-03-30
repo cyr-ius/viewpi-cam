@@ -173,12 +173,6 @@ class Presets(db.Model):
     i_rate: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
 
 
-class LockFiles(db.Model):
-    __tablename__ = "lock_files"
-    id: db.Mapped[str] = db.mapped_column(db.String, primary_key=True)
-    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-
-
 class Ubuttons(db.Model):
     __tablename__ = "ubuttons"
     id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
@@ -244,3 +238,22 @@ class Scheduler(db.Model):
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
+
+
+class Files(db.Model):
+    __tablename__ = "files"
+    id: db.Mapped[str] = db.mapped_column(db.String, primary_key=True)
+    name: db.Mapped[str] = db.mapped_column(
+        db.String, index=True, unique=True, nullable=False
+    )
+    type: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
+    size: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
+    icon: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
+    datetime: db.Mapped[dt] = db.mapped_column(db.DateTime, nullable=False)
+    locked: db.Mapped[bool] = db.mapped_column(db.Boolean, nullable=False)
+    realname: db.Mapped[str] = db.mapped_column(
+        db.String, index=True, unique=True, nullable=False
+    )
+    number: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
+    lapse_count: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
+    duration: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
