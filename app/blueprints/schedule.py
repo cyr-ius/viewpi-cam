@@ -133,10 +133,10 @@ def scheduler() -> None:
                     send = schedule.command_off
                     settings.data["last_detection_stop"] = str(dt_now())
                     db.session.commit()
-                    update_img_db()
                     if send:
                         send_cmds(str_cmd=send, days=schedule.calendars)
                         last_on_cmd = None
+                    update_img_db()
                 else:
                     write_log("Stop capture request ignored, already stopped")
             elif cmd == ca.config["SCHEDULE_START"] or autocapture == 1:
@@ -336,6 +336,7 @@ def update_img_db():
         if thumb["id"] not in files:
             file = files_db(**thumb)
             db.session.add(file)
+            write_log(f"Add {file.id} to database")
 
     db.session.commit()
     db.session.close()
