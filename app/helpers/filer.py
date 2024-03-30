@@ -1,12 +1,14 @@
 """Files functions."""
 
+from __future__ import annotations
+
 import os
 from datetime import datetime as dt
+from typing import Any
 
 from flask import current_app as ca
 
 from ..models import Files as files_db
-from ..models import db
 
 
 def find_lapse_files(filename: str) -> list[str]:
@@ -78,10 +80,8 @@ def delete_mediafiles(filename: str, delete: bool = True) -> int:
     compute_delete_file(f"{media_path}/{filename}", size, delete)
 
     # Remove database
-    id = data_file_name(filename)[:-4].replace("_", "")
-    file_db = files_db.query.get(id)
-    db.session.delete(file_db)
-    db.session.commit()
+    file = files_db.query.get(get_file_id(filename))
+    file.delete()
 
     return round(size / 1024)
 
@@ -153,6 +153,12 @@ def get_file_timestamp(file: str) -> dt:
     return dt.strptime(sdatetime, "%Y%m%d%H%M%S").timestamp()
 
 
+def get_file_id(file: str) -> str:
+    """Return id from file."""
+    realname = data_file_name(file)
+    return realname[:-4].replace("_", "")
+
+
 def list_folder_files(path: str, exts: list[str] | None = None) -> list[str]:
     """List files in folder path."""
     if exts is None:
@@ -162,6 +168,58 @@ def list_folder_files(path: str, exts: list[str] | None = None) -> list[str]:
         for f in os.listdir(path)
         if os.path.isfile(os.path.join(path, f)) and (get_file_ext(f) in exts)
     ]
+
+
+def get_file_info(file: str) -> dict[str, Any] | None:
+    """Return information for file."""
+    if not is_thumbnail(file):
+        return
+
+    media_path = ca.raspiconfig.media_path
+    type = get_file_type(file)
+    realname = data_file_name(file)
+    id = get_file_id(file)
+    number = get_file_index(file)
+    locked = True if (thumb := files_db.query.get(id)) and thumb.locked else False
+    size = 0
+    lapse_count = 0
+    duration = 0
+    realname_path = f"{media_path}/{realname}"
+
+    match type:
+        case "v":
+            icon = "bi-camera-reels"
+        case "t":
+            icon = "bi-images"
+            lapse_count = len(find_lapse_files(file))
+        case "i":
+            icon = "bi-camera"
+        case _:
+            icon = "bi-camera"
+
+    if os.path.isfile(realname_path):
+        size = round(get_file_size(realname_path) / 1024)
+        timestamp = get_file_timestamp(realname)
+        if type == "v":
+            duration = get_file_duration(realname_path)
+    else:
+        timestamp = (
+            get_file_timestamp(realname) if realname != "" else get_file_timestamp(file)
+        )
+
+    return {
+        "id": id,
+        "name": file,
+        "type": type,
+        "size": size,
+        "icon": icon,
+        "datetime": dt.fromtimestamp(timestamp),
+        "locked": locked,
+        "realname": realname,
+        "number": number,
+        "lapse_count": lapse_count,
+        "duration": duration,
+    }
 
 
 def get_sorted_files(folder: str, ascending: bool = True) -> list[str]:
