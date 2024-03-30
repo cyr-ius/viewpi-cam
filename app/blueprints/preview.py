@@ -248,7 +248,9 @@ def video_convert(filename: str) -> None:
 
 def get_thumbs(sort_order: str, show_types: str, time_filter: int):
     """Return thumbnails from database."""
-    order = files_db.datetime.desc() if sort_order == "desc" else files_db.id.asc()
+    order = (
+        files_db.datetime.desc() if sort_order == "desc" else files_db.datetime.asc()
+    )
     match show_types:
         case "both":
             show_types = ["i", "t", "v"]
