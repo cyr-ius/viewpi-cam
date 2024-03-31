@@ -124,9 +124,7 @@ def allowed_file(filename):
 def set_timezone(timezone: str) -> None:
     """Set localtime and timezone."""
     try:
-        execute_cmd(f"ln -fs /usr/share/zoneinfo/{timezone} /etc/localtime")
-        with open("/etc/timezone", mode="w", encoding="utf-8") as file:
-            file.writelines(f"{timezone}\n")
-            file.close()
+        write_log(f"Set timezone {timezone}")
+        execute_cmd(f"copy -f /usr/share/zoneinfo/{timezone} /etc/localtime")
     except Exception as error:
         ca.logger.error(error)

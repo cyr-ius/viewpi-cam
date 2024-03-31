@@ -58,7 +58,6 @@ class Settings(Resource):
         if (new_tz := settings.data["gmt_offset"]) != cur_tz:
             try:
                 set_timezone(new_tz)
-                write_log(f"Set timezone {new_tz}")
             except ViewPiCamException as error:
                 write_log(error)
 
