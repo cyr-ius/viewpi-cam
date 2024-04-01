@@ -43,7 +43,7 @@ def index():
 
     mode = 0
     cam_pos = None
-    pipan_file = ca.config["PIPAN_FILE"]
+    pipan_file = f"{ca.config_folder}/{ca.config['PIPAN_FILE']}"
     if os.path.isfile(pipan_file):
         mode = 1
         with open(pipan_file, encoding="utf-8") as file:
@@ -164,7 +164,7 @@ def view():
 def pipan():
     """Pipan page."""
     servo_cmd = "/dev/servoblaster"
-    servo_data = ca.config["SERVO_FILE"]
+    servo_data = f"{ca.config_folder}/{ca.config['SERVO_FILE']}"
     min_pan = 50
     max_pan = 250
     min_tilt = 80
@@ -268,7 +268,7 @@ def image_mask():
     if file.filename == "":
         return make_response(jsonify({"message": "No selected file"}), 422)
     if file and allowed_file(file.filename):
-        file_path = os.path.join(ca.config["SYSTEM_FOLDER"], ca.config["MASK_FILENAME"])
+        file_path = os.path.join(ca.config_folder, ca.config["MASK_FILENAME"])
         file.save(file_path)
         try:
             ca.raspiconfig.send(f"mi {file_path}")
