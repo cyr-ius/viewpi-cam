@@ -6,7 +6,6 @@ __pycache__
 *.log
 static/
 media/
-system/
+config/
 macros/
 h264/
-db/
