@@ -1,5 +1,6 @@
 """ViewPI Camera."""
 
+import json
 import logging
 import os
 import shutil
@@ -54,6 +55,7 @@ def create_app(config=None):
 
     # Load default configuration
     app.config.from_object("app.config")
+    app.config.from_file(f"{app.config_folder}/.secret_key", load=json.load)
 
     # Load config file from FLASK_CONF env variable
     if "FLASK_CONF" in os.environ:
