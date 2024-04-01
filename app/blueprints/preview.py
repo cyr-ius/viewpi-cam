@@ -232,6 +232,7 @@ def update_img_db() -> None:
         if is_thumbnail(thumb) and (get_file_id(thumb) not in files):
             info = get_file_info(thumb)
             file = files_db(**info)
+            files.append(file.id)
             db.session.add(file)
             write_log(f"Add {file.id} to database")
     db.session.commit()
