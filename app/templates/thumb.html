@@ -6,7 +6,7 @@
 <div id="{{thumb.id}}" class="col-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" data-bs-name="{{thumb.name}}">
     <div class="card shadow-sm">
         <a title="{{thumb.realname}}" href="#" onclick="load_preview('{{thumb.id}}');scroll_top();">
-            <img class="mx-auto d-block card-img-top" loading="lazy" src="{{ url_for('static', filename=config['MEDIA'])~'/'~thumb.name }}"/>
+            <img class="mx-auto d-block card-img-top" loading="lazy" src="{{ url_for('static', filename=config['MEDIA_FOLDER'])~'/'~thumb.name }}"/>
         </a>
         <div class="card-img-overlay" style="height:5px;">
             <i class="float-start {{icon}}" style="font-size: 16px;color: white;"></i>
