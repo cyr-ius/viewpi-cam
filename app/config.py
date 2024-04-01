@@ -7,7 +7,7 @@ basedir = os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
 # GENERAL SETTINGS
 SITE_NAME = "ViewPI Camera"
 VERSION = os.getenv("VERSION", "0.0.0")
-SYSTEM_FOLDER = f"{basedir}/../system"
+SYSTEM_FOLDER = f"{basedir}/../config"
 
 # BASIC APP CONFIG
 SECRET_KEY = os.getenv("SECRET_KEY", "12345678900987654321")

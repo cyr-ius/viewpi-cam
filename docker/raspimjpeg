@@ -169,7 +169,7 @@ watchdog_errors 3
 # Set callback_timeout to 0 to disable it
 callback_timeout 30
 #optional user_config file to overwrite (persist) changes
-user_config /app/system/user_config
+user_config /app/config/user_config
 
 #logfile for raspimjpeg, default to merge with scheduler log
 log_file /var/log/schedule.log

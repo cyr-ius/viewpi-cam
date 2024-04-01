@@ -22,11 +22,8 @@ def create_app(config=None):
     app.static_folder = f"{app.root_path}/../static"
     os.makedirs(app.static_folder, exist_ok=True)
 
-    app.system_folder = f"{app.root_path}/../system"
-    os.makedirs(app.system_folder, exist_ok=True)
-
-    app.db_folder = f"{app.root_path}/../db"
-    os.makedirs(app.system_folder, exist_ok=True)
+    app.config_folder = f"{app.root_path}/../config"
+    os.makedirs(app.config_folder, exist_ok=True)
 
     shutil.copytree(
         f"{app.root_path}/resources/css/fonts",
@@ -47,7 +44,7 @@ def create_app(config=None):
     )
 
     # If we use Docker + Gunicorn, adjust the log handler
-    if "GUNICORN_LOGLEVEL" in os.environ:
+    if "LOG_LEVEL" in os.environ:
         gunicorn_logger = logging.getLogger("gunicorn.error")
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
@@ -62,7 +59,7 @@ def create_app(config=None):
     if "FLASK_CONF" in os.environ:
         app.config.from_envvar("FLASK_CONF")
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{app.db_folder}/app.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{app.config_folder}/config.db"
 
     # Register filter
     app.jinja_env.add_extension("jinja2.ext.debug")

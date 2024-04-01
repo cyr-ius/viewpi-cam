@@ -57,7 +57,7 @@ RUN /env/bin/pip3 install --no-cache-dir --verbose -r /tmp/requirements.txt && r
 RUN apk del build
 
 # Create folders
-RUN mkdir -p /app/media /app/h264 /app/macros /app/system /app/static/css /app/db
+RUN mkdir -p /app/media /app/h264 /app/macros /app/config /app/static/css
 
 ADD docker/raspimjpeg /etc/
 ADD --chmod=744 docker/macros/* /app/macros/
@@ -69,13 +69,12 @@ VOLUME /app/static
 VOLUME /app/macros
 VOLUME /app/media
 VOLUME /app/h264
-VOLUME /app/system
-VOLUME /app/db
+VOLUME /app/config
 
 ARG VERSION
 ENV VERSION ${VERSION}
 
 EXPOSE 8000/tcp
-HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1/"]
+HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=3","http://127.0.0.1/"]
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["gunicorn","app:create_app()"]
