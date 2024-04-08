@@ -102,8 +102,6 @@ class Scheduler(Resource):
 @api.route("/actions", doc=False)
 @api.route("/actions/stop", endpoint="schedule_stop")
 @api.route("/actions/start", endpoint="schedule_start")
-@api.route("/actions/backup", endpoint="schedule_backup")
-@api.route("/actions/restore", endpoint="schedule_restore")
 @api.response(204, "Success")
 @api.response(404, "Not found", message)
 @api.response(401, "Unauthorized", message)
@@ -124,12 +122,6 @@ class Actions(Resource):
                     execute_cmd(f"kill {pid}")
                 except ViewPiCamException as error:
                     return abort(422, error)
-                return "", 204
-            case "api.schedule_backup":
-                # ca.settings.backup()
-                return "", 204
-            case "api.schedule_restore":
-                # ca.settings.restore()
                 return "", 204
         abort(404, "Action not found")
 
