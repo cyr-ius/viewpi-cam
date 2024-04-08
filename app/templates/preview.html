@@ -53,7 +53,8 @@
     </div>
 </div>
 {% endblock %}
-{% block extrascripts %}
+{% block scripts %}
+{{ super() }}
 <script>
 let subdir_char = '{{raspiconfig.subdir_char}}';
 let next, next_info, prev, prev_info;

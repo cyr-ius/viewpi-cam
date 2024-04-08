@@ -15,7 +15,8 @@
     {%endfor%}
 </div>
 {% endblock%}
-{% block extrascripts %}
+{% block scripts %}
+{{ super() }}
 <script>
 $(function(){
     $('#main').addClass("d-none")

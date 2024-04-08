@@ -1,54 +1,52 @@
 {% import "_macros.html" as render %}
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
-  <head>
-  {% block head %}
-    {% block metas %}
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <head>
+    {% block head %}
+        {% block metas %}
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        {% endblock %}
+        {% block extrameta%}
+        {% endblock %}
+        <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
+        {% assets "css_main" -%}<link rel="stylesheet" href="{{ ASSET_URL }}">{%- endassets %}
+        {% assets "css_custom" -%}<link rel="stylesheet" href="{{ ASSET_URL }}">{%- endassets %}
+        {% block extracss%}{% endblock %}
+        <title>{% block title %}{{ config['CAM_STRING'] }}{% endblock %}</title>
     {% endblock %}
-    {% block extrameta%}
-    {% endblock %}
-    <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
-    {% assets "css_main" -%}<link rel="stylesheet" href="{{ ASSET_URL }}">{%- endassets %}
-    {% assets "css_custom" -%}<link rel="stylesheet" href="{{ ASSET_URL }}">{%- endassets %}
-    {% block extracss%}{% endblock %}
-    <title>{% block title %}{{ config['CAM_STRING'] }}{% endblock %}</title>
-  {% endblock %}
-  </head>
-  {% block body %}
-  <body>
-    <!-- Scripts -->
-    {% block header_scripts %}
-    {% assets "js_main" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
-    {% endblock %}
-    <!-- Content -->
-    {# {% if config["DEBUG"] == True %}{% debug %}{%endif%} #}
-    <!-- Header -->
-    {%block header%}
-    <header>
-        {% include "navbar.html" %}
-    </header>
-    {% endblock %}
-    <!-- Contains page content -->
-    {%block main%}
-    <main>
-        {% include "toast.html" %}
-        {% block content %}{% endblock %}
-    </main>
-    {% endblock %}
-    {%block footer%}
-    <footer class="footer mt-auto bg-body-tertiary">
-      {% include "footer.html" %}
-    </footer>
-    {% endblock %}
-    <!-- Scripts -->
-    {% block scripts %}
-    {% assets "js_colors" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
-    {% assets "js_custom" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
-    {% endblock %}
-    <!-- Extra scripts -->
-    {% block extrascripts %}{% endblock %}
-  </body>
-{% endblock  body %}
+    </head>
+    {% block body %}
+    <body>
+        <!-- Header scripts -->
+        {% block header_scripts %}
+        {% assets "js_main" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
+        {% endblock %}
+        <!-- Content -->
+        {# {% if config["DEBUG"] == True %}{% debug %}{%endif%} #}
+        <!-- Header -->
+        {%block header%}
+        <header>
+            {% include "navbar.html" %}
+        </header>
+        {% endblock %}
+        <!-- Contains page content -->
+        {%block main%}
+        <main>
+            {% include "toast.html" %}
+            {% block content %}{% endblock %}
+        </main>
+        {% endblock %}
+        {%block footer%}
+        <footer class="footer mt-auto bg-body-tertiary">
+            {% include "footer.html" %}
+        </footer>
+        {% endblock %}
+        <!-- Scripts -->
+        {% block scripts %}
+            {% assets "js_colors" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
+            {% assets "js_custom" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
+        {% endblock %}
+    </body>
+    {% endblock  body %}
 </html>

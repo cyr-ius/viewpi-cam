@@ -69,7 +69,8 @@
     </div>
 </div>
 {% endblock %}
-{% block extrascripts %}
+{% block scripts %}
+{{ super() }}
 <script>
 let mjpeg_img;
 let halted = 0;
