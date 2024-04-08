@@ -193,9 +193,9 @@
             </form>
         </div>
 </div>
-
 {% endblock %}
-{% block extrascripts %}
+{% block scripts %}
+{{ super() }}
 <script>
 $(function(){
     $("#main").addClass("d-none")
@@ -251,17 +251,6 @@ $('#sch_save').click(function(){
         }
         $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_scheduler')}}","data": schedulers})
     }
-});
-
-$('#backup').unbind();
-$('#backup').click(function(){
-    $.queryData({"url":"{{ url_for('api.schedule_backup') }}"})
-});
-
-$('#restore').unbind();
-$('#restore').click(function(){
-    let callbackSuccess = function(e){location.reload();}
-    $.queryData({"url":"{{ url_for('api.schedule_restore')}}","callbackSuccess": callbackSuccess})
 });
 
 $('#schedule').on('click','#start', function(){

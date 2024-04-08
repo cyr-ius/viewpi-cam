@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import os
+import zipfile
 from datetime import datetime as dt
+from io import BytesIO
 from typing import Any
 
 from flask import current_app as ca
 
+from ..config import ALLOWED_EXTENSIONS
 from ..models import Files as files_db
 
 
@@ -247,3 +250,30 @@ def maintain_folders(
             else:
                 empty = False
     return empty and not root and os.rmdir(path)
+
+
+def zip_folder(path: str) -> BytesIO:
+    """Zip folder."""
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, "a") as zip_file:
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                try:
+                    zip_file.write(os.path.join(root, file), file)
+                except FileNotFoundError:
+                    continue
+    memory_file.seek(0)
+
+    return memory_file
+
+
+def zip_extract(file, path: str):
+    """Extract zip file."""
+    archive = zipfile.ZipFile(file)
+    for file in archive.namelist():
+        archive.extract(file, path)
+
+
+def allowed_file(filename):
+    type, sub_type = filename.mimetype.split("/")
+    return sub_type.lower() in ALLOWED_EXTENSIONS

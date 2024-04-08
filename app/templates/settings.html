@@ -205,11 +205,14 @@
     </div>
 </div>
 {% include "modal_qr.html"%}
+{% include "modal_upload.html"%}
 {% endblock %}
-{%block extrascripts%}
+{% block scripts %}
+{{ super() }}
 <script>
 $(function () {
     $('#main').addClass("d-none")
+    $('#settings').removeClass("d-none")
 });
 
 $('#upreset, #pilight, #pipan, #servo, #loglevel').unbind()
