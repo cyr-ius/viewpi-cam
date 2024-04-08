@@ -16,7 +16,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 
 # Allowed extension for mask file
-ALLOWED_EXTENSIONS = ["pgm"]
+ALLOWED_EXTENSIONS = ["pgm", "zip"]
 MASK_FILENAME = "motionmask.pgm"
 
 # The host running the application
