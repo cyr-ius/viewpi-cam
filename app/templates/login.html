@@ -8,38 +8,38 @@
   </symbol>
 </svg>
 <main class="form-signin w-100 m-auto">
-  <form id="login" class="needs-validation" method="POST" action="{{ url_for('auth.register') if register else url_for('auth.login') }}" novalidate>
-      <h1 class="h3 mb-3 fw-normal">{{_('Please sign in')}}</h1>
-      <div class="input-group mb-3">
-        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-        <input class="form-control" name="username" placeholder="{{_('Username')}}" type="text" aria-label="Username" required autofocus>
-      </div>
-      <div class="input-group mb-3">
-        <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-        <input class="form-control" name="password" placeholder="{{_('Password')}}" type="password" aria-label="Password" required>
-      </div>
-      {% if register %}
-      <div class="input-group mb-3">
-        <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-        <input class="form-control" name="password_2" placeholder="{{_('Password')}}" type="password" aria-label="Password" required>
-      </div>
-      {%endif%}
-      <div class="form-check mb-3">
-        <input class="form-check-input" name="remember" type="checkbox" id="flexCheckDefault">
-        <label class="form-check-label" for="flexCheckDefault">Remember me</label>
-      </div>
-      <input id="next" name="next" type="hidden" value="{{request.args.next}}">
-      <input class="btn btn-primary w-100 py-2" id="submit" name="submit" type="submit" value="{{_('Sign in')}}">
-      {% for message in get_flashed_messages() %}
-      <div class="alert alert-danger d-flex align-items-center mt-2" role="alert">
-        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:" style="width:20px;height:20px;">
-          <use xlink:href="#exclamation-triangle-fill"></use>
-        </svg>
-        <small>{{message}}</small>
-      </div>
-      {%endfor%}
-  </form>
-  <p class="mt-2 text-body-secondary">&copy; 2017–2023</p>
+    <form id="login" class="needs-validation" method="POST" action="{{ url_for('auth.register') if register else url_for('auth.login') }}" novalidate>
+        <h1 class="h3 mb-3 fw-normal">{{_('Please sign in')}}</h1>
+        <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+            <input class="form-control" name="username" placeholder="{{_('Username')}}" type="text" aria-label="Username" required autofocus>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+            <input class="form-control" name="password" placeholder="{{_('Password')}}" type="password" aria-label="Password" required>
+        </div>
+        {% if register %}
+        <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+            <input class="form-control" name="password_2" placeholder="{{_('Password')}}" type="password" aria-label="Password" required>
+        </div>
+        {%endif%}
+        <div class="form-check mb-3">
+            <input class="form-check-input" name="remember" type="checkbox" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">Remember me</label>
+        </div>
+        <input id="next" name="next" type="hidden" value="{{request.args.next}}">
+        <input class="btn btn-primary w-100 py-2" id="submit" name="submit" type="submit" value="{{_('Sign in')}}">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-danger d-flex align-items-center mt-2" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:" style="width:20px;height:20px;">
+                <use xlink:href="#exclamation-triangle-fill"></use>
+            </svg>
+            <small>{{message}}</small>
+        </div>
+        {%endfor%}
+    </form>
+    <p class="mt-2 text-body-secondary">&copy; 2017–2023</p>
 </main> 
 {%endblock%}
 {%block footer%}{%endblock%}
