@@ -1,16 +1,18 @@
-<nav class="navbar navbar-expand">
+<nav class="navbar navbar-expand fixed-bottom ">
     <div class="container-fluid">
-        <ul class="navbar-nav">
+        <ul id="footer-infos" class="navbar-nav d-none d-md-flex">
             <li class="nav-item"><a class="nav-link" href="https://github.com/cyr-ius/viewpi-cam" target="_blank">Github</a></li>
             <li class="nav-item"><a class="nav-link" href="http://www.raspberrypi.org/forums/viewtopic.php?f=43&amp;t=63276" target="_blank">Forum</a></li>
             <li class="nav-item"><a class="nav-link" href="http://elinux.org/RPi-Cam-Web-Interface" target="_blank">Wiki</a></li>
         </ul>
-        <div class="ms-auto me-1"><span id="check-update" class="fs-6 fw-lighter"></span></div>
-        <div class="ms-auto me-1"><span class="fs-6 fw-lighter">ViewPi Cam ({{config.VERSION}})</span></div>
+        <div class="ms-auto me-1 d-none d-md-flex"><span id="check-update" class="fs-6 fw-lighter">ViewPi Cam  - Release {{config.VERSION}}</span></div>
+        <div class="ms-auto me-1">
         {% include "theme_languages.html"%}
-        {% include "theme_colors.html"%}
+        </div>
+        {% include "theme_colors.html"%}           
     </div>
 </nav>
+{% block scripts%}
 <script>
 $(function(){
     let callback = function(data){
@@ -34,3 +36,4 @@ $(function(){
 
 });
 </script>
+{% endblock%}

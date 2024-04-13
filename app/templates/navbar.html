@@ -1,6 +1,7 @@
 {% block navbar %}
-<nav class="navbar navbar-expand-lg">
-    <a class="navbar-brand ms-3" href="{{ url_for('main.index') }}">
+<nav class="navbar navbar-expand-md">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
             <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
             <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
@@ -12,7 +13,7 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarToggler">
+    <div class="collapse navbar-collapse text-center mt-2 mt-md-auto " id="navbarToggler">
         {% if current_user.right >= config.USERLEVEL.max %}
         <ul class="navbar-nav d-none" id="main">
             <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" href="#cameraSetting">{{_('Camera Settings')}}</a></li>
@@ -22,47 +23,50 @@
             <li class="nav-item"><a id="motion-mode" class="nav-link" data-bs-toggle="offcanvas" href="#motionSetting">{{ _('Motion Settings')}}</a></li>
             {%endif%}
         </ul>
+        <div class="row row-cols-1 row-cols-md-auto g-2 ms-auto d-none" id="mainset">
+            {% set mjpegmode = 1 if mjpegmode == 0 else 0%}
+            {% set label_stream = "MJPEG-Stream" if mjpegmode == 1 else "Default-Stream"%}
+            <button id="toggle_stream" class="btn btn-sm btn-outline-secondary me-md-1" type="button" value="{{mjpegmode}}">{{label_stream}}</button>
+            {% set display_mode = "Off" if display_mode == "On" else "On"%}
+            <button id="display_mode" class="btn btn-sm btn-outline-secondary me-md-1" type="button" value="{{display_mode}}">{{ _('Display')}} {{display_mode}}</button>
+        </div>
         {%endif%}
         {% if current_user.right >= config.USERLEVEL.max %}
-        <ul class="navbar-nav d-none" id="settings">
-            <div class="container-fluid justify-content-start">
-                <a class="btn btn-sm btn-outline-secondary" type="button" href="{{url_for('settings.backup')}}">{{ _('Backup')}}</a>
-                <button id="restore" class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#upload-modal">{{ _('Restore')}}</button>    
-            </div>
-        </ul>
+        <div  class="row row-cols-1 row-cols-md-auto g-2 d-none" id="settings">
+            <button class="btn btn-sm btn-outline-secondary me-md-1" href="{{url_for('settings.backup')}}" role="button">{{ _('Backup')}}</button>
+            <button class="btn btn-sm btn-outline-secondary me-md-1" href="#" id="restore" data-bs-toggle="modal" data-bs-target="#upload-modal" role="button">{{ _('Restore')}}</button>
+        </div>
         {%endif%}
         {% if current_user.right >= config.USERLEVEL.max %}
-        <ul class="navbar-nav d-none" id="schedule">
-            {% set action="start" if schedule_pid == 0  else "stop"%}
-            <div class="container-fluid justify-content-start">
-                <button id="sch_save" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Save Settings')}}</button>
-                <button id="{{action}}" class="btn btn-sm btn-outline-secondary stopstart" type="button">{{action|capitalize}}</button>
-            </div>
-        </ul>
+        {% set action="start" if schedule_pid == 0  else "stop"%}
+        <div class="row row-cols-1 row-cols-md-auto g-2 d-none" id="schedule">
+            <button id="sch_save" class="btn btn-sm btn-outline-secondary me-md-1" type="button">{{ _('Save Settings')}}</button>
+            <button id="{{action}}" class="btn btn-sm btn-outline-secondary me-md-1 stopstart" type="button">{{action|capitalize}}</button>
+        </div>
         {%endif%}
         {% if current_user.right >= config.USERLEVEL.max %}
-        <ul class="navbar-nav d-none" id="log">
-            <li class="nav-item pe-1"><button id="downloadlog" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Download Log')}}</button></li>
-            <li class="nav-item pe-1"><button id="clearlog" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Clear Log')}}</button></li>
-        </ul>
+        <div class="row row-cols-1 row-cols-md-auto g-2 d-none" id="log">
+            <button id="downloadlog" class="btn btn-sm btn-outline-secondary me-md-1" type="button">{{ _('Download Log')}}</button>
+            <button id="clearlog" class="btn btn-sm btn-outline-secondary me-md-1" type="button">{{ _('Clear Log')}}</button>
+        </div>
         {%endif%}
         {% if current_user.right >= config.USERLEVEL.preview %}
-        <ul class="navbar-nav d-none" id="gallery">
-            <li class="nav-item pe-1"><button id="selectNone" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Deselect')}}</button></li>
-            <li class="nav-item pe-1"><button id="selectAll" class="btn btn-sm btn-outline-secondary" type="button">{{ _('Select All')}}</button></li>
-            <li class="nav-item pe-1"><button id="zipSel" class="btn btn-sm btn-primary" type="button">{{ _('Download Zip')}}</button></li>
-            <li class="nav-item pe-1"><button id="deleteSel" class="btn btn-sm btn-warning" type="button">{{ _('Delete Selected')}}</button></li>
-            <li class="nav-item pe-1"><button id="deleteAll" class="btn btn-sm btn-danger" type="button">{{ _('Delete All')}}</button></li>
-            <li class="nav-item pe-1"><button id="lockSel" class="btn btn-sm btn-primary" type="button">{{ _('Lock')}}</button></li>
-            <li class="nav-item pe-1"><button id="unlockSel" class="btn btn-sm btn-primary" type="button">{{ _('Unlock')}}</button></li>
-        </ul>
+        <div class="row row-cols-1 row-cols-md-auto g-2 d-none" id="gallery">
+            <button id="selectNone" class="btn btn-sm btn-outline-secondary me-1" type="button">{{ _('Deselect')}}</button>
+            <button id="selectAll" class="btn btn-sm btn-outline-secondary me-1" type="button">{{ _('Select All')}}</button>
+            <button id="zipSel" class="btn btn-sm btn-primary me-1" type="button">{{ _('Download Zip')}}</button>
+            <button id="deleteSel" class="btn btn-sm btn-warning me-1" type="button">{{ _('Delete Selected')}}</button>
+            <button id="deleteAll" class="btn btn-sm btn-danger me-1" type="button">{{ _('Delete All')}}</button>
+            <button id="lockSel" class="btn btn-sm btn-primary me-1" type="button">{{ _('Lock')}}</button>
+            <button id="unlockSel" class="btn btn-sm btn-primary me-1" type="button">{{ _('Unlock')}}</button>
+        </div>
         {%endif%}
         {% if current_user.right >= config.USERLEVEL.preview %}
-        <ul class="navbar-nav d-none" id="display">
-            <li class="nav-item pe-1"><button id="download" class="btn btn-sm btn-primary" type="button">{{ _('Download')}}</button></li>
-            <li class="nav-item pe-1"><button id="delete" class="btn btn-sm btn-danger" type="button">{{ _('Delete')}}</button></li>
-            <li class="nav-item pe-1"><button id="convert" class="btn btn-sm btn-primary" type="button">{{ _('Start convert')}}</button></li>
-        </ul>
+        <div class="row row-cols-1 row-cols-md-auto g-2 d-none" id="display">
+            <button id="download" class="btn btn-sm btn-primary me-1" type="button">{{ _('Download')}}</button>
+            <button id="delete" class="btn btn-sm btn-danger me-1" type="button">{{ _('Delete')}}</button>
+            <button id="convert" class="btn btn-sm btn-primary me-1" type="button">{{ _('Start convert')}}</button>
+        </div>
         {%endif%}
         <ul class="navbar-nav ms-md-auto" id="nav-right">
             {% if current_user.right >= config.USERLEVEL.preview%}
@@ -71,20 +75,10 @@
             {% if current_user.right >= config.USERLEVEL.max%}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ _('System')}}</a>
-                <ul class="dropdown-menu">
-                    {% if request.path == url_for('main.index') %}
-                    {% set mjpegmode = 1 if mjpegmode == 0 else 0%}
-                    {% set label_stream = "MJPEG-Stream" if mjpegmode == 1 else "Default-Stream"%}
-                    <li class="nav-item"><button id="toggle_stream" class="dropdown-item" value="{{mjpegmode}}">{{label_stream}}</button></li>
-                    {% set display_mode = "Off" if display_mode == "On" else "On"%}
-                    <li class="nav-item"><button id="display_mode" class="dropdown-item" value="{{display_mode}}">{{ _('Display')}} {{display_mode}}</button></li>
+                <ul class="dropdown-menu" style="left:-20px">
+                    <li class="nav-item"><a class="dropdown-item" href="{{url_for('settings.index')}}">{{ _('Settings')}}</a></li>
+                    <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">{{ _('Scheduler')}}</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    {%endif%}
-                    <div id="system">
-                        <li class="nav-item"><a class="dropdown-item" href="{{url_for('settings.index')}}">{{ _('Settings')}}</a></li>
-                        <li class="nav-item"><a class="dropdown-item" href="{{ url_for('schedule.index') }}">{{ _('Scheduler')}}</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                    </div>
                     <li class="nav-item"><button id="restart_app" class="dropdown-item">{{ _('Restart application')}}</button></li>
                     <li class="nav-item"><button id="restart" class="dropdown-item">{{ _('Restart system')}}</button></li>
                     <li class="nav-item"><button id="shutdown" class="dropdown-item">{{ _('Shutdown system')}}</button></li>
@@ -104,9 +98,10 @@
             {% endif %}
         </ul>
     </div>
+  </div>    
 </nav>
 {% endblock %}
-{% block extrascripts%}
+{% block scripts %}
 <script>
 $('#restart_app, #restart, #shutdown, #reset').unbind();
 
@@ -132,14 +127,5 @@ $('#reset').click(function(){
     $.sendCmd({cmd:"rs",params:"1",success:callbackSuccess})
   }
 });
-
-$('#toggle_stream').click(function(){
-  set_stream_mode(this.value);
-});
-
-$('#display_mode').click(function(){
-  set_display(this.value);
-});
-
 </script>
 {%endblock%}

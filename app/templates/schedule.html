@@ -9,7 +9,7 @@
             <span class="col">{{_('Sunrise')}}: <b>{{sunrise}}</b></span>
             <span class="col">{{_('Sunset')}}: <b>{{sunset}}</b></span>
             <span class="col">{{_('Current')}}: <b>{{current_time}}</b></span>
-            <span id="period" class="col">{{_('Period')}}: <b>{{period}}</b></span>
+            <span id="period" class="col">{{_('Period')}}: <b>{{period|capitalize}}</b></span>
         </div>
         <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
             <div class="col"><label class="col-form-label-sm">{{_('Motion - Fifo In')}}</label></div>
@@ -167,27 +167,27 @@
         </div>
     </form>
         <div id="period_scheduler" class="row mx-auto mt-5">
-            <div class="row row-cols-5 row-cols-md-5 text-center p-1 ">
-                <span class="col-2">{{ _('Period')}}</span>
-                <span class="col-2">{{ _('Mon - - Wed - - Sun')}}</span>
-                <span class="col-2">{{ _('Motion Start')}}</span>
-                <span class="col-2">{{ _('Motion Stop')}}</span>
-                <span class="col-2">{{ _('Period Start')}}</span>
+            <div class="row row-cols-2 row-cols-md-5 text-center p-1 ">
+                <span class="col-6 col-md">{{ _('Period')}}</span>
+                <span class="col-6 col-md">{{ _('Mon - - Wed - - Sun')}}</span>
+                <span class="col-4 col-md">{{ _('Motion Start')}}</span>
+                <span class="col-4 col-md">{{ _('Motion Stop')}}</span>
+                <span class="col-4 col-md">{{ _('Period Start')}}</span>
             </div>
             <form id="form_schedule" class="row needs-validation">
             <input type="hidden" name="daymode" value="{{settings.daymode}}">   
             {% for item in scheduler %}
-            <div class="row row-cols-5 row-cols-md-5 gy-1 gx-2">
-                <div class="col-1" data-time="{{item.period}}"><label class="col-form-label-sm">{{item.period}}</label></div>
-                <div class="col text-center">
+            <div class="row row-cols-2 row-cols-md-5 gy-1 gx-2">
+                <div class="col-6 col-md" data-time="{{item.period}}"><label class="col-form-label-sm">{{item.period|capitalize }}</label></div>
+                <div class="col-6 col-md text-center">
                     {% for day in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]%}
                     {% set i = loop.index0 %}
                     <input class="form-checkbox form-checkbox-sm" type="checkbox" name="scheduler[{{item.id}}][{{day}}]" {%if item.days[i] %} checked="checked" {%endif%}>
                     {%endfor%}
                 </div>
-                <div class="col"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_on]" value="{{item.command_on}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_off]" value="{{item.command_off}}"></div>
-                <div class="col"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][modes]" value="{{item.mode}}"></div>
+                <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_on]" value="{{item.command_on}}"></div>
+                <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_off]" value="{{item.command_off}}"></div>
+                <div class="col-8 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][modes]" value="{{item.mode}}"></div>
             </div>
             {%endfor%}
             </form>
@@ -204,7 +204,7 @@ $(function(){
     let daymode = parseInt($("#daymode").val());
     let callbackSuccess = function(data) {
         let period = data["period"]       
-        $('#period').html(`Period: <b>${period}</b>`)
+        $('#period').html(`Period: <b>${period|capitalize}</b>`)
         let line = $("#period_scheduler").find(`[data-time="${period}"]`)
         $(line).css("background-color","LightGreen").css("color","black")
     }
@@ -279,7 +279,5 @@ $('#daymode').change(function(){
     let callbackSuccess = function(e){ location.reload(true); }
     $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data, "callbackSuccess": callbackSuccess})
 });
-
-
 </script>
 {% endblock%}

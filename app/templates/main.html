@@ -24,15 +24,15 @@
             {% if mode == 1 %}onclick="ontouchstart=pipan_start();" {%endif%}
             class="img-fluid standard" onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.jpg') }}">
     </div>
-    <div id="main-buttons" class="my-2 {% if display_mode == "Off" %}d-none{%endif%}">
+    <div id="main-buttons" class="row row-cols-sm-auto justify-content-center g-2 my-2 mx-auto {% if display_mode == "Off" %}d-none{%endif%}">
         {% if current_user.right >= config.USERLEVEL.medium%}
-        <button id="video_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
-        <button id="image_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
-        <button id="timelapse_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
+        <button id="video_button" type="button" class="btn btn-sm btn-outline-secondary g-2 mx-2"></button>
+        <button id="image_button" type="button" class="btn btn-sm btn-outline-secondary g-2 mx-2"></button>
+        <button id="timelapse_button" type="button" class="btn btn-sm btn-outline-secondary g-2 mx-2"></button>
         {%endif%}
         {% if current_user.right >= config.USERLEVEL.max%}
-        <button id="md_button" type="button" class="btn btn-sm btn-outline-secondary"></button>
-        <button id="halt_button" type="button" class="btn btn-sm btn-danger"></button>
+        <button id="md_button" type="button" class="btn btn-sm btn-outline-secondary g-2 mx-2"></button>
+        <button id="halt_button" type="button" class="btn btn-sm btn-danger g-2 mx-2"></button>
         {%endif%}
     </div>
     <div id="secondary-buttons" class="container-fluid text-center">
@@ -65,12 +65,11 @@
         {%endfor%}
         </div>
         {%endif%}
-
     </div>
 </div>
 {% endblock %}
 {% block scripts %}
-{{ super() }}
+{{ super() }}   
 <script>
 let mjpeg_img;
 let halted = 0;
@@ -83,7 +82,7 @@ let elem = document.documentElement;
 let time = new Date().getTime();
 
 $(function(){
-    $('#main').removeClass("d-none")
+    $('#main, #mainset').removeClass("d-none")
     setTimeout('init({{mjpegmode}},{{raspiconfig.video_fps}}, {{raspiconfig.divider}});', 100);
 });
 
@@ -365,6 +364,15 @@ function toggle_fullscreen(event) {
         openFullscreen();
     }
 }
+
+$('#toggle_stream').click(function(){
+  set_stream_mode(this.value);
+});
+
+$('#display_mode').click(function(){
+  set_display(this.value);
+});
+
 </script>
 {% if mode > 0 %}
     {% assets "js_pipan" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}

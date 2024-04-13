@@ -3,7 +3,7 @@
 {%- set icon="bi-images" if thumb.type == "t" else icon %}
 {%- set icon="bi-camera" if thumb.type == "i" else icon %}
 {%- set size=(thumb.size/1024)|round(2)~'MB' if thumb.size > 1024 else thumb.size~'KB' %}
-<div id="{{thumb.id}}" class="col-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" data-bs-name="{{thumb.name}}">
+<div id="{{thumb.id}}" class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 col-xxl-1" data-bs-name="{{thumb.name}}">
     <div class="card shadow-sm">
         <a title="{{thumb.realname}}" href="#" onclick="load_preview('{{thumb.id}}');scroll_top();">
             <img class="mx-auto d-block card-img-top" loading="lazy" src="{{ url_for('static', filename=config['MEDIA_FOLDER'])~'/'~thumb.name }}"/>

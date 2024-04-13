@@ -576,8 +576,6 @@
         </div>
     </div>
 </div>
-{% endblock cam_settings %}
-{% block extrascripts%}
 <script>
 $(function() {
     let at_yuv=[parseInt($('#at_y').val()),parseInt($('#at_u').val()),parseInt($('#at_v').val())]
@@ -665,6 +663,5 @@ function update_preview_delay() {
     var divider = parseInt($("#divider").val());
     preview_delay = Math.floor(divider / Math.max(video_fps,1) * 1000);
 }
-
 </script>
-{% endblock%}
+{% endblock cam_settings %}

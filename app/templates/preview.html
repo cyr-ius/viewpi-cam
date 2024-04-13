@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container-fluid overflow-auto">
-    <div class="progress mb-3" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress mb-2" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar" style="background-color:{{disk_usage[4]}};width: {{disk_usage[3]}}%"><span>local: {{disk_usage[3]}}%  Total: {{disk_usage[0]}} MB</span></div>
     </div>
     <div id="preview" class="d-none text-center" style="position:relative">
@@ -16,24 +16,24 @@
             <span class="visually-hidden">{{ _('Next')}}</span>
         </button>
     </div>
-    <div id="filtering" class="row m-1">
-        <label class="col-auto col-form-label-sm">{{_('Ordering')}}</label>
-        <div class="col-1">
+    <div id="filtering" class="row row-cols-sm-auto mt-1 g-1">
+        <label class="col-2 col-md-1 col-form-label-sm">{{_('Ordering')}}</label>
+        <div class="col-10 col-md">
             <select id="sort_order" class="form-select form-select-sm" name="sort_order">
                 <option value="asc" {%  if sort_order == "asc" %}selected{%endif%}>{{ _('Ascending')}}</option>
                 <option value="desc" {%  if sort_order == "desc" %}selected{%endif%}>{{ _('Descending')}}</option>
             </select>
         </div>
-        <label class="col-auto col-form-label-sm">{{_('Types')}}</label>
-        <div class="col-1">
+        <label class="col-2 col-md-1 col-form-label-sm">{{_('Types')}}</label>
+        <div class="col-10 col-md">
             <select id="show_types" class="form-select form-select-sm" name="show_types">
                 <option value="both" {%  if show_types == "both" %}selected{%endif%}>{{ _('Images &amp Videos')}}</option>
                 <option value="image" {%  if show_types == "image" %}selected{%endif%}>{{ _('Images only')}}</option>
                 <option value="video" {%  if show_types == "video" %}selected{%endif%}>{{ _('Videos only')}}</option>
             </select>
         </div>
-        <label class="col-auto col-form-label-sm">{{ _('Filter')}}</label>
-        <div class="col-1">
+        <label class="col-2 col-md-1 col-form-label-sm">{{ _('Filter')}}</label>
+        <div class="col-10 col-md">
             <select id="time_filter" class="form-select form-select-sm" name="time_filter">
                 <option value="1" {%  if time_filter|int == 1 %}selected{%endif%}>{{_('All')}}</option>
                 {% for i in range(2, time_filter_max)%}
