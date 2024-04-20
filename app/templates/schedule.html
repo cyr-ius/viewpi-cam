@@ -202,13 +202,13 @@ $(function(){
     $("#schedule").removeClass("d-none")
 
     let daymode = parseInt($("#daymode").val());
-    let callbackSuccess = function(data) {
+    let success = function(data) {
         let period = data["period"]       
         $('#period').html(`Period: <b>${period|capitalize}</b>`)
         let line = $("#period_scheduler").find(`[data-time="${period}"]`)
         $(line).css("background-color","LightGreen").css("color","black")
     }
-    $.queryData({"url":"{{ url_for('api.schedule_period')}}", "data": {"daymode": daymode}, "callbackSuccess":callbackSuccess})    
+    $.queryData({url:"{{ url_for('api.schedule_period')}}", data: {"daymode": daymode}, success:success})    
 })
 
 $('#sch_save').unbind();
@@ -218,7 +218,7 @@ $('#sch_save').click(function(){
     } else {
         $("#form_setting").removeClass('was-validated')
         data = $("#form_setting").serializeObject({'checkboxesAsBools': true});
-        $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data})
+        $.queryData({method:"put", url:"{{ url_for('api.schedule_settings')}}", data: data})
     }
 
     if (!document.getElementById('form_schedule').checkValidity()) {
@@ -249,35 +249,35 @@ $('#sch_save').click(function(){
                 delete data[key]
             }
         }
-        $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_scheduler')}}","data": schedulers})
+        $.queryData({method:"put", url:"{{ url_for('api.schedule_scheduler')}}", data: schedulers})
     }
 });
 
 $('#schedule').on('click','#start', function(){
-    let callbackSuccess = function(response) {
+    let success = function(response) {
         $('.stopstart').val('stop')
         $('.stopstart').prop("id", 'stop')
         $('.stopstart').prop("name",'stop')
         $('.stopstart').html('Stop')
     }
-    $.queryData({"url":"{{ url_for('api.schedule_actions')}}/start","callbackSuccess": callbackSuccess})
+    $.queryData({url:"{{ url_for('api.schedule_actions')}}/start", success: success})
 });
 
 $('#schedule').on('click','#stop', function(){
-    let callbackSuccess = function(response) {
+    let success = function(response) {
         $('.stopstart').val('start')
         $('.stopstart').prop("id", 'start')
         $('.stopstart').prop("name",'start')
         $('.stopstart').html('Start')
     }
-    $.queryData({"url":"{{ url_for('api.schedule_actions')}}/stop","callbackSuccess": callbackSuccess})
+    $.queryData({url:"{{ url_for('api.schedule_actions')}}/stop", success: success})
 });
 
 $('#daymode').unbind();
 $('#daymode').change(function(){
     let data = {"daymode": parseInt($("#daymode").val())}
-    let callbackSuccess = function(e){ location.reload(true); }
-    $.queryData({"method":"PUT", "url":"{{ url_for('api.schedule_settings')}}","data": data, "callbackSuccess": callbackSuccess})
+    let success = function(e){ location.reload(true); }
+    $.queryData({method:"put", url:"{{ url_for('api.schedule_settings')}}", data: data, success: success})
 });
 </script>
 {% endblock%}
