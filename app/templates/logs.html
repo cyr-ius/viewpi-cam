@@ -10,6 +10,7 @@
 {% block scripts %}
 {{ super() }}
 <script>
+let source;
 $(function(){
     $('#main').addClass("d-none")
     $('#log').removeClass("d-none")
@@ -18,35 +19,37 @@ $(function(){
 
 $('#downloadlog').unbind();
 $('#downloadlog').click(function(){
-    $.ajax({
-        url: '{{url_for('main.log')}}',
-        method: 'POST',
-        data: JSON.stringify({"action": "downloadlog"}),
-        contentType:"application/json; charset=utf-8",
-        xhrFields: {
-            responseType: 'blob'
-        },
-        success: function (data) {
-            var a = document.createElement('a');
-            var url = window.URL.createObjectURL(data);
-            a.href = url;
-            a.download =  "viewrpicam-log";
-            document.body.append(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-        }
+    let success = function(data, response, xhr){
+        let disposition = xhr.getResponseHeader('Content-Disposition')
+        let filename = disposition.split(/;(.+)/)[1].split(/=(.+)/)[1];
+        let a = document.createElement('a');
+        let url = window.URL.createObjectURL(data);
+        a.href = url;
+        a.download = filename;
+        document.body.append(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    }
+    let data = JSON.stringify({"action": "downloadlog"})
+    let xhrFields = {responseType: 'blob'}
+    $.queryData({
+         method: 'post', url: '{{url_for('main.log')}}', data: data, xhrFields: xhrFields, success: success
     });
 });
 
 $('#clearlog').unbind();
 $('#clearlog').click(function(){
-    callbackSuccess = function(data) {location.reload();}
-    $.queryData({"method":"delete","url":"{{url_for('api.logs_content')}}","callbackSuccess":callbackSuccess})
+    success = function(data) {location.reload();}
+    $.queryData({method:"delete", url:'{{url_for('api.logs_content')}}', success: success})
+});
+
+$(window).on('beforeunload', function(){
+    source.close();
 });
 
 function stream() {
-    var source = new EventSource("{{ url_for('main.streamlog') }}");
+    source = new EventSource("{{ url_for('main.streamlog') }}");
     source.onmessage = function(event) {
         if (event.data) {
             let line = JSON.parse(event.data)
