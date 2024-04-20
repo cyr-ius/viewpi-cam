@@ -33,8 +33,8 @@
         {%endif%}
         {% if current_user.right >= config.USERLEVEL.max %}
         <div  class="row row-cols-1 row-cols-md-auto g-2 d-none" id="settings">
-            <button class="btn btn-sm btn-outline-secondary me-md-1" href="{{url_for('settings.backup')}}" role="button">{{ _('Backup')}}</button>
-            <button class="btn btn-sm btn-outline-secondary me-md-1" href="#" id="restore" data-bs-toggle="modal" data-bs-target="#upload-modal" role="button">{{ _('Restore')}}</button>
+            <button class="btn btn-sm btn-outline-secondary me-md-1" id="backup" href="{{url_for('settings.backup')}}" role="button">{{ _('Backup')}}</button>
+            <button class="btn btn-sm btn-outline-secondary me-md-1" id="restore" data-bs-toggle="modal" data-bs-target="#upload-modal" role="button">{{ _('Restore')}}</button>
         </div>
         {%endif%}
         {% if current_user.right >= config.USERLEVEL.max %}
@@ -122,9 +122,9 @@ $('#shutdown').click(function(){
 });
 
 $('#reset').click(function(){
-  let callbackSuccess = function(e){setTimeout(function(){location.reload(true);}, 1000);}
+  let success = function(e){setTimeout(function(){location.reload(true);}, 1000);}
   if(confirm('Are you sure to reset the settings to the default values?')) {
-    $.sendCmd({cmd:"rs",params:"1",success:callbackSuccess})
+    $.sendCmd({cmd:"rs",params:"1",success:success})
   }
 });
 </script>
