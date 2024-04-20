@@ -596,7 +596,7 @@ function set_preset(value) {
 }
 
 function set_motion_external(value){
-    callbackSuccess = function(data) {
+    success = function(data) {
         if (!data) {
             if (value == "0")
                 $('#motion-mode').prop("href","#motionSetting")
@@ -604,7 +604,7 @@ function set_motion_external(value){
                 $('#motion-mode').prop("href","#motionExternal")
         }
     }
-    $.sendCmd({cmd:"mx",params:value, success:callbackSuccess});
+    $.sendCmd({cmd:"mx",params:value, success:success});
 }
 
 function set_res() {

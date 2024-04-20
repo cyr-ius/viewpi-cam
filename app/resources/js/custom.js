@@ -79,8 +79,8 @@ $.queryData = function (options) {
       method: "POST",
       url: null,
       data: null,
-      callbackSuccess: null,
-      callbackError: null,
+      success: null,
+      error: null,
       convertJson: null,
       xhrFields: null,
     },
@@ -99,20 +99,20 @@ $.queryData = function (options) {
     beforeSend: function (data) {
       $.spinner({ status: true });
     },
-    success: function (data) {
+    success: function (data, response, xhr) {
       $.spinner({ status: false });
       $("#toast").addClass("text-bg-primary");
       if (data && data.responseJSON)
         $("#toast .toast-body").html(data.responseJSON["message"]);
-      if (o.callbackSuccess) return o.callbackSuccess(data);
+      if (o.success) return o.success(data, response, xhr);
     },
-    error: function (data) {
+    error: function (data, response, xhr) {
       $.spinner({ status: false });
       $("#toast").removeClass("text-bg-primary").addClass("text-bg-danger");
       $("#toast .toast-body").html(data.status + " - " + data["message"]);
       if (data.responseJSON)
         $("#toast .toast-body").html(data.responseJSON["message"]);
-      if (o.callbackError) return o.callbackError(data);
+      if (o.error) return o.error(data, response, xhr);
     },
   });
 };
@@ -140,8 +140,8 @@ $.sendCmd = function (options) {
   $.queryData({
     url: o.url,
     data: { cmd: o.cmd, params: o.params },
-    callbackSuccess: o.success,
-    callbackError: o.error,
+    success: o.success,
+    error: o.error,
   });
 };
 

@@ -231,42 +231,60 @@ $('#btn_token, #btn_api_token').click(function () {
 
 $('#get_token').unbind();
 $('#get_token').click(function () {
-    let callbackSuccess = function(data){
+    let success = function(data){
         let cam_token = data["cam_token"];
         $('#cam_token').val(cam_token);
         $('#cam_pic_new').attr("href",`{{ url_for("camera.cam_pic_new", cam_token=None) }}?cam_token=${cam_token}`)
         $('#cam_pic').attr("href",`{{ url_for("camera.cam_pic", cam_token=None) }}?cam_token=${cam_token}`)
         $('#cam_pic_new, #cam_pic').removeClass("d-none");
     }
-    $.queryData({url:"{{url_for('api.users_token')}}",callbackSuccess:callbackSuccess});
+    $.queryData({url:"{{url_for('api.users_token')}}",success:success});
 });
 
 $('#del_token').unbind();
 $('#del_token').click(function () {
-    let callbackSuccess = function(data){
+    let success = function(data){
         $('#cam_token').val('')
         $('#cam_pic_new, #cam_pic').addClass("d-none");
     }
-    $.queryData({method:"delete", url:"{{ url_for('api.users_token')}}",callbackSuccess:callbackSuccess});
+    $.queryData({method:"delete", url:"{{ url_for('api.users_token')}}",success:success});
 });
 
 $('#get_api_token').unbind();
 $('#get_api_token').click(function () {
-    let callbackSuccess = function(data){$('#apitoken').val(data["api_token"])}
-    $.queryData({url:"{{url_for('api.users_api_token')}}",callbackSuccess:callbackSuccess});
+    let success = function(data){$('#apitoken').val(data["api_token"])}
+    $.queryData({url:"{{url_for('api.users_api_token')}}",success:success});
 });
 
 $('#del_api_token').unbind();
 $('#del_api_token').click(function () {
-    let callbackSuccess = function(data){$('#apitoken').val('')}
-    $.queryData({method:"delete", url:"{{ url_for('api.users_api_token')}}",callbackSuccess:callbackSuccess});
+    let success = function(data){$('#apitoken').val('')}
+    $.queryData({method:"delete", url:"{{ url_for('api.users_api_token')}}",success:success});
 });
+
+$('#backup').on('click',function(){
+    let success = function(data, response, xhr){
+        let disposition = xhr.getResponseHeader('Content-Disposition')
+        let filename = disposition.split(/;(.+)/)[1].split(/=(.+)/)[1];
+        let a = document.createElement('a');
+        let url = window.URL.createObjectURL(data);
+        a.href = url;
+        a.download = filename;
+        document.body.append(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    }
+    $.queryData({
+         method: 'get', url: '{{url_for('settings.backup')}}', xhrFields: {responseType: 'blob'}, success: success
+    });
+})
 
 $('#users').on('click','.add_button', function() {
     let parent = $(this).parent().parent();
     let data = $(parent).find('input, select').serializeObject();
     let templ = $('#users-ref').clone();
-    let callbackSuccess = function(data){
+    let success = function(data){
         templ.find('.add_button').parent().addClass('d-none');
         templ.find('.del_button').parent().removeClass('d-none');
         templ.find('.otp_user').prop('disabled',false);
@@ -279,14 +297,14 @@ $('#users').on('click','.add_button', function() {
     }
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
     if (this.dispatchEvent(divsubmit))
-        $.queryData({url:"{{url_for('api.users_users')}}",data:data, callbackSuccess:callbackSuccess});
+        $.queryData({url:"{{url_for('api.users_users')}}",data:data, success:success});
 });
 
 $('#users').on('click','.del_button', function() {
     let parent = $(this).parent().parent()
     let data = $(parent).find('input, select').serializeObject();
-    let callbackSuccess = function(data){ parent.remove() }
-    $.queryData({method:"delete", url:`{{ url_for('api.users_users')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
+    let success = function(data){ parent.remove() }
+    $.queryData({method:"delete", url:`{{ url_for('api.users_users')}}/${data["id"]}`, success:success});
 });
 
 $('#users').on('click','.otp_user', function() {
@@ -305,7 +323,7 @@ $('#ubuttons').on('click','.add_button', function() {
     let parent = $(this).parent().parent();
     let data = $(parent).find('input').serializeObject({"checkboxesAsBools":true});
     let templ = $('#ubuttons-ref').clone();
-    let callbackSuccess = function(data){
+    let success = function(data){
         templ.find('.add_button').parent().addClass('d-none');
         templ.find('.del_button').parent().removeClass('d-none');
         templ.attr('id','ubuttons-'+data["id"]);
@@ -317,15 +335,15 @@ $('#ubuttons').on('click','.add_button', function() {
     }
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
     if (this.dispatchEvent(divsubmit))
-        $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, callbackSuccess:callbackSuccess});
+        $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, success:success});
 
 });
 
 $('#ubuttons').on('click','.del_button', function() {
     let parent = $(this).parent().parent();
     let data = $(parent).find('input').serializeObject({"checkboxesAsBools":true});
-    let callbackSuccess = function(data){ parent.remove() }
-    $.queryData({method:"delete", url:`{{ url_for('api.settings_buttons')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
+    let success = function(data){ parent.remove() }
+    $.queryData({method:"delete", url:`{{ url_for('api.settings_buttons')}}/${data["id"]}`, success:success});
 });
 
 $('#ubuttons').on('change','.uchange', function(){
@@ -337,7 +355,7 @@ $('#multiviews').on('click','.add_button', function() {
     let parent = $(this).parent().parent();
     let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
     let templ = $('#multiviews-ref').clone();
-    let callbackSuccess = function(data){
+    let success = function(data){
         templ.find('.add_button').parent().addClass('d-none');
         templ.find('.del_button').parent().removeClass('d-none');
         templ.attr('id','multiviews-'+data["id"]);
@@ -349,14 +367,14 @@ $('#multiviews').on('click','.add_button', function() {
     }
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
     if (this.dispatchEvent(divsubmit))
-        $.queryData({url:"{{url_for('api.multiview_multiviews')}}",data:data, callbackSuccess:callbackSuccess});
+        $.queryData({url:"{{url_for('api.multiview_multiviews')}}",data:data, success:success});
 });
 
 $('#multiviews').on('click','.del_button', function() {
     let parent = $(this).parent().parent();
     let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
-    let callbackSuccess = function(data){ parent.remove() }
-    $.queryData({method:"delete", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, callbackSuccess:callbackSuccess});
+    let success = function(data){ parent.remove() }
+    $.queryData({method:"delete", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, success:success});
 });
 
 $('#multiviews').on('change','.uchange', function(){

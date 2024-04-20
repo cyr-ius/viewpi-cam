@@ -15,7 +15,7 @@
 {% block scripts%}
 <script>
 $(function(){
-    let callback = function(data){
+    let success = function(data){
         sessionStorage.checkUpdate = 1;
         if (data) {
             last_version = data.app_version
@@ -29,7 +29,7 @@ $(function(){
     }
 
     if (!sessionStorage.checkUpdate)
-        $.queryData({method:"get", url:"{{url_for('api.system_version')}}", callbackSuccess:callback});
+        $.queryData({method:"get", url:"{{url_for('api.system_version')}}", success:success});
 
     if (sessionStorage.app_version && sessionStorage.app_version != '{{config.VERSION}}')
         $('#check-update').html(`New version detected, please restart to update to ${sessionStorage.app_version}`)

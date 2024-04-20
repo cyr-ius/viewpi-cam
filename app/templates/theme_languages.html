@@ -16,7 +16,7 @@
 $('#language').unbind()
 $('#language').on('click', 'button', function(){
   let data = {"locale":$(this).val()}
-  let callback = function(data){setTimeout(location.reload(),100)}
-  $.queryData({method:"put", url:"{{url_for('api.users_locale',id=current_user.id)}}", data:data, callbackSuccess:callback});
+  let success = function(data){setTimeout(location.reload(),100)}
+  $.queryData({method:"put", url:"{{url_for('api.users_locale',id=current_user.id)}}", data:data, success:success});
 })
 </script>

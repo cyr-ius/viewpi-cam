@@ -43,7 +43,7 @@ $(document).on('shown.bs.modal','#otpmodal',function(event){
     let status = $(event.currentTarget).attr("aria-viewpicam-modal-status")
     $('#userid').val(id);
 
-    let callbackSuccess = function(data){
+    let success = function(data){
       if (!data["otp_confirmed"]) {
         $('.modal-body p').html("Please scan QR Code and input code to first onboarding.")
         $('#otp_svg, #otp_secret, #otp_btn').show()
@@ -54,7 +54,7 @@ $(document).on('shown.bs.modal','#otpmodal',function(event){
         $('#otp_del_btn').show()
       }
     }
-    $.queryData({method:"get", url:`{{url_for('api.users_totp')}}/${id}`,data:"", callbackSuccess:callbackSuccess});
+    $.queryData({method:"get", url:`{{url_for('api.users_totp')}}/${id}`,data:"", success:success});
 });
 
 $(document).on('hide.bs.modal','#otpmodal',function(event){
@@ -64,22 +64,22 @@ $(document).on('hide.bs.modal','#otpmodal',function(event){
 $('#otp_btn').unbind();
 $('#otp_btn').click(function () {
   let data = $('#otpmodal').find('input, select').serializeObject();
-  let callback = function(data){
+  let success = function(data){
     $('#otp_svg, #otp_secret, #otp_btn, #otp_del_btn').hide()
     otpModal.hide();
   }
-  $.queryData({method:"post", url:`{{ url_for('api.users_totp')}}/${data["id"]}`,data:data, "callbackSuccess":callback});
+  $.queryData({method:"post", url:`{{ url_for('api.users_totp')}}/${data["id"]}`,data:data, "success":success});
 });
 
 $('#otp_del_btn').unbind();
 $('#otp_del_btn').click(function () {
   let data = $('#otpmodal').find('input, select').serializeObject();
-  let callback = function(data){
+  let success = function(data){
     $('#otp_svg, #otp_secret, #otp_btn, #otp_del_btn').hide()
     otpModal.hide();
   }
   if (confirm('Are you sure you want to delete OTP code ?')) {
-    $.queryData({"method":"delete", "url":`{{ url_for('api.users_totp')}}/${data["id"]}`,  "callbackSuccess":callback});
+    $.queryData({"method":"delete", "url":`{{ url_for('api.users_totp')}}/${data["id"]}`,  "success":success});
   }
 });
 </script>
