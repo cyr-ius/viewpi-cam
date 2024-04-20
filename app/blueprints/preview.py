@@ -109,7 +109,7 @@ def zipdata():
         zip_list = []
         for id in check_list:
             thumb = files_db.query.get(id)
-            zip_list.append(thumb["name"])
+            zip_list.append(thumb.name)
 
         return get_zip(zip_list)
     abort(404, {"message": "List empty"})
