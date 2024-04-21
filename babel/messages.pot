@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: viewpicam VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-21 16:56+0200\n"
+"POT-Creation-Date: 2024-04-21 17:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,7 +85,8 @@ msgstr ""
 msgid "Upload"
 msgstr ""
 
-#: ../app/templates/navbar.html:21 ../app/templates/navbar.html:23
+#: ../app/templates/motion_settings.html:4 ../app/templates/navbar.html:21
+#: ../app/templates/navbar.html:23
 msgid "Motion Settings"
 msgstr ""
 

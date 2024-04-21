@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-21 16:56+0200\n"
+"POT-Creation-Date: 2024-04-21 17:01+0200\n"
 "PO-Revision-Date: 2023-10-23 20:00+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -56,7 +56,7 @@ msgstr "Mot de passe"
 
 #: ../app/templates/login.html:31
 msgid "Sign in"
-msgstr "Connection"
+msgstr "Connexion"
 
 #: ../app/templates/modal_qr.html:10
 msgid "TOTP Enrollment"
@@ -82,7 +82,8 @@ msgstr "Annulé"
 msgid "Upload"
 msgstr "Téléverser"
 
-#: ../app/templates/navbar.html:21 ../app/templates/navbar.html:23
+#: ../app/templates/motion_settings.html:4 ../app/templates/navbar.html:21
+#: ../app/templates/navbar.html:23
 msgid "Motion Settings"
 msgstr "Paramètres du mouvement"
 
