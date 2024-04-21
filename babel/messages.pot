@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: viewpicam VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-21 17:01+0200\n"
+"POT-Creation-Date: 2024-04-21 17:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,6 +55,10 @@ msgstr ""
 #: ../app/templates/register.html:4 ../app/templates/register.html:5
 #: ../app/templates/settings.html:47 ../app/templates/settings.html:62
 msgid "Password"
+msgstr ""
+
+#: ../app/templates/login.html:28
+msgid "Remember me"
 msgstr ""
 
 #: ../app/templates/login.html:31

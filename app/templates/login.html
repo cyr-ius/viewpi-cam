@@ -25,7 +25,7 @@
         {%endif%}
         <div class="form-check mb-3">
             <input class="form-check-input" name="remember" type="checkbox" id="flexCheckDefault">
-            <label class="form-check-label" for="flexCheckDefault">Remember me</label>
+            <label class="form-check-label" for="flexCheckDefault">{{_('Remember me')}}</label>
         </div>
         <input id="next" name="next" type="hidden" value="{{request.args.next}}">
         <input class="btn btn-primary w-100 py-2" id="submit" name="submit" type="submit" value="{{_('Sign in')}}">

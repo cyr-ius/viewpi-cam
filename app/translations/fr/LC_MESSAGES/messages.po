@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-21 17:01+0200\n"
+"POT-Creation-Date: 2024-04-21 17:03+0200\n"
 "PO-Revision-Date: 2023-10-23 20:00+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -53,6 +53,10 @@ msgstr "Utilisateur"
 #: ../app/templates/settings.html:47 ../app/templates/settings.html:62
 msgid "Password"
 msgstr "Mot de passe"
+
+#: ../app/templates/login.html:28
+msgid "Remember me"
+msgstr "Se souvenir du moi"
 
 #: ../app/templates/login.html:31
 msgid "Sign in"
