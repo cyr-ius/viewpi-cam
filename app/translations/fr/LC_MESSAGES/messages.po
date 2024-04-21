@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-21 16:37+0200\n"
+"POT-Creation-Date: 2024-04-21 16:49+0200\n"
 "PO-Revision-Date: 2023-10-23 20:00+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -30,6 +30,11 @@ msgstr "Accès refusé"
 #: ../app/templates/cam_settings.html:5 ../app/templates/navbar.html:19
 msgid "Camera Settings"
 msgstr "Paramètres caméra"
+
+#: ../app/templates/footer.html:8
+#, fuzzy
+msgid "Release"
+msgstr "Version"
 
 #: ../app/templates/login.html:11 ../app/templates/totp.html:12
 msgid "Please sign in"
