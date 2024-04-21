@@ -166,15 +166,15 @@
             </div>
         </div>
     </form>
-        <div id="period_scheduler" class="row mx-auto mt-5">
-            <div class="row row-cols-2 row-cols-md-5 text-center p-1 ">
-                <span class="col-6 col-md">{{ _('Period')}}</span>
-                <span class="col-6 col-md">{{ _('Mon - - Wed - - Sun')}}</span>
-                <span class="col-4 col-md">{{ _('Motion Start')}}</span>
-                <span class="col-4 col-md">{{ _('Motion Stop')}}</span>
-                <span class="col-4 col-md">{{ _('Period Start')}}</span>
-            </div>
-            <form id="form_schedule" class="row needs-validation">
+    <div id="period_scheduler" class="row mx-auto mt-5">
+        <div class="row row-cols-2 row-cols-md-5 text-center p-1 ">
+            <span class="col-6 col-md">{{ _('Period')}}</span>
+            <span class="col-6 col-md">{{ _('Mon - - Wed - - Sun')}}</span>
+            <span class="col-4 col-md">{{ _('Motion Start')}}</span>
+            <span class="col-4 col-md">{{ _('Motion Stop')}}</span>
+            <span class="col-4 col-md">{{ _('Period Start')}}</span>
+        </div>
+        <form id="form_schedule" class="row needs-validation">
             <input type="hidden" name="daymode" value="{{settings.daymode}}">   
             {% for item in scheduler %}
             <div class="row row-cols-2 row-cols-md-5 gy-1 gx-2">
@@ -190,8 +190,8 @@
                 <div class="col-8 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][modes]" value="{{item.mode}}"></div>
             </div>
             {%endfor%}
-            </form>
-        </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
 {% block scripts %}
