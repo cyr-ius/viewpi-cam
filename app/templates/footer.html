@@ -23,7 +23,7 @@ $(function(){
         }
     }
 
-    if (!sessionStorage.lastUpdateCheck || parseInt(sessionStorage.lastUpdateCheck) + 300000 < Date.now())
+    if (!sessionStorage.lastUpdateCheck || parseInt(sessionStorage.lastUpdateCheck) + 300000 < Date.now)
         $.queryData({method:"get", url:"{{url_for('api.system_version')}}", success:success});
 
     if (sessionStorage.appVersion && sessionStorage.appVersion != '{{config.VERSION}}')
