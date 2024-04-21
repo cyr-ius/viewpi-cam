@@ -5,7 +5,7 @@
             <li class="nav-item"><a class="nav-link" href="http://www.raspberrypi.org/forums/viewtopic.php?f=43&amp;t=63276" target="_blank">Forum</a></li>
             <li class="nav-item"><a class="nav-link" href="http://elinux.org/RPi-Cam-Web-Interface" target="_blank">Wiki</a></li>
         </ul>
-        <div class="ms-auto me-1 d-none d-md-flex"><span id="check-update" class="fs-6 fw-lighter">ViewPi Cam  - Release {{config.VERSION}}</span></div>
+        <div class="ms-auto me-1 d-none d-md-flex"><span id="check-update" class="fs-6 fw-lighter">ViewPi Cam  - {{_('Release')}} {{config.VERSION}}</span></div>
         <div class="ms-auto me-1">
         {% include "theme_languages.html"%}
         </div>
@@ -19,7 +19,7 @@ $(function(){
         sessionStorage.lastUpdateCheck = Date.now();
         if (data && data.update_available == 1) {
             sessionStorage.appVersion = data.app_version
-            $('#check-update').html(`New version detected, please restart to update to ${sessionStorage.appVersion}`)
+            $('#check-update').html(`{{_('New version detected, please restart to update to')}} ${sessionStorage.appVersion}`)
         }
     }
 
@@ -27,7 +27,7 @@ $(function(){
         $.queryData({method:"get", url:"{{url_for('api.system_version')}}", success:success});
 
     if (sessionStorage.appVersion && sessionStorage.appVersion != '{{config.VERSION}}')
-        $('#check-update').html(`New version detected, please restart to update to ${sessionStorage.appVersion}`)
+        $('#check-update').html(`{{_('New version detected, please restart to update to')}} ${sessionStorage.appVersion}`)
 
 });
 </script>
