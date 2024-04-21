@@ -16,23 +16,18 @@
 <script>
 $(function(){
     let success = function(data){
-        sessionStorage.checkUpdate = 1;
-        if (data) {
-            last_version = data.app_version
-            if (data.update_available == 1) {
-                $('#check-update').html(`New version detected, please restart to update to ${last_version}`)
-            }
-            sessionStorage.app_version = last_version
-        } else {
-            sessionStorage.removeItem('app_version')
+        sessionStorage.lastUpdateCheck = Date.now();
+        if (data && data.update_available == 1) {
+            sessionStorage.appVersion = data.app_version
+            $('#check-update').html(`New version detected, please restart to update to ${sessionStorage.appVersion}`)
         }
     }
 
-    if (!sessionStorage.checkUpdate)
+    if (!sessionStorage.lastUpdateCheck || sessionStorage.lastUpdateCheck + 300000 < Date.now())
         $.queryData({method:"get", url:"{{url_for('api.system_version')}}", success:success});
 
-    if (sessionStorage.app_version && sessionStorage.app_version != '{{config.VERSION}}')
-        $('#check-update').html(`New version detected, please restart to update to ${sessionStorage.app_version}`)
+    if (sessionStorage.appVersion && sessionStorage.appVersion != '{{config.VERSION}}')
+        $('#check-update').html(`New version detected, please restart to update to ${sessionStorage.appVersion}`)
 
 });
 </script>
