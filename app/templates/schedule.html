@@ -1,196 +1,200 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container-fluid overflow-auto px-5 py-2">
-    <form id="form_setting" class="row needs-validation">
-        <div class="row"><h4 class="p-0">{{_('Scheduler')}}</h3></div>
+    <div class="row">
+        <div class="row"><h4 class="p-0">{{_('Scheduler settings')}}</h4></div>
         <hr class="p-0 ">
-        <div class="row row-cols-1 row-cols-md-5 text-center mb-2 gy-1 gx-2 border">
+        <div class="row row-cols-1 row-cols-md-5 text-center mx-auto mb-2 p-1 border">
             <span class="col">{{_('Time Offset')}}: <b>{{offset}}</b></span>
             <span class="col">{{_('Sunrise')}}: <b>{{sunrise}}</b></span>
             <span class="col">{{_('Sunset')}}: <b>{{sunset}}</b></span>
             <span class="col">{{_('Current')}}: <b>{{current_time}}</b></span>
-            <span id="period" class="col">{{_('Period')}}: <b>{{period|capitalize}}</b></span>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('Motion - Fifo In')}}</label></div>
-            <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{motion_pipe}}">
-            </div>
-            <div class="col"><label class="col-form-label-sm">{{_('Control - Fifo Out')}}</label></div>
-            <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{control_file}}">
-            </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('AutoCamera')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocamera_interval" value="{{ settings.autocamera_interval|default(0, true)}}" required>
-                    <span class="input-group-text">{{_('seconds')}}</span>
+            <span id="period" class="col" style="text-transform: capitalize;">{{_('Period')}}: <b>{{period}}</b></span>
+        </div>        
+        <form id="form_setting" class="row needs-validation">
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('Motion - Fifo In')}}</label></div>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{motion_pipe}}">
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('Control - Fifo Out')}}</label></div>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" autocomplete="off" disabled="disabled" value="{{control_file}}">
                 </div>
             </div>
-            <div class="col"><label class="col-form-label-sm">{{_('AutoCapture')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocapture_interval" value="{{ settings.autocapture_interval|default(0, true)}}" required>
-                    <span class="input-group-text">{{_('seconds')}}</span>
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('AutoCamera')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocamera_interval" value="{{ settings.autocamera_interval|default(0, true)}}" required>
+                        <span class="input-group-text">{{_('seconds')}}</span>
+                    </div>
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('AutoCapture')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="autocapture_interval" value="{{ settings.autocapture_interval|default(0, true)}}" required>
+                        <span class="input-group-text">{{_('seconds')}}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('Cmd Poll')}}</label></div>
-            <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="cmd_poll" value="{{ settings.cmd_poll|default(0, true)}}" required>
-            </div>
-            <div class="col"><label class="col-form-label-sm">{{_('DawnStart')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="dawnstart_minutes" value="{{ settings.dawnstart_minutes|default(0, true)}}" required>
-                    <span class="input-group-text">{{_('minutes')}}</span>
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('Cmd Poll')}}</label></div>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="cmd_poll" value="{{ settings.cmd_poll|default(0, true)}}" required>
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('DawnStart')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="dawnstart_minutes" value="{{ settings.dawnstart_minutes|default(0, true)}}" required>
+                        <span class="input-group-text">{{_('minutes')}}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('DayEnd')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="dayend_minutes" value="{{ settings.dayend_minutes|default(0, true)}}" required>
-                    <span class="input-group-text">{{_('minutes')}}</span>
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('DayEnd')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="dayend_minutes" value="{{ settings.dayend_minutes|default(0, true)}}" required>
+                        <span class="input-group-text">{{_('minutes')}}</span>
+                    </div>
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('Day Mode')}}</label></div>
+                <div class="col">
+                    <select id="daymode" class="form-select form-select-sm" name="daymode" required>
+                        <option value="1" {%if  settings.daymode == 1 %}selected="selected"{%endif%}>All Day</option>
+                        <option value="0" {%if  settings.daymode == 0 %}selected="selected"{%endif%}>Sun based</option>
+                        <option value="2" {%if  settings.daymode == 2 %}selected="selected"{%endif%}>Fixed Times</option>
+                    </select>
                 </div>
             </div>
-            <div class="col"><label class="col-form-label-sm">{{_('Day Mode')}}</label></div>
-            <div class="col">
-                <select id="daymode" class="form-select form-select-sm" name="daymode" required>
-                    <option value="1" {%if  settings.daymode == 1 %}selected="selected"{%endif%}>All Day</option>
-                    <option value="0" {%if  settings.daymode == 0 %}selected="selected"{%endif%}>Sun based</option>
-                    <option value="2" {%if  settings.daymode == 2 %}selected="selected"{%endif%}>Fixed Times</option>
-                </select>
-            </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('DayStart')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="daystart_minutes" value="{{ settings.daystart_minutes|default(0, true)}}" required>
-                    <span class="input-group-text">{{_('minutes')}}</span>
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('DayStart')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="daystart_minutes" value="{{ settings.daystart_minutes|default(0, true)}}" required>
+                        <span class="input-group-text">{{_('minutes')}}</span>
+                    </div>
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('DuskEnd')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="duskend_minutes" value="{{ settings.duskend_minutes|default(0, true)}}" required>
+                        <span class="input-group-text">{{_('minutes')}}</span>
+                    </div>
                 </div>
             </div>
-            <div class="col"><label class="col-form-label-sm">{{_('DuskEnd')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="duskend_minutes" value="{{ settings.duskend_minutes|default(0, true)}}" required>
-                    <span class="input-group-text">{{_('minutes')}}</span>
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('Purge Video')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgevideo_hours" value="{{ settings.purgevideo_hours}}" required>
+                        <span class="input-group-text">hours</span>
+                    </div>
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('GMT offset')}}</label></div>
+                <div class="col">
+                    <select class="form-select form-select-sm" id="gmt_offset" name="gmt_offset">
+                        {%- for timezone in timezones|sort %}
+                        <option {% if settings.gmt_offset == timezone %}selected{%endif%} value="{{timezone}}">{{timezone}}</option>
+                        {%endfor%}
+                    </select>
                 </div>
             </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('Purge Video')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgevideo_hours" value="{{ settings.purgevideo_hours}}" required>
-                    <span class="input-group-text">hours</span>
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('Latitude')}}</label></div>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="latitude" value="{{ settings.latitude|default(0, true)}}" step="0.01">
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('Longitude')}}</label></div>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="longitude" value="{{ settings.longitude|default(0, true)}}" step="0.01">
                 </div>
             </div>
-            <div class="col"><label class="col-form-label-sm">{{_('GMT offset')}}</label></div>
-            <div class="col">
-                <select class="form-select form-select-sm" id="gmt_offset" name="gmt_offset">
-                    {%- for timezone in timezones|sort %}
-                    <option {% if settings.gmt_offset == timezone %}selected{%endif%} value="{{timezone}}">{{timezone}}</option>
-                    {%endfor%}
-                </select>
-            </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('Latitude')}}</label></div>
-            <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="latitude" value="{{ settings.latitude|default(0, true)}}" step="0.01">
-            </div>
-            <div class="col"><label class="col-form-label-sm">{{_('Longitude')}}</label></div>
-            <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="longitude" value="{{ settings.longitude|default(0, true)}}" step="0.01">
-            </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('Management command')}}</label></div>
-            <div class="col">
-                <input class="form-control form-control-sm" type="text" autocomplete="off" name="management_command" value="{{ settings.management_command}}">
-            </div>
-            <div class="col"><label class="col-form-label-sm">{{_('Management interval')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="management_interval" value="{{ settings.management_interval}}">
-                    <span class="input-group-text">{{_('seconds')}}</span>
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('Management command')}}</label></div>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" autocomplete="off" name="management_command" value="{{ settings.management_command}}">
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('Management interval')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="management_interval" value="{{ settings.management_interval}}">
+                        <span class="input-group-text">{{_('seconds')}}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('Max capture')}}</label></div>
-            <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="max_capture" value="{{ settings.max_capture}}" required>
-            </div>
-            <div class="col"><label class="col-form-label-sm">{{_('Mode Poll')}}</label></div>
-            <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="mode_poll" value="{{ settings.mode_poll}}" required>
-            </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('Purge image')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgeimage_hours" value="{{ settings.purgeimage_hours}}" required>
-                    <span class="input-group-text">{{_('hours')}}</span>
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('Max capture')}}</label></div>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="max_capture" value="{{ settings.max_capture}}" required>
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('Mode Poll')}}</label></div>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="mode_poll" value="{{ settings.mode_poll}}" required>
                 </div>
             </div>
-            <div class="col"><label class="col-form-label-sm">{{_('Purge lapse')}}</label></div>
-            <div class="col">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgelapse_hours" value="{{ settings.purgelapse_hours}}" required>
-                    <span class="input-group-text">{{_('hours')}}</span>
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('Purge image')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgeimage_hours" value="{{ settings.purgeimage_hours}}" required>
+                        <span class="input-group-text">{{_('hours')}}</span>
+                    </div>
+                </div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('Purge lapse')}}</label></div>
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgelapse_hours" value="{{ settings.purgelapse_hours}}" required>
+                        <span class="input-group-text">{{_('hours')}}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row row-cols-2 row-cols-md-4 gy-1 gx-2">
-            <div class="col"><label class="col-form-label-sm">{{_('Purge space level')}}</label></div>
-            <div class="col">
-                <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgespace_level" value="{{ settings.purgespace_level}}" required>
-            </div>
-            <div class="col"><label class="col-form-label-sm">{{_('Purge Mode')}}</label></div>
-            <div class="col">
-                <select id="PurgeSpace_ModeEx" class="form-select form-select-sm" name="purgespace_modeex" required>
-                    <option value="0" {% if  settings.purgespace_modeex == 0%}selected{%endif%}>Off</option>
-                    <option value="1" {% if  settings.purgespace_modeex == 1%}selected{%endif%}>Min Space %</option>
-                    <option value="2" {% if  settings.purgespace_modeex == 2%}selected{%endif%}>Max Usage %</option>
-                    <option value="3" {% if  settings.purgespace_modeex == 3%}selected{%endif%}>Min Space GB</option>
-                    <option value="4" {% if  settings.purgespace_modeex == 4%}selected{%endif%}>Max Usage GB</option>
-                </select>
-            </div>
-        </div>
-    </form>
-    <div id="period_scheduler" class="row mx-auto mt-5">
-        <div class="row row-cols-2 row-cols-md-5 text-center p-1 ">
-            <span class="col-6 col-md">{{ _('Period')}}</span>
-            <span class="col-6 col-md">{{ _('Mon - - Wed - - Sun')}}</span>
-            <span class="col-4 col-md">{{ _('Motion Start')}}</span>
-            <span class="col-4 col-md">{{ _('Motion Stop')}}</span>
-            <span class="col-4 col-md">{{ _('Period Start')}}</span>
-        </div>
-        <form id="form_schedule" class="row needs-validation">
-            <input type="hidden" name="daymode" value="{{settings.daymode}}">   
-            {% for item in scheduler %}
-            <div class="row row-cols-2 row-cols-md-5 gy-1 gx-2">
-                <div class="col-6 col-md" data-time="{{item.period}}"><label class="col-form-label-sm">{{item.period|capitalize }}</label></div>
-                <div class="col-6 col-md text-center">
-                    {% for day in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]%}
-                    {% set i = loop.index0 %}
-                    <input class="form-checkbox form-checkbox-sm" type="checkbox" name="scheduler[{{item.id}}][{{day}}]" {%if item.days[i] %} checked="checked" {%endif%}>
-                    {%endfor%}
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col mb-2"><label class="col-form-label-sm">{{_('Purge space level')}}</label></div>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" autocomplete="off" name="purgespace_level" value="{{ settings.purgespace_level}}" required>
                 </div>
-                <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_on]" value="{{item.command_on}}"></div>
-                <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_off]" value="{{item.command_off}}"></div>
-                <div class="col-8 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][modes]" value="{{item.mode}}"></div>
+                <div class="col mb-2 ps-md-5"><label class="col-form-label-sm">{{_('Purge Mode')}}</label></div>
+                <div class="col">
+                    <select id="PurgeSpace_ModeEx" class="form-select form-select-sm" name="purgespace_modeex" required>
+                        <option value="0" {% if  settings.purgespace_modeex == 0%}selected{%endif%}>Off</option>
+                        <option value="1" {% if  settings.purgespace_modeex == 1%}selected{%endif%}>Min Space %</option>
+                        <option value="2" {% if  settings.purgespace_modeex == 2%}selected{%endif%}>Max Usage %</option>
+                        <option value="3" {% if  settings.purgespace_modeex == 3%}selected{%endif%}>Min Space GB</option>
+                        <option value="4" {% if  settings.purgespace_modeex == 4%}selected{%endif%}>Max Usage GB</option>
+                    </select>
+                </div>
             </div>
-            {%endfor%}
         </form>
+        <div class="row mt-5"><h4 class="p-0">{{_('Scheduler')}}</h4></div>
+        <hr class="p-0 ">
+        <div id="period_scheduler" class="row mt-5">
+            <div class="row row-cols-2 row-cols-md text-center">
+                <span class="col-6 col-md">{{ _('Period')}}</span>
+                <span class="col-6 col-md">{{ _('Mon - - Wed - - Sun')}}</span>
+                <span class="col-4 col-md">{{ _('Motion Start')}}</span>
+                <span class="col-4 col-md">{{ _('Motion Stop')}}</span>
+                <span class="col-4 col-md">{{ _('Period Start')}}</span>
+            </div>
+            <form id="form_schedule" class="row needs-validation">
+                <input type="hidden" name="daymode" value="{{settings.daymode}}">   
+                {% for item in scheduler %}
+                <div class="row row-cols-2 row-cols-md g-1">
+                    <div class="col-6 col-md" data-time="{{item.period}}"><label class="col-form-label-sm">{{item.period|capitalize }}</label></div>
+                    <div class="col-6 col-md text-center">
+                        {% for day in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]%}
+                        {% set i = loop.index0 %}
+                        <input class="form-checkbox form-checkbox-sm" type="checkbox" name="scheduler[{{item.id}}][{{day}}]" {%if item.days[i] %} checked="checked" {%endif%}>
+                        {%endfor%}
+                    </div>
+                    <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_on]" value="{{item.command_on}}"></div>
+                    <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_off]" value="{{item.command_off}}"></div>
+                    <div class="col-8 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][modes]" value="{{item.mode}}"></div>
+                </div>
+                {%endfor%}
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -204,14 +208,14 @@ $(function(){
     let daymode = parseInt($("#daymode").val());
     let success = function(data) {
         let period = data["period"]       
-        $('#period').html(`Period: <b>${period|capitalize}</b>`)
+        $('#period').html(`Period: <b>${period}</b>`)
         let line = $("#period_scheduler").find(`[data-time="${period}"]`)
         $(line).css("background-color","LightGreen").css("color","black")
     }
     $.queryData({url:"{{ url_for('api.schedule_period')}}", data: {"daymode": daymode}, success:success})    
 })
 
-$('#sch_save').unbind();
+$('#sch_save').unbind();    
 $('#sch_save').click(function(){
     if (!document.getElementById('form_setting').checkValidity()) {
         $("#form_setting").addClass('was-validated')
