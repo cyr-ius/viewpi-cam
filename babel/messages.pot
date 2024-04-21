@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: viewpicam VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-02 12:40+0100\n"
+"POT-Creation-Date: 2024-04-21 16:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,135 +17,147 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.14.0\n"
 
-#: ../app/blueprints/auth.py:57
+#: ../app/blueprints/auth.py:44
 msgid "User or password is empty."
 msgstr ""
 
-#: ../app/blueprints/auth.py:59 ../app/blueprints/auth.py:98
-#: ../app/blueprints/auth.py:99
+#: ../app/blueprints/auth.py:46 ../app/blueprints/auth.py:86
+#: ../app/blueprints/auth.py:87
 msgid "User or password invalid."
 msgstr ""
 
-#: ../app/blueprints/auth.py:117
+#: ../app/blueprints/auth.py:112
 msgid "Access id denied."
 msgstr ""
 
-#: ../app/templates/cam_settings.html:5 ../app/templates/navbar.html:18
+#: ../app/templates/cam_settings.html:5 ../app/templates/navbar.html:19
 msgid "Camera Settings"
 msgstr ""
 
-#: ../app/templates/login.html:12 ../app/templates/totp.html:12
+#: ../app/templates/login.html:11 ../app/templates/totp.html:12
 msgid "Please sign in"
 msgstr ""
 
-#: ../app/templates/login.html:15 ../app/templates/settings.html:46
+#: ../app/templates/login.html:14 ../app/templates/settings.html:46
 #: ../app/templates/settings.html:61
 msgid "Username"
 msgstr ""
 
-#: ../app/templates/login.html:19 ../app/templates/login.html:24
+#: ../app/templates/login.html:18 ../app/templates/login.html:23
 #: ../app/templates/register.html:4 ../app/templates/register.html:5
 #: ../app/templates/settings.html:47 ../app/templates/settings.html:62
 msgid "Password"
 msgstr ""
 
-#: ../app/templates/login.html:28
+#: ../app/templates/login.html:31
 msgid "Sign in"
 msgstr ""
 
-#: ../app/templates/modal_qr.html:5
+#: ../app/templates/modal_qr.html:10
 msgid "TOTP Enrollment"
 msgstr ""
 
-#: ../app/templates/modal_qr.html:27
+#: ../app/templates/modal_qr.html:32
 msgid "Close"
 msgstr ""
 
-#: ../app/templates/modal_qr.html:28
+#: ../app/templates/modal_qr.html:33
 msgid "Check OTP"
 msgstr ""
 
-#: ../app/templates/navbar.html:20 ../app/templates/navbar.html:22
+#: ../app/templates/modal_upload.html:10
+msgid "Zip configuration"
+msgstr ""
+
+#: ../app/templates/modal_upload.html:18
+msgid "Cancel"
+msgstr ""
+
+#: ../app/templates/modal_upload.html:19
+msgid "Upload"
+msgstr ""
+
+#: ../app/templates/navbar.html:21 ../app/templates/navbar.html:23
 msgid "Motion Settings"
 msgstr ""
 
-#: ../app/templates/navbar.html:30
-msgid "Save Settings"
-msgstr ""
-
 #: ../app/templates/navbar.html:31
-msgid "Backup"
-msgstr ""
-
-#: ../app/templates/navbar.html:32
-msgid "Restore"
-msgstr ""
-
-#: ../app/templates/navbar.html:39
-msgid "Download Log"
-msgstr ""
-
-#: ../app/templates/navbar.html:40
-msgid "Clear Log"
-msgstr ""
-
-#: ../app/templates/navbar.html:45
-msgid "Deselect"
-msgstr ""
-
-#: ../app/templates/navbar.html:46
-msgid "Select All"
-msgstr ""
-
-#: ../app/templates/navbar.html:47
-msgid "Download Zip"
-msgstr ""
-
-#: ../app/templates/navbar.html:48
-msgid "Delete Selected"
-msgstr ""
-
-#: ../app/templates/navbar.html:49
-msgid "Delete All"
-msgstr ""
-
-#: ../app/templates/navbar.html:50
-msgid "Lock"
-msgstr ""
-
-#: ../app/templates/navbar.html:51
-msgid "Unlock"
-msgstr ""
-
-#: ../app/templates/navbar.html:56
-msgid "Download"
-msgstr ""
-
-#: ../app/templates/navbar.html:57
-msgid "Delete"
-msgstr ""
-
-#: ../app/templates/navbar.html:58
-msgid "Start convert"
-msgstr ""
-
-#: ../app/templates/navbar.html:63
-msgid "Gallery"
-msgstr ""
-
-#: ../app/templates/navbar.html:67
-msgid "System"
-msgstr ""
-
-#: ../app/templates/navbar.html:74
 msgid "Display"
 msgstr ""
 
-#: ../app/templates/navbar.html:78 ../app/templates/settings.html:5
+#: ../app/templates/navbar.html:36
+msgid "Backup"
+msgstr ""
+
+#: ../app/templates/navbar.html:37
+msgid "Restore"
+msgstr ""
+
+#: ../app/templates/navbar.html:43
+msgid "Save Settings"
+msgstr ""
+
+#: ../app/templates/navbar.html:49
+msgid "Download Log"
+msgstr ""
+
+#: ../app/templates/navbar.html:50
+msgid "Clear Log"
+msgstr ""
+
+#: ../app/templates/navbar.html:55
+msgid "Deselect"
+msgstr ""
+
+#: ../app/templates/navbar.html:56
+msgid "Select All"
+msgstr ""
+
+#: ../app/templates/navbar.html:57
+msgid "Download Zip"
+msgstr ""
+
+#: ../app/templates/navbar.html:58
+msgid "Delete Selected"
+msgstr ""
+
+#: ../app/templates/navbar.html:59
+msgid "Delete All"
+msgstr ""
+
+#: ../app/templates/navbar.html:60
+msgid "Lock"
+msgstr ""
+
+#: ../app/templates/navbar.html:61
+msgid "Unlock"
+msgstr ""
+
+#: ../app/templates/navbar.html:66
+msgid "Download"
+msgstr ""
+
+#: ../app/templates/navbar.html:67
+msgid "Delete"
+msgstr ""
+
+#: ../app/templates/navbar.html:68
+msgid "Start convert"
+msgstr ""
+
+#: ../app/templates/navbar.html:73
+msgid "Gallery"
+msgstr ""
+
+#: ../app/templates/navbar.html:77
+msgid "System"
+msgstr ""
+
+#: ../app/templates/navbar.html:79 ../app/templates/settings.html:5
 msgid "Settings"
 msgstr ""
 
-#: ../app/templates/navbar.html:79 ../app/templates/schedule.html:5
+#: ../app/templates/navbar.html:80 ../app/templates/schedule.html:170
 msgid "Scheduler"
 msgstr ""
 
@@ -225,8 +237,12 @@ msgstr ""
 msgid "hours old"
 msgstr ""
 
-#: ../app/templates/preview.html:48
+#: ../app/templates/preview.html:51
 msgid "No videos/images saved"
+msgstr ""
+
+#: ../app/templates/schedule.html:5
+msgid "Scheduler settings"
 msgstr ""
 
 #: ../app/templates/schedule.html:8
@@ -245,130 +261,126 @@ msgstr ""
 msgid "Current"
 msgstr ""
 
-#: ../app/templates/schedule.html:12 ../app/templates/schedule.html:171
+#: ../app/templates/schedule.html:12 ../app/templates/schedule.html:174
 msgid "Period"
 msgstr ""
 
-#: ../app/templates/schedule.html:15
+#: ../app/templates/schedule.html:16
 msgid "Motion - Fifo In"
 msgstr ""
 
-#: ../app/templates/schedule.html:19
+#: ../app/templates/schedule.html:20
 msgid "Control - Fifo Out"
 msgstr ""
 
-#: ../app/templates/schedule.html:25
+#: ../app/templates/schedule.html:26
 msgid "AutoCamera"
 msgstr ""
 
-#: ../app/templates/schedule.html:29 ../app/templates/schedule.html:36
-#: ../app/templates/schedule.html:122
+#: ../app/templates/schedule.html:30 ../app/templates/schedule.html:37
+#: ../app/templates/schedule.html:123
 msgid "seconds"
 msgstr ""
 
-#: ../app/templates/schedule.html:32
+#: ../app/templates/schedule.html:33
 msgid "AutoCapture"
 msgstr ""
 
-#: ../app/templates/schedule.html:41
+#: ../app/templates/schedule.html:42
 msgid "Cmd Poll"
 msgstr ""
 
-#: ../app/templates/schedule.html:45
+#: ../app/templates/schedule.html:46
 msgid "DawnStart"
 msgstr ""
 
-#: ../app/templates/schedule.html:49 ../app/templates/schedule.html:58
-#: ../app/templates/schedule.html:75 ../app/templates/schedule.html:82
+#: ../app/templates/schedule.html:50 ../app/templates/schedule.html:59
+#: ../app/templates/schedule.html:76 ../app/templates/schedule.html:83
 msgid "minutes"
 msgstr ""
 
-#: ../app/templates/schedule.html:54
+#: ../app/templates/schedule.html:55
 msgid "DayEnd"
 msgstr ""
 
-#: ../app/templates/schedule.html:61
+#: ../app/templates/schedule.html:62
 msgid "Day Mode"
 msgstr ""
 
-#: ../app/templates/schedule.html:71
+#: ../app/templates/schedule.html:72
 msgid "DayStart"
 msgstr ""
 
-#: ../app/templates/schedule.html:78
+#: ../app/templates/schedule.html:79
 msgid "DuskEnd"
 msgstr ""
 
-#: ../app/templates/schedule.html:87
+#: ../app/templates/schedule.html:88
 msgid "Purge Video"
 msgstr ""
 
-#: ../app/templates/schedule.html:94
+#: ../app/templates/schedule.html:95
 msgid "GMT offset"
 msgstr ""
 
-#: ../app/templates/schedule.html:104
+#: ../app/templates/schedule.html:105
 msgid "Latitude"
 msgstr ""
 
-#: ../app/templates/schedule.html:108
+#: ../app/templates/schedule.html:109
 msgid "Longitude"
 msgstr ""
 
-#: ../app/templates/schedule.html:114
+#: ../app/templates/schedule.html:115
 msgid "Management command"
 msgstr ""
 
-#: ../app/templates/schedule.html:118
+#: ../app/templates/schedule.html:119
 msgid "Management interval"
 msgstr ""
 
-#: ../app/templates/schedule.html:127
+#: ../app/templates/schedule.html:128
 msgid "Max capture"
 msgstr ""
 
-#: ../app/templates/schedule.html:131
+#: ../app/templates/schedule.html:132
 msgid "Mode Poll"
 msgstr ""
 
-#: ../app/templates/schedule.html:137
+#: ../app/templates/schedule.html:138
 msgid "Purge image"
 msgstr ""
 
-#: ../app/templates/schedule.html:141 ../app/templates/schedule.html:148
+#: ../app/templates/schedule.html:142 ../app/templates/schedule.html:149
 msgid "hours"
 msgstr ""
 
-#: ../app/templates/schedule.html:144
+#: ../app/templates/schedule.html:145
 msgid "Purge lapse"
 msgstr ""
 
-#: ../app/templates/schedule.html:153
+#: ../app/templates/schedule.html:154
 msgid "Purge space level"
 msgstr ""
 
-#: ../app/templates/schedule.html:157
+#: ../app/templates/schedule.html:158
 msgid "Purge Mode"
 msgstr ""
 
-#: ../app/templates/schedule.html:172
-msgid "Days Su-Sa"
+#: ../app/templates/schedule.html:175
+msgid "Mon - - Wed - - Sun"
 msgstr ""
 
-#: ../app/templates/schedule.html:173
+#: ../app/templates/schedule.html:176
 msgid "Motion Start"
 msgstr ""
 
-#: ../app/templates/schedule.html:174
+#: ../app/templates/schedule.html:177
 msgid "Motion Stop"
 msgstr ""
 
-#: ../app/templates/schedule.html:175
+#: ../app/templates/schedule.html:178
 msgid "Period Start"
-msgstr ""
-
-#: ../app/templates/schedule.html:181
-msgid "All Days"
 msgstr ""
 
 #: ../app/templates/settings.html:8
