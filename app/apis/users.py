@@ -121,7 +121,7 @@ class Locale(Resource):
             abort(403, "System account cannot be modified")
 
         if user := db.get_or_404(users_db, id):
-            user.update(**api.payload)
+            user.locale = api.payload.get("locale")
             db.session.commit()
             return "", 204
         abort(404, "User not found")

@@ -241,7 +241,7 @@ msgstr "Aucunes vidéos/images"
 #: ../app/templates/schedule.html:5
 #, fuzzy
 msgid "Scheduler settings"
-msgstr "Paramètres caméra"
+msgstr "Paramètres de l'orchestreur"
 
 #: ../app/templates/schedule.html:8
 msgid "Time Offset"
