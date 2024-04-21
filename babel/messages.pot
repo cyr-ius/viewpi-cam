@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: viewpicam VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-21 16:37+0200\n"
+"POT-Creation-Date: 2024-04-21 16:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,6 +32,10 @@ msgstr ""
 
 #: ../app/templates/cam_settings.html:5 ../app/templates/navbar.html:19
 msgid "Camera Settings"
+msgstr ""
+
+#: ../app/templates/footer.html:8
+msgid "Release"
 msgstr ""
 
 #: ../app/templates/login.html:11 ../app/templates/totp.html:12
