@@ -6,7 +6,7 @@
     </div>
     <hr/>
     <div class="offcanvas-body">
-        <div class="row row-col-2 g-3">
+        <div class="row g-3">
             <label class="col col-form-label">Motion Vector Preview:</label>
             <div class="col">
                 <select id="preview_select" class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'vp','params':this.value});setTimeout(function(){location.reload(true);}, 1000);">
@@ -15,71 +15,49 @@
                 </select>
             </div>
         </div>
-        <div class="row row-col-2 g-3">
+        <div class="row g-3">
             <label class="col col-form-label">Noise level (1-255 / >1000):</label>
             <div class="col">
-                <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_noise" type="number" value="{{raspiconfig.motion_noise}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'mn','params':$('#motion_noise').val()});">OK</button>
-                </div>
+                <input class="form-control form-control-sm" id="motion_noise" type="number" min="1" value="{{raspiconfig.motion_noise}}" onchange="$.sendCmd({'cmd':'mn','params':$(this).val()});">
             </div>
         </div>
-        <div class="row row-col-2 g-3">
+        <div class="row g-3">
             <label class="col col-form-label">Threshold (1-32000):</label>
             <div class="col">
-                <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_threshold" type="number" value="{{raspiconfig.motion_threshold}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'mt','params':$('#motion_threshold').val()});">OK</button>
-
-                </div>
+                <input class="form-control form-control-sm" id="motion_threshold" type="number" min="1" max="32000" value="{{raspiconfig.motion_threshold}}" onchange="$.sendCmd({'cmd':'mt','params':$(this).val()});">
             </div>
         </div>
-        <div class="row row-col-2 g-3">
+        <div class="row g-3">
             <label class="col col-form-label">Clipping factor (2-50), default 3:</label>
             <div class="col">
-                <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_clip" type="number" value="{{raspiconfig.motion_clip}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'mc','params':$('#motion_clip').val()});">OK</button>
-                </div>
+                <input class="form-control form-control-sm" id="motion_clip" type="number" min="2" max="50" value="{{raspiconfig.motion_clip}}" onchange="$.sendCmd({'cmd':'mnmc','params':$(this).val()});">
             </div>
         </div>
-        <div class="row row-col-2 g-3">
+        <div class="row g-3"> 
             <label class="col col-form-label">Mask Image:</label>
             <div class="col">
-                <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_image" type="file" value="{{raspiconfig.motion_image}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'mi','params':''});">Reset</button>
-                </div>
+                <input class="form-control form-control-sm" id="motion_image" type="file" value="{{raspiconfig.motion_image}}" onchange="$.sendCmd({'cmd':'mi','params':''});">
             </div>
         </div>
-        <div class="row row-col-2 g-3">
+        <div class="row g-3">
             <label class="col col-form-label">Delay Frames to detect:</label>
             <div class="col">
-                <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_initframes" type="number" value="{{raspiconfig.motion_initframes}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'ms','params':$('#motion_initframes').val()});">OK</button>
-                </div>
+                <input class="form-control form-control-sm" id="motion_initframes" type="number" value="{{raspiconfig.motion_initframes}}" onchange="$.sendCmd({'cmd':'ms','params':$(this).val()});">
             </div>
         </div>
-        <div class="row row-col-2 g-3">
+        <div class="row g-3">
             <label class="col col-form-label">Change Frames to start:</label>
             <div class="col">
-                <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_startframes" type="number" value="{{raspiconfig.motion_startframes}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'mb','params':$('#motion_startframes').val()});">OK</button>
-                </div>
+                <input class="form-control form-control-sm" id="motion_startframes" type="number" value="{{raspiconfig.motion_startframes}}" onchange="$.sendCmd({'cmd':'mb','params':$(this).val()});">
             </div>
         </div>
-        <div class="row row-col-2 g-3">
+        <div class="row g-3">
             <label class="col col-form-label">Still Frames to stop:</label>
             <div class="col">
-                <div class="input-group mb-3">
-                    <input class="form-control form-control-sm" id="motion_stopframes" type="number" value="{{raspiconfig.motion_stopframes}}">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="$.sendCmd({'cmd':'me','params':$('#motion_stopframes').val()});">OK</button>
-                </div>
+                <input class="form-control form-control-sm" id="motion_stopframes" type="number" value="{{raspiconfig.motion_stopframes}}" onchange="$.sendCmd({'cmd':'me','params':$(this).val()});">
             </div>
         </div>
-        <div class="row row-col-2 g-3">
+        <div class="row g-3">
             <label class="col col-form-label">Save vectors to .dat:<br>(Uses more space)</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'mf','params':this.value});">
