@@ -84,8 +84,8 @@
                         <button class="btn btn-sm btn-outline-secondary" id="get_token" type="button">{{_('Generate')}}</button>
                         <button class="btn btn-sm btn-outline-secondary" id="del_token" type="button">{{_('Reset')}}</button>
                     </div>
-                    <a id="cam_pic_new" href="{{ url_for("camera.cam_pic_new", cam_token=settings.cam_token) }}" target="_blank">{{_('Stream view')}}</a>
-                    <a id="cam_pic" href="{{ url_for("camera.cam_pic", cam_token=settings.cam_token) }}" target="_blank">{{_('Last Picture')}}</a>
+                    <a id="cam_pic_new" href="{{ url_for("camera.cam_pic_new", cam_token=camera_token) }}" target="_blank">{{_('Stream view')}}</a>
+                    <a id="cam_pic" href="{{ url_for("camera.cam_pic", cam_token=camera_token) }}" target="_blank">{{_('Last Picture')}}</a>
                 </div>
             </div>
         </div>
