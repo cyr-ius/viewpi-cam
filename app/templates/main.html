@@ -311,7 +311,7 @@ function set_display(value) {
         $('#display_mode').html("Display On")
     }
 
-    document.cookie="display_mode=" + value + "; " + expires;
+    document.cookie="display_mode=" + value + "; samesite=lax; " + expires;
 }
 
 function set_stream_mode(value) {
@@ -325,7 +325,7 @@ function set_stream_mode(value) {
         $("#toggle_stream").html("Default-Stream");
         $("#toggle_stream").val(1);
     }
-    document.cookie="mjpegmode=" + value + "; " + expires;
+    document.cookie="mjpegmode=" + value + "; samesite=lax; " + expires;
     document.location.reload(true);
 }
 
