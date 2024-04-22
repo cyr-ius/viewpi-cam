@@ -1,11 +1,11 @@
-name: Dependabot auto-approve
+name: Dependency auto-merge
 on: pull_request
 
 permissions:
   pull-requests: write
 
 jobs:
-  dependabot:
+  dependency:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]' || github.actor == 'pre-commit-ci[bot]' }}
     steps:
