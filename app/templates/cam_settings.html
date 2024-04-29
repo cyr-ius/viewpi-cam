@@ -491,7 +491,7 @@
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'bo','params':this.value});">
                     <option value="0" {% if raspiconfig.mp4box|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="2" {% if raspiconfig.mp4box|int == 2 %}selected{%endif%}>Background</option>
+                    <option value="1" {% if raspiconfig.mp4box|int != 0 or raspiconfig.mp4box == 'background' %}selected{%endif%}>Background</option>
                 </select>
             </div>
         </div>
