@@ -15,10 +15,11 @@ from flask import current_app as ca
 from flask_login import login_required
 
 from ..apis.settings import Macros, Sets
+from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
 from ..helpers.filer import allowed_file, zip_extract, zip_folder
-from ..helpers.utils import execute_cmd
-from ..models import Multiviews, Presets, Ubuttons, Users
+from ..models import Files as files_db
+from ..models import Multiviews, Presets, Ubuttons, Users, db
 
 bp = Blueprint(
     "settings", __name__, template_folder="templates", url_prefix="/settings"
@@ -83,6 +84,7 @@ def restore():
         flash("No selected file")
     if file and allowed_file(file):
         zip_extract(file, ca.config_folder)
-        flash("Warning, restarting the application")
-        execute_cmd("killall gunicorn")
+        files_db.query.delete()
+        db.session.commit()
+        update_img_db()
     return redirect(url_for("settings.index"))

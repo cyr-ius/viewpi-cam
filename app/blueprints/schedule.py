@@ -14,6 +14,7 @@ from flask.cli import with_appcontext
 from flask_login import login_required
 
 from ..apis.schedule import dt_now, get_calendar, sun_info, time_offset
+from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
 from ..helpers.fifo import check_motion, open_pipe
 from ..helpers.filer import (
@@ -160,6 +161,9 @@ def scheduler() -> None:
             elif cmd == ca.config["SCHEDULE_RESET"]:
                 write_log("Reload parameters command requested")
                 break
+            elif cmd == ca.config["SCHEDULE_UPDATE"]:
+                write_log("Encoding completed, update database")
+                update_img_db()
             elif cmd != "":
                 write_log(f"Ignore FIFO char {cmd}")
 
