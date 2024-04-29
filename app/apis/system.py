@@ -70,6 +70,7 @@ class RestartApp(Resource):
         return "", 204
 
 
+@api.response(204, "Success")
 @api.response(401, "Unauthorized", message)
 @api.response(404, "Not found", message)
 @api.response(422, "Error", message)
@@ -84,8 +85,9 @@ class Command(Resource):
             try:
                 if params := api.payload.get("params"):
                     params = " ".join(params)
-                    return ca.raspiconfig.send(f"{cmd} {params}")
-                return ca.raspiconfig.send(f"{cmd}")
+                    ca.raspiconfig.send(f"{cmd} {params}")
+                ca.raspiconfig.send(f"{cmd}")
+                return "", 204
             except RaspiConfigError as error:
                 abort(422, str(error))
         abort(404, f"Command not found {cmd}")
