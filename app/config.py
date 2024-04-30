@@ -97,3 +97,32 @@ SCHEDULE_RESET = "9"
 SCHEDULE_UPDATE = "8"
 SCHEDULE_START = "1"
 SCHEDULE_STOP = "0"
+
+# Motion
+MOTION_URL = "http://127.0.0.1:6642/0/"
+MOTION_CONFIGBACKUP = "motionPars.json"
+MOTION_PARS = "motionPars"
+MOLTION_FILTER = [
+    "switchfilter",
+    "threshold",
+    "threshold_tune",
+    "noise_level",
+    "noise_tune",
+    "despeckle",
+    "despeckle_filter",
+    "area_detect",
+    "mask_file",
+    "smart_mask_speed",
+    "lightswitch",
+    "minimum_motion_frames",
+    "framerate",
+    "minimum_frame_time",
+    "netcam_url",
+    "netcam_userpass",
+    "gap",
+    "event_gap",
+    "on_event_start",
+    "on_event_end",
+    "on_motion_detected",
+    "on_area_detected",
+]

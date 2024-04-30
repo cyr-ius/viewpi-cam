@@ -6,17 +6,179 @@
     </div>
     <div class="offcanvas-body">
         {% if show_all%}
-        <button class='btn btn-primary' type='submit' name='action' value='showLess'>Show</button>
+        <button class="btn btn-sm btn-outline-secondary" id="show" role="button">{{ _('Show')}}</button>
         {%else%}
-        <button class='btn btn-primary' type='submit' name='action' value='showAll'>Show All</button>
+        <button class="btn btn-sm btn-outline-secondary" id="show_all" role="button">{{ _('Show All')}}</button>
         {%endif%}
-        <button class='btn btn-primary' type='submit' name='action' value='save'>Save</button>
-        <button class='btn btn-primary' type='submit' name='action' value='backup'>Backup</button>
-        <button class='btn btn-primary' type='submit' name='action' value='restore'>Restore</button>
+        <button class="btn btn-sm btn-outline-secondary" id="save" role="button">{{ _('Save')}}</button>
+        <button class="btn btn-sm btn-outline-secondary" id="backup" role="button">{{ _('Backup')}}</button>
+        <button class="btn btn-sm btn-outline-secondary" id="restore" data-bs-toggle="modal" data-bs-target="#upload-modal" role="button">{{ _('Restore')}}</button>
+        <form id="motion_settings" class="row needs-validation">
+            <div class="row g-3">
+                <label class="col col-form-label">Framerate</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" min="0" max="100" name="framerate" value="">
+                </div>
+            </div>
+            <div class="row g-3">
+                <label class="col col-form-label">Min Framerate</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" min="0" max="2147483647" name="minimum_framerate_time" value="">
+                </div>
+            </div>
+            <div class="row g-3">
+                <label class="col col-form-label">Netcam Url</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" maxlength="4095" name="netcam_url" value="">
+                </div>
+            </div>
+            <div class="row g-3">
+                <label class="col col-form-label">Netcam UserPass</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" maxlength="4095" name="netcam_userpass" value="">
+                </div>
+            </div>
+            <div class="row g-3">
+                <label class="col col-form-label">Switch filter</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="bool" name="switch_filter" value="">
+                </div>
+            </div>
+            <div class="row g-3">
+                <label class="col col-form-label">Threshold</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" min="0" max="2147483647" name="threshold" value="">
+                </div>
+            </div>
+            <div class="row g-3">
+                <label class="col col-form-label">Threshold tune</label>
+                <div class="col">
+                    <select class="form-select form-select-sm" name="threshold_tune">
+                        <option value="0" {% if raspiconfig.video_stabilisation|int == 0 %}selected{%endif%}>Off</option>
+                        <option value="1" {% if raspiconfig.video_stabilisation|int == 1 %}selected{%endif%}>On</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row g-3">
+                <label class="col col-form-label">Noiselevel</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" min="0" max="10" name="noiselevel" value="">
+                </div>
+            </div>
+            <div class="row g-3">
+                <label class="col col-form-label">Noiselevel tune</label>
+                <div class="col">
+                    <select class="form-select form-select-sm" name="noiselevel_tune">
+                        <option value="0" {% if raspiconfig.video_stabilisation|int == 0 %}selected{%endif%}>Off</option>
+                        <option value="1" {% if raspiconfig.video_stabilisation|int == 1 %}selected{%endif%}>On</option>
+                    </select>
+                </div>            
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">Despeckle</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" name="despeckle" value="">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">Area_detect</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" min="0" max="999999999" name="area_detect" value="">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">Mask file</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" maxlength="4095" name="mask_file" value="">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">Smart mask speed</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" min="0" max="10" name="smart_mask_speed" value="">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">lightswitch</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" min="0" max="100" name="lightswitch" value="">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">Min. motion frames</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" min="0" max="1000" name="minimum_motion_frames" value="">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">gap</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="number" min="0" max="2147483647" name="gap" value="60">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">On Event start</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" maxlength="4095" name="on_event_start" value="">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">On Event end</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" maxlength="4095" name="on_event_end" value="">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">On Motion detected</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" maxlength="4095" name="on_motion_detected" value="">
+                </div>
+            </div>        
+            <div class="row g-3">
+                <label class="col col-form-label">On Area detected</label>
+                <div class="col">
+                    <input class="form-control form-control-sm" type="text" maxlength="4095" name="on_area_detected" value="">
+                </div>
+            </div>     
+        </form>   
     </div>
     {%if motion_ready%}
     {%else%}
     <h1>Motion not running. Put in detection state</h1>
     {%endif%}
 </div>
+{% include "modal_upload.html"%}
+{%endblock%}
+{% block scripts %}
+<script>
+$(function(){
+    $('#form_upload').attr('action','{{url_for("motion.action",action="restore")}}')
+})
+
+$('#save').on('click',function(){
+    if (!document.getElementById('motion_settings').checkValidity()) {
+        $("#motion_settings").addClass('was-validated')
+    } else {
+        $("#motion_settings").removeClass('was-validated')
+        data = $("#motion_settings").serializeObject({'checkboxesAsBools': true});
+        $.queryData({method:"put", url:"{{ url_for('api.motion_settings')}}", data: data})
+    }
+});
+
+$('#backup').on('click',function(){
+    let success = function(data, response, xhr){
+        let disposition = xhr.getResponseHeader('Content-Disposition')
+        let filename = disposition.split(/;(.+)/)[1].split(/=(.+)/)[1];
+        let a = document.createElement('a');
+        let url = window.URL.createObjectURL(data);
+        a.href = url;
+        a.download = filename;
+        document.body.append(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    }
+    $.queryData({method: "post", url:"{{url_for('motion.action', action='backup')}}", success: success, xhrFields: {responseType: 'blob'}});
+});
+</script>
 {%endblock%}

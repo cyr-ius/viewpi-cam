@@ -11,6 +11,7 @@ from .settings import api as settings
 from .system import api as system
 from .totp import api as totp
 from .users import api as users
+from .motion import api as motion
 
 
 def init_app(app):
@@ -26,5 +27,6 @@ def init_app(app):
     api.add_namespace(system)
     api.add_namespace(totp)
     api.add_namespace(users)
+    api.add_namespace(motion)
 
     api.model("Msg", message)

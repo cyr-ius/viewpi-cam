@@ -16,10 +16,11 @@ from flask import (
     send_file,
 )
 from flask import current_app as ca
-from flask_login import login_required, current_user
+from flask_login import current_user, login_required
 
 from ..apis.logs import get_logs
 from ..helpers.decorator import role_required
+from ..helpers.motion import check_motion, get_motion
 from ..helpers.utils import allowed_file, write_log
 from ..models import Multiviews as multiviews_db
 from ..models import Presets as presets_db
@@ -54,6 +55,9 @@ def index():
     if settings.data.get("servo"):
         mode = 2
 
+    if check_motion():
+        motionconfig = get_motion()
+
     presets = presets_db.query.filter_by(mode=settings.data["upreset"]).all()
 
     return render_template(
@@ -62,6 +66,7 @@ def index():
         cam_pos=cam_pos,
         user_buttons=ubuttons_db.query.all(),
         raspiconfig=ca.raspiconfig,
+        motionconfig=motionconfig,
         display_mode=display_mode,
         mjpegmode=mjpegmode,
         preset=settings.data["upreset"],
