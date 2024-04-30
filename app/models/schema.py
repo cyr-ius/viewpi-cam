@@ -1,10 +1,8 @@
 """ Schema database."""
-
 import random
 import uuid
 from datetime import datetime as dt
 from datetime import timezone
-from typing import List
 
 import jwt
 import pyotp
@@ -230,7 +228,7 @@ class Scheduler(db.Model):
     )
 
     daysmode: db.Mapped["DaysMode"] = db.relationship(back_populates="scheduler")
-    calendars: db.Mapped[List["Calendar"]] = db.relationship(
+    calendars: db.Mapped[list["Calendar"]] = db.relationship(
         secondary=scheduler_calendar
     )
 
