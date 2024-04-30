@@ -24,7 +24,7 @@ def get_motion() -> configparser.ConfigParser:
         abort(422, str(error))
 
 
-def set_motion(key, value) -> None:
+def set_motion(key: str, value: [str | bool | int | float]) -> None:
     """set motion parameter."""
     try:
         rsp = requests.get(f"{ca.config['MOTION_URL']}/config/set?{key}={value}")
