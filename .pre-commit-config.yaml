@@ -1,3 +1,4 @@
+---
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
@@ -15,17 +16,20 @@ repos:
           - --ignore-words-list=matchs,medias,bu
           - --skip="./.*,*.csv,*.json,*.po,*.mo"
           - --quiet-level=2
-        exclude_types: [csv, json]                   
+        exclude_types: [csv, json]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-      - id: check-yaml
-        exclude: (.vscode|.devcontainer|.github)
       - id: check-toml
       - id: check-json
         exclude: (.vscode|.devcontainer)
       - id: pretty-format-json
         exclude: (.vscode|.devcontainer)
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        exclude: (.vscode|.devcontainer|.github)
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
