@@ -213,6 +213,7 @@
 $(function () {
     $('#main').addClass("d-none")
     $('#settings').removeClass("d-none")
+    $('#form_upload').attr('action','{{url_for("settings.restore")}}')
 });
 
 $('#upreset, #pilight, #pipan, #servo, #loglevel').unbind()

@@ -10,7 +10,7 @@
                 {{ _('Zip configuration')}}</h5>
             </div>
             <div class="modal-body text-center">
-                <form id="upload_setting" class="needs-validation" method="post" enctype="multipart/form-data" action="{{url_for('settings.restore')}}" >
+                <form id="form_upload" class="needs-validation" method="post" enctype="multipart/form-data">
                     <input class="form-control" type="file" name="file" required>
                 </form>
             </div>
@@ -24,11 +24,11 @@
 <script>
 $('#upload').unbind();
 $('#upload').click(function () {
-    if (!document.getElementById('upload_setting').checkValidity()) {
-        $("#upload_setting").addClass('was-validated')
+    if (!document.getElementById('form_upload').checkValidity()) {
+        $("#form_upload").addClass('was-validated')
     } else {
-        $("#upload_setting").removeClass('was-validated')
-        $('#upload_setting').submit()
+        $("#form_upload").removeClass('was-validated')
+        $('#form_upload').submit()
     }
 });
 </script>
