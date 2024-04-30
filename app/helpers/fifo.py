@@ -26,7 +26,7 @@ def open_pipe(pipename: str):
         write_log(error)
 
 
-def send_motion(cmd: str) -> None:
+def send_pipe(cmd: str) -> None:
     """Send command to pipe."""
     try:
         pipe = os.open(ca.raspiconfig.motion_pipe, os.O_WRONLY | os.O_NONBLOCK)
@@ -37,7 +37,7 @@ def send_motion(cmd: str) -> None:
         write_log(f"Motion - {error}")
 
 
-def check_motion(pipe):
+def read_pipe(pipe):
     """Read motion pipe."""
     if isinstance(pipe, bool):
         return ""

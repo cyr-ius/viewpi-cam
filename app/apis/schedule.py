@@ -14,7 +14,7 @@ from suntime import Sun
 
 from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
-from ..helpers.fifo import send_motion
+from ..helpers.fifo import send_pipe
 from ..helpers.utils import execute_cmd, get_pid, set_timezone, write_log
 from ..models import Calendar as calendar_db
 from ..models import Scheduler as scheduler_db
@@ -61,7 +61,7 @@ class Settings(Resource):
             except ViewPiCamException as error:
                 write_log(error)
 
-        # send_motion(ca.config["SCHEDULE_RESET"])
+        send_pipe(ca.config["SCHEDULE_RESET"])
         return "", 204
 
 
@@ -95,7 +95,7 @@ class Scheduler(Resource):
                     my_schedule.calendars.append(cal.scalar())
             db.session.commit()
 
-        send_motion(ca.config["SCHEDULE_RESET"])
+        send_pipe(ca.config["SCHEDULE_RESET"])
         return "", 204
 
 

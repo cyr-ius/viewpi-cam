@@ -16,7 +16,7 @@ from flask_login import login_required
 from ..apis.schedule import dt_now, get_calendar, sun_info, time_offset
 from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
-from ..helpers.fifo import check_motion, open_pipe
+from ..helpers.fifo import read_pipe, open_pipe
 from ..helpers.filer import (
     delete_mediafiles,
     get_file_type,
@@ -122,7 +122,7 @@ def scheduler() -> None:
         last_status_time = os.path.getmtime(ca.raspiconfig.status_file)
         while timeout_max == 0 or timeout < timeout_max:
             time.sleep(poll_time)
-            cmd = check_motion(motion_fifo_in)
+            cmd = read_pipe(motion_fifo_in)
             if cmd == ca.config["SCHEDULE_STOP"] and autocapture == 0:
                 if last_on_cmd:
                     write_log("Stop capture requested")
