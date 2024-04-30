@@ -135,7 +135,6 @@ dmypy.json
 
 # Custom
 *.code-workspace
-*.log
 static/
 media/
 config/
