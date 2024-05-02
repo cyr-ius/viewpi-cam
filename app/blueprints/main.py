@@ -8,6 +8,7 @@ from flask import (
     Blueprint,
     Response,
     abort,
+    flash,
     json,
     jsonify,
     make_response,
@@ -20,7 +21,7 @@ from flask_login import current_user, login_required
 
 from ..apis.logs import get_logs
 from ..helpers.decorator import role_required
-from ..helpers.motion import check_motion, get_motion
+from ..helpers.motion import MotionError, check_motion, get_motion
 from ..helpers.utils import allowed_file, write_log
 from ..models import Multiviews as multiviews_db
 from ..models import Presets as presets_db
@@ -55,8 +56,12 @@ def index():
     if settings.data.get("servo"):
         mode = 2
 
+    motionconfig = None
     if check_motion():
-        motionconfig = get_motion()
+        try:
+            motionconfig = get_motion()
+        except MotionError as error:
+            flash("Motion config not found (%s)", error)
 
     presets = presets_db.query.filter_by(mode=settings.data["upreset"]).all()
 
