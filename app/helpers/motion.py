@@ -10,7 +10,7 @@ from ..helpers.utils import get_pid
 
 
 def check_motion():
-    return get_pid("motion") != 0
+    return get_pid("motion") == 0
 
 
 def get_motion() -> configparser.ConfigParser:

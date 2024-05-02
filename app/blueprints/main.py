@@ -60,8 +60,8 @@ def index():
     if check_motion():
         try:
             motionconfig = get_motion()
-        except MotionError as error:
-            flash("Motion config not found (%s)", error)
+        except MotionError:
+            flash("Motion config not found")
 
     presets = presets_db.query.filter_by(mode=settings.data["upreset"]).all()
 
