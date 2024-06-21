@@ -113,6 +113,12 @@ def launch_schedule() -> None:
         Popen(["flask", "scheduler", "start"], stdout=PIPE)
 
 
+def launch_rsync() -> None:
+    """Run scheduler."""
+    if not get_pid("rsync"):
+        Popen(["flask", "rsync", "start"], stdout=PIPE)
+
+
 def allowed_file(filename):
     """Check allowed file extension."""
     return (

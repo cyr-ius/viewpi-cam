@@ -162,6 +162,15 @@ setting = Model(
             description="Log level",
             enum=["INFO", "WARNING", "ERROR", "DEBUG"],
         ),
+        "rs_path": fields.String(required=True, default=False),
+        "rs_user": fields.String(required=False, default=False),
+        "rs_pwd": fields.String(required=False, default=False),
+        "rs_direction": fields.String(required=False, default=False),
+        "rs_mode": fields.String(required=False, default=False),
+        "rs_remote_host": fields.String(required=False, default=False),
+        "rs_remote_module_name": fields.String(required=False, default=False),
+        "rs_options": fields.List(fields.String(default=None)),
+        "rs_enabled": fields.Boolean(required=False, default=False),
     },
 )
 locale = Model("Locale", {"locale": fields.String(enumerate=LOCALES)})
