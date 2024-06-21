@@ -14,7 +14,7 @@ css_main = Bundle(
     "https://fonts.googleapis.com/css?family=Roboto+Mono:400,300,700",
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
     Bundle(
-        "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.min.css",  # noqa
+        "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css",  # noqa
         filters="datauri",
     ),
     output="css/main.css",
