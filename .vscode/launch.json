@@ -7,7 +7,7 @@
 
     {
       "name": "Python: Flask",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "flask",
       "env": {
@@ -23,7 +23,7 @@
     },
     {
       "name": "Python: Scheduler Flask",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "flask",
       "env": {
@@ -33,6 +33,19 @@
       "args": ["scheduler", "start"],
       "jinja": true,
       "justMyCode": true
-    }
+    },
+    {
+      "name": "Python: Rsync Flask",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_DEBUG": "1",
+        "FLASK_ENV": "development"
+      },
+      "args": ["rsync", "start"],
+      "jinja": true,
+      "justMyCode": true
+    }    
   ]
 }
