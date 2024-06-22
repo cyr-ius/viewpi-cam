@@ -82,6 +82,9 @@ def create_app(config=None):
     # Start scheduler
     if bool(int(app.config["SVC_SCHEDULER"])):
         launch_schedule()
+
+    # Start rsync
+    if bool(int(app.config["SVC_RSYNC"])):
         launch_rsync()
 
     @app.context_processor
