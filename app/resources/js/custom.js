@@ -83,6 +83,8 @@ $.queryData = function (options) {
       error: null,
       convertJson: null,
       xhrFields: null,
+      display_success: true,
+      display_error: true,
     },
     options || {},
   );
@@ -101,17 +103,21 @@ $.queryData = function (options) {
     },
     success: function (data, response, xhr) {
       $.spinner({ status: false });
-      $("#toast").addClass("text-bg-primary");
-      if (data && data.responseJSON)
-        $("#toast .toast-body").html(data.responseJSON["message"]);
+      if (o.display_error) {
+        $("#toast").addClass("text-bg-primary");
+        if (data && data.responseJSON)
+          $("#toast .toast-body").html(data.responseJSON["message"]);
+      }
       if (o.success) return o.success(data, response, xhr);
     },
     error: function (data, response, xhr) {
       $.spinner({ status: false });
-      $("#toast").removeClass("text-bg-primary").addClass("text-bg-danger");
-      $("#toast .toast-body").html(data.status + " - " + data["message"]);
-      if (data.responseJSON)
-        $("#toast .toast-body").html(data.responseJSON["message"]);
+      if (o.display_error) {
+        $("#toast").removeClass("text-bg-primary").addClass("text-bg-danger");
+        $("#toast .toast-body").html(data.status + " - " + data["message"]);
+        if (data.responseJSON)
+          $("#toast .toast-body").html(data.responseJSON["message"]);
+      }
       if (o.error) return o.error(data, response, xhr);
     },
   });
