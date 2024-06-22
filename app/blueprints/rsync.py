@@ -25,7 +25,7 @@ bp.cli.short_help = "Stop/Start scheduler"
 @with_appcontext
 def stop_scheduler() -> None:
     """Stop rsync."""
-    pid = get_pid("rsync")
+    pid = get_pid("*/rsync")
     Popen(f"kill {pid}", shell=True)
 
 
@@ -54,6 +54,7 @@ def rsync() -> None:
 
         write_log(cmd)
         if not get_pid(cmd):
-            Popen(cmd, shell=True)
+            line = f"while inotifywait -r {media_path}/*; do  {cmd}; done"
+            Popen(line, shell=True)
 
         time.sleep(poll_time * 1000)

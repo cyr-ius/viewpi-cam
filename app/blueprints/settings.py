@@ -14,10 +14,12 @@ from flask import (
 from flask import current_app as ca
 from flask_login import login_required
 
+from ..apis.rsync import Rsync
 from ..apis.settings import Macros, Sets
 from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
 from ..helpers.filer import allowed_file, zip_extract, zip_folder
+from ..helpers.utils import get_pid
 from ..models import Files as files_db
 from ..models import Multiviews, Presets, Ubuttons, Users, db
 
@@ -32,6 +34,7 @@ bp = Blueprint(
 def index():
     macros = Macros().get_config()
     settings = Sets().get()
+    rsync = Rsync().get()
     users = Users.query.filter(Users.id > 0).all()
     camera_token, api_token = (
         Users.query.with_entities(Users.cam_token, Users.api_token)
@@ -51,6 +54,8 @@ def index():
         presets=dict(presets).values(),
         camera_token=camera_token,
         api_token=api_token,
+        rsync=rsync,
+        rsync_pid=get_pid(["*/flask", "rsync"]),
     )
 
 

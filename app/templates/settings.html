@@ -194,32 +194,33 @@
         <div class="row">{{_('RSync')}}</div>
         <div class="row">
             <div id="rsync" class="row g-1 ms-2 needs-validation">
-                <div class="col"><input class="form-control form-control-sm" name="rs_user" type="text" placeholder="{{_('User')}}" value="{{settings.rs_user}}" required></div>
-                <div class="col"><input class="form-control form-control-sm" name="rs_pwd" type="password" placeholder="{{_('Password')}}" value="{{settings.rs_pwd}}" required></div>
-                <div class="col"><input class="form-control form-control-sm" name="rs_direction" type="text" placeholder="{{_('Remote Folder')}}" value="{{settings.rs_direction}}"></div>
+                <div class="col"><input class="form-control form-control-sm" name="rs_user" type="text" placeholder="{{_('User')}}" value="{{rsync.rs_user}}" required></div>
+                <div class="col"><input class="form-control form-control-sm" name="rs_pwd" type="password" placeholder="{{_('Password')}}" value="{{rsync.rs_pwd}}" required></div>
+                <div class="col"><input class="form-control form-control-sm" name="rs_direction" type="text" placeholder="{{_('Remote Folder')}}" value="{{rsync.rs_direction}}"></div>
                 <div class="col">
                     <select class="form-select form-select-sm" name="rs_mode" required>
-                        <option {% if settings.rs_mode == "Module" %}selected{%endif%} value="Module">Module</option>
-                        <option {% if settings.rs_mode == "SSH" %}selected{%endif%} value="SSH">SSH</option>
+                        <option {% if rsync.rs_mode == "Module" %}selected{%endif%} value="Module">Module</option>
+                        <option {% if rsync.rs_mode == "SSH" %}selected{%endif%} value="SSH">SSH</option>
                     </select>
                 </div>
-                <div class="col"><input class="form-control form-control-sm" name="rs_remote_host" type="text" placeholder="{{_('Remote Host')}}" value="{{settings.rs_remote_host}}" required></div>
-                <div class="col"><input class="form-control form-control-sm" name="rs_remote_module_name" type="text" placeholder="{{_('Remote module name')}}" value="{{settings.rs_remote_module_name}}"></div>
+                <div class="col"><input class="form-control form-control-sm" name="rs_remote_host" type="text" placeholder="{{_('Remote Host')}}" value="{{rsync.rs_remote_host}}" required></div>
+                <div class="col"><input class="form-control form-control-sm" name="rs_remote_module_name" type="text" placeholder="{{_('Remote module name')}}" value="{{rsync.rs_remote_module_name}}"></div>
                 <div class="col">
                     <select class="form-control form-control-sm selectpicker" name="rs_options" multiple data-multi-select data-style="" data-style-base="form-control">
-                        <option value="-t" {% if "-t" in settings.rs_options %}selected{%endif%}>Times</option>
-                        <option value="-b" {% if "-b" in settings.rs_options %}selected{%endif%}>Backup</option>
-                        <option value="-z" {% if "-z" in settings.rs_options %}selected="selected"{%endif%}>Compress</option>
-                        <option value="-a" {% if "-a" in settings.rs_options %}selected{%endif%}>Archive</option>
-                        <option value="--delete" {% if "--delete" in settings.rs_options %}selected{%endif%}>Delete</option>
-                        <option value="-q" {% if "-q" in settings.rs_options %}selected{%endif%}>Quiet</option>
-                        <option value="-p" {% if "-p" in settings.rs_options %}selected{%endif%}>Preserve Permissions</option>
-                        <option value="--delay-updates" {% if "--delay-updates"  in settings.rs_options %}selected{%endif%}> Delay Updates</option>
+                        <option value="-t" {% if "-t" in rsync.rs_options %}selected{%endif%}>Times</option>
+                        <option value="-b" {% if "-b" in rsync.rs_options %}selected{%endif%}>Backup</option>
+                        <option value="-z" {% if "-z" in rsync.rs_options %}selected="selected"{%endif%}>Compress</option>
+                        <option value="-a" {% if "-a" in rsync.rs_options %}selected{%endif%}>Archive</option>
+                        <option value="--delete" {% if "--delete" in rsync.rs_options %}selected{%endif%}>Delete</option>
+                        <option value="-q" {% if "-q" in rsync.rs_options %}selected{%endif%}>Quiet</option>
+                        <option value="-p" {% if "-p" in rsync.rs_options %}selected{%endif%}>Preserve Permissions</option>
+                        <option value="--delay-updates" {% if "--delay-updates"  in rsync.rs_options %}selected{%endif%}> Delay Updates</option>
                     </select>
                 </div>                
-                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="rs_enabled" type="checkbox" {% if settings.rs_enabled %}checked{%endif%}></div></div>       
-                <div class="col-auto"><button class="btn btn-sm btn-outline-success rsync_save" type="button"><i class="bi bi-floppy-fill"></i></button></div>         
-                <div class="col-auto"><button class="btn btn-sm btn-outline-danger rsync_reset" type="button"><i class="bi bi-x-circle-fill"></i></button></div>         
+                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="rs_enabled" type="checkbox" {% if rsync.rs_enabled %}checked{%endif%}></div></div>       
+                <div class="col-auto"><button class="btn btn-sm btn-outline-success rsync_start" type="button" title="Start"><i class="bi bi-play-circle-fill"></i></button></div>         
+                <div class="col-auto d-none"><button class="btn btn-sm btn-outline-danger rsync_stop" type="button" title="Stop"><i class="bi bi-stop-circle-fill"></i></button></div>         
+                <div class="col-auto"><button class="btn btn-sm btn-outline-light rsync_reset" type="button" title="Reset settings"><i class="bi bi-arrow-repeat"></i></button></div>         
             </div>
         </div>
         <hr class="mt-3">
@@ -415,19 +416,37 @@ $('#multiviews').on('change','.uchange', function(){
     $.queryData({method:"put", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, data:data});
 });
 
-$('#rsync').on('click','.rsync_save', function(){
+$('#rsync').on('click','.rsync_start', function(){
     let parent = $(this).parent().parent().parent();
     let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-    $.queryData({url:"{{url_for('api.settings_sets')}}",data:data});
+    let success = function(data){
+        let success = function(data){
+            $('.rsync_start').parent().addClass('d-none')            
+            $('.rsync_stop').parent().removeClass('d-none')
+        }
+        $.queryData({url:"{{url_for('api.rsync_start')}}", success:success})
+    }
+    $.queryData({url:"{{url_for('api.rsync_rsync')}}",data:data, success:success});
 });
 
-$('.rsync_reset').unbind();
-$('.rsync_reset').click(function () {
+$('#rsync').on('click','.rsync_stop', function(){
+    let success = function(data){
+        $('.rsync_stop').parent().addClass('d-none')            
+        $('.rsync_start').parent().removeClass('d-none')
+    }
+    $.queryData({url:"{{url_for('api.rsync_stop')}}", success:success})
+});
+
+$('#rsync').on('click','.rsync_reset', function(){
     let parent = $(this).parent().parent().parent();
-    let data = $(parent).find('input, select, textarea');
-    $(data).each(function(){
+    // Reset data
+    $(parent).find('input, select, textarea').each(function(){
         $(this).val("");
     });
+
+    let success = function(data){$('.rsync_stop').trigger('click');}
+    let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+    $.queryData({url:"{{url_for('api.rsync_rsync')}}", data:data, success:success});
 });
 
 
