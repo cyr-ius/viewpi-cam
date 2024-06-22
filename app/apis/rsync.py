@@ -45,6 +45,17 @@ class Rsync(Resource):
             ca.logger.setLevel(loglevel)
         return "", 204
 
+    @api.expect(rsync)
+    @api.response(204, "Success")
+    def delete(self):
+        """Delete settings."""
+        settings = settting_db.query.first()
+        params = settings.data.copy()
+        for param in api.payload:
+            params.pop(param, None)
+        settings.data.update(**params)
+        return "", 204
+
 
 @api.route("/stop", endpoint="rsync_stop")
 @api.route("/start", endpoint="rsync_start")
