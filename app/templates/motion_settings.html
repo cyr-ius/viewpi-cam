@@ -10,8 +10,8 @@
             <label class="col col-form-label">Motion Vector Preview:</label>
             <div class="col">
                 <select id="preview_select" class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'vp','params':this.value});setTimeout(function(){location.reload(true);}, 1000);">
-                    <option value="0" {% if raspiconfig.vector_preview == "0" %}selected{%endif%}>Off</option>
-                    <option value="1" {% if raspiconfig.vector_preview == "1" %}selected{%endif%}>On</option>
+                    <option value="0" {{ 'selected' if raspiconfig.vector_preview == "0" }}>Off</option>
+                    <option value="1" {{ 'selected' if raspiconfig.vector_preview == "1" }}>On</option>
                 </select>
             </div>
         </div>
@@ -61,8 +61,8 @@
             <label class="col col-form-label">Save vectors to .dat:<br>(Uses more space)</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'mf','params':this.value});">
-                    <option value="0" {% if raspiconfig.motion_file == "0" %}selected{%endif%}>Off</option>
-                    <option value="1" {% if raspiconfig.motion_file == "1" %}selected{%endif%}>On</option>
+                    <option value="0" {{ 'selected' if raspiconfig.motion_file == "0" }}>Off</option>
+                    <option value="1" {{ 'selected' if raspiconfig.motion_file == "1" }}>On</option>
                 </select>
             </div>
         </div>

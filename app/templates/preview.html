@@ -20,16 +20,16 @@
         <label class="col-2 col-md-1 col-form-label-sm">{{_('Ordering')}}</label>
         <div class="col-10 col-md">
             <select id="sort_order" class="form-select form-select-sm" name="sort_order">
-                <option value="asc" {%  if sort_order == "asc" %}selected{%endif%}>{{ _('Ascending')}}</option>
-                <option value="desc" {%  if sort_order == "desc" %}selected{%endif%}>{{ _('Descending')}}</option>
+                <option value="asc" {{ 'checked' if sort_order == "asc" }}>{{ _('Ascending')}}</option>
+                <option value="desc" {{ 'checked' if sort_order == "desc" }}>{{ _('Descending')}}</option>
             </select>
         </div>
         <label class="col-2 col-md-1 col-form-label-sm">{{_('Types')}}</label>
         <div class="col-10 col-md">
             <select id="show_types" class="form-select form-select-sm" name="show_types">
-                <option value="both" {%  if show_types == "both" %}selected{%endif%}>{{ _('Images &amp Videos')}}</option>
-                <option value="image" {%  if show_types == "image" %}selected{%endif%}>{{ _('Images only')}}</option>
-                <option value="video" {%  if show_types == "video" %}selected{%endif%}>{{ _('Videos only')}}</option>
+                <option value="both" {{ 'checked' if show_types == "both" }} >{{ _('Images &amp Videos')}}</option>
+                <option value="image" {{ 'checked' if show_types == "image" }}>{{ _('Images only')}}</option>
+                <option value="video" {{ 'checked' if show_types == "video" }}>{{ _('Videos only')}}</option>
             </select>
         </div>
         <label class="col-2 col-md-1 col-form-label-sm">{{ _('Filter')}}</label>
@@ -37,9 +37,9 @@
             <select id="time_filter" class="form-select form-select-sm" name="time_filter">
                 <option value="1" {%  if time_filter|int == 1 %}selected{%endif%}>{{_('All')}}</option>
                 {% for i in range(2, time_filter_max)%}
-                <option value="{{i}}" {% if time_filter|int == i %}selected{%endif%}>{{(i-2) * 24}} - {{(i-1) * 24}} {{_('hours old')}}</option>
+                <option value="{{i}}" {{ 'selected' if time_filter|int == i }}>{{(i-2) * 24}} - {{(i-1) * 24}} {{_('hours old')}}</option>
                 {%endfor%}
-                <option value="{{time_filter_max}}" {% if time_filter|int == time_filter_max %}selected{%endif%} >{{(time_filter_max-2) * 24}} {{_('hours old')}}</option>
+                <option value="{{time_filter_max}}" {{ 'selected' if time_filter|int == time_filter_max }}>{{(time_filter_max-2) * 24}} {{_('hours old')}}</option>
             </select>
         </div>
         <div class="col-auto ms-auto"><button id="hide-preview" class="btn d-none" style="border-style: none;"><i class="bi bi-arrow-bar-up"></i></button></div>

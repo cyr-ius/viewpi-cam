@@ -54,8 +54,8 @@
                 <label class="col col-form-label">Threshold tune</label>
                 <div class="col">
                     <select class="form-select form-select-sm" name="threshold_tune">
-                        <option value="0" {% if raspiconfig.video_stabilisation|int == 0 %}selected{%endif%}>Off</option>
-                        <option value="1" {% if raspiconfig.video_stabilisation|int == 1 %}selected{%endif%}>On</option>
+                        <option value="0" {{ 'selected' if raspiconfig.video_stabilisation|int == 0  }}>Off</option>
+                        <option value="1" {{ 'selected' if raspiconfig.video_stabilisation|int == 1  }}>On</option>
                     </select>
                 </div>
             </div>
@@ -68,10 +68,10 @@
             <div class="row g-3">
                 <label class="col col-form-label">Noiselevel tune</label>
                 <div class="col">
-                    <select class="form-select form-select-sm" name="noiselevel_tune">
-                        <option value="0" {% if raspiconfig.video_stabilisation|int == 0 %}selected{%endif%}>Off</option>
-                        <option value="1" {% if raspiconfig.video_stabilisation|int == 1 %}selected{%endif%}>On</option>
-                    </select>
+                    {# <select class="form-select form-select-sm" name="noiselevel_tune">
+                        <option value="0" {{ 'selected' if raspiconfig.noiselevel_tune|int == 0  }}>Off</option>
+                        <option value="1" {{ 'selected' if raspiconfig.noiselevel_tune|int == 1  }}>On</option>
+                    </select> #}
                 </div>            
             </div>        
             <div class="row g-3">

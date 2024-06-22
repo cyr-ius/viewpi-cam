@@ -95,8 +95,8 @@
             <label class="col col-form-label">Use camera</label>
             <div class="col">
             <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'cn','params':this.value});">
-                <option value="1" {% if raspiconfig.camera_num|int == 1 %}selected{%endif%}>First</option>
-                <option value="2" {% if raspiconfig.camera_num|int == 2 %}selected{%endif%}>Second</option>
+                <option value="1" {{ 'selected' if raspiconfig.camera_num|int == 1 }}>First</option>
+                <option value="2" {{ 'selected' if raspiconfig.camera_num|int == 2 }}>Second</option>
             </select>
             </div>
         </div>
@@ -132,8 +132,8 @@
             <label class="col col-form-label">Background</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'ab','params':this.value});">
-                    <option value="0" {% if raspiconfig.anno_background|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if raspiconfig.anno_background|int == 1 %}selected{%endif%}>On</option>
+                    <option value="1" {{ 'selected' if raspiconfig.anno_background|int == 1 }}>On</option>
+                    <option value="0" {{ 'selected' if raspiconfig.anno_background|int == 0 }}>Off</option>
                 </select>
             </div>
         </div>
@@ -214,10 +214,10 @@
             <label class="col col-form-label">Metering Mode, default 'average':</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'mm','params':this.value});">
-                    <option value="average" {% if raspiconfig.metering_mode == "average" %}selected{%endif%}>Average</option>
-                    <option value="spot" {% if raspiconfig.metering_mode == "spot" %}selected{%endif%}>Spot</option>
-                    <option value="backlit" {% if raspiconfig.metering_mode == "backlit" %}selected{%endif%}>Backlit</option>
-                    <option value="matrix" {% if raspiconfig.metering_mode == "matrix" %}selected{%endif%}>Matrix</option>
+                    <option value="average" {{'selected' if raspiconfig.metering_mode == "average"}}>Average</option>
+                    <option value="spot" {{'selected' if raspiconfig.metering_mode == "spot"}}>Spot</option>
+                    <option value="backlit" {{'selected' if raspiconfig.metering_mode == "backlit"}}>Backlit</option>
+                    <option value="matrix" {{'selected' if raspiconfig.metering_mode == "matrix"}}>Matrix</option>
                 </select>
             </div>
         </div>
@@ -225,8 +225,8 @@
             <label class="col col-form-label">Video Stabilisation, default: 'off'</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'vs','params':this.value});">
-                    <option value="0" {% if raspiconfig.video_stabilisation|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if raspiconfig.video_stabilisation|int == 1 %}selected{%endif%}>On</option>
+                    <option value="0" {{'selected' if raspiconfig.video_stabilisation|int == 0}}>Off</option>
+                    <option value="1" {{'selected' if raspiconfig.video_stabilisation|int == 1}}>On</option>
                 </select>
             </div>
         </div>
@@ -240,17 +240,17 @@
             <label class="col col-form-label">Exposure Mode, default 'auto':</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'em','params':this.value});">
-                    <option value="off" {% if raspiconfig.exposure_mode == "off" %}selected{%endif%}>Off</option>
-                    <option value="auto" {% if raspiconfig.exposure_mode == "auto" %}selected{%endif%}>Auto</option>
-                    <option value="night" {% if raspiconfig.exposure_mode == "night" %}selected{%endif%}>Night</option>
-                    <option value="nightpreview" {% if raspiconfig.exposure_mode == "nightpreview" %}selected{%endif%}>Nightpreview</option>
-                    <option value="backlight" {% if raspiconfig.exposure_mode == "backlight" %}selected{%endif%}>Backlight</option>
-                    <option value="spotlight" {% if raspiconfig.exposure_mode == "spotlight" %}selected{%endif%}>Spotlight</option>
-                    <option value="sports" {% if raspiconfig.exposure_mode == "sports" %}selected{%endif%}>Sports</option>
-                    <option value="snow" {% if raspiconfig.exposure_mode == "snow" %}selected{%endif%}>Snow</option>
-                    <option value="beach" {% if raspiconfig.exposure_mode == "beach" %}selected{%endif%}>Beach</option>
-                    <option value="verylong" {% if raspiconfig.exposure_mode == "verylong" %}selected{%endif%}>Verylong</option>
-                    <option value="fixedfps" {% if raspiconfig.exposure_mode == "fixedfps" %}selected{%endif%}>Fixedfps</option>
+                    <option value="off" {{'selected' if raspiconfig.exposure_mode == "off"}}>Off</option>
+                    <option value="auto" {{'selected' if raspiconfig.exposure_mode == "auto"}}>Auto</option>
+                    <option value="night" {{'selected' if raspiconfig.exposure_mode == "night"}}>Night</option>
+                    <option value="nightpreview" {{'selected' if raspiconfig.exposure_mode == "nightpreview"}}>Nightpreview</option>
+                    <option value="backlight" {{'selected' if raspiconfig.exposure_mode == "backlight"}}>Backlight</option>
+                    <option value="spotlight" {{'selected' if raspiconfig.exposure_mode == "spotlight"}}>Spotlight</option>
+                    <option value="sports" {{'selected' if raspiconfig.exposure_mode == "sports"}}>Sports</option>
+                    <option value="snow" {{'selected' if raspiconfig.exposure_mode == "snow"}}>Snow</option>
+                    <option value="beach" {{'selected' if raspiconfig.exposure_mode == "beach"}}>Beach</option>
+                    <option value="verylong" {{'selected' if raspiconfig.exposure_mode == "verylong"}}>Verylong</option>
+                    <option value="fixedfps" {{'selected' if raspiconfig.exposure_mode == "fixedfps"}}>Fixedfps</option>
                 </select>
             </div>
         </div>
@@ -258,17 +258,17 @@
             <label class="col col-form-label">White Balance, default 'auto':</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'wb','params':this.value});">
-                    <option value="off" {% if raspiconfig.white_balance == "off" %}selected{%endif%}>Off</option>
-                    <option value="auto" {% if raspiconfig.white_balance == "auto" %}selected{%endif%}>Auto</option>
-                    <option value="sun" {% if raspiconfig.white_balance == "sun" %}selected{%endif%}>Sun</option>
-                    <option value="cloudy" {% if raspiconfig.white_balance == "cloudy" %}selected{%endif%}>Cloudy</option>
-                    <option value="shade" {% if raspiconfig.white_balance == "shade" %}selected{%endif%}>Shade</option>
-                    <option value="tungsten" {% if raspiconfig.white_balance == "tungsten" %}selected{%endif%}>Tungsten</option>
-                    <option value="fluorescent" {% if raspiconfig.white_balance == "fluorescent" %}selected{%endif%}>Fluorescent</option>
-                    <option value="incandescent" {% if raspiconfig.white_balance == "incandescent" %}selected{%endif%}>Incandescent</option>
-                    <option value="flash" {% if raspiconfig.white_balance == "flash" %}selected{%endif%}>Flash</option>
-                    <option value="horizon" {% if raspiconfig.white_balance == "horizon" %}selected{%endif%}>Horizon</option>
-                    <option value="greyworld" {% if raspiconfig.white_balance == "greyworld" %}selected{%endif%}>Greyworld</option>
+                    <option value="off" {{'selected' if raspiconfig.white_balance == "off"}}>Off</option>
+                    <option value="auto" {{'selected' if raspiconfig.white_balance == "auto"}}>Auto</option>
+                    <option value="sun" {{'selected' if raspiconfig.white_balance == "sun"}}>Sun</option>
+                    <option value="cloudy" {{'selected' if raspiconfig.white_balance == "cloudy"}}>Cloudy</option>
+                    <option value="shade" {{'selected' if raspiconfig.white_balance == "shade"}}>Shade</option>
+                    <option value="tungsten" {{'selected' if raspiconfig.white_balance == "tungsten"}}>Tungsten</option>
+                    <option value="fluorescent" {{'selected' if raspiconfig.white_balance == "fluorescen"}}>Fluorescent</option>
+                    <option value="incandescent" {{'selected' if raspiconfig.white_balance == "incandesce"}}>Incandescent</option>
+                    <option value="flash" {{'selected' if raspiconfig.white_balance == "flash"}}>Flash</option>
+                    <option value="horizon" {{'selected' if raspiconfig.white_balance == "horizon"}}>Horizon</option>
+                    <option value="greyworld" {{'selected' if raspiconfig.white_balance == "greyworld"}}>Greyworld</option>
                 </select>
             </div>
         </div>
@@ -316,8 +316,8 @@
             <label class="col col-form-label">Colour Effect, default 'disabled':</label>
             <div class="col">
                 <select class="form-select form-select-sm" id="ce_en" onchange="set_ce();">
-                    <option value="0" {% if raspiconfig.colour_effect_en|int == 0 %}selected{%endif%}>Disabled</option>
-                    <option value="1" {% if raspiconfig.colour_effect_en|int == 1 %}selected{%endif%}>Enabled</option>
+                    <option value="0" {{'selected' if raspiconfig.colour_effect_en|int == 0 }}>Disabled</option>
+                    <option value="1" {{'selected' if raspiconfig.colour_effect_en|int == 1 }}>Enabled</option>
                 </select>
             </div>
         </div>
@@ -343,8 +343,8 @@
             <label class="col col-form-label">Image Statistics, default 'Off':</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'st','params':this.value});">
-                    <option value="0" {% if raspiconfig.stat_pass|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if raspiconfig.stat_pass|int == 1 %}selected{%endif%}>On</option>
+                    <option value="0" {{ 'selected' if raspiconfig.stat_pass|int == 0}}>Off</option>
+                    <option value="1" {{ 'selected' if raspiconfig.stat_pass|int == 1}}>On</option>
                 </select>
             </div>
         </div>
@@ -353,10 +353,10 @@
             <div class="col">
                 <div class="input-group input-group-sm">
                     <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'ro','params':this.value});">
-                        <option value="0" {% if raspiconfig.rotation|int == 0 %}selected{%endif%}>0</option>
-                        <option value="90" {% if raspiconfig.rotation|int == 90 %}selected{%endif%}>90</option>
-                        <option value="180" {% if raspiconfig.rotation|int == 180 %}selected{%endif%}>180</option>
-                        <option value="270" {% if raspiconfig.rotation|int == 270 %}selected{%endif%}>270</option>
+                        <option value="0" {{ 'selected' if raspiconfig.rotation|int == 0}}>0</option>
+                        <option value="90" {{ 'selected' if raspiconfig.rotation|int == 90}}>90</option>
+                        <option value="180" {{ 'selected' if raspiconfig.rotation|int == 180}}>180</option>
+                        <option value="270" {{ 'selected' if raspiconfig.rotation|int == 270}}>270</option>
                     </select>
                     <span class="input-group-text me-1">°</span>
                 </div>  
@@ -366,10 +366,10 @@
             <label class="col col-form-label">Flip, default 'none':</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'fl','params':this.value});">
-                    <option value="0" {% if raspiconfig.flip == 0 %}selected{%endif%}>None</option>
-                    <option value="1" {% if raspiconfig.flip == 1 %}selected{%endif%}>Horizontal</option>
-                    <option value="2" {% if raspiconfig.flip == 2 %}selected{%endif%}>Vertical</option>
-                    <option value="3" {% if raspiconfig.flip == 3 %}selected{%endif%}>Both</option>
+                    <option value="0" {{ 'selected' if raspiconfig.flip == 0}}>None</option>
+                    <option value="1" {{ 'selected' if raspiconfig.flip == 1}}>Horizontal</option>
+                    <option value="2" {{ 'selected' if raspiconfig.flip == 2}}>Vertical</option>
+                    <option value="3" {{ 'selected' if raspiconfig.flip == 3}}>Both</option>
                 </select>
             </div>
         </div>
@@ -450,8 +450,8 @@
             <label class="col col-form-label">Raw Layer, default: 'off'</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'rl','params':this.value});">
-                    <option value="0" {% if raspiconfig.raw_layer|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if raspiconfig.raw_layer|int == 1 %}selected{%endif%}>On</option>
+                    <option value="0" {{'selected' if raspiconfig.raw_layer|int == 0 }}>Off</option>
+                    <option value="1" {{'selected' if raspiconfig.raw_layer|int == 1 }}>On</option>
                 </select>
             </div>
         </div>
@@ -490,8 +490,8 @@
             <label class="col col-form-label">MP4 Boxing mode : </label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'bo','params':this.value});">
-                    <option value="0" {% if raspiconfig.mp4box|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if raspiconfig.mp4box|int != 0 or raspiconfig.mp4box == 'background' %}selected{%endif%}>Background</option>
+                    <option value="0" {{'selected' if raspiconfig.mp4box|int == 0 }}>Off</option>
+                    <option value="1" {{'selected' if raspiconfig.mp4box|int != 0 or raspiconfig.mp4box == 'background'}}>Background</option>
                 </select>
             </div>
         </div>
@@ -511,9 +511,9 @@
             <label class="col col-form-label">Motion detect mode:</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="set_motion_external(this.value)">
-                    <option value="0" {% if raspiconfig.motion_external|int == 0 %}selected{%endif%}>Internal</option>
-                    <option value="1" {% if raspiconfig.motion_external|int == 1 %}selected{%endif%}>External</option>
-                    <option value="2" {% if raspiconfig.motion_external|int == 2 %}selected{%endif%}>Monitor</option>
+                    <option value="0" {{'selected' if raspiconfig.motion_external|int == 0}}>Internal</option>
+                    <option value="1" {{'selected' if raspiconfig.motion_external|int == 1}}>External</option>
+                    <option value="2" {{'selected' if raspiconfig.motion_external|int == 2}}>Monitor</option>
                 </select>
             </div>
         </div>
@@ -527,8 +527,8 @@
             <label class="col col-form-label">HDMI Preview, default: 'off'</label>
             <div class="col">
                 <select class="form-select form-select-sm" onchange="$.sendCmd({'cmd':'hp','params':this.value});">
-                    <option value="0" {% if raspiconfig.hdmi_preview|int == 0 %}selected{%endif%}>Off</option>
-                    <option value="1" {% if raspiconfig.hdmi_preview|int == 1 %}selected{%endif%}>On</option>
+                    <option value="0" {{ 'selected' if raspiconfig.hdmi_preview|int == 0 }}>Off</option>
+                    <option value="1" {{ 'selected' if raspiconfig.hdmi_preview|int == 1 }}>On</option>
                 </select>
             </div>
         </div>
