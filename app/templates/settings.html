@@ -242,10 +242,11 @@
 {% block scripts %}
 {{ super() }}
 <script>
-$(function () {
-    $('#main').addClass("d-none")
-    $('#settings').removeClass("d-none")
-    $('#form_upload').attr('action','{{url_for("settings.restore")}}')
+$(function(){
+    $('#main').addClass("d-none");
+    $('#settings').removeClass("d-none");
+    $('#form_upload').attr('action','{{url_for("settings.restore")}}');
+    setInterval('watchRsyncService();',10000);   
 });
 
 $('#upreset, #pilight, #pipan, #servo, #loglevel').unbind()
@@ -468,6 +469,21 @@ function copyToClipboard(element) {
     $temp.val($(element).val()).select();
     document.execCommand("copy");
     $temp.remove();
+}
+
+function watchRsyncService() {
+    $.queryData({
+        method: "get",
+        url:"{{url_for('api.rsync_status')}}", 
+        success:function(data){
+            $('.rsync_start').parent().addClass('d-none')            
+            $('.rsync_stop').parent().removeClass('d-none')
+        },
+        error:function(data){
+            $('.rsync_stop').parent().addClass('d-none')            
+            $('.rsync_start').parent().removeClass('d-none')
+        }
+    });
 }
 </script>
 {%endblock%}
