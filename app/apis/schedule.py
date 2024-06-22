@@ -119,7 +119,8 @@ class Actions(Resource):
             case "api.schedule_stop":
                 pid = get_pid(["*/flask", "scheduler"])
                 try:
-                    execute_cmd(f"kill {pid}")
+                    if pid:
+                        execute_cmd(f"kill {pid}")
                 except ViewPiCamException as error:
                     return abort(422, error)
                 return "", 204
