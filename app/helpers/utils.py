@@ -1,5 +1,6 @@
 """Utils functions."""
 
+import fnmatch
 import os
 import re
 import shutil
@@ -26,18 +27,18 @@ def reverse(url: str) -> bool:
     return False
 
 
-def get_pid(pid_type: str) -> int:
+def get_pid(pid_type: str | list[str]) -> int:
     """Return process id."""
+    if not isinstance(pid_type, list):
+        pid_type = list(pid_type)
     for proc in process_iter():
         try:
             cmdline = proc.cmdline()
         except ZombieProcess:
             cmdline = []
-        if pid_type == "scheduler":
-            if "flask" and "scheduler" in cmdline:
+        else:
+            if all(fnmatch.filter(cmdline, item) for item in pid_type):
                 return proc.pid
-        if pid_type in cmdline:
-            return proc.pid
     return 0
 
 
@@ -109,13 +110,13 @@ def get_timezone() -> str | list[str]:
 
 def launch_schedule() -> None:
     """Run scheduler."""
-    if not get_pid("scheduler"):
+    if not get_pid(["*/flask", "scheduler"]):
         Popen(["flask", "scheduler", "start"], stdout=PIPE)
 
 
 def launch_rsync() -> None:
     """Run scheduler."""
-    if not get_pid("rsync"):
+    if not get_pid(["*/flask", "rsync"]):
         Popen(["flask", "rsync", "start"], stdout=PIPE)
 
 
