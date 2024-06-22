@@ -174,7 +174,6 @@ rsync = Model(
         "rs_remote_host": fields.String(required=True, default=False),
         "rs_remote_module_name": fields.String(required=False, default=False),
         "rs_options": fields.List(fields.String(default=None)),
-        "rs_enabled": fields.Boolean(required=True, default=False),
     },
 )
 locale = Model("Locale", {"locale": fields.String(enumerate=LOCALES)})

@@ -18,20 +18,20 @@ bp = Blueprint(
     url_prefix="/rsync",
     cli_group="rsync",
 )
-bp.cli.short_help = "Stop/Start scheduler"
+bp.cli.short_help = "Stop/Start rsync"
 
 
 @bp.cli.command("stop", short_help="Stop rsync task")
 @with_appcontext
-def stop_scheduler() -> None:
+def stop() -> None:
     """Stop rsync."""
-    pid = get_pid("*/rsync")
+    pid = get_pid(["*/flask", "rsync"])
     Popen(f"kill {pid}", shell=True)
 
 
 @bp.cli.command("start", short_help="Start rsync task")
 @with_appcontext
-def start_scheduler() -> None:
+def start() -> None:
     """Start rsync."""
     rsync()
 
@@ -45,7 +45,7 @@ def rsync() -> None:
     poll_time = settings.data["cmd_poll"]
     media_path = ca.raspiconfig.media_path
 
-    while settings.data["rs_enabled"]:
+    while True:
         options = " ".join(settings.data["rs_options"])
         if settings.data["rs_mode"] == "SSH":
             cmd = f'rsync {options} --exclude={{"*.info","*.th.jpg"}} {media_path} -e ssh {settings.data["rs_user"]}@{settings.data["rs_remote_host"]}:/{settings.data["rs_direction"]}'
@@ -54,7 +54,7 @@ def rsync() -> None:
 
         write_log(cmd)
         if not get_pid(cmd):
-            line = f"while inotifywait -r {media_path}/*; do  {cmd}; done"
-            Popen(line, shell=True)
+            # line = f"while inotifywait -r {media_path}/*; do  {cmd}; done"
+            Popen(cmd, shell=True)
 
         time.sleep(poll_time * 1000)
