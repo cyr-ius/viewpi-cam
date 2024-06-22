@@ -217,8 +217,8 @@
                         <option value="--delay-updates" {{ 'selected' if "--delay-updates" in rsync.rs_options }}> Delay Updates</option>
                     </select>
                 </div>                
-                <div class="col-auto {{'d-none' if rsync_pid }}"><button class="btn btn-sm btn-outline-success rsync_start" type="button" title="Start"><i class="bi bi-play-circle-fill"></i></button></div>         
-                <div class="col-auto {{'d-none' if not rsync_pid }}"><button class="btn btn-sm btn-outline-danger rsync_stop" type="button" title="Stop"><i class="bi bi-stop-circle-fill"></i></button></div>         
+                <div class="col-auto"><button class="btn btn-sm btn-outline-success rsync_start" type="button" title="Start"><i class="bi bi-play-circle-fill"></i></button></div>         
+                <div class="col-auto d-none"><button class="btn btn-sm btn-outline-danger rsync_stop" type="button" title="Stop"><i class="bi bi-stop-circle-fill"></i></button></div>         
                 <div class="col-auto"><button class="btn btn-sm btn-outline-light rsync_reset" type="button" title="Reset settings"><i class="bi bi-arrow-repeat"></i></button></div>         
             </div>
         </div>
@@ -246,6 +246,7 @@ $(function(){
     $('#main').addClass("d-none");
     $('#settings').removeClass("d-none");
     $('#form_upload').attr('action','{{url_for("settings.restore")}}');
+    watchRsyncService();
     setInterval('watchRsyncService();',10000);   
 });
 
@@ -420,21 +421,13 @@ $('#rsync').on('click','.rsync_start', function(){
     let parent = $(this).parent().parent().parent();
     let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
     let success = function(data){
-        let success = function(data){
-            $('.rsync_start').parent().addClass('d-none')            
-            $('.rsync_stop').parent().removeClass('d-none')
-        }
-        $.queryData({url:"{{url_for('api.rsync_start')}}", success:success})
+        $.queryData({url:"{{url_for('api.rsync_start')}}", success:function(data){watchRsyncService();}})
     }
     $.queryData({url:"{{url_for('api.rsync_rsync')}}",data:data, success:success});
 });
 
 $('#rsync').on('click','.rsync_stop', function(){
-    let success = function(data){
-        $('.rsync_stop').parent().addClass('d-none')            
-        $('.rsync_start').parent().removeClass('d-none')
-    }
-    $.queryData({url:"{{url_for('api.rsync_stop')}}", success:success})
+    $.queryData({url:"{{url_for('api.rsync_stop')}}", success:function(data){watchRsyncService();}})
 });
 
 $('#rsync').on('click','.rsync_reset', function(){
@@ -482,7 +475,9 @@ function watchRsyncService() {
         error:function(data){
             $('.rsync_stop').parent().addClass('d-none')            
             $('.rsync_start').parent().removeClass('d-none')
-        }
+        },
+        display_success:false,
+        display_error:false,
     });
 }
 </script>

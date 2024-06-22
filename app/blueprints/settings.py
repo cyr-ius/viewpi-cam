@@ -19,7 +19,6 @@ from ..apis.settings import Macros, Sets
 from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
 from ..helpers.filer import allowed_file, zip_extract, zip_folder
-from ..helpers.utils import get_pid
 from ..models import Files as files_db
 from ..models import Multiviews, Presets, Ubuttons, Users, db
 
@@ -55,7 +54,6 @@ def index():
         camera_token=camera_token,
         api_token=api_token,
         rsync=rsync,
-        rsync_pid=get_pid(["*/flask", "rsync"]),
     )
 
 
