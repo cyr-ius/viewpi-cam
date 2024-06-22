@@ -22,7 +22,7 @@ api = Namespace(
 api.add_model("Rsync", rsync)
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/")
 class Rsync(Resource):
     """Rsync settings."""
@@ -61,7 +61,7 @@ class Rsync(Resource):
 @api.route("/start", endpoint="rsync_start")
 @api.response(204, "Success")
 @api.response(404, "Not found", message)
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 class Actions(Resource):
     """Actions."""
 
@@ -82,3 +82,17 @@ class Actions(Resource):
                     return abort(422, error)
                 return "", 204
         abort(404, "Action not found")
+
+
+@api.route("/status")
+@api.response(204, "Service started")
+@api.response(401, "Unauthorized")
+@api.response(404, "Service stopped", message)
+class Status(Resource):
+    """Status."""
+
+    def get(self):
+        """Get rsync status."""
+        if get_pid(["*/flask", "rsync"]) != 0:
+            return "", 204
+        abort(404, "Rsync stopped")
