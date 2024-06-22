@@ -40,21 +40,26 @@ def rsync() -> None:
     """Rsync daemon."""
 
     write_log("Rsync support started")
+
     settings = settings_db.query.first()
-    os.environ["RSYNC_PASSWORD"] = settings.data["rs_pwd"]
     poll_time = settings.data["cmd_poll"]
     media_path = ca.raspiconfig.media_path
 
-    while True:
+    if rs_pwd := settings.data.get("rs_pwd"):
+        os.environ["RSYNC_PASSWORD"] = rs_pwd
+
+    while settings.data.get("rs_direction") or settings.data.get(
+        "rs_remote_module_name"
+    ):
         options = " ".join(settings.data["rs_options"])
         if settings.data["rs_mode"] == "SSH":
             cmd = f'rsync {options} --exclude={{"*.info","*.th.jpg"}} {media_path} -e ssh {settings.data["rs_user"]}@{settings.data["rs_remote_host"]}:/{settings.data["rs_direction"]}'
         else:
             cmd = f"rsync {options} --exclude={{'*.info','*.th.jpg'}} {media_path} {settings.data['rs_user']}@{settings.data['rs_remote_host']}::{settings.data['rs_remote_module_name']}"
 
-        write_log(cmd)
         if not get_pid(cmd):
             # line = f"while inotifywait -r {media_path}/*; do  {cmd}; done"
+            write_log(cmd)
             Popen(cmd, shell=True)
 
         time.sleep(poll_time * 1000)
