@@ -1,8 +1,9 @@
 """Blueprint Scheduler."""
 
 import os
+import re
 import time
-from subprocess import Popen
+from subprocess import PIPE, Popen
 
 from flask import Blueprint
 from flask import current_app as ca
@@ -51,15 +52,24 @@ def rsync() -> None:
     while settings.data.get("rs_direction") or settings.data.get(
         "rs_remote_module_name"
     ):
+        if not isinstance(settings.data["rs_options"], list):
+            settings.data["rs_options"] = [settings.data["rs_options"]]
+
         options = " ".join(settings.data["rs_options"])
         if settings.data["rs_mode"] == "SSH":
-            cmd = f'rsync {options} --exclude={{"*.info","*.th.jpg"}} {media_path} -e ssh {settings.data["rs_user"]}@{settings.data["rs_remote_host"]}:/{settings.data["rs_direction"]}'
+            cmd = f'rsync -v {options} --no-perms --exclude={{"*.info","*.th.jpg"}} {media_path}/ -e ssh {settings.data["rs_user"]}@{settings.data["rs_remote_host"]}:/{settings.data["rs_direction"]}'
         else:
-            cmd = f"rsync {options} --exclude={{'*.info','*.th.jpg'}} {media_path} {settings.data['rs_user']}@{settings.data['rs_remote_host']}::{settings.data['rs_remote_module_name']}"
+            cmd = f"rsync -v {options} --no-perms --exclude={{'*.info','*.th.jpg'}} {media_path}/ {settings.data['rs_user']}@{settings.data['rs_remote_host']}::{settings.data['rs_remote_module_name']}"
 
         if not get_pid(cmd):
-            # line = f"while inotifywait -r {media_path}/*; do  {cmd}; done"
-            write_log(cmd)
-            Popen(cmd, shell=True)
+            print(cmd)
+            process = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, text="utf-8")
+            if raw := process.stderr.read():
+                errorcode = re.findall("rsync error:.* \\(code ([0-9]{1,2})\\).*", raw)
+                write_log(f"Rsync failed ({errorcode[0]})")
+                print(raw)
+                break
+            if raw := process.stdout.read():
+                print(raw)
 
         time.sleep(poll_time * 1000)
