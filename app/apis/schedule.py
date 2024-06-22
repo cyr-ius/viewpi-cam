@@ -99,9 +99,8 @@ class Scheduler(Resource):
         return "", 204
 
 
-@api.route("/actions", doc=False)
-@api.route("/actions/stop", endpoint="schedule_stop")
-@api.route("/actions/start", endpoint="schedule_start")
+@api.route("/stop", endpoint="schedule_stop")
+@api.route("/start", endpoint="schedule_start")
 @api.response(204, "Success")
 @api.response(404, "Not found", message)
 @api.response(401, "Unauthorized", message)
