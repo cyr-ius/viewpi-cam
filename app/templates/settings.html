@@ -48,7 +48,7 @@
                 <div class="col-4 col-sm">
                     <select class="form-select form-select-sm" name="right" required>
                         {% for key,value in config.USERLEVEL.items() %}
-                        <option {% if user.right == value %}selected{%endif%} value="{{value}}">{{key| capitalize}}</option>
+                        <option value="{{value}}" {{ 'selected' if user.right == value }} >{{key| capitalize}}</option>
                         {% endfor%}
                     </select>
                 </div>
@@ -113,7 +113,7 @@
                 <div class="col"><label class="form-check-label" for="servo">Servo blaster</label></div>
                 <div class="col-auto">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" id="servo" name="servo" type="checkbox" {% if settings.servo == 1 %}checked{%endif%}>
+                        <input class="form-check-input" id="servo" name="servo" type="checkbox" {{ 'checked' if settings.servo == 1 }}>
                     </div>
                 </div>
             </div>
@@ -121,7 +121,7 @@
                 <div class="col"><label class="form-check-label" for="pipan">Pi Pan</label></div>
                 <div class="col-auto">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" id="pipan" name="pipan" type="checkbox" {% if settings.pipan == 1 %}checked{%endif%}>
+                        <input class="form-check-input" id="pipan" name="pipan" type="checkbox" {{ 'checked' if settings.pipan == 1 }}>
                     </div>
                 </div>
             </div>
@@ -129,7 +129,7 @@
                 <div class="col"><label class="form-check-label" for="pilight">Pi Light</label></div>
                 <div class="col-auto">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" id="pilight" name="pilight" type="checkbox" {% if settings.pilight == 1 %}checked{%endif%}>
+                        <input class="form-check-input" id="pilight" name="pilight" type="checkbox" {{ 'checked' if settings.pilight == 1 }}>
                     </div>
                 </div>
             </div>
@@ -138,7 +138,7 @@
                 <div class="col-auto ">
                     <select class="form-select form-select-sm" id="upreset" name="upreset">
                         {% for preset in presets %}
-                        <option {% if settings.upreset == "v2" %}selected{%endif%} value="{{preset}}">{{preset}}</option>
+                        <option value="{{preset}}" {{ 'selected' if settings.upreset == preset }}>{{preset}}</option>
                         {% endfor%}
                     </select>
                 </div>
@@ -199,27 +199,27 @@
                 <div class="col"><input class="form-control form-control-sm" name="rs_direction" type="text" placeholder="{{_('Remote Folder')}}" value="{{rsync.rs_direction}}"></div>
                 <div class="col">
                     <select class="form-select form-select-sm" name="rs_mode" required>
-                        <option {% if rsync.rs_mode == "Module" %}selected{%endif%} value="Module">Module</option>
-                        <option {% if rsync.rs_mode == "SSH" %}selected{%endif%} value="SSH">SSH</option>
+                        <option value="Module" {{ 'selected' if rsync.rs_mode == "Module" }}>Module</option>
+                        <option value="SSH" {{ 'selected' if rsync.rs_mode == "SSH" }}>SSH</option>
                     </select>
                 </div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_remote_host" type="text" placeholder="{{_('Remote Host')}}" value="{{rsync.rs_remote_host}}" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_remote_module_name" type="text" placeholder="{{_('Remote module name')}}" value="{{rsync.rs_remote_module_name}}"></div>
                 <div class="col">
                     <select class="form-control form-control-sm selectpicker" name="rs_options" multiple data-multi-select data-style="" data-style-base="form-control">
-                        <option value="-t" {% if "-t" in rsync.rs_options %}selected{%endif%}>Times</option>
-                        <option value="-b" {% if "-b" in rsync.rs_options %}selected{%endif%}>Backup</option>
-                        <option value="-z" {% if "-z" in rsync.rs_options %}selected="selected"{%endif%}>Compress</option>
-                        <option value="-a" {% if "-a" in rsync.rs_options %}selected{%endif%}>Archive</option>
-                        <option value="--delete" {% if "--delete" in rsync.rs_options %}selected{%endif%}>Delete</option>
-                        <option value="-q" {% if "-q" in rsync.rs_options %}selected{%endif%}>Quiet</option>
-                        <option value="-p" {% if "-p" in rsync.rs_options %}selected{%endif%}>Preserve Permissions</option>
-                        <option value="--delay-updates" {% if "--delay-updates"  in rsync.rs_options %}selected{%endif%}> Delay Updates</option>
+                        <option value="-t" {{ 'selected' if "-t" in rsync.rs_options }}>Times</option>
+                        <option value="-b" {{ 'selected' if "-b" in rsync.rs_options }}>Backup</option>
+                        <option value="-z" {{ 'selected' if "-z" in rsync.rs_options }}>Compress</option>
+                        <option value="-a" {{ 'selected' if "-a" in rsync.rs_options }}>Archive</option>
+                        <option value="--delete" {{ 'selected' if "--delete" in rsync.rs_options }}>Delete</option>
+                        <option value="-q" {{ 'selected' if "-q" in rsync.rs_options }}>Quiet</option>
+                        <option value="-p" {{ 'selected' if "-p" in rsync.rs_options }}>Preserve Permissions</option>
+                        <option value="--delay-updates" {{ 'selected' if "--delay-updates" in rsync.rs_options }}> Delay Updates</option>
                     </select>
                 </div>                
                 <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="rs_enabled" type="checkbox" {% if rsync.rs_enabled %}checked{%endif%}></div></div>       
-                <div class="col-auto"><button class="btn btn-sm btn-outline-success rsync_start" type="button" title="Start"><i class="bi bi-play-circle-fill"></i></button></div>         
-                <div class="col-auto d-none"><button class="btn btn-sm btn-outline-danger rsync_stop" type="button" title="Stop"><i class="bi bi-stop-circle-fill"></i></button></div>         
+                <div class="col-auto {{'d-none' if rsync_pid }}"><button class="btn btn-sm btn-outline-success rsync_start" type="button" title="Start"><i class="bi bi-play-circle-fill"></i></button></div>         
+                <div class="col-auto {{'d-none' if not rsync_pid }}"><button class="btn btn-sm btn-outline-danger rsync_stop" type="button" title="Stop"><i class="bi bi-stop-circle-fill"></i></button></div>         
                 <div class="col-auto"><button class="btn btn-sm btn-outline-light rsync_reset" type="button" title="Reset settings"><i class="bi bi-arrow-repeat"></i></button></div>         
             </div>
         </div>
