@@ -113,11 +113,11 @@ class Actions(Resource):
         """Post action."""
         match request.endpoint:
             case "api.schedule_start":
-                if not get_pid("scheduler"):
+                if not get_pid(["*/flask", "scheduler"]):
                     Popen(["flask", "scheduler", "start"], stdout=PIPE)
                 return "", 204
             case "api.schedule_stop":
-                pid = get_pid("scheduler")
+                pid = get_pid(["*/flask", "scheduler"])
                 try:
                     execute_cmd(f"kill {pid}")
                 except ViewPiCamException as error:

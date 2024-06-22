@@ -16,7 +16,7 @@ from flask_login import login_required
 from ..apis.schedule import dt_now, get_calendar, sun_info, time_offset
 from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
-from ..helpers.fifo import read_pipe, open_pipe
+from ..helpers.fifo import open_pipe, read_pipe
 from ..helpers.filer import (
     delete_mediafiles,
     get_file_type,
@@ -63,7 +63,7 @@ def index():
         motion_pipe=ca.raspiconfig.motion_pipe,
         offset=time_offset(settings.data["gmt_offset"]),
         period=get_calendar(settings.data["daymode"]),
-        schedule_pid=get_pid("scheduler"),
+        schedule_pid=get_pid(["*/flask", "scheduler"]),
         settings=settings.data,
         sunrise=sun_info("sunrise").strftime("%H:%M"),
         sunset=sun_info("sunset").strftime("%H:%M"),
@@ -76,7 +76,7 @@ def index():
 @with_appcontext
 def stop_scheduler() -> None:
     """Stop scheduler."""
-    pid = get_pid("scheduler")
+    pid = get_pid(["*/flask", "scheduler"])
     Popen(f"kill {pid}", shell=True)
 
 
