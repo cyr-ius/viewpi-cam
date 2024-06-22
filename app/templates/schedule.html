@@ -264,7 +264,7 @@ $('#schedule').on('click','#start', function(){
         $('.stopstart').prop("name",'stop')
         $('.stopstart').html('Stop')
     }
-    $.queryData({url:"{{ url_for('api.schedule_actions')}}/start", success: success})
+    $.queryData({url:"{{ url_for('api.schedule_start')}}", success: success})
 });
 
 $('#schedule').on('click','#stop', function(){
@@ -274,7 +274,7 @@ $('#schedule').on('click','#stop', function(){
         $('.stopstart').prop("name",'start')
         $('.stopstart').html('Start')
     }
-    $.queryData({url:"{{ url_for('api.schedule_actions')}}/stop", success: success})
+    $.queryData({url:"{{ url_for('api.schedule_stop')}}", success: success})
 });
 
 $('#daymode').unbind();
