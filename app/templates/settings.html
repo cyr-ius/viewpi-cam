@@ -438,14 +438,14 @@ $('#rsync').on('click','.rsync_stop', function(){
 
 $('#rsync').on('click','.rsync_reset', function(){
     let parent = $(this).parent().parent().parent();
-    // Reset data
-    $(parent).find('input, select, textarea').each(function(){
-        $(this).val("");
-    });
-
-    let success = function(data){$('.rsync_stop').trigger('click');}
+    let success = function(data){
+        $('.rsync_stop').trigger('click');
+        $(parent).find('input, select, textarea').each(function(){
+            $(this).val("");
+        });
+    }
     let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-    $.queryData({url:"{{url_for('api.rsync_rsync')}}", data:data, success:success});
+    $.queryData({method: "delete", url:"{{url_for('api.rsync_rsync')}}", data:data, success:success});
 });
 
 
