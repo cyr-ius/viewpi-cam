@@ -23,7 +23,8 @@ $(function () {
 {% if multiview.state%}
 let mjpeg_img_{{multiview.id}};
 function load_img_{{multiview.id}}() {
-	mjpeg_img_{{multiview.id}}.src = "{{url_for('main.view',pHost=multiview.id)}}&time=" + new Date().getTime();
+	let time = new Date().getTime()
+	mjpeg_img_{{multiview.id}}.src = "{{url_for('main.view',pHost=multiview.id, time=0)}}".replace(0,time);
 }
 {%endif%}
 {%-endfor%}
