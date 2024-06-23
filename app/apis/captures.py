@@ -1,5 +1,7 @@
 """Api camera."""
 
+import time
+
 from flask import current_app as ca
 from flask import request
 from flask_login import login_required
@@ -70,3 +72,23 @@ class Timelapse(Resource):
             return "", 204
         except RaspiConfigError as error:
             abort(422, error)
+
+
+@api.response(200, "Success")
+@api.response(401, "Unauthorized", message)
+@api.response(422, "Error", message)
+@api.route("/status")
+class StatusMjpeg(Resource):
+    """Status mjpeg."""
+
+    @api.param("last", "Last content")
+    def get(self):
+        """Get status."""
+        file_content = ""
+        with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
+            file_content = file.read()
+            if file_content != request.args.get("last"):
+                return {"status": ""}
+            time.sleep(0.1)
+            file.close()
+        return {"status": str(file_content)}
