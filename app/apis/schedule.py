@@ -102,8 +102,8 @@ class Scheduler(Resource):
 @api.route("/stop", endpoint="schedule_stop")
 @api.route("/start", endpoint="schedule_start")
 @api.response(204, "Success")
-@api.response(404, "Not found", message)
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
+@api.response(422, "Error", message)
 class Actions(Resource):
     """Actions."""
 
@@ -123,18 +123,22 @@ class Actions(Resource):
                 except ViewPiCamException as error:
                     return abort(422, error)
                 return "", 204
-        abort(404, "Action not found")
+        abort(422, "Action not found")
 
 
 @api.route("/period")
-@api.response(401, "Unauthorized", message)
+@api.response(422, "Error", message)
+@api.response(401, "Unauthorized")
 class Period(Resource):
     """Sunrise."""
 
+    @api.expect(daymode)
     @api.marshal_with(period)
     def post(self):
         """Post day mode and return period."""
-        return {"period": get_calendar(api.payload["daymode"])}
+        if api.payload["daymode"] in [0, 1, 2]:
+            return {"period": get_calendar(api.payload["daymode"])}
+        abort(422, "Daymode not exist")
 
 
 @api.route("/sun/sunrise")
