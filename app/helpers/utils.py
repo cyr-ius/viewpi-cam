@@ -109,16 +109,10 @@ def get_timezone() -> str | list[str]:
     return settings.data["gmt_offset"]
 
 
-def launch_schedule() -> None:
+def launch_module(module: str, action: str = "start") -> None:
     """Run scheduler."""
-    if not get_pid(["*/flask", "scheduler"]):
-        Popen(["flask", "scheduler", "start"], stdout=PIPE)
-
-
-def launch_rsync() -> None:
-    """Run scheduler."""
-    if not get_pid(["*/flask", "rsync"]):
-        Popen(["flask", "rsync", "start"], stdout=PIPE)
+    if not get_pid(["*/flask", module]):
+        Popen(["flask", module, action])
 
 
 def allowed_file(filename):
