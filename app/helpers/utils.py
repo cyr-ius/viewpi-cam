@@ -1,6 +1,7 @@
 """Utils functions."""
 
 import fnmatch
+import json
 import os
 import re
 import shutil
@@ -61,7 +62,8 @@ def write_log(msg: str, level: str = "info") -> None:
 
     mode = "w" if not os.path.isfile(log_file) else "a"
     with open(log_file, mode=mode, encoding="utf-8") as file:
-        file.write(f'{{"datetime":"{str_now}","msg":"{msg}"}}\n')
+        line = json.dumps({"datetime": str_now, "level": level, "msg": msg})
+        file.write(line + "\n")
 
 
 def delete_log(log_size: int) -> None:

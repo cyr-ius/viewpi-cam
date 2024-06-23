@@ -2,7 +2,7 @@
 {% block content %}
 <div id="streamlog" class="container-fluid overflow-auto">
     {% for line in log %}
-    <div class="row px-3">{{line.datetime}} - {{line.msg}}</div>
+    <div class="row px-3">{{line.datetime}} - {{line.level|upper()}} - {{line.msg}}</div>
     {%endfor%}
 
 </div>
