@@ -50,10 +50,7 @@ class Rsync(Resource):
     def delete(self):
         """Delete settings."""
         settings = settting_db.query.first()
-        params = settings.data.copy()
-        for param in api.payload:
-            params.pop(param, None)
-        settings.data.update(**params)
+        settings.delete(**api.payload)
         return "", 204
 
 
