@@ -2,6 +2,7 @@
 
 import os
 import time
+from datetime import datetime as dt
 from subprocess import PIPE, Popen
 
 from flask import Blueprint
@@ -60,18 +61,33 @@ def rsync() -> None:
 
         options = " ".join(settings.data["rs_options"])
         if settings.data["rs_mode"] == "SSH":
-            cmd = f'rsync -v {options} --no-perms --exclude={{"*.info","*.th.jpg"}} {media_path}/ -e ssh {settings.data["rs_user"]}@{settings.data["rs_remote_host"]}:/{settings.data["rs_direction"]}'
+            cmd = f"rsync -v {options} --no-perms --exclude '*.info' --exclude '*.th.jpg' {media_path}/ -e ssh {settings.data['rs_user']}@{settings.data['rs_remote_host']}:/{settings.data['rs_direction']}"
         else:
-            cmd = f"rsync -v {options} --no-perms --exclude={{'*.info','*.th.jpg'}} {media_path}/ {settings.data['rs_user']}@{settings.data['rs_remote_host']}::{settings.data['rs_remote_module_name']}"
+            cmd = f"rsync -v {options} --no-perms --exclude '*.info' --exclude '*.th.jpg' {media_path}/ {settings.data['rs_user']}@{settings.data['rs_remote_host']}::{settings.data['rs_remote_module_name']}"
+
+        print_msg(cmd)
 
         if not get_pid("*/rsync"):
-            ca.logger.debug(cmd)
             process = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, text="utf-8")
-            if (raw := process.stderr.readlines()) and len(raw) > 0:
-                write_log(raw[-1].replace("\n", ""), "error")
+            for stdout_line in iter(process.stdout.readline, ""):
+                print_msg(stdout_line)
+            process.stdout.close()
+            for stderr_line in iter(process.stderr.readline, ""):
+                print_msg(stderr_line)
+                write_log(stderr_line, "error")
+            process.stderr.close()
+            return_code = process.wait()
+            if return_code > 0:
+                msg = f"[RSync] Error {return_code}"
+                print_msg(msg)
+                write_log(msg, "error")
                 break
-            if (raw := process.stdout.readlines()) and len(raw) > 0:
-                for line in raw:
-                    ca.logger.debug(line)
-
+            write_log("[RSync] Successful")
         time.sleep(poll_time * 1000)
+
+
+def print_msg(msg):
+    msg = msg.strip()
+    str_now = dt.now().strftime("%Y/%m/%d %H:%M:%S,%f")[:-3]
+    if msg != "":
+        print(f"[{str_now}] [rsync.py] INFO - {msg}")
