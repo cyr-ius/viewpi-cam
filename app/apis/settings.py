@@ -41,6 +41,7 @@ class Sets(Resource):
         db.session.commit()
         if loglevel := api.payload.get("loglevel"):
             ca.logger.setLevel(loglevel)
+            ca.logger.debug(f"Log level: {loglevel}")
         return "", 204
 
 
