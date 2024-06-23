@@ -62,14 +62,14 @@ def rsync() -> None:
             cmd = f"rsync -v {options} --no-perms --exclude={{'*.info','*.th.jpg'}} {media_path}/ {settings.data['rs_user']}@{settings.data['rs_remote_host']}::{settings.data['rs_remote_module_name']}"
 
         if not get_pid(cmd):
-            print(cmd)
+            ca.logger.debug(cmd)
             process = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, text="utf-8")
             if raw := process.stderr.read():
                 errorcode = re.findall("rsync error:.* \\(code ([0-9]{1,2})\\).*", raw)
-                write_log(f"Rsync failed ({errorcode[0]})")
-                print(raw)
+                ca.logger.debug(raw)
+                write_log(f"Rsync failed ({str(errorcode)})")
                 break
             if raw := process.stdout.read():
-                print(raw)
+                ca.logger.debug(raw)
 
         time.sleep(poll_time * 1000)
