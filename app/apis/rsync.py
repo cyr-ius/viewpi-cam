@@ -57,8 +57,8 @@ class Rsync(Resource):
 @api.route("/stop", endpoint="rsync_stop")
 @api.route("/start", endpoint="rsync_start")
 @api.response(204, "Success")
-@api.response(404, "Not found", message)
 @api.response(401, "Unauthorized")
+@api.response(422, "Error", message)
 class Actions(Resource):
     """Actions."""
 
@@ -68,7 +68,11 @@ class Actions(Resource):
         match request.endpoint:
             case "api.rsync_start":
                 if not get_pid(["*/flask", "rsync"]):
-                    Popen(["flask", "rsync", "start"], stdout=PIPE)
+                    process = Popen(
+                        ["flask", "rsync", "start"], stderr=PIPE, text="utf-8"
+                    )
+                    if (errors := process.stderr.readlines()) and len(errors) > 0:
+                        abort(422, errors[-1])
                 return "", 204
             case "api.rsync_stop":
                 pid = get_pid(["*/flask", "rsync"])
@@ -78,7 +82,7 @@ class Actions(Resource):
                 except ViewPiCamException as error:
                     return abort(422, error)
                 return "", 204
-        abort(404, "Action not found")
+        abort(422, "Action not found")
 
 
 @api.route("/status")
