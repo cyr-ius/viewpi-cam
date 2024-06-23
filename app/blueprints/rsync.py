@@ -48,10 +48,14 @@ def rsync() -> None:
 
     if rs_pwd := settings.data.get("rs_pwd"):
         os.environ["RSYNC_PASSWORD"] = rs_pwd
+    else:
+        write_log("Rsync not start (Password not found)")
+        return
 
     while settings.data.get("rs_direction") or settings.data.get(
         "rs_remote_module_name"
     ):
+        ca.logger.debug("Rsync check")
         if not isinstance(settings.data["rs_options"], list):
             settings.data["rs_options"] = [settings.data["rs_options"]]
 
@@ -61,7 +65,7 @@ def rsync() -> None:
         else:
             cmd = f"rsync -v {options} --no-perms --exclude={{'*.info','*.th.jpg'}} {media_path}/ {settings.data['rs_user']}@{settings.data['rs_remote_host']}::{settings.data['rs_remote_module_name']}"
 
-        if not get_pid(cmd):
+        if not get_pid("*/rsync"):
             ca.logger.debug(cmd)
             process = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, text="utf-8")
             if raw := process.stderr.read():
