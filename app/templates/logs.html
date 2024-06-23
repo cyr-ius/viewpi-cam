@@ -53,7 +53,7 @@ function stream() {
     source.onmessage = function(event) {
         if (event.data) {
             let line = JSON.parse(event.data)
-            $('#streamlog').prepend('<div class="row px-3">'+line.datetime+' - '+line.msg+'</div>');
+            $('#streamlog').prepend('<div class="row px-3">'+line.datetime+' - '+line.level.toUpperCase()+' - '+line.msg+'</div>');
         }
     }
     source.onerror = (err) => {
