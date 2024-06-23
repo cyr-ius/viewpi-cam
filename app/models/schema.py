@@ -1,4 +1,5 @@
-""" Schema database."""
+"""Schema database."""
+
 import random
 import uuid
 from datetime import datetime as dt
@@ -17,9 +18,17 @@ from .base import db
 
 class Settings(db.Model):
     __tablename__ = "settings"
-
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(MutableDict.as_mutable(JSON))
+
+    def delete(self, *args, **kwargs):
+        """Delete."""
+        args = tuple(kwargs.keys())
+        data = self.data.copy()
+        for arg in args + tuple(kwargs.keys()):
+            data.pop(arg, None)
+        self.data = data
+        db.session.commit()
 
 
 class Multiviews(db.Model):
