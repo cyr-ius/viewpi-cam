@@ -126,7 +126,7 @@ class RaspiConfig:
             os.close(pipe)
             write_log(f"Control - Send {cmd}")
         except Exception as error:  # pylint: disable=W0718
-            write_log(f"Raspiconfig error:{error}")
+            write_log(f"[Raspiconfig] {error}", "error")
             raise RaspiConfigError(error) from error
         finally:
             os.sync()

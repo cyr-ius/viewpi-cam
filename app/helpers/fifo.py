@@ -15,15 +15,15 @@ def open_pipe(pipename: str):
         execute_cmd(f"mkfifo {pipename}")
         execute_cmd(f"chmod 666 {pipename}")
     else:
-        write_log(f"Capture Pipe already exists ({pipename})")
+        write_log(f"Capture Pipe already exists ({pipename})", "warning")
 
     try:
         pipe = os.open(pipename, os.O_RDONLY | os.O_NONBLOCK)
         return pipe
     except OSError as error:
-        write_log(f"Error open pipe {pipename} {str(error)}")
+        write_log(f"[FIFO] Error open pipe {pipename} {str(error)}", "error")
     except ViewPiCamException as error:
-        write_log(error)
+        write_log(f"[FIFO] {str(error)}", "error")
 
 
 def send_pipe(cmd: str) -> None:
@@ -34,7 +34,7 @@ def send_pipe(cmd: str) -> None:
         os.close(pipe)
         write_log(f"Motion - Send {cmd}")
     except Exception as error:  # pylint: disable=W0718
-        write_log(f"Motion - {error}")
+        write_log(f"[Motion] {error}", "error")
 
 
 def read_pipe(pipe):

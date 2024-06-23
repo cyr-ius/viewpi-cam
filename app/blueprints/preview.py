@@ -185,7 +185,7 @@ def video_convert(filename: str) -> None:
                 )
                 write_log("Convert finished")
             except ViewPiCamException as error:
-                write_log(f"Error converting ({error})")
+                write_log(f"[Convert] {str(error)}", "error")
 
 
 def get_thumbs(sort_order: str, show_types: str, time_filter: int):

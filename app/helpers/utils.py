@@ -53,11 +53,11 @@ def execute_cmd(cmd: str) -> None:
     return output.decode("utf-8")
 
 
-def write_log(msg: str) -> None:
+def write_log(msg: str, level: str = "info") -> None:
     """Write log."""
     log_file = ca.raspiconfig.log_file
     str_now = dt.now().strftime("%Y/%m/%d %H:%M:%S")
-    ca.logger.info(msg)
+    getattr(ca.logger, level)(msg)
 
     mode = "w" if not os.path.isfile(log_file) else "a"
     with open(log_file, mode=mode, encoding="utf-8") as file:

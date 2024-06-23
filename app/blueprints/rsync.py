@@ -1,7 +1,6 @@
 """Blueprint Scheduler."""
 
 import os
-import re
 import time
 from subprocess import PIPE, Popen
 
@@ -49,7 +48,7 @@ def rsync() -> None:
     if rs_pwd := settings.data.get("rs_pwd"):
         os.environ["RSYNC_PASSWORD"] = rs_pwd
     else:
-        write_log("Rsync not start (Password not found)")
+        write_log("[Rsync] Password not found", "error")
         return
 
     while settings.data.get("rs_direction") or settings.data.get(
@@ -68,12 +67,11 @@ def rsync() -> None:
         if not get_pid("*/rsync"):
             ca.logger.debug(cmd)
             process = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, text="utf-8")
-            if raw := process.stderr.read():
-                errorcode = re.findall("rsync error:.* \\(code ([0-9]{1,2})\\).*", raw)
-                ca.logger.debug(raw)
-                write_log(f"Rsync failed ({str(errorcode)})")
+            if (raw := process.stderr.readlines()) and len(raw) > 0:
+                write_log(raw[-1].replace("\n", ""), "error")
                 break
-            if raw := process.stdout.read():
-                ca.logger.debug(raw)
+            if (raw := process.stdout.readlines()) and len(raw) > 0:
+                for line in raw:
+                    ca.logger.debug(line)
 
         time.sleep(poll_time * 1000)

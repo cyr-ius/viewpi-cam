@@ -59,7 +59,7 @@ class Settings(Resource):
             try:
                 set_timezone(new_tz)
             except ViewPiCamException as error:
-                write_log(error)
+                write_log(f"[Timezone] {str(error)}", "error")
 
         send_pipe(ca.config["SCHEDULE_RESET"])
         return "", 204

@@ -90,7 +90,7 @@ def start_scheduler() -> None:
 def scheduler() -> None:
     """Scheduler."""
     if not os.path.isfile(ca.raspiconfig.status_file):
-        write_log("Status mjpeg not found")
+        write_log("[Raspimjpeg] Status mjpeg not found", "error")
         return
 
     write_log("RaspiCam support started")
@@ -313,7 +313,7 @@ def send_cmds(str_cmd: str, days: dict[str, Any] | None = None) -> None:
                 try:
                     ca.raspiconfig.send(cmd)
                 except RaspiConfigError as error:
-                    write_log(f"Error while send command scheduling {error}")
+                    write_log(f"[Scheduler] Error while send command {error}")
                 time.sleep(0.2)
 
 
