@@ -30,7 +30,8 @@ def reverse(url: str) -> bool:
 def get_pid(pid_type: str | list[str]) -> int:
     """Return process id."""
     if not isinstance(pid_type, list):
-        pid_type = list(pid_type)
+        pid_type = [pid_type]
+
     for proc in process_iter():
         try:
             cmdline = proc.cmdline()
