@@ -9,7 +9,7 @@ from flask import Flask, g
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from . import apis, blueprints, models, services
-from .helpers.utils import get_pid, launch_rsync, launch_schedule, set_timezone
+from .helpers.utils import get_pid, launch_module, set_timezone
 from .models import Settings as settings_db
 from .models import db
 
@@ -81,11 +81,11 @@ def create_app(config=None):
 
     # Start scheduler
     if bool(int(app.config["SVC_SCHEDULER"])):
-        launch_schedule()
+        launch_module("scheduler")
 
     # Start rsync
     if bool(int(app.config["SVC_RSYNC"])):
-        launch_rsync()
+        launch_module("rsync")
 
     @app.context_processor
     def inject_path_exists():
