@@ -59,6 +59,9 @@ RUN apk del build
 # Create folders
 RUN mkdir -p /app/media /app/h264 /app/macros /app/config /app/static/css
 
+# Install mandatory components
+RUN apk add --no-cache rsync
+
 ADD docker/raspimjpeg /etc/
 ADD --chmod=744 docker/macros/* /app/macros/
 ADD --chmod=744 docker/docker-entrypoint.sh /
