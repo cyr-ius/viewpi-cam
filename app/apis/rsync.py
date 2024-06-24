@@ -2,7 +2,6 @@
 
 from subprocess import PIPE, Popen
 
-from flask import current_app as ca
 from flask import request
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
@@ -41,8 +40,6 @@ class Rsync(Resource):
         settings = settting_db.query.first()
         settings.data.update(**api.payload)
         db.session.commit()
-        if loglevel := api.payload.get("loglevel"):
-            ca.logger.setLevel(loglevel)
         return "", 204
 
     @api.expect(rsync)
