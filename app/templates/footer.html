@@ -5,7 +5,7 @@
             <li class="nav-item"><a class="nav-link" href="http://www.raspberrypi.org/forums/viewtopic.php?f=43&amp;t=63276" target="_blank">Forum</a></li>
             <li class="nav-item"><a class="nav-link" href="http://elinux.org/RPi-Cam-Web-Interface" target="_blank">Wiki</a></li>
         </ul>
-        <div class="ms-auto me-1 d-none d-md-flex"><span id="check-update" class="fs-6 fw-lighter">ViewPi Cam  - {{_('Release')}} {{config.VERSION}}</span></div>
+        <div class="ms-auto me-1 d-none d-md-flex"><span id="check-update" class="fs-6 fw-lighter"></span></div>
         <div class="ms-auto me-1">
         {% include "theme_languages.html"%}
         </div>
@@ -15,20 +15,30 @@
 {% block scripts%}
 <script>
 $(function(){
-    let success = function(data){
-        sessionStorage.lastUpdateCheck = Date.now();
-        if (data && data.update_available == 1) {
-            sessionStorage.appVersion = data.app_version
-            $('#check-update').html(`{{_('New version detected, please restart to update to')}} ${sessionStorage.appVersion}`)
-        }
-    }
-
-    if (!sessionStorage.lastUpdateCheck || parseInt(sessionStorage.lastUpdateCheck) + 300000 < Date.now)
-        $.queryData({method:"get", url:"{{url_for('api.system_version')}}", success:success});
-
-    if (sessionStorage.appVersion && sessionStorage.appVersion != '{{config.VERSION}}')
-        $('#check-update').html(`{{_('New version detected, please restart to update to')}} ${sessionStorage.appVersion}`)
-
+ checkVersion();
 });
+function checkVersion() {
+    if (window.location.pathname == "/") {   
+        let success = function(data){
+            sessionStorage.update_available = data.update_available
+            if (data.update_available == 1) {
+                sessionStorage.version = data.app_version
+            } else {
+                sessionStorage.version = "{{config.VERSION}}";
+            }
+            displayVersion();
+        }
+        $.queryData({method:"get", url:"{{url_for('api.system_version')}}", success:success});
+    } else {
+        displayVersion();
+    }
+}
+function displayVersion(){
+    if (sessionStorage.update_available == 1){
+        $('#check-update').html(`{{_('New version detected, please restart to update to')}} ${sessionStorage.version}`)
+    } else {
+        $('#check-update').html("ViewPi Cam  - {{_('Release')}} {{config.VERSION}}");
+    }
+}
 </script>
 {% endblock%}
