@@ -29,6 +29,7 @@ from ..models import Scheduler as scheduler_db
 from ..models import Settings as settings_db
 from ..models import db
 from ..services.raspiconfig import RaspiConfigError
+from ..services.rsync import rsync
 
 bp = Blueprint(
     "schedule",
@@ -164,6 +165,8 @@ def scheduler() -> None:
             elif cmd == ca.config["SCHEDULE_UPDATE"]:
                 write_log("Encoding completed, update database")
                 update_img_db()
+                if settings.data.get("rs_enabled"):
+                    rsync()
             elif cmd != "":
                 write_log(f"Ignore FIFO char {cmd}")
 
