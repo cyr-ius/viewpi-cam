@@ -341,7 +341,7 @@ $('#users').on('click','.del_button', function() {
 $('#users').on('click','.otp_user', function() {
     let parent = $(this).parent().parent();
     let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-    $('#otpmodal').attr("aria-viewpicam-modal-id", data["id"])
+    $('#otpmodal').attr("data-viewpicam-modal-id", data["id"])
     otpModal.show();
 });
 

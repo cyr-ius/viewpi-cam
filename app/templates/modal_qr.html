@@ -39,8 +39,8 @@
 let otpModal = new bootstrap.Modal('#otpmodal');
 
 $(document).on('shown.bs.modal','#otpmodal',function(event){
-    let id = $(event.currentTarget).attr("aria-viewpicam-modal-id")
-    let status = $(event.currentTarget).attr("aria-viewpicam-modal-status")
+    let id = $(event.currentTarget).attr("data-viewpicam-modal-id")
+    let status = $(event.currentTarget).attr("data-viewpicam-modal-status")
     $('#userid').val(id);
 
     let success = function(data){
