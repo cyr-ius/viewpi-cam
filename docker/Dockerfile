@@ -12,7 +12,7 @@ RUN make -j`nproc`
 
 WORKDIR /app
 
-RUN git clone --branch 5.10.4 https://github.com/cyr-ius/userland.git userland
+RUN git clone --branch 5.10.5 https://github.com/cyr-ius/userland.git userland
 
 WORKDIR /app/userland
 RUN sed -i 's/sudo//g' buildme
