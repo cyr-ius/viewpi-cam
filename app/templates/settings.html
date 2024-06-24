@@ -196,7 +196,7 @@
             <div id="rsync" class="row g-1 ms-2 needs-validation">
                 <div class="col"><input class="form-control form-control-sm" name="rs_user" type="text" placeholder="{{_('User')}}" value="{{rsync.rs_user}}" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_pwd" type="password" placeholder="{{_('Password')}}" value="{{rsync.rs_pwd}}" required></div>
-                <div class="col"><input class="form-control form-control-sm" name="rs_direction" type="text" placeholder="{{_('Remote Folder')}}" value="{{rsync.rs_direction}}"></div>
+                <div class="col"><input class="form-control form-control-sm" name="rs_direction" type="text" placeholder="{{_('Remote Folder or Module')}}" value="{{rsync.rs_direction}}" required></div>
                 <div class="col">
                     <select class="form-select form-select-sm" name="rs_mode" required>
                         <option value="Module" {{ 'selected' if rsync.rs_mode == "Module" }}>Module</option>
@@ -204,7 +204,6 @@
                     </select>
                 </div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_remote_host" type="text" placeholder="{{_('Remote Host')}}" value="{{rsync.rs_remote_host}}" required></div>
-                <div class="col"><input class="form-control form-control-sm" name="rs_remote_module_name" type="text" placeholder="{{_('Remote module name')}}" value="{{rsync.rs_remote_module_name}}"></div>
                 <div class="col">
                     <select class="form-control form-control-sm selectpicker" name="rs_options" multiple data-multi-select data-style="" data-style-base="form-control">
                         <option value="-t" {{ 'selected' if "-t" in rsync.rs_options }}>Times</option>
@@ -418,12 +417,18 @@ $('#multiviews').on('change','.uchange', function(){
 });
 
 $('#rsync').on('click','.rsync_start', function(){
+
     let parent = $(this).parent().parent().parent();
     let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
     let success = function(data){
+        $('#rsync').removeClass('needs-validation was-validated');
         $.queryData({url:"{{url_for('api.rsync_start')}}", success:function(data){watchRsyncService();}})
     }
-    $.queryData({url:"{{url_for('api.rsync_rsync')}}",data:data, success:success});
+
+    let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
+    if (this.dispatchEvent(divsubmit))
+        $.queryData({url:"{{url_for('api.rsync_rsync')}}",data:data, success:success});
+
 });
 
 $('#rsync').on('click','.rsync_stop', function(){
