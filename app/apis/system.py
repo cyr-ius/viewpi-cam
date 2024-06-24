@@ -86,7 +86,8 @@ class Command(Resource):
                 if params := api.payload.get("params"):
                     params = " ".join(params)
                     ca.raspiconfig.send(f"{cmd} {params}")
-                ca.raspiconfig.send(f"{cmd}")
+                else:
+                    ca.raspiconfig.send(f"{cmd}")
                 return "", 204
             except RaspiConfigError as error:
                 abort(422, str(error))
