@@ -1,6 +1,5 @@
 """Blueprint Scheduler."""
 
-import time
 from subprocess import Popen
 
 from flask import Blueprint
@@ -27,7 +26,5 @@ def stop() -> None:
 def start() -> None:
     """Start rsync."""
     settings = settings_db.query.first()
-    poll_time = settings.data["cmd_poll"]
-    while True:
+    if settings.data.get("rs_enabled"):
         rsync()
-        time.sleep(poll_time * 1000)
