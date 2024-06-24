@@ -4,7 +4,8 @@ import glob
 import os
 import time
 
-from flask import Blueprint, Response, current_app, request
+from flask import Blueprint, Response, request
+from flask import current_app as ca
 from flask_login import login_required
 
 bp = Blueprint("camera", __name__, url_prefix="/cam")
@@ -23,7 +24,7 @@ def cam_pic():
 @bp.route("/cam_picLatestTL", methods=["GET"])
 @login_required
 def cam_pictl():
-    media_path = current_app.raspiconfig.media_path
+    media_path = ca.raspiconfig.media_path
     list_of_files = filter(os.path.isfile, glob.glob(media_path + "*"))
     list_of_files = sorted(list_of_files, key=lambda x: os.stat(x).st_ctime)
     last_element = list_of_files[-1]
@@ -34,7 +35,7 @@ def cam_pictl():
 @bp.route("/cam_get", methods=["GET"])
 @login_required
 def cam_get():
-    os.popen(f"touch {current_app.config.root_path}/status_mjpeg.txt")
+    os.popen(f"touch {ca.config.root_path}/status_mjpeg.txt")
     cam_jpg = _get_shm_cam()
     return Response(cam_jpg, headers={"Content-Type": "image/jpeg"})
 
@@ -43,7 +44,7 @@ def cam_get():
 @login_required
 def cam_pic_new():
     delay = float(request.args.get("delay", 100)) / 1000  # Unit (ms)
-    preview_path = current_app.raspiconfig.preview_path
+    preview_path = ca.raspiconfig.preview_path
     return Response(
         _gather_img(preview_path, delay),
         mimetype="multipart/x-mixed-replace; boundary=PIderman",
@@ -56,21 +57,19 @@ def status_mjpeg():
     """Return status_mjpeg."""
     file_content = ""
     for _ in range(0, 30):
-        with open(current_app.raspiconfig.status_file, encoding="utf-8") as file:
+        with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
             file_content = file.read()
             if file_content != request.args.get("last"):
                 break
             time.sleep(0.1)
             file.close()
-    os.popen(f"touch {current_app.raspiconfig.status_file}")
+    os.popen(f"touch {ca.raspiconfig.status_file}")
     return Response(file_content)
 
 
 def _get_shm_cam(preview_path=None):
     """Return binary data from cam.jpg."""
-    preview_path = (
-        current_app.raspiconfig.preview_path if preview_path is None else preview_path
-    )
+    preview_path = ca.raspiconfig.preview_path if preview_path is None else preview_path
 
     display_path = (
         preview_path
