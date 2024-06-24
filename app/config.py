@@ -86,7 +86,6 @@ TIME_FILTER_MAX = 8
 # Starts services
 SVC_RASPIMJPEG = os.getenv("SVC_RASPIMJPEG", "1")
 SVC_SCHEDULER = os.getenv("SVC_SCHEDULER", "1")
-SVC_RSYNC = os.getenv("SVC_RSYNC", "1")
 
 # API Swagger documentation
 SWAGGER_UI_DOC_EXPANSION = "list"
