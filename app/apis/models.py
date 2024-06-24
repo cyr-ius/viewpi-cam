@@ -167,12 +167,12 @@ setting = Model(
 rsync = Model(
     "Rsync",
     {
+        "rs_enabled": fields.String(required=True, default=False),
         "rs_user": fields.String(required=True, default=""),
         "rs_pwd": fields.String(required=True, default=""),
-        "rs_direction": fields.String(required=False, default=""),
+        "rs_direction": fields.String(required=True, default=""),
         "rs_mode": fields.String(required=True, default="Module"),
         "rs_remote_host": fields.String(required=True, default=""),
-        "rs_remote_module_name": fields.String(required=False, default=""),
         "rs_options": fields.List(fields.String(default=None), default=["-a","-z"]),
     },
 )
