@@ -1,5 +1,6 @@
 """Api camera."""
 
+import os
 import time
 
 from flask import current_app as ca
@@ -85,10 +86,12 @@ class StatusMjpeg(Resource):
     def get(self):
         """Get status."""
         file_content = ""
-        with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
-            file_content = file.read()
-            if file_content != request.args.get("last"):
-                return {"status": ""}
-            time.sleep(0.1)
-            file.close()
+        for _ in range(0, 30):
+            with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
+                file_content = file.read()
+                if file_content != request.args.get("last"):
+                    break
+                time.sleep(0.1)
+                file.close()
+        os.popen(f"touch {ca.raspiconfig.status_file}")
         return {"status": str(file_content)}
