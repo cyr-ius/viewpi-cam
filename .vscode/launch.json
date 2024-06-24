@@ -15,7 +15,6 @@
         "FLASK_ENV": "development",
         "SVC_RASPIMJPEG": "0",
         "SVC_SCHEDULER": "0",
-        "SVC_RSYNC": "0"
       },
       "args": ["run", "--no-debugger"],
       // "args": ["run", "--no-debugger", "--no-reload"],
