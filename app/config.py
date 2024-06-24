@@ -35,6 +35,7 @@ CAM_STRING = f"{SITE_NAME} {VERSION}: {CAM_NAME}@{HOSTNAME}"
 # File where default settings
 RASPI_CONFIG = "/etc/raspimjpeg"
 RASPI_BINARY = "/usr/bin/raspimjpeg"
+RSYNC_BINARY = "/usr/bin/rsync"
 MEDIA_FOLDER = "media"
 
 # Character used to flatten file paths
