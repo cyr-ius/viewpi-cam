@@ -194,6 +194,7 @@
         <div class="row">{{_('RSync')}}</div>
         <div class="row">
             <div id="rsync" class="row g-1 ms-2 needs-validation">
+                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input rsync_start" name="rs_enabled" type="checkbox" {{'checked' if rsync.rs_enabled}}></div></div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_user" type="text" placeholder="{{_('User')}}" value="{{rsync.rs_user}}" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_pwd" type="password" placeholder="{{_('Password')}}" value="{{rsync.rs_pwd}}" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_direction" type="text" placeholder="{{_('Remote Folder or Module')}}" value="{{rsync.rs_direction}}" required></div>
@@ -216,8 +217,6 @@
                         <option value="--delay-updates" {{ 'selected' if "--delay-updates" in rsync.rs_options }}> Delay Updates</option>
                     </select>
                 </div>                
-                <div class="col-auto"><button class="btn btn-sm btn-outline-success rsync_start" type="button" title="Start"><i class="bi bi-play-circle-fill"></i></button></div>         
-                <div class="col-auto d-none"><button class="btn btn-sm btn-outline-danger rsync_stop" type="button" title="Stop"><i class="bi bi-stop-circle-fill"></i></button></div>         
                 <div class="col-auto"><button class="btn btn-sm btn-outline-light rsync_reset" type="button" title="Reset settings"><i class="bi bi-arrow-repeat"></i></button></div>         
             </div>
         </div>
@@ -245,8 +244,6 @@ $(function(){
     $('#main').addClass("d-none");
     $('#settings').removeClass("d-none");
     $('#form_upload').attr('action','{{url_for("settings.restore")}}');
-    watchRsyncService();
-    setInterval('watchRsyncService();',10000);   
 });
 
 $('#upreset, #pilight, #pipan, #servo, #loglevel').unbind()
@@ -416,13 +413,12 @@ $('#multiviews').on('change','.uchange', function(){
     $.queryData({method:"put", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, data:data});
 });
 
-$('#rsync').on('click','.rsync_start', function(){
+$('#rsync').on('change','.rsync_start', function(){
 
     let parent = $(this).parent().parent().parent();
     let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
     let success = function(data){
         $('#rsync').removeClass('needs-validation was-validated');
-        $.queryData({url:"{{url_for('api.rsync_start')}}", success:function(data){watchRsyncService();}})
     }
 
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
@@ -431,14 +427,9 @@ $('#rsync').on('click','.rsync_start', function(){
 
 });
 
-$('#rsync').on('click','.rsync_stop', function(){
-    $.queryData({url:"{{url_for('api.rsync_stop')}}", success:function(data){watchRsyncService();}})
-});
-
 $('#rsync').on('click','.rsync_reset', function(){
     let parent = $(this).parent().parent().parent();
     let success = function(data){
-        $('.rsync_stop').trigger('click');
         $(parent).find('input, select, textarea').each(function(){
             $(this).val("");
         });
@@ -467,23 +458,6 @@ function copyToClipboard(element) {
     $temp.val($(element).val()).select();
     document.execCommand("copy");
     $temp.remove();
-}
-
-function watchRsyncService() {
-    $.queryData({
-        method: "get",
-        url:"{{url_for('api.rsync_status')}}", 
-        success:function(data){
-            $('.rsync_start').parent().addClass('d-none')            
-            $('.rsync_stop').parent().removeClass('d-none')
-        },
-        error:function(data){
-            $('.rsync_stop').parent().addClass('d-none')            
-            $('.rsync_start').parent().removeClass('d-none')
-        },
-        display_success:false,
-        display_error:false,
-    });
 }
 </script>
 {%endblock%}
