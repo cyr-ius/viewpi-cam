@@ -83,10 +83,6 @@ def create_app(config=None):
     if bool(int(app.config["SVC_SCHEDULER"])):
         launch_module("scheduler")
 
-    # Start rsync
-    if bool(int(app.config["SVC_RSYNC"])):
-        launch_module("rsync")
-
     @app.context_processor
     def inject_path_exists():
         def file_exists(path):
