@@ -14,9 +14,10 @@ def rsync() -> None:
     """Rsync execute."""
 
     write_log("Rsync support started")
-    settings = settings_db.query.first()
     media_path = ca.raspiconfig.media_path
     binary = ca.config["RSYNC_BINARY"]
+
+    settings = settings_db.query.first()
     options = settings.data.get("rs_options", [])
     pwd = settings.data.get("rs_pwd")
     mode = settings.data.get("rs_mode")
@@ -24,13 +25,8 @@ def rsync() -> None:
     host = settings.data.get("rs_remote_host")
     direction = settings.data.get("rs_direction")
 
-    if pwd is None:
-        write_log("[Rsync] Password not found", "error")
-        return False
-
     if not isinstance(options, list):
         options = [options]
-
     options = " ".join(options)
 
     if mode == "SSH":
@@ -61,11 +57,11 @@ def rsync() -> None:
         process.stderr.close()
         return_code = process.wait()
         if return_code > 0:
-            msg = f"[RSync] Error {return_code}"
+            msg = f"Rsync failed ({return_code})"
             print_msg(msg)
             write_log(msg, "error")
             return False
-        write_log("[RSync] Successful")
+        write_log("Rsync successful")
     return True
 
 
