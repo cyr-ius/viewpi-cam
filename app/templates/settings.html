@@ -147,25 +147,13 @@
         <hr class="mt-3">
         <div class="row">{{_('Macros')}}</div>
         <div id="macros" class="row">
-            {%for macro in config["MACROS"]%}
+            {%for macro in macros%}
             <div class="row g-1 ms-2 uchange">
-                <input type="hidden" name="name" value="{{macro|lower}}">
-                {% if macros[macro][:1] == "-" %}
-                    {% set value=macros[macro][1:] %}
-                    {% set checked="" %}
-                {%else%}
-                    {% set value=macros[macro] %}
-                    {% set checked="checked" %}
-                {%endif%}
-                <div class="col-auto">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" name="state" type="checkbox" {{checked}}>
-                    </div>
-                </div>
-
-                <div class="col">{{macro|replace("_", " ")}}</div>
-                <div class="col-6"><input class="form-control form-control-sm" type="text" name="command" value="{{value}}"></div>
-                <div class="col-auto"><button class="btn btn-sm btn-outline-secondary" type="button" onclick="send_macroUpdate({{loop.index0}},'{{macro}}');">{{_('Execute')}}</button></div>
+                <input type="hidden" name="name" value="{{macro.name|lower}}">
+                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="state" type="checkbox" {{'checked' if macro.state }}></div></div>
+                <div class="col">{{macro.name|replace("_", " ")}}</div>
+                <div class="col-6"><input class="form-control form-control-sm" type="text" name="command" value="{{macro.command}}"></div>
+                <div class="col-auto"><button class="btn btn-sm btn-outline-secondary" type="button" onclick="send_macroUpdate({{loop.index0}},'{{macro.name}}');">{{_('Execute')}}</button></div>
             </div>
             {%endfor%}
         </div>
@@ -175,7 +163,7 @@
             {%for multiview in multiviews%}
             <div id="multiviews-{{multiview.uid}}" class="row g-1 ms-2 uchange">
                 <input type="hidden" name="id" value="{{multiview.id}}">
-                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="state" type="checkbox" {% if multiview.state %}checked{%endif%}></div></div>
+                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="state" type="checkbox" {{ 'checked' if multiview.state }}></div></div>
                 <div class="col"><input class="form-control form-control-sm" name="url" type="url" value="{{multiview.url}}" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="delay" type="number" value="{{multiview.delay}}" required></div>
                 <div class="col-auto"><button class="btn btn-sm btn-danger del_button" type="button"><i class="bi bi-dash-square-fill"></i></button></div>
