@@ -62,7 +62,9 @@ def write_log(msg: str, level: str = "info") -> None:
 
     mode = "w" if not os.path.isfile(log_file) else "a"
     with open(log_file, mode=mode, encoding="utf-8") as file:
-        line = json.dumps({"datetime": str_now, "level": level, "msg": msg})
+        line = json.dumps(
+            {"datetime": str_now, "level": level.upper(), "msg": msg}, separators=(',', ':')
+        )
         file.write(line + "\n")
 
 
