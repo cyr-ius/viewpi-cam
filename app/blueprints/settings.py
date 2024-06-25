@@ -31,7 +31,7 @@ bp = Blueprint(
 @login_required
 @role_required("max")
 def index():
-    macros = Macros().get_config()
+    macros = Macros().get()
     settings = Sets().get()
     rsync = Rsync().get()
     users = Users.query.filter(Users.id > 0).all()
