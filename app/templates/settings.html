@@ -150,10 +150,10 @@
             {%for macro in macros%}
             <div class="row g-1 ms-2 uchange">
                 <input type="hidden" name="name" value="{{macro.name|lower}}">
-                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="state" type="checkbox" {{'checked' if macro.state }}></div></div>
+                <div class="col-auto"><div class="form-check form-switch"><input id="{{macro.name|lower}}_chk" class="form-check-input" name="state" type="checkbox" {{'checked' if macro.state }}></div></div>
                 <div class="col">{{macro.name|replace("_", " ")}}</div>
                 <div class="col-6"><input class="form-control form-control-sm" type="text" name="command" value="{{macro.command}}"></div>
-                <div class="col-auto"><button class="btn btn-sm btn-outline-secondary" type="button" onclick="send_macroUpdate({{loop.index0}},'{{macro.name}}');">{{_('Execute')}}</button></div>
+                <div class="col-auto"><button class="btn btn-sm btn-outline-secondary" type="button" onclick="send_macro({{loop.index0}},'{{macro.name}}');">{{_('Execute')}}</button></div>
             </div>
             {%endfor%}
         </div>
@@ -432,12 +432,11 @@ $('#macros').on('change','.uchange', function(){
     $.queryData({url:"{{url_for('api.settings_macros')}}", data:data});
 });
 
-function send_macroUpdate(i, macro) {
-    var macrovalue = $('#'+macro).val();
+function send_macro(i, macro) {
     if(! $("#"+macro+"_chk").prop("checked")) {
-        macrovalue = "-" + macrovalue;
+        let macro = "-" + macro;
     }
-    $.sendCmd({'cmd':'um', 'params':[i.toString(), macrovalue]})
+    $.sendCmd({'cmd':'um', 'params':[i.toString(), macro]})
 }
 
 function copyToClipboard(element) {
