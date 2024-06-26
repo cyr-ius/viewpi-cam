@@ -181,8 +181,8 @@
         <hr class="mt-3">
         <div class="row">{{_('RSync')}}</div>
         <div class="row">
-            <div id="rsync" class="row g-1 ms-2 needs-validation">
-                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input rsync_start" name="rs_enabled" type="checkbox" {{'checked' if rsync.rs_enabled}}></div></div>
+            <div id="rsync" class="row g-1 ms-2 needs-validation uchange">
+                <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="rs_enabled" type="checkbox" {{'checked' if rsync.rs_enabled}}></div></div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_user" type="text" placeholder="{{_('User')}}" value="{{rsync.rs_user}}" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_pwd" type="password" placeholder="{{_('Password')}}" value="{{rsync.rs_pwd}}" required></div>
                 <div class="col"><input class="form-control form-control-sm" name="rs_direction" type="text" placeholder="{{_('Remote Folder or Module')}}" value="{{rsync.rs_direction}}" required></div>
@@ -401,18 +401,14 @@ $('#multiviews').on('change','.uchange', function(){
     $.queryData({method:"put", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, data:data});
 });
 
-$('#rsync').on('change','.rsync_start', function(){
-
-    let parent = $(this).parent().parent().parent();
-    let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+$('#rsync').on('change','.uchange', function(){
+    let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
     let success = function(data){
         $('#rsync').removeClass('needs-validation was-validated');
     }
-
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
     if (this.dispatchEvent(divsubmit))
         $.queryData({url:"{{url_for('api.rsync_rsync')}}",data:data, success:success});
-
 });
 
 $('#rsync').on('click','.rsync_reset', function(){
