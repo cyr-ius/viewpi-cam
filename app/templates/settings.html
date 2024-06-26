@@ -426,15 +426,10 @@ $('#rsync').on('click','.rsync_reset', function(){
     $.queryData({method: "delete", url:"{{url_for('api.rsync_rsync')}}", data:data, success:success});
 });
 
-
 $('#macros').on('change','.uchange', function(){
     let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
     $.queryData({url:"{{url_for('api.settings_macros')}}", data:data});
 });
-
-function exec_macro(macro) {
-    $.sendCmd({'cmd':'sy', 'params': macro})
-}
 
 function copyToClipboard(element) {
     var $temp = $("<input>");
