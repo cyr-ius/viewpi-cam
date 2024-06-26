@@ -136,8 +136,9 @@ def get_file_duration(file: str) -> int:
     if get_file_ext(file) == "mp4" and os.path.isfile(info_file):
         with open(info_file, encoding="utf-8") as info:
             duration = info.readline().replace("\n", "")
-        duration = dt.strptime(duration, "%H:%M:%S.%f")
-        return duration.hour * 3600 + duration.minute * 60 + duration.second
+            if duration and duration != '':
+                duration = dt.strptime(duration, "%H:%M:%S.%f")
+                return duration.hour * 3600 + duration.minute * 60 + duration.second
     return 0
 
 
