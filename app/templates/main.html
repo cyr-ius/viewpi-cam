@@ -22,7 +22,7 @@
         <img id="mjpeg_dest"
             {% if raspiconfig.vector_preview == 1 %}style="width:{{raspiconfig.width}}px !important"{%endif%}
             {% if mode == 1 %}onclick="ontouchstart=pipan_start();" {%endif%}
-            class="img-fluid standard" onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.jpg') }}">
+            class="img-fluid standard" onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.png') }}">
     </div>
     <div id="main-buttons" class="row row-cols-sm-auto justify-content-center g-2 my-2 mx-auto {% if display_mode == "Off" %}d-none{%endif%}">
         {% if current_user.right >= config.USERLEVEL.medium%}
@@ -83,12 +83,7 @@ let time = new Date().getTime();
 
 $(function(){
     $('#main, #mainset').removeClass("d-none")
-    setTimeout('init({{mjpegmode}},{{raspiconfig.video_fps}}, {{raspiconfig.divider}});', 100);
-});
-
-$('#main-buttons button').unbind();
-$('#main-buttons button').click(function(){
-    $.sendCmd({'cmd':$(this).attr("aria-viewpicam-cmd"),'params':$(this).attr("aria-viewpicam-values")})
+    setTimeout('init({{mjpegmode}},{{raspiconfig.video_fps}},{{raspiconfig.divider}});', 100);
 });
 
 function hashHandler() {
@@ -137,7 +132,7 @@ function init(mjpeg, video_fps, divider) {
 }
 
 function reload_ajax (last) {
-    $.get("{{url_for('camera.status_mjpeg')}}?last=" + last,function(response){
+    let success = function(response){
         if(response == "ready") {
             setButtonState("video_button", false, "record video start", "ca",1);
             setButtonState("image_button", false, "record image", "im");
@@ -267,21 +262,22 @@ function reload_ajax (last) {
         }
         updatePreview();
         reload_ajax(response);
-    })
+    }
+    $.queryData({method:"get", url:`{{url_for('camera.status_mjpeg')}}?last=${last}`, success:success, display_success:false, display_error:false});
 }
 
 function setButtonState(btn_id, disabled, value, cmd, values) {
     let btn =$('#'+btn_id);
     btn.prop('disabled', disabled)
-    btn.attr("aria-viewpicam-cmd",cmd);
-    btn.attr("aria-viewpicam-values",values);
+    btn.attr("data-viewpicam-cmd",cmd);
+    btn.attr("data-viewpicam-values",values);
     btn.html(value);
 }
 
 function updatePreview(cycle) {
     if (mjpegmode) {
         if (cycle !== undefined && cycle == true) {
-            mjpeg_img.src = "{{ url_for('static', filename='img/updating.jpg') }}";
+            mjpeg_img.src = "{{ url_for('static', filename='img/updating.png') }}";
             setTimeout(`mjpeg_img.src="{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}";`, 1000);
             return;
         }
@@ -289,7 +285,7 @@ function updatePreview(cycle) {
             if(!halted) {
                 mjpeg_img.src = `{{ url_for('camera.cam_pic_new') }}?time=${time}&delay=${preview_delay}`;
             } else {
-                mjpeg_img.src = "{{ url_for('static', filename='img/unavailable.jpg') }}";
+                mjpeg_img.src = "{{ url_for('static', filename='img/unavailable.png') }}";
             }
         }
         previous_halted = halted;
@@ -365,12 +361,17 @@ function toggle_fullscreen(event) {
     }
 }
 
+$('#main-buttons button').unbind();
+$('#main-buttons button').click(function(){
+    $.sendCmd({'cmd':$(this).attr("data-viewpicam-cmd"),'params':$(this).attr("data-viewpicam-values")})
+});
+
 $('#toggle_stream').click(function(){
-  set_stream_mode(this.value);
+    set_stream_mode(this.value);
 });
 
 $('#display_mode').click(function(){
-  set_display(this.value);
+    set_display(this.value);
 });
 
 </script>

@@ -68,13 +68,13 @@ def status_mjpeg():
 
 
 def _get_shm_cam(preview_path=None):
-    """Return binary data from cam.jpg."""
+    """Return binary data from cam.png."""
     preview_path = ca.raspiconfig.preview_path if preview_path is None else preview_path
 
     display_path = (
         preview_path
         if os.path.isfile(preview_path)
-        else "app/resources/img/unavailable.jpg"
+        else "app/resources/img/unavailable.png"
     )
 
     with open(display_path, "rb") as file:
