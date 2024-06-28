@@ -106,7 +106,7 @@ def streamlog():
                         file.read()
                         first = False
                     yield f"data: {file.read()}\n\n"
-                    time.sleep(0.5)
+                    time.sleep(0.1)
 
     return Response(generate(log_file), mimetype="text/event-stream")
 

@@ -43,12 +43,15 @@ def get_logs(reverse: bool) -> list[str]:
     if os.path.isfile(log_file):
         with open(log_file, encoding="utf-8") as file:
             lines = file.readlines()
-            lines.sort(reverse=reverse)
-            for line in lines:
-                line = line.replace("\n", "")
-                try:
-                    line = json.loads(line)
-                except JSONDecodeError:
-                    pass
-                logs.append(line)
+            file.close()
+
+        for line in lines:
+            line = line.replace("\n", "")
+            try:
+                line = json.loads(line)
+            except JSONDecodeError:
+                pass
+            logs.append(line)
+
+        logs.reverse()
     return logs
