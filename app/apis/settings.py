@@ -128,9 +128,12 @@ class Macros(Resource):
     def post(self):
         """Set macro."""
         if api.payload:
-            name = api.payload["name"]
-            command = api.payload["command"]
+            for idx, name in enumerate(Macros().get_config().keys()):
+                if api.payload["name"] == name:
+                    break
+
+            cmd = api.payload["command"]
             if not api.payload["state"]:
-                command = f"-{command}"
-            ca.raspiconfig.set_config({name: command})
+                cmd = f"-{cmd}"
+            ca.raspiconfig.send(f'um {idx} {cmd}')
         return "", 204
