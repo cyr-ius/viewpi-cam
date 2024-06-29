@@ -263,7 +263,7 @@ function reload_ajax (last) {
         updatePreview();
         reload_ajax(response);
     }
-    $.queryData({method:"get", url:`{{url_for('camera.status_mjpeg')}}?last=${last}`, success:success, display_success:false, display_error:false});
+    $.queryData({method:"get", url:`{{url_for('camera.status_mjpeg')}}?last=${last}`, success:success, display_success:false, display_error:false, display_spinner:false});
 }
 
 function setButtonState(btn_id, disabled, value, cmd, values) {
