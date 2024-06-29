@@ -72,18 +72,18 @@ $(function(){
 		switch (event.keyCode) {
             case 39:
                 if (next) {
-                    load_preview(next);
+                    loadPreview(next);
                 }
                 break;
             case 37:
                 if (prev) {
-                    load_preview(prev);
+                    loadPreview(prev);
                 }
                 break;
 		}
 	};
-    update_list()
-    load_preview(preview_id);
+    updateList()
+    loadPreview(preview_id);
 });
 
 $('#time_filter, #show_types, #sort_order').on('change', function() {
@@ -100,8 +100,8 @@ $('#delete').on('click', function(){
         let success = function(data) {
             $('#hide-preview').trigger('click');
             $(`#${id}`).remove();
-            free_disk();
-            update_list();
+            freeDisk();
+            updateList();
         }
     
         $.queryData({method:"delete", url:"{{url_for('api.previews_thumb', id=0)}}".replace(0,id), success:success})
@@ -124,16 +124,15 @@ $('#selectAll').on('click', function(){
 });
 
 $('#deleteSel').on('click', function(){
+    let data_html = $('#thumbs input:checked').parent().parent().parent().parent()
     let data = $('#thumbs input').serializeObject()
     if (typeof data.thumb_id === 'string' || data.thumb_id instanceof String)
         data.thumb_id = [data.thumb_id]
     
     let success = function(data) { 
-        data.forEach(function(item){   
-            $(`#${item}`).remove();
-        });
-        free_disk();
-        update_list();
+        data_html.remove()
+        freeDisk();
+        updateList();
     };
 
     $.queryData({method:"delete", url:'{{url_for("api.previews_thumbs")}}', data:data, success:success})
@@ -223,8 +222,8 @@ $('#thumbs').on('click','button[name="delete"], #delete', function() {
         let id = $(this).val();
         let success = function(data) {
             $(`#${id}`).remove();
-            free_disk();
-            update_list();
+            freeDisk();
+            updateList();
         }
 
         $.queryData({method:"delete", url:"{{url_for('api.previews_thumb', id=0)}}".replace(0,id), success:success})
@@ -258,15 +257,15 @@ function preloadImage(url) {
     _img.src = url;
 }
 
-function search_media(id) {
+function searchMedia(id) {
     for (let item of thumbnails) {
         if (item.id == id)
             return item
     }
 }
 
-function load_preview(id) {
-    let info = search_media(id);
+function loadPreview(id) {
+    let info = searchMedia(id);
     if (typeof(info) == "undefined") {
         return;
     };
@@ -286,8 +285,8 @@ function load_preview(id) {
         prev = dataCarousel[imageIndex-1];
         $('#prev').prop('disabled', false);
         $('#prev').unbind();
-        $('#prev').click(function(){load_preview(prev);});
-        prev_info = search_media(prev)
+        $('#prev').click(function(){loadPreview(prev);});
+        prev_info = searchMedia(prev)
         if (fileExtension(imageFromThumbnail(prev_info.name)) == 'jpg') {
             preloadImage(mediaBase + imageFromThumbnail(prev_info.name));
         }
@@ -301,8 +300,8 @@ function load_preview(id) {
         next = dataCarousel[imageIndex+1];
         $('#next').prop('disabled', false);
         $('#next').unbind();
-        $('#next').click(function(){load_preview(next);});
-        next_info = search_media(next)
+        $('#next').click(function(){loadPreview(next);});
+        next_info = searchMedia(next)
         if (fileExtension(imageFromThumbnail(next_info.name)) == 'jpg') {
             preloadImage(mediaBase + imageFromThumbnail(next_info.name));
         }
@@ -330,11 +329,11 @@ function load_preview(id) {
 	}
 }
 
-function scroll_top() {
+function scrollTop() {
   $('main .container-fluid')[0].scrollTop=0
 }
 
-function free_disk(){
+function freeDisk(){
     let success = function(data) { 
         $(".progress-bar").css("width",data.prc+"%").css("background-color",data.color)
         $(".progress-bar span").html(`Percent: ${data.prc}%  Total: ${data.total} MB`)
@@ -342,7 +341,7 @@ function free_disk(){
     $.queryData({method:"get", url:`{{url_for('api.system_freespace')}}`, success:success})
 }
 
-function update_list(){
+function updateList(){
     dataCarousel = []
     thumbnails = []
     $("#thumbs").children().each(
