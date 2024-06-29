@@ -235,3 +235,10 @@ $.fn.serializeObject = function (options) {
     return obj;
   }, {});
 };
+
+$.fn.clearFields = function (options) {
+  this.find(":input")
+    .not(":button, :submit, :reset, :hidden, :checkbox, :radio")
+    .val("");
+  this.find(":checkbox, :radio").prop("checked", false);
+};
