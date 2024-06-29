@@ -48,7 +48,7 @@ js_colors = Bundle(
     output="js/colors.js",
 )
 
-js_custom = Bundle(
+js_library = Bundle(
     "../app/resources/js/jquery_utils.js",
     "../app/resources/js/utils.js",
     filters="jinja2,rjsmin",
