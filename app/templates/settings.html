@@ -401,9 +401,8 @@ $('#multiviews').on('change','.uchange', function(){
     $.queryData({method:"put", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, data:data});
 });
 
-$('#rsync').on('change','.uchange', function(){
-    let parent = $(this).parent().parent().parent();
-    let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
+$('#rsync').on('change', function(){
+    let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
     let success = function(data){
         $('#rsync').removeClass('needs-validation was-validated');
     }
@@ -415,9 +414,7 @@ $('#rsync').on('change','.uchange', function(){
 $('#rsync').on('click','.rsync_reset', function(){
     let parent = $(this).parent().parent().parent();
     let success = function(data){
-        $(parent).find('input, select, textarea').each(function(){
-            $(this).val("");
-        });
+        $(parent).clearFields();
     }
     let data = $(parent).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
     $.queryData({method: "delete", url:"{{url_for('api.rsync_rsync')}}", data:data, success:success});
