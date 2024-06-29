@@ -22,7 +22,7 @@
         <img id="mjpeg_dest"
             {% if raspiconfig.vector_preview == 1 %}style="width:{{raspiconfig.width}}px !important"{%endif%}
             {% if mode == 1 %}onclick="ontouchstart=pipan_start();" {%endif%}
-            class="img-fluid standard" onclick="toggle_fullscreen(this);" src="{{ url_for('static', filename='img/loading.png') }}">
+            class="img-fluid standard" onclick="toggleFullscreen(this);" src="{{ url_for('static', filename='img/loading.png') }}">
     </div>
     <div id="main-buttons" class="row row-cols-sm-auto justify-content-center g-2 my-2 mx-auto {% if display_mode == "Off" %}d-none{%endif%}">
         {% if current_user.right >= config.USERLEVEL.medium%}
@@ -91,26 +91,26 @@ function hashHandler() {
         case '#full':
         case '#fullscreen':
             if (mjpeg_img !== null && $(".fullscreen").length == 0) {
-                toggle_fullscreen(mjpeg_img);
+                toggleFullscreen(mjpeg_img);
             }
             break;
         case '#normal':
         case '#normalscreen':
             if (mjpeg_img !== null && $(".fullscreen").length != 0) {
-                toggle_fullscreen(mjpeg_img);
+                toggleFullscreen(mjpeg_img);
             }
             break;
     }
 }
 
-function reload_img () {
+function reloadImg () {
     let time = new Date().getTime()
     if(!halted) {
         mjpeg_img.src=`{{url_for('camera.cam_pic')}}?time=${time}&delay=${preview_delay}`;
-    } else { setTimeout("reload_img()", 500);}
+    } else { setTimeout("reloadImg()", 500);}
 }
 
-function error_img () {
+function errorImg () {
     let time = new Date().getTime()
     setTimeout(`mjpeg_img.src="{{url_for('camera.cam_pic')}}?time=${time}";`, 100);
 }
@@ -124,14 +124,14 @@ function init(mjpeg, video_fps, divider) {
         mjpegmode = 1;
     } else {
         mjpegmode = 0;
-        mjpeg_img.onload = reload_img;
-        mjpeg_img.onerror = error_img;
-        reload_img();
+        mjpeg_img.onload = reloadImg;
+        mjpeg_img.onerror = errorImg;
+        reloadImg();
     }
-    reload_ajax("");
+    reloadAjax("");
 }
 
-function reload_ajax (last) {
+function reloadAjax (last) {
     let success = function(response){
         if(response == "ready") {
             setButtonState("video_button", false, "record video start", "ca",1);
@@ -261,7 +261,7 @@ function reload_ajax (last) {
             alert("Error in RaspiMJPEG: " + response.substr(7) + "\nRestart ViewPI Cam or the whole RPi.");
         }
         updatePreview();
-        reload_ajax(response);
+        reloadAjax(response);
     }
     $.queryData({method:"get", url:`{{url_for('camera.status_mjpeg')}}?last=${last}`, success:success, display_success:false, display_error:false, display_spinner:false});
 }
@@ -292,7 +292,7 @@ function updatePreview(cycle) {
     }
 }
 
-function set_display(value) {
+function setDisplay(value) {
     let d = new Date();
     let val;
     d.setTime(d.getTime() + (365*24*60*60*1000));
@@ -310,7 +310,7 @@ function set_display(value) {
     document.cookie="display_mode=" + value + "; samesite=lax; " + expires;
 }
 
-function set_stream_mode(value) {
+function setStreamMode(value) {
     let d = new Date();
     d.setTime(d.getTime() + (365*24*60*60*1000));
     let expires = "expires="+d.toUTCString();
@@ -325,53 +325,16 @@ function set_stream_mode(value) {
     document.location.reload(true);
 }
 
-function openFullscreen() {
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { /* Safari */
-        elem.webkitRequestFullscreen();
-    }
-}
-
-function closeFullscreen() {
-    if (document.exitFullscreen) {
-        document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) { /* Safari */
-        document.webkitExitFullscreen();
-    }
-}
-
-function toggle_fullscreen(event) {
-    let background = document.getElementById("background");
-
-    if(!background) {
-        background = document.createElement("div");
-        background.id = "background";
-        document.body.appendChild(background);
-    }
-
-    if(event.className == "fullscreen") {
-        event.className = "img-fluid standard";
-        background.style.display = "none";
-        closeFullscreen();
-    } else {
-        event.className = "fullscreen";
-        background.style.display = "block";
-        openFullscreen();
-    }
-}
-
-$('#main-buttons button').unbind();
-$('#main-buttons button').click(function(){
+$('#main-buttons button').on('click', function(){
     $.sendCmd({'cmd':$(this).attr("data-viewpicam-cmd"),'params':$(this).attr("data-viewpicam-values")})
 });
 
-$('#toggle_stream').click(function(){
-    set_stream_mode(this.value);
+$('#toggle_stream').on('click', function(){
+    setStreamMode(this.value);
 });
 
-$('#display_mode').click(function(){
-    set_display(this.value);
+$('#display_mode').on('click',function(){
+    setDisplay(this.value);
 });
 
 </script>
