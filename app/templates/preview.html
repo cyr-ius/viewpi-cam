@@ -236,9 +236,11 @@ $('#thumbs').on('click','.lock', function() {
     let success = function(data){
         if (state) {
             curObj.children().removeClass('bi-lock').addClass('bi-unlock')
+            curObj.siblings().prop('disabled', '')
             curObj.removeClass("active")
         } else {
             curObj.children().addClass('bi-lock').removeClass('bi-unlock')
+            curObj.siblings().prop('disabled', 'disabled')
             curObj.addClass("active")
         }
     }
