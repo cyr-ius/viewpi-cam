@@ -61,8 +61,7 @@ $(document).on('hide.bs.modal','#otpmodal',function(event){
   $('#otp_svg, #otp_secret, #otp_btn, #otp_del_btn').hide();
 });
 
-$('#otp_btn').unbind();
-$('#otp_btn').click(function () {
+$('#otp_btn').on('click', function () {
   let data = $('#otpmodal').find('input, select').serializeObject();
   let success = function(data){
     $('#otp_svg, #otp_secret, #otp_btn, #otp_del_btn').hide()
@@ -71,8 +70,7 @@ $('#otp_btn').click(function () {
   $.queryData({method:"post", url:`{{ url_for('api.users_totp')}}/${data["id"]}`,data:data, "success":success});
 });
 
-$('#otp_del_btn').unbind();
-$('#otp_del_btn').click(function () {
+$('#otp_del_btn').on('click', function () {
   let data = $('#otpmodal').find('input, select').serializeObject();
   let success = function(data){
     $('#otp_svg, #otp_secret, #otp_btn, #otp_del_btn').hide()

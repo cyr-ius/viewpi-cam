@@ -13,7 +13,6 @@
   </ul>
 </div>
 <script>
-$('#language').unbind()
 $('#language').on('click', 'button', function(){
   let data = {"locale":$(this).val()}
   let success = function(data){setTimeout(location.reload(),100)}

@@ -103,25 +103,23 @@
 {% endblock %}
 {% block scripts %}
 <script>
-$('#restart_app, #restart, #shutdown, #reset').unbind();
-
-$('#restart_app').click(function(){
+$('#restart_app').on('click', function(){
   $.queryData({"url":"{{url_for('api.system_restart_app')}}"})
 });
 
-$('#restart').click(function(){
+$('#restart').on('click', function(){
   if(confirm('Are you sure to restart this host?')) {
     $.queryData({"url":"{{url_for('api.system_restart')}}"})
   }
 });
 
-$('#shutdown').click(function(){
+$('#shutdown').on('click', function(){
   if(confirm('Are you sure to shutdown this host?')) {
     $.queryData({"url":"{{url_for('api.system_shutdown')}}"})
   }
 });
 
-$('#reset').click(function(){
+$('#reset').on('click', function(){
   let success = function(e){setTimeout(function(){location.reload(true);}, 1000);}
   if(confirm('Are you sure to reset the settings to the default values?')) {
     $.sendCmd({cmd:"rs",params:"1",success:success})

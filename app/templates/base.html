@@ -23,7 +23,6 @@
         {% assets "js_main" -%}<script src="{{ ASSET_URL }}"></script>{%- endassets %}
         {% endblock %}
         <!-- Content -->
-        {# {% if config["DEBUG"] == True %}{% debug %}{%endif%} #}
         <!-- Header -->
         {%block header%}
         <header>
@@ -35,6 +34,7 @@
         <main>
             {% include "toast.html" %}
             {% block content %}{% endblock %}
+            {# {% if config["DEBUG"] == True %}<div class="container-fluid"><div class="row">{% debug %}</div></div>{%endif%}         #}
         </main>
         {% endblock %}
         {%block footer%}

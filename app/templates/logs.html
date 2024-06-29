@@ -17,8 +17,7 @@ $(function(){
     stream()
 });
 
-$('#downloadlog').unbind();
-$('#downloadlog').click(function(){
+$('#downloadlog').on('click', function(){
     let success = function(data, response, xhr){
         let disposition = xhr.getResponseHeader('Content-Disposition')
         let filename = disposition.split(/;(.+)/)[1].split(/=(.+)/)[1];
@@ -38,8 +37,7 @@ $('#downloadlog').click(function(){
     });
 });
 
-$('#clearlog').unbind();
-$('#clearlog').click(function(){
+$('#clearlog').on('click', function(){
     success = function(data) {location.reload();}
     $.queryData({method:"delete", url:'{{url_for('api.logs_content')}}', success: success})
 });

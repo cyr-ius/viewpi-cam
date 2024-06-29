@@ -22,8 +22,7 @@
     </div>
 </div>
 <script>
-$('#upload').unbind();
-$('#upload').click(function () {
+$('#upload').on('click', function () {
     if (!document.getElementById('form_upload').checkValidity()) {
         $("#form_upload").addClass('was-validated')
     } else {
