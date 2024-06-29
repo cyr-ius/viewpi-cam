@@ -205,7 +205,7 @@
                         <option value="--delay-updates" {{ 'selected' if "--delay-updates" in rsync.rs_options }}> Delay Updates</option>
                     </select>
                 </div>                
-                <div class="col-auto"><button class="btn btn-sm btn-outline-light rsync_reset" type="button" title="Reset settings"><i class="bi bi-arrow-repeat"></i></button></div>         
+                <div class="col-auto"><button class="btn btn-sm btn-outline-light reset" type="button" title="Reset settings"><i class="bi bi-arrow-repeat"></i></button></div>         
             </div>
         </div>
         <hr class="mt-3">
@@ -405,7 +405,7 @@ $('#rsync').on('change', function(){
         $.queryData({url:"{{url_for('api.rsync_rsync')}}",data:data, success:success});
 });
 
-$('#rsync').on('click','.rsync_reset', function(){
+$('#rsync').on('click','.reset', function(){
     let parent = $(this).parent().parent().parent();
     let success = function(data){
         $(parent).clearFields();
