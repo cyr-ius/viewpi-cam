@@ -100,8 +100,6 @@
     </div>
   </div>    
 </nav>
-{% endblock %}
-{% block scripts %}
 <script>
 $('#restart_app').on('click', function(){
   $.queryData({"url":"{{url_for('api.system_restart_app')}}"})
@@ -126,4 +124,4 @@ $('#reset').on('click', function(){
   }
 });
 </script>
-{%endblock%}
+{% endblock navbar %}

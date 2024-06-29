@@ -148,8 +148,6 @@
     {%endif%}
 </div>
 {% include "modal_upload.html"%}
-{%endblock%}
-{% block scripts %}
 <script>
 $(function(){
     $('#form_upload').attr('action','{{url_for("motion.action",action="restore")}}')
@@ -181,4 +179,4 @@ $('#backup').on('click',function(){
     $.queryData({method: "post", url:"{{url_for('motion.action', action='backup')}}", success: success, xhrFields: {responseType: 'blob'}});
 });
 </script>
-{%endblock%}
+{% endblock motion_external %}
