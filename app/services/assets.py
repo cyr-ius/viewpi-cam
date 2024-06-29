@@ -5,7 +5,9 @@ from flask_assets import Bundle
 
 def clean_map(_in, out, **kw):
     out.write(
-        _in.read().replace("//# sourceMappingURL=bootstrap.bundle.min.js.map", "")
+        _in.read()
+        .replace("//# sourceMappingURL=bootstrap.bundle.min.js.map", "")
+        .replace("//# sourceMappingURL=bootstrap-select.min.js.map", "")
     )
 
 
@@ -47,5 +49,8 @@ js_colors = Bundle(
 )
 
 js_custom = Bundle(
-    "../app/resources/js/custom.js", filters="jinja2,rjsmin", output="js/custom.js"
+    "../app/resources/js/jquery_utils.js",
+    "../app/resources/js/utils.js",
+    filters="jinja2,rjsmin",
+    output="js/library.js",
 )
