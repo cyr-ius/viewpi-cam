@@ -40,7 +40,7 @@
         {% if current_user.right >= config.USERLEVEL.max %}
         {% set action="start" if schedule_pid == 0  else "stop"%}
         <div class="row row-cols-1 row-cols-md-auto g-2 d-none" id="schedule">
-            <button id="sch_save" class="btn btn-sm btn-outline-secondary me-md-1" type="button">{{ _('Save Settings')}}</button>
+            <button id="save" class="btn btn-sm btn-outline-secondary me-md-1" type="button">{{ _('Save Settings')}}</button>
             <button id="{{action}}" class="btn btn-sm btn-outline-secondary me-md-1 stopstart" type="button">{{action|capitalize}}</button>
         </div>
         {%endif%}

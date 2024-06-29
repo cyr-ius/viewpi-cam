@@ -8,7 +8,7 @@
             <span class="col">{{_('Time Offset')}}: <b>{{offset}}</b></span>
             <span class="col">{{_('Sunrise')}}: <b>{{sunrise}}</b></span>
             <span class="col">{{_('Sunset')}}: <b>{{sunset}}</b></span>
-            <span class="col">{{_('Current')}}: <b>{{current_time}}</b></span>
+            <span id="current_time" class="col">{{_('Current')}}: <b>{{current_time}}</b></span>
             <span id="period" class="col" style="text-transform: capitalize;">{{_('Period')}}: <b>{{period}}</b></span>
         </div>        
         <form id="form_setting" class="row needs-validation">
@@ -202,21 +202,13 @@
 {{ super() }}
 <script>
 $(function(){
-    $("#main").addClass("d-none")
-    $("#schedule").removeClass("d-none")
-
-    let daymode = parseInt($("#daymode").val());
-    let success = function(data) {
-        let period = data["period"]       
-        $('#period').html(`Period: <b>${period}</b>`)
-        let line = $("#period_scheduler").find(`[data-time="${period}"]`)
-        $(line).css("background-color","LightGreen").css("color","black")
-    }
-    $.queryData({url:"{{ url_for('api.schedule_period')}}", data: {"daymode": daymode}, success:success})    
+    $("#main").addClass("d-none");
+    $("#schedule").removeClass("d-none");
+    daymodeControl();
+    setInterval(updateDateTime, 1000);
 })
-
-$('#sch_save').unbind();    
-$('#sch_save').click(function(){
+  
+$('#schedule').on('click', '#save', function(){
     if (!document.getElementById('form_setting').checkValidity()) {
         $("#form_setting").addClass('was-validated')
     } else {
@@ -277,11 +269,38 @@ $('#schedule').on('click','#stop', function(){
     $.queryData({url:"{{ url_for('api.schedule_stop')}}", success: success})
 });
 
-$('#daymode').unbind();
-$('#daymode').change(function(){
+$('#form_setting').on('change','#daymode', function(){
     let data = {"daymode": parseInt($("#daymode").val())}
-    let success = function(e){ location.reload(true); }
+    let success = function(){ location.reload(true); }
     $.queryData({method:"put", url:"{{ url_for('api.schedule_settings')}}", data: data, success: success})
 });
+
+function daymodeControl(){
+    // Check day mode and display
+    let success = function(data) {
+        let period = data["period"]       
+        $('#period').html(`Period: <b>${period}</b>`)
+        let line = $("#period_scheduler").find(`[data-time="${period}"]`)
+        $(line).css("background-color","LightGreen").css("color","black")
+    }
+    let daymode = parseInt($("#daymode").val());    
+    $.queryData({url:"{{ url_for('api.schedule_period')}}", data: {"daymode": daymode}, success:success})    
+}
+
+function updateDateTime() {
+
+    function checkTime(i) {
+         // add zero in front of numbers < 10
+        if (i < 10) {i = "0" + i}; 
+        return i;
+    }
+
+    const now = new Date();
+    let h = now.getHours();
+    let m = checkTime(now.getMinutes());
+    const currentDateTime = h + ":" + m;
+    $('#current_time').html(`{{_('Current')}}: <b>${currentDateTime}</b>`);
+}
+
 </script>
 {% endblock%}
