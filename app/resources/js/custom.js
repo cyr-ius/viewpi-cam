@@ -85,6 +85,7 @@ $.queryData = function (options) {
       xhrFields: null,
       display_success: true,
       display_error: true,
+      display_spinner: true,
     },
     options || {},
   );
@@ -99,7 +100,7 @@ $.queryData = function (options) {
     contentType: "application/json; charset=utf-8",
     xhrFields: o.xhrFields,
     beforeSend: function (data) {
-      $.spinner({ status: true });
+      if (o.display_spinner) $.spinner({ status: true });
     },
     success: function (data, response, xhr) {
       $.spinner({ status: false });
