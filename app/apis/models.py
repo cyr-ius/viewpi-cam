@@ -86,7 +86,13 @@ files = Model(
         "uri": PathURI(attribute="name", example="string"),
     },
 )
-
+lock_mode = Model(
+    "LockMode",
+    {
+        "mode": fields.Boolean(required=True, description="Locked is true"),
+        "ids": fields.List(fields.String()),
+    },
+)
 macros = Model(
     "Macros",
     {
@@ -161,7 +167,7 @@ setting = Model(
             required=False,
             description="Log level",
             enum=["INFO", "WARNING", "ERROR", "DEBUG"],
-        )
+        ),
     },
 )
 rsync = Model(
@@ -173,7 +179,7 @@ rsync = Model(
         "rs_direction": fields.String(required=True, default=""),
         "rs_mode": fields.String(required=True, default="Module"),
         "rs_remote_host": fields.String(required=True, default=""),
-        "rs_options": fields.List(fields.String(default=None), default=["-a","-z"]),
+        "rs_options": fields.List(fields.String(default=None), default=["-a", "-z"]),
     },
 )
 locale = Model("Locale", {"locale": fields.String(enumerate=LOCALES)})

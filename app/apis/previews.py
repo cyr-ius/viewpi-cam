@@ -10,7 +10,7 @@ from ..helpers.decorator import role_required
 from ..helpers.filer import delete_mediafiles, maintain_folders
 from ..models import Files as files_db
 from ..models import db
-from .models import deletes, files, message
+from .models import deletes, files, lock_mode, message
 
 api = Namespace(
     "previews",
@@ -19,9 +19,10 @@ api = Namespace(
 )
 api.add_model("Files", files)
 api.add_model("Deletes", deletes)
+api.add_model("LockMode", lock_mode)
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/")
 class Thumbs(Resource):
     """Previews."""
@@ -58,7 +59,7 @@ class Thumbs(Resource):
 
 
 @api.route("/<string:id>")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 class Thumb(Resource):
     """Preview."""
 
@@ -69,7 +70,6 @@ class Thumb(Resource):
 
     @api.doc(description="Delete file")
     @api.response(204, "Success")
-    @api.response(404, "Not found", message)
     @api.response(422, "Error", message)
     def delete(self, id: str):
         """Delete file."""
@@ -79,13 +79,32 @@ class Thumb(Resource):
             delete_mediafiles(thumb.name)
             maintain_folders(ca.raspiconfig.media_path, False, False)
             return "", 204
-        abort(404, "Thumb not found")
+        abort(422, "Thumb not found")
+
+
+@api.route("/lock_mode")
+@api.response(204, "Success")
+@api.response(401, "Unauthorized")
+class LockMode(Resource):
+    """Lock Mode."""
+
+    @api.expect(lock_mode)
+    def post(self):
+        """Lock Mode."""
+        ids = self.api.payload["ids"]
+        mode = self.api.payload["mode"] is True
+        ids = [ids] if isinstance(ids, str) else ids
+        for id in ids:
+            if thumb := files_db.query.get(id):
+                thumb.locked = mode
+                db.session.commit()
+        return "", 204
 
 
 @api.route("/<string:id>/lock")
 @api.response(204, "Success")
-@api.response(401, "Unauthorized", message)
-@api.response(404, "Not found", message)
+@api.response(401, "Unauthorized")
+@api.response(422, "Error", message)
 class Lock(Resource):
     """Lock file."""
 
@@ -97,13 +116,13 @@ class Lock(Resource):
                 db.session.commit()
                 return "", 204
             return "Thumb is already locked", 204
-        abort(404, f"Thumb not found ({id})")
+        abort(422, f"Thumb not found ({id})")
 
 
 @api.route("/<string:id>/unlock")
 @api.response(204, "Success")
-@api.response(401, "Unauthorized", message)
-@api.response(404, "Not found", message)
+@api.response(401, "Unauthorized")
+@api.response(422, "Error", message)
 class Unlock(Resource):
     """Unock file."""
 
@@ -115,13 +134,13 @@ class Unlock(Resource):
                 db.session.commit()
                 return "", 204
             return "Thumb is already unlocked", 204
-        abort(404, f"Thumb not found ({id})")
+        abort(422, f"Thumb not found ({id})")
 
 
 @api.route("/<string:id>/convert")
 @api.response(204, "Success")
-@api.response(401, "Unauthorized", message)
-@api.response(404, "Not found", message)
+@api.response(401, "Unauthorized")
+@api.response(422, "Error", message)
 class Convert(Resource):
     """Convert timelapse file to mp4."""
 
@@ -130,4 +149,4 @@ class Convert(Resource):
         if thumb := files_db.query.get(id):
             video_convert(thumb.name)
             return "", 204
-        abort(404, "Thumb not found")
+        abort(422, "Thumb not found")

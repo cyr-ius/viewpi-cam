@@ -10,7 +10,7 @@
         </a>
         <div class="card-img-overlay" style="height:5px;">
             <i class="float-start {{icon}}" style="font-size: 16px;color: white;"></i>
-            <i id="icon_lock" class="float-start bi bi-lock-fill {{'d-none' if not thumb.locked}}" style="font-size: 16px;color: rgb(209, 182, 28);position: absolute;right: 5px;"></i>
+            {# <i id="icon_lock" class="float-start bi bi-lock-fill {{'d-none' if not thumb.locked}}" style="font-size: 16px;color: rgb(209, 182, 28);position: absolute;right: 5px;"></i> #}
         </div>
         <div class="card-body">
             <div class="form-check form-switch">
@@ -18,7 +18,10 @@
                 <label class="form-check-label" for="{{thumb.id}}">{{thumb.datetime}}</label>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-2">
-                <button class="btn btn-outline-danger btn-sm" type="button" name="delete" value="{{thumb.id}}" {{'disabled' if thumb.locked}}><i class="bi bi-trash"></i></button>
+                <div>
+                    <button style="--bs-btn-font-size: .60rem;" class="btn btn-outline-danger delete" type="button" value="{{thumb.id}}" {{'disabled' if thumb.locked}}><i class="bi bi-trash"></i></button>
+                    <button style="--bs-btn-font-size: .60rem;" class="btn btn-outline-warning lock {{'active' if thumb.locked}}" type="button"><i class="bi {{'bi-lock' if thumb.locked else 'bi-unlock'}}"></i></button>
+                </div>
                 <small class="text-body-secondary">{{size}} {{thumb.lapse_count if thumb.lapse_count > 0}} {{thumb.duration~'s' if thumb.duration >0 }}</small>
             </div>
         </div>
