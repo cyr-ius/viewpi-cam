@@ -16,6 +16,7 @@
 <script>
 $(function(){
  checkVersion();
+ displayFlashMessage();
 });
 function checkVersion() {
     if (window.location.pathname == "/") {   
@@ -39,6 +40,12 @@ function displayVersion(){
     } else {
         $('#check-update').html("ViewPi Cam  - {{_('Release')}} {{config.VERSION}}");
     }
+}
+function displayFlashMessage(){
+    const msgs = Array({% for category, message in get_flashed_messages(with_categories=true) %}{"category":"{{category}}","message":"{{message}}"},{% endfor%});
+    msgs.forEach(function(item){ 
+        $.msgToToast({category:"success", msg:item.message})
+    });
 }
 </script>
 {% endblock%}
