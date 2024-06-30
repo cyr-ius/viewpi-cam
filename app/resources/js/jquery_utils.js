@@ -47,6 +47,7 @@ const callback = function (mutationsList, observer) {
         $(this).toast("show");
         $(this).on("hide.bs.toast", function () {
           $(this).find(".toast-body").html("");
+          $(this).removeClass("text-bg-primary text-bg-warning text-bg-danger");
         });
       });
     }
@@ -56,8 +57,8 @@ const callback = function (mutationsList, observer) {
 // Create an observer instance linked to the callback function
 // Options for the observer (which mutations to observe)
 const targetNode = document.getElementById("toast");
-const observer = new MutationObserver(callback);
 const config = { attributes: true, childList: true, subtree: true };
+const observer = new MutationObserver(callback);
 // Start observing the target node for configured mutations
 observer.observe(targetNode, config);
 
@@ -103,7 +104,6 @@ $.queryData = function (options) {
       if (o.display_spinner) $.spinner({ status: true });
     },
     success: function (data, response, xhr) {
-      $.spinner({ status: false });
       if (o.display_error) {
         $("#toast").addClass("text-bg-primary");
         if (data && data.responseJSON)
@@ -112,14 +112,16 @@ $.queryData = function (options) {
       if (o.success) return o.success(data, response, xhr);
     },
     error: function (data, response, xhr) {
-      $.spinner({ status: false });
       if (o.display_error) {
-        $("#toast").removeClass("text-bg-primary").addClass("text-bg-danger");
+        $("#toast").addClass("text-bg-danger");
         $("#toast .toast-body").html(data.status + " - " + data["message"]);
         if (data.responseJSON)
           $("#toast .toast-body").html(data.responseJSON["message"]);
       }
       if (o.error) return o.error(data, response, xhr);
+    },
+    complete: function (xhr, status) {
+      $.spinner({ status: false });
     },
   });
 };
