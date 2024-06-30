@@ -21,7 +21,7 @@ from flask_login import current_user, login_required
 
 from ..apis.logs import get_logs
 from ..helpers.decorator import role_required
-from ..helpers.motion import MotionError, check_motion, get_motion
+from ..helpers.motion import MotionError, is_motion, get_motion
 from ..helpers.utils import allowed_file, write_log
 from ..models import Multiviews as multiviews_db
 from ..models import Presets as presets_db
@@ -57,7 +57,7 @@ def index():
         mode = 2
 
     motionconfig = None
-    if check_motion():
+    if is_motion():
         try:
             motionconfig = get_motion()
         except MotionError:
