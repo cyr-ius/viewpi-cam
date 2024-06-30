@@ -21,7 +21,7 @@ api.add_model("Secret", secret)
 @api.response(404, "Not found", message)
 @api.route("/<int:id>")
 class Totp(Resource):
-    """TOTP."""
+    """One Time Password."""
 
     @api.marshal_with(otp)
     @api.response(200, "Success")
