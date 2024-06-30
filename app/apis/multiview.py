@@ -17,7 +17,7 @@ api.add_model("Multiview", multiview)
 api.add_model("Multiviews", multiviews)
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/")
 class Multiviews(Resource):
     """List hosts."""
@@ -28,18 +28,17 @@ class Multiviews(Resource):
         return multiviews_db.query.all()
 
     @api.expect(multiview)
-    @api.marshal_with(multiviews)
+    @api.marshal_with(multiviews, code=201)
     def post(self):
         """Create host."""
         api.payload.pop("id", None)
         multiview = multiviews_db(**api.payload)
         db.session.add(multiview)
         db.session.commit()
-        return multiview
+        return multiview, 201
 
 
-@api.response(401, "Unauthorized", message)
-@api.response(404, "NotFound", message)
+@api.response(401, "Unauthorized")
 @api.route("/<int:id>")
 class Multiview(Resource):
     """Multiview object."""
@@ -50,8 +49,8 @@ class Multiview(Resource):
         return db.get_or_404(multiviews_db, id)
 
     @api.response(204, "Success")
+    @api.response(404, "NotFound", message)
     @api.expect(multiviews)
-    @api.marshal_with(multiview)
     def put(self, id: int):
         """Set multiview."""
         if multiview := db.get_or_404(multiviews_db, id):
@@ -61,6 +60,7 @@ class Multiview(Resource):
         abort(404, "Host not found")
 
     @api.response(204, "Success")
+    @api.response(404, "NotFound", message)
     def delete(self, id: int):
         """Delete multiview."""
         if multiview := db.get_or_404(multiviews_db, id):

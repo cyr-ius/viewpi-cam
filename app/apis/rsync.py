@@ -33,7 +33,6 @@ class Rsync(Resource):
         return settings.data
 
     @api.expect(rsync)
-    @api.marshal_with(rsync)
     @api.response(204, "Success")
     def post(self):
         """Set settings."""
@@ -51,15 +50,14 @@ class Rsync(Resource):
         return "", 204
 
 
-@api.route("/stop", endpoint="rsync_stop")
-@api.route("/start", endpoint="rsync_start")
+@api.route("/stop", endpoint="rsync_stop", doc={"description": "Stop rsync"})
+@api.route("/start", endpoint="rsync_start", doc={"description": "Start rsync"})
 @api.response(204, "Success")
 @api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 class Actions(Resource):
     """Actions."""
 
-    @api.marshal_with(message)
     def post(self):
         """Post action."""
         match request.endpoint:
@@ -79,18 +77,3 @@ class Actions(Resource):
                 except ViewPiCamException as error:
                     return abort(422, error)
                 return "", 204
-        abort(422, "Action not found")
-
-
-@api.route("/status")
-@api.response(204, "Service started")
-@api.response(401, "Unauthorized")
-@api.response(404, "Service stopped", message)
-class Status(Resource):
-    """Status."""
-
-    def get(self):
-        """Get rsync status."""
-        if get_pid(["*/flask", "rsync"]) != 0:
-            return "", 204
-        abort(404, "Rsync stopped")

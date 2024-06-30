@@ -9,17 +9,19 @@ from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.utils import delete_log
-from .models import message
+from .models import log, message
 
 api = Namespace("logs", description="Log management", decorators=[login_required])
+api.add_model("Log", log)
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/")
 class Content(Resource):
     """Get log."""
 
     @api.param("reverse", description="Ordering display (True|False)", _in="query")
+    @api.marshal_with(log, as_list=True)
     def get(self):
         """List log."""
         reverse = request.args.get("reverse", True) is True

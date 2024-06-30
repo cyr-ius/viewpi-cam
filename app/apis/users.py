@@ -1,15 +1,15 @@
 """Blueprint Users API."""
 
-from flask import current_app as ca
 from flask_login import login_required
-from flask_restx import Namespace, Resource, abort
+from flask_restx import Namespace, Resource, abort, fields
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
 
+from ..config import LOCALES
 from ..helpers.decorator import role_required
 from ..models import Users as users_db
 from ..models import db
-from .models import api_token, cam_token, locale, message, user, users
+from .models import api_token, cam_token, message, user, users
 
 api = Namespace(
     "users",
@@ -18,12 +18,11 @@ api = Namespace(
 )
 api.add_model("User", user)
 api.add_model("Users", users)
-api.add_model("Locale", locale)
 api.add_model("CamToken", cam_token)
 api.add_model("APIToken", api_token)
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/")
 class Users(Resource):
     """List users."""
@@ -34,7 +33,7 @@ class Users(Resource):
         return users_db.query.filter(users_db.id > 0).all()
 
     @api.expect(user)
-    @api.marshal_with(users)
+    @api.marshal_with(users, code=201)
     @api.response(422, "Error", message)
     def post(self):
         """Create user."""
@@ -44,12 +43,12 @@ class Users(Resource):
             api.payload["secret"] = generate_password_hash(password)
             user = users_db(**api.payload)
             user.create_user()
-            return user
+            return user, 201
         except IntegrityError:
             abort(422, "User name is already exists, please change.")
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/<int:id>")
 class User(Resource):
     """User object."""
@@ -64,7 +63,6 @@ class User(Resource):
         return db.get_or_404(users_db, id)
 
     @api.expect(user)
-    @api.marshal_with(user)
     @api.response(204, "Success")
     @api.response(403, "Forbidden", message)
     @api.response(404, "Not found", message)
@@ -95,26 +93,15 @@ class User(Resource):
         abort(404, "User not found")
 
 
-@api.response(401, "Unauthorized", message)
-@api.route("/locales")
-class Locales(Resource):
-    """Language for user."""
-
-    def get(self):
-        """Get all languages."""
-        return {"locales": ca.config["LOCALES"]}
-
-
 @api.response(204, "Success")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.response(403, "Forbidden", message)
 @api.response(404, "Not found", message)
 @api.route("/<int:id>/locale")
 class Locale(Resource):
     """Language for user."""
 
-    @api.expect(locale)
-    @api.marshal_with(user)
+    @api.expect(api.model("Resource", {"locale": fields.String(enum=LOCALES)}))
     def put(self, id: int):
         """Set language."""
         if id == 0:
@@ -127,7 +114,7 @@ class Locale(Resource):
         abort(404, "User not found")
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/ctoken")
 class Token(Resource):
     """Token."""
@@ -138,12 +125,12 @@ class Token(Resource):
         user = users_db.query.get(0)
         return {"cam_token": user.cam_token}
 
-    @api.marshal_with(cam_token)
+    @api.marshal_with(cam_token, code=201)
     def post(self):
         """Create token."""
         user = users_db.query.get(0)
         cam_token = user.set_camera_token()
-        return {"cam_token": cam_token}
+        return {"cam_token": cam_token}, 201
 
     @api.response(204, "Success")
     def delete(self):
@@ -165,12 +152,12 @@ class APIToken(Resource):
         api_token = user.set_api_token()
         return {"api_token": api_token}
 
-    @api.marshal_with(api_token)
+    @api.marshal_with(api_token, code=201)
     def post(self):
         """Create token."""
         user = users_db.query.get(0)
         api_token = user.set_api_token()
-        return {"api_token": api_token}
+        return {"api_token": api_token}, 201
 
     @api.response(204, "Success")
     def delete(self):

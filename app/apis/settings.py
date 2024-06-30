@@ -7,7 +7,7 @@ from flask_restx import Namespace, Resource, abort
 from ..helpers.decorator import role_required
 from ..models import Settings as settting_db
 from ..models import Ubuttons, db
-from .models import button, buttons, macros, message, setting
+from .models import button, buttons, macro, message, setting
 
 api = Namespace(
     "settings",
@@ -15,12 +15,12 @@ api = Namespace(
     decorators=[role_required("max"), login_required],
 )
 api.add_model("Set", setting)
-api.add_model("Macros", macros)
+api.add_model("Macro", macro)
 api.add_model("Button", button)
 api.add_model("Buttons", buttons)
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/")
 class Sets(Resource):
     """Settings."""
@@ -32,7 +32,6 @@ class Sets(Resource):
         return settings.data
 
     @api.expect(setting)
-    @api.marshal_with(setting)
     @api.response(204, "Success")
     def post(self):
         """Set settings."""
@@ -45,7 +44,7 @@ class Sets(Resource):
         return "", 204
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/buttons")
 class Buttons(Resource):
     """List buttons."""
@@ -56,17 +55,17 @@ class Buttons(Resource):
         return Ubuttons.query.all()
 
     @api.expect(button)
-    @api.marshal_with(buttons)
+    @api.marshal_with(buttons, code=201)
     def post(self):
         """Create button."""
         api.payload.pop("id", None)
         ubutton = Ubuttons(**api.payload)
         db.session.add(ubutton)
         db.session.commit()
-        return ubutton
+        return ubutton, 201
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/buttons/<int:id>")
 class Button(Resource):
     """Button object."""
@@ -78,7 +77,6 @@ class Button(Resource):
         return db.get_or_404(Ubuttons, id)
 
     @api.expect(button)
-    @api.marshal_with(button)
     @api.response(204, "Success")
     @api.response(404, "Not found", message)
     def put(self, id: int):
@@ -100,7 +98,7 @@ class Button(Resource):
         abort(404, "Button not found")
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.route("/macros")
 class Macros(Resource):
     """Macros."""
@@ -110,7 +108,7 @@ class Macros(Resource):
         """Return config."""
         return {item: getattr(ca.raspiconfig, item) for item in ca.config["MACROS"]}
 
-    @api.marshal_with(macros, as_list=True)
+    @api.marshal_with(macro, as_list=True)
     def get(self):
         """Get macros."""
         list_macros = []
@@ -122,8 +120,7 @@ class Macros(Resource):
             list_macros.append({"name": key, "command": value, "state": state})
         return list_macros
 
-    @api.expect(macros)
-    @api.marshal_with(macros)
+    @api.expect(macro)
     @api.response(204, "Success")
     def post(self):
         """Set macro."""
@@ -135,5 +132,5 @@ class Macros(Resource):
             cmd = api.payload["command"]
             if not api.payload["state"]:
                 cmd = f"-{cmd}"
-            ca.raspiconfig.send(f'um {idx} {cmd}')
+            ca.raspiconfig.send(f"um {idx} {cmd}")
         return "", 204

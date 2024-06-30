@@ -10,7 +10,7 @@ from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.utils import disk_usage, execute_cmd
 from ..services.raspiconfig import RaspiConfigError
-from .models import command, message
+from .models import command, locales, message
 
 api = Namespace(
     "system",
@@ -18,10 +18,11 @@ api = Namespace(
     decorators=[role_required("max"), login_required],
 )
 api.add_model("Command", command)
+api.add_model("Locales", locales)
 
 
 @api.response(204, "Success")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 @api.route("/restart")
 class Restart(Resource):
@@ -38,7 +39,7 @@ class Restart(Resource):
 
 
 @api.response(204, "Success")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 @api.route("/shutdown")
 class Shutdown(Resource):
@@ -55,7 +56,7 @@ class Shutdown(Resource):
 
 
 @api.response(204, "Success")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 @api.route("/restart/app", endpoint="system_restart_app")
 class RestartApp(Resource):
@@ -71,7 +72,7 @@ class RestartApp(Resource):
 
 
 @api.response(204, "Success")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.response(404, "Not found", message)
 @api.response(422, "Error", message)
 @api.route("/command")
@@ -94,7 +95,8 @@ class Command(Resource):
         abort(404, f"Command not found {cmd}")
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 @api.route("/version")
 class Version(Resource):
@@ -121,7 +123,8 @@ class Version(Resource):
             abort(422, str(error))
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 @api.route("/disk/free")
 class Freespace(Resource):
@@ -140,3 +143,14 @@ class Freespace(Resource):
             }
         except requests.RequestException as error:
             abort(422, str(error))
+
+
+@api.response(401, "Unauthorized")
+@api.route("/locales")
+class Locales(Resource):
+    """Language for user."""
+
+    @api.marshal_with(locales)
+    def get(self):
+        """Get all languages."""
+        return {"locales": ca.config["LOCALES"]}

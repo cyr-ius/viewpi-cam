@@ -22,8 +22,12 @@ api = Namespace(
 @api.response(204, "Action execute")
 @api.response(401, "Unauthorized", message)
 @api.response(422, "Error", message)
-@api.route("/video/start", endpoint="captures_video_start")
-@api.route("/video/stop", endpoint="captures_video_stop")
+@api.route(
+    "/video/start", endpoint="captures_video_start", doc={"description": "Start camera"}
+)
+@api.route(
+    "/video/stop", endpoint="captures_video_stop", doc={"description": "Stop camera"}
+)
 class Camera(Resource):
     """Camera."""
 
@@ -40,7 +44,7 @@ class Camera(Resource):
 
 
 @api.response(204, "Action execute")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 @api.route("/image")
 class Image(Resource):
@@ -56,10 +60,18 @@ class Image(Resource):
 
 
 @api.response(204, "Action execute")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
-@api.route("/timelapse/start", endpoint="captures_timelapse_start")
-@api.route("/timelapse/stop", endpoint="captures_timelapse_stop")
+@api.route(
+    "/timelapse/start",
+    endpoint="captures_timelapse_start",
+    doc={"description": "Start timelapse"},
+)
+@api.route(
+    "/timelapse/stop",
+    endpoint="captures_timelapse_stop",
+    doc={"description": "Stop timelapse"},
+)
 class Timelapse(Resource):
     """Timelapse."""
 
@@ -76,7 +88,7 @@ class Timelapse(Resource):
 
 
 @api.response(200, "Success")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 @api.route("/status")
 class StatusMjpeg(Resource):
@@ -86,6 +98,8 @@ class StatusMjpeg(Resource):
     def get(self):
         """Get status."""
         file_content = ""
+        if not os.path.isfile(ca.raspiconfig.status_file):
+            abort(422, "Status file not found.")
         for _ in range(0, 30):
             with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
                 file_content = file.read()

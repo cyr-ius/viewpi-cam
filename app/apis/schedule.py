@@ -20,7 +20,16 @@ from ..models import Calendar as calendar_db
 from ..models import Scheduler as scheduler_db
 from ..models import Settings as settings_db
 from ..models import db
-from .models import date_time, day, daymode, message, period, schedule
+from .models import (
+    calendar,
+    date_time,
+    daymode,
+    daysmode,
+    message,
+    period,
+    schedule,
+    scheduler,
+)
 
 api = Namespace(
     "schedule",
@@ -29,13 +38,15 @@ api = Namespace(
 )
 api.add_model("Datetime", date_time)
 api.add_model("Schedule", schedule)
-api.add_model("Day", day)
 api.add_model("Daymode", daymode)
 api.add_model("Period", period)
+api.add_model("Scheduler", scheduler)
+api.add_model("Calendar", calendar)
+api.add_model("Daysmode", daysmode)
 
 
 @api.route("/")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 class Settings(Resource):
     """Schedule."""
 
@@ -46,7 +57,6 @@ class Settings(Resource):
         return settings.data
 
     @api.expect(schedule)
-    @api.marshal_with(message)
     @api.response(204, "Success")
     def put(self):
         """Set settings."""
@@ -66,30 +76,32 @@ class Settings(Resource):
 
 
 @api.route("/scheduler")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 class Scheduler(Resource):
     """Schedule."""
 
-    @api.marshal_with(schedule)
+    @api.marshal_with(scheduler, as_list=True)
+    @api.param("daymode", description="Daymode id")
     def get(self):
         """Get settings scheduler."""
+        if id := request.args.get("daymode"):
+            return scheduler_db.query.filter_by(daysmode_id=id).all()
         return scheduler_db.query.all()
 
-    @api.expect(schedule)
-    @api.marshal_with(message)
+    @api.expect(scheduler)
     @api.response(204, "Success")
     def put(self):
         """Set settings."""
-        for sch_id, scheduler in api.payload.items():
+        for sch_id, sch in api.payload.items():
             my_schedule = scheduler_db.query.filter_by(
-                daysmode_id=scheduler["daymode"], id=int(sch_id)
+                daysmode_id=sch["daymode"], id=int(sch_id)
             )
             my_schedule = my_schedule.scalar()
-            my_schedule.command_on = scheduler["commands_on"]
-            my_schedule.command_off = scheduler["commands_off"]
-            my_schedule.mode = scheduler["modes"]
+            my_schedule.command_on = sch["commands_on"]
+            my_schedule.command_off = sch["commands_off"]
+            my_schedule.mode = sch["modes"]
             my_schedule.calendars = []
-            for key, value in scheduler["calendar"].items():
+            for key, value in sch["calendar"].items():
                 if value:
                     cal = calendar_db.query.filter_by(name=key)
                     my_schedule.calendars.append(cal.scalar())
@@ -99,15 +111,14 @@ class Scheduler(Resource):
         return "", 204
 
 
-@api.route("/stop", endpoint="schedule_stop")
-@api.route("/start", endpoint="schedule_start")
+@api.route("/stop", endpoint="schedule_stop", doc={"description": "Stop scheduler"})
+@api.route("/start", endpoint="schedule_start", doc={"description": "Start scheduler"})
 @api.response(204, "Success")
 @api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 class Actions(Resource):
     """Actions."""
 
-    @api.marshal_with(message)
     def post(self):
         """Post action."""
         match request.endpoint:
@@ -123,21 +134,20 @@ class Actions(Resource):
                 except ViewPiCamException as error:
                     return abort(422, error)
                 return "", 204
-        abort(422, "Action not found")
 
 
 @api.route("/period")
-@api.response(422, "Error", message)
 @api.response(401, "Unauthorized")
+@api.response(422, "Error", message)
 class Period(Resource):
     """Sunrise."""
 
     @api.expect(daymode)
-    @api.marshal_with(period)
+    @api.marshal_with(period, code=201)
     def post(self):
         """Post day mode and return period."""
         if api.payload["daymode"] in [0, 1, 2]:
-            return {"period": get_calendar(api.payload["daymode"])}
+            return {"period": get_calendar(api.payload["daymode"])}, 201
         abort(422, "Daymode not exist")
 
 

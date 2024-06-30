@@ -7,6 +7,7 @@ from flask_restx import Namespace, Resource
 
 from ..helpers.decorator import role_required
 from ..helpers.motion import (
+    MotionError,
     get_motion,
     parse_ini,
     restart_motion,
@@ -22,7 +23,7 @@ api = Namespace(
 )
 
 
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
 @api.route("/")
 class Settings(Resource):
@@ -32,7 +33,7 @@ class Settings(Resource):
         """Get settings."""
         try:
             return get_motion()
-        except (ValueError, requests.RequestException) as error:
+        except (ValueError, requests.RequestException, MotionError) as error:
             abort(422, str(error))
 
     @api.response(204, "Success")
@@ -49,7 +50,7 @@ class Settings(Resource):
                 write_motion()
                 rsp = restart_motion()
                 return parse_ini(rsp.text())
-        except (ValueError, requests.RequestException) as error:
+        except (ValueError, requests.RequestException, MotionError) as error:
             abort(422, str(error))
 
         return "", 204

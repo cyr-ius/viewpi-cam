@@ -31,7 +31,26 @@ class UriOTP(fields.Raw):
         return img.to_string(encoding="unicode")
 
 
-wild = fields.Wildcard(fields.List(fields.Integer()))
+class Days(fields.Raw):
+    def output(self, key, obj, **kwargs):
+        calendar = {}
+        for idx, day in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]):
+            for item in obj.calendars:
+                if item.name == day:
+                    calendar.update({int(idx): 1})
+                    break
+            else:
+                calendar.update({int(idx): 0})
+
+        return calendar
+
+
+class DayMode(fields.Raw):
+    def output(self, key, obj, **kwargs):
+        return obj.daysmode_id
+
+
+api_token = Model("APIToken", {"api_token": fields.String(required=True)})
 button = Model(
     "Button",
     {
@@ -43,13 +62,13 @@ button = Model(
         "other": fields.String(required=False, description="Others options"),
     },
 )
-
 buttons = Model(
-    "Buttons",
-    {
-        "id": fields.Integer(required=True, description="Id"),
-        **button,
-    },
+    "Buttons", {"id": fields.Integer(required=True, description="Id"), **button}
+)
+cam_token = Model("CamToken", {"cam_token": fields.String(required=True)})
+calendar = Model(
+    "Calendar",
+    {"id": fields.Integer(required=True), "name": fields.String(required=True)},
 )
 command = Model(
     "Command",
@@ -61,8 +80,15 @@ command = Model(
     },
 )
 date_time = Model("Datetime", {"datetime": fields.DateTime(dt_format="iso8601")})
-day = Model("Day", {"*": wild})
 daymode = Model("Daymode", {"daymode": fields.Integer(description="Day mode")})
+daysmode = Model(
+    "Daysmode",
+    {"id": fields.Integer(required=True), "name": fields.String(required=True)},
+)
+deletes = Model(
+    "Deletes",
+    {"thumb_id": fields.List(fields.String(description="id thumb"), default=None)},
+)
 files = Model(
     "Files",
     {
@@ -86,6 +112,7 @@ files = Model(
         "uri": PathURI(attribute="name", example="string"),
     },
 )
+locales = Model("Locales", {"locales": fields.List(fields.String(enumerate=LOCALES))})
 lock_mode = Model(
     "LockMode",
     {
@@ -93,8 +120,16 @@ lock_mode = Model(
         "ids": fields.List(fields.String()),
     },
 )
-macros = Model(
-    "Macros",
+log = Model(
+    "Log",
+    {
+        "datetime": fields.String(required=True),
+        "level": fields.String(required=True),
+        "msg": fields.String(required=True),
+    },
+)
+macro = Model(
+    "Macro",
     {
         "name": fields.String(required=True, description="Macro name"),
         "command": fields.String(required=True, description="Script execute"),
@@ -102,50 +137,71 @@ macros = Model(
     },
 )
 message = Model("Msg", {"message": fields.String(required=True)})
+multiview = Model(
+    "Multiview",
+    {
+        "url": fields.String(
+            required=True,
+            description="URL Stream MJPEG",
+            example="http://192.168.1.1/cam/cam_pic?token=Bxxxxxxxxxxxxx",
+        ),
+        "delay": fields.Integer(required=True, description="Refresh rate"),
+        "state": fields.Boolean(
+            required=True, default=False, description="Display camera"
+        ),
+    },
+)
+multiviews = Model(
+    "Multiviews", {"id": fields.Integer(required=True, description="Id"), **multiview}
+)
+otp = Model(
+    "Otp",
+    {
+        "id": fields.Integer(required=True, description="Id"),
+        "name": fields.String(required=True, description="The user name"),
+        "otp_svg": UriOTP(required=False),
+        "otp_confirmed": fields.Boolean(required=False, description="otp status"),
+    },
+)
 period = Model("Period", {"period": fields.String(description="period")})
 schedule = Model(
     "Schedule",
     {
-        "autocamera_interval": fields.Integer(required=True, description="File name"),
-        "autocapture_interval": fields.Integer(required=True, description="I/T/V"),
-        "cmd_poll": fields.Float(required=True, description="Size"),
-        "command_off": fields.List(fields.String(description="Command")),
-        "command_on": fields.List(fields.String(description="Command")),
-        "dawnstart_minute": fields.Integer(
-            required=True, description="Read/Write right on disk"
-        ),
-        "daystart_minute": fields.Integer(
-            required=True, description="Read/Write right on disk"
-        ),
-        "dayend_minute": fields.Integer(
-            required=True, description="Read/Write right on disk"
-        ),
-        "daymode": fields.Integer(required=True, description="Original name"),
-        "days": fields.Nested(day),
-        "gmt_offset": fields.String(
-            required=False, description="image numbers of timelapse"
-        ),
-        "latitude": fields.Float(
-            required=False, description="image numbers of timelapse"
-        ),
-        "longitude": fields.Float(
-            required=False, description="image numbers of timelapse"
-        ),
-        "managment_command": fields.String(
-            required=False, description="image numbers of timelapse"
-        ),
-        "managment_interval": fields.Integer(
-            required=True, description="Original name"
-        ),
-        "max_capture": fields.Integer(required=True, description="Size"),
-        "mode_poll": fields.Integer(required=True, description="Size"),
-        "modes": fields.List(fields.String(description="mode")),
-        "purgeimage_hours": fields.Integer(required=True, description="Size"),
-        "purgelapse_hours": fields.Integer(required=True, description="Size"),
-        "purgevideo_hours": fields.Integer(required=True, description="Size"),
-        "purgespace_level": fields.Integer(required=True, description="Size"),
-        "purgespace_modeex": fields.Integer(required=True, description="Size"),
-        "times": fields.List(fields.String(description="time")),
+        "autocamera_interval": fields.Integer(required=True),
+        "autocapture_interval": fields.Integer(required=True),
+        "cmd_poll": fields.Float(required=True),
+        "dawnstart_minutes": fields.Integer(required=True),
+        "dayend_minutes": fields.Integer(required=True),
+        "daymode": fields.Integer(required=True),
+        "daystart_minutes": fields.Integer(required=True),
+        "duskend_minutes": fields.Integer(required=True),
+        "gmt_offset": fields.String(required=False),
+        "latitude": fields.Float(required=False),
+        "longitude": fields.Float(required=False),
+        "managment_command": fields.String(required=False),
+        "managment_interval": fields.Integer(required=True),
+        "max_capture": fields.Integer(required=True),
+        "mode_poll": fields.Integer(required=True),
+        "purgeimage_hours": fields.Integer(required=True),
+        "purgelapse_hours": fields.Integer(required=True),
+        "purgevideo_hours": fields.Integer(required=True),
+        "purgespace_level": fields.Integer(required=True),
+        "purgespace_modeex": fields.Integer(required=True),
+    },
+)
+scheduler = Model(
+    "Scheduler",
+    {
+        "id": fields.Integer(required=True),
+        "command_on": fields.String(),
+        "command_off": fields.String(),
+        "daysmode": fields.Nested(daysmode),
+        "daysmode_id": fields.Integer(),
+        "daymode": DayMode(required=True),
+        "enabled": fields.Boolean(required=True),
+        "mode": fields.String(),
+        "period": fields.String(required=True),
+        "days": Days(),
     },
 )
 setting = Model(
@@ -182,38 +238,8 @@ rsync = Model(
         "rs_options": fields.List(fields.String(default=None), default=["-a", "-z"]),
     },
 )
-locale = Model("Locale", {"locale": fields.String(enumerate=LOCALES)})
-multiview = Model(
-    "Multiview",
-    {
-        "url": fields.String(
-            required=True,
-            description="URL Stream MJPEG",
-            example="http://192.168.1.1/cam/cam_pic?token=Bxxxxxxxxxxxxx",
-        ),
-        "delay": fields.Integer(required=True, description="Refresh rate"),
-        "state": fields.Boolean(
-            required=True, default=False, description="Display camera"
-        ),
-    },
-)
-multiviews = Model(
-    "Multiviews",
-    {
-        "id": fields.Integer(required=True, description="Id"),
-        **multiview,
-    },
-)
-cam_token = Model("CamToken", {"cam_token": fields.String(required=True)})
-api_token = Model("APIToken", {"api_token": fields.String(required=True)})
-otp = Model(
-    "TOTP",
-    {
-        "id": fields.Integer(required=True, description="Id"),
-        "name": fields.String(required=True, description="The user name"),
-        "otp_svg": UriOTP(required=False),
-        "otp_confirmed": fields.Boolean(required=False, description="otp status"),
-    },
+secret = Model(
+    "Secret", {"secret": fields.String(required=True, description="OTP code")}
 )
 user = Model(
     "User",
@@ -225,14 +251,4 @@ user = Model(
         "otp_confirmed": fields.Boolean(required=False, description="otp status"),
     },
 )
-users = Model(
-    "Users",
-    {
-        "id": fields.Integer(required=True, description="Id"),
-        **user,
-    },
-)
-deletes = Model(
-    "Deletes",
-    {"thumb_id": fields.List(fields.String(description="id thumb"), default=None)},
-)
+users = Model("Users", {"id": fields.Integer(required=True, description="Id"), **user})

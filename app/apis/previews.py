@@ -36,11 +36,11 @@ class Thumbs(Resource):
         sort_order = request.args.get("sort_order", "asc").lower()
         show_types = request.args.get("show_types", "both").lower()
         time_filter = int(request.args.get("time_filter", 1))
-
         return get_thumbs(sort_order, show_types, time_filter)
 
     @api.doc(description="Delete  all files or files list")
     @api.expect(deletes)
+    @api.marshal_with(deletes, code=201)
     def delete(self):
         """Delete all media files."""
         deleted_ids = []
@@ -55,22 +55,23 @@ class Thumbs(Resource):
         else:
             maintain_folders(ca.raspiconfig.media_path, True, True)
         db.session.close()
-        return deleted_ids
+        return deleted_ids, 201
 
 
 @api.route("/<string:id>")
 @api.response(401, "Unauthorized")
+@api.response(404, "Not found", message)
+@api.response(422, "Error", message)
 class Thumb(Resource):
     """Preview."""
 
     @api.marshal_with(files)
     def get(self, id: str):
         """Get file information."""
-        return files_db.get(id)
+        return db.get_or_404(files_db, id)
 
     @api.doc(description="Delete file")
     @api.response(204, "Success")
-    @api.response(422, "Error", message)
     def delete(self, id: str):
         """Delete file."""
         if thumb := files_db.query.get(id):
@@ -79,7 +80,7 @@ class Thumb(Resource):
             delete_mediafiles(thumb.name)
             maintain_folders(ca.raspiconfig.media_path, False, False)
             return "", 204
-        abort(422, "Thumb not found")
+        abort(404, "Thumb not found")
 
 
 @api.route("/lock_mode")
@@ -102,6 +103,7 @@ class LockMode(Resource):
 
 
 @api.route("/<string:id>/lock")
+@api.response(201, "Already lock", message)
 @api.response(204, "Success")
 @api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
@@ -115,11 +117,12 @@ class Lock(Resource):
                 thumb.locked = True
                 db.session.commit()
                 return "", 204
-            return "Thumb is already locked", 204
+            return {"message": "Thumb is already locked"}, 201
         abort(422, f"Thumb not found ({id})")
 
 
 @api.route("/<string:id>/unlock")
+@api.response(201, "Already unlock", message)
 @api.response(204, "Success")
 @api.response(401, "Unauthorized")
 @api.response(422, "Error", message)
@@ -133,7 +136,7 @@ class Unlock(Resource):
                 thumb.locked = False
                 db.session.commit()
                 return "", 204
-            return "Thumb is already unlocked", 204
+            return {"message": "Thumb is already unlocked"}, 201
         abort(422, f"Thumb not found ({id})")
 
 
