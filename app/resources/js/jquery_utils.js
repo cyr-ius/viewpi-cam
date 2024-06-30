@@ -63,6 +63,16 @@ const observer = new MutationObserver(callback);
 observer.observe(targetNode, config);
 
 // *** Global functions ***
+// Display Toast message
+$.msgToToast = function (options) {
+  var o = $.extend({ category: "success", msg: null }, options || {});
+  if (o.category == "success") $("#toast").addClass("text-bg-primary");
+  if (o.category == "error") $("#toast").addClass("text-bg-danger");
+  if (o.category == "warning") $("#toast").addClass("text-bg-warning");
+
+  $("#toast .toast-body").html(o.msg);
+};
+// Toggle Spinner display
 $.spinner = function (options) {
   var o = $.extend({ status: null }, options || {});
   if (o.status) {
@@ -73,7 +83,7 @@ $.spinner = function (options) {
     $(".spinner-border").addClass("d-none");
   }
 };
-
+// Ajax advanced function
 $.queryData = function (options) {
   var o = $.extend(
     {
@@ -82,41 +92,53 @@ $.queryData = function (options) {
       data: null,
       success: null,
       error: null,
-      convertJson: null,
+      contentType: "application/json; charset=utf-8",
       xhrFields: null,
       display_success: true,
       display_error: true,
       display_spinner: true,
+      processData: true,
     },
     options || {},
   );
 
-  if (o.convertJson == null) o.convertJson = true;
-  if (o.method.toUpperCase() == "GET") o.convertJson = false;
+  if (
+    o.contentType == "application/json; charset=utf-8" &&
+    o.data != "" &&
+    o.method.toUpperCase() != "GET"
+  )
+    o.data = JSON.stringify(o.data);
 
   $.ajax({
     method: o.method,
     url: o.url,
-    data: o.convertJson && o.data != "" ? JSON.stringify(o.data) : o.data,
-    contentType: "application/json; charset=utf-8",
+    data: o.data,
+    contentType: o.contentType,
     xhrFields: o.xhrFields,
+    processData: o.processData,
     beforeSend: function (data) {
       if (o.display_spinner) $.spinner({ status: true });
     },
     success: function (data, response, xhr) {
       if (o.display_error) {
-        $("#toast").addClass("text-bg-primary");
         if (data && data.responseJSON)
-          $("#toast .toast-body").html(data.responseJSON["message"]);
+          $.msgToToast({
+            category: "success",
+            msg: data.responseJSON["message"],
+          });
       }
       if (o.success) return o.success(data, response, xhr);
     },
     error: function (data, response, xhr) {
       if (o.display_error) {
-        $("#toast").addClass("text-bg-danger");
-        $("#toast .toast-body").html(data.status + " - " + data["message"]);
-        if (data.responseJSON)
-          $("#toast .toast-body").html(data.responseJSON["message"]);
+        if (data && data.responseJSON) {
+          $.msgToToast({
+            category: "error",
+            msg: data.responseJSON["message"],
+          });
+        } else {
+          $.msgToToast({ category: "error", msg: data["message"] });
+        }
       }
       if (o.error) return o.error(data, response, xhr);
     },
@@ -125,13 +147,13 @@ $.queryData = function (options) {
     },
   });
 };
-
+// Check is_number
 $.filterFloat = function (value) {
   if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value))
     return Number(value);
   return NaN;
 };
-
+// Send command to raspiconfig
 $.sendCmd = function (options) {
   var o = $.extend(
     {
@@ -153,11 +175,11 @@ $.sendCmd = function (options) {
     error: o.error,
   });
 };
-
+// Serialize form to array
 $.fn.serialize = function (options) {
   return $.param(this.serializeArray(options));
 };
-
+// Serialize Array function
 $.fn.serializeArray = function (options) {
   var o = $.extend(
     {
@@ -215,7 +237,7 @@ $.fn.serializeArray = function (options) {
     })
     .get();
 };
-
+// Serialize form to object (dict)
 $.fn.serializeObject = function (options) {
   var o = $.extend({ checkboxesAsBools: false }, options || {});
   return this.serializeArray({
@@ -237,7 +259,7 @@ $.fn.serializeObject = function (options) {
     return obj;
   }, {});
 };
-
+// Clear form fields
 $.fn.clearFields = function (options) {
   this.find(":input")
     .not(":button, :submit, :reset, :hidden, :checkbox, :radio")
