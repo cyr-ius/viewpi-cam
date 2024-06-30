@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import jwt
 from flask import current_app as ca
-from flask import redirect, render_template, request, session, url_for
+from flask import redirect, render_template, request, url_for
 from flask_assets import Environment
 from flask_babel import Babel
 from flask_login import LoginManager
@@ -42,16 +42,8 @@ def handle_bad_gateway(error):
     return render_template("errors/502.html", code=502, message=error), 502
 
 
-def handle_unauthorized_access(error):
-    session["next"] = request.script_root + request.path
-    return redirect(url_for("auth.login"))
-
-
 @login_manager.user_loader
 def load_user(user_id):
-    """
-    This will be current_user
-    """
     return Users.query.filter_by(alternative_id=user_id).first()
 
 
@@ -59,7 +51,7 @@ def load_user(user_id):
 def unauthorized():
     if request.blueprint == "api":
         abort(HTTPStatus.UNAUTHORIZED, "API token is incorrect.")
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login", next=request.path))
 
 
 @login_manager.request_loader
