@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import jwt
 from flask import current_app as ca
-from flask import redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for
 from flask_assets import Environment
 from flask_babel import Babel
 from flask_login import LoginManager
@@ -51,6 +51,7 @@ def load_user(user_id):
 def unauthorized():
     if request.blueprint == "api":
         abort(HTTPStatus.UNAUTHORIZED, "API token is incorrect.")
+    flash(login_manager.login_message, login_manager.login_message_category)
     return redirect(url_for("auth.login", next=request.path))
 
 

@@ -20,6 +20,7 @@ def init_app(app):
 
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
+    login_manager.login_message_category = "info"
 
     assets.register("css_custom", css_custom)
     assets.register("css_main", css_main)
