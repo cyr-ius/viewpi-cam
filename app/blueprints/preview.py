@@ -99,8 +99,7 @@ def download():
 def zipdata():
     """ZIP File."""
     check_list = request.json.get("thumb_id", [])
-    if isinstance(check_list, str):
-        check_list = [request.json["check_list"]]
+    check_list = [check_list] if isinstance(check_list, str) else check_list
     if check_list:
         zip_list = []
         for id in check_list:
