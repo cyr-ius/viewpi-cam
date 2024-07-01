@@ -73,9 +73,6 @@ input:read-only {
   fill: currentColor;
 }
 
-.toast {
-  z-index: var(--bs-toast-zindex);
-}
 /* .nav-scroller {
   position: relative;
   z-index: 2;
