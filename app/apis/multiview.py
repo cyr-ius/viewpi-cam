@@ -53,8 +53,10 @@ class Multiview(Resource):
     @api.expect(multiviews)
     def put(self, id: int):
         """Set multiview."""
-        if multiview := db.get_or_404(multiviews_db, id):
-            multiview.update(**api.payload)
+        if (
+            multiview := multiviews_db.query.filter_by(id=id)
+        ) and multiview.first() is not None:
+            multiview.update(api.payload)
             db.session.commit()
             return "", 204
         abort(404, "Host not found")

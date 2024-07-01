@@ -70,10 +70,10 @@ class User(Resource):
         """Set user."""
         if id == 0:
             abort(403, "System account cannot be modified")
-        if user := db.get_or_404(users_db, id):
+        if (user := users_db.query.filter_by(id=id)) and user.first() is not None:
             if password := api.payload.pop("password", None):
                 api.payload["secret"] = generate_password_hash(password)
-            user.update(**api.payload)
+            user.update(api.payload)
             db.session.commit()
             return "", 204
         abort(404, "User not found")

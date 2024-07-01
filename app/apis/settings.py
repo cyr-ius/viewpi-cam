@@ -81,8 +81,8 @@ class Button(Resource):
     @api.response(404, "Not found", message)
     def put(self, id: int):
         """Set button."""
-        if ubutton := db.get_or_404(Ubuttons, id):
-            ubutton.update(**api.payload)
+        if (ubutton := Ubuttons.query.filter_by(id=id)) and ubutton.first() is not None:
+            ubutton.update(api.payload)
             db.session.commit()
             return "", 204
         abort(404, "Button not found")
