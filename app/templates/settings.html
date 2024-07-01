@@ -161,7 +161,7 @@
         <div class="row">{{_('Multiview')}}<small>{{ _('Add multiple camera display on same page')}} <a href="{{url_for('main.multiview')}}" target="_blank">{{_('View')}}</a></small></div>
         <div id="multiviews" class="row">
             {%for multiview in multiviews%}
-            <div id="multiviews-{{multiview.uid}}" class="row g-1 ms-2 uchange">
+            <div id="multiviews-{{multiview.id}}" class="row g-1 ms-2 uchange">
                 <input type="hidden" name="id" value="{{multiview.id}}">
                 <div class="col-auto"><div class="form-check form-switch"><input class="form-check-input" name="state" type="checkbox" {{ 'checked' if multiview.state }}></div></div>
                 <div class="col"><input class="form-control form-control-sm" name="url" type="url" value="{{multiview.url}}" required></div>
@@ -305,7 +305,7 @@ $('#users').on('click','.add', function() {
         templ.addClass('uchange').removeClass('needs-validation was-validated');
         templ.find('input[name="id"]').val(data["id"]);
         templ.insertBefore(parent);
-        parent.find('input').val('');
+        parent.clearFields();
         parent.removeClass('was-validated')
     }
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
@@ -343,7 +343,7 @@ $('#ubuttons').on('click','.add', function() {
         templ.addClass('uchange').removeClass('needs-validation was-validated');
         templ.find('input[name="id"]').val(data["id"]);
         templ.insertBefore(parent);
-        parent.find('input, select, textarea').val('');
+        parent.clearFields();
         parent.removeClass('was-validated')
     }
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
@@ -375,7 +375,7 @@ $('#multiviews').on('click','.add', function() {
         templ.addClass('uchange').removeClass('needs-validation was-validated');
         templ.find('input[name="id"]').val(data["id"]);
         templ.insertBefore(parent);
-        parent.find('input, select, textarea').val('');
+        parent.clearFields();
         parent.removeClass('was-validated')
     }
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
@@ -387,12 +387,12 @@ $('#multiviews').on('click','.delete', function() {
     let parent = $(this).parent().parent();
     let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
     let success = function(data){ parent.remove() }
-    $.queryData({method:"delete", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, success:success});
+    $.queryData({method:"delete", url:"{{url_for('api.multiview_multiview',id=0)}}".replace(0,data["id"]), success:success});
 });
 
 $('#multiviews').on('change','.uchange', function(){
     let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-    $.queryData({method:"put", url:`{{url_for('api.multiview_multiviews')}}/${data["id"]}`, data:data});
+    $.queryData({method:"put", url:"{{url_for('api.multiview_multiview',id=0)}}".replace(0,data["id"]), data:data});
 });
 
 $('#rsync').on('change', function(){
