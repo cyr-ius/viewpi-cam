@@ -24,7 +24,7 @@ css_main = Bundle(
 )
 
 css_style = Bundle(
-    "../app/resources/css/custom.css",
+    "../app/resources/css/style.css",
     "../app/resources/css/themes.css",
     filters="cssmin",
     output="css/style.css",
