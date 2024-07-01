@@ -23,10 +23,12 @@ css_main = Bundle(
     output="css/main.css",
 )
 
-css_custom = Bundle(
-    "../app/resources/css/custom.css", filters="cssmin", output="css/custom.css"
+css_style = Bundle(
+    "../app/resources/css/custom.css",
+    "../app/resources/css/themes.css",
+    filters="cssmin",
+    output="css/style.css",
 )
-
 
 js_main = Bundle(
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js",

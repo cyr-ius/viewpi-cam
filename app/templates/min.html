@@ -8,7 +8,7 @@
         {% endblock %}
         <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
         {% assets "css_main" -%}<link rel="stylesheet" href="{{ ASSET_URL }}">{%- endassets %}
-        {% assets "css_custom" -%}<link rel="stylesheet" href="{{ ASSET_URL }}">{%- endassets %}
+        {% assets "css_style" -%}<link rel="stylesheet" href="{{ ASSET_URL }}">{%- endassets %}
         {% block extracss%}
         {% endblock %}
         <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
