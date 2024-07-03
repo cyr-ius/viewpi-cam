@@ -317,7 +317,7 @@ $('#users').on('click','.delete', function() {
     let parent = $(this).parent().parent()
     let data = $(parent).find('input, select').serializeObject();
     let success = function(data){ parent.remove() }
-    $.queryData({method:"delete", url:`{{ url_for('api.users_users')}}/${data["id"]}`, success:success});
+    $.queryData({method:"delete", url:"{{ url_for('api.users_user', id=0)}}".replace(0,data["id"]), success:success});
 });
 
 $('#users').on('click','.otp_user', function() {
@@ -329,7 +329,7 @@ $('#users').on('click','.otp_user', function() {
 
 $('#users').on('change','.uchange', function(){
     let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-    $.queryData({method:"put", url:`{{url_for('api.users_users')}}/${data["id"]}`, data:data});
+    $.queryData({method:"put", url:"{{ url_for('api.users_user', id=0)}}".replace(0,data["id"]), data:data});
 });
 
 $('#ubuttons').on('click','.add', function() {
