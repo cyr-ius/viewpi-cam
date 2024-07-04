@@ -34,14 +34,14 @@ def index():
     macros = Macros().get()
     settings = Sets().get()
     rsync = Rsync().get()
-    users = Users.query.filter(Users.id > 0).all()
+    users = db.session.scalars(db.select(Users).filter(Users.id > 0)).all()
     camera_token, api_token = (
         Users.query.with_entities(Users.cam_token, Users.api_token)
         .filter(Users.id == 0)
         .one()
     )
-    ubuttons = Ubuttons.query.all()
-    multiviews = Multiviews.query.all()
+    ubuttons = db.session.scalars(db.select(Ubuttons)).all()
+    multiviews = db.session.scalars(db.select(Multiviews)).all()
     presets = Presets.query.add_column(Presets.mode).group_by("mode").all()
     return render_template(
         "settings.html",

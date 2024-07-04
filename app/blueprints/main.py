@@ -7,7 +7,6 @@ import urllib
 from flask import (
     Blueprint,
     Response,
-    abort,
     flash,
     json,
     jsonify,
@@ -21,12 +20,9 @@ from flask_login import current_user, login_required
 
 from ..apis.logs import get_logs
 from ..helpers.decorator import role_required
-from ..helpers.motion import MotionError, is_motion, get_motion
+from ..helpers.motion import MotionError, get_motion, is_motion
 from ..helpers.utils import allowed_file, write_log
-from ..models import Multiviews as multiviews_db
-from ..models import Presets as presets_db
-from ..models import Settings as settings_db
-from ..models import Ubuttons as ubuttons_db
+from ..models import Multiviews, Presets, Settings, Ubuttons, db
 from ..services.raspiconfig import RaspiConfigError
 from .camera import status_mjpeg
 
@@ -37,7 +33,7 @@ bp = Blueprint("main", __name__, template_folder="templates")
 @login_required
 def index():
     """Index page."""
-    settings = settings_db.query.first()
+    settings = db.session.scalars(db.select(Settings)).first()
     write_log(f"Logged in user: {current_user.name}")
     write_log(f"UserLevel {current_user.right}")
     display_mode = request.cookies.get("display_mode", "On")
@@ -63,13 +59,17 @@ def index():
         except MotionError:
             flash("Motion config not found")
 
-    presets = presets_db.query.filter_by(mode=settings.data["upreset"]).all()
+    presets = db.session.scalars(
+        db.select(Presets).filter_by(mode=settings.data["upreset"])
+    ).all()
+
+    ubuttons = db.session.scalars(db.select(Ubuttons)).all()
 
     return render_template(
         "main.html",
         mode=mode,
         cam_pos=cam_pos,
-        user_buttons=ubuttons_db.query.all(),
+        user_buttons=ubuttons,
         raspiconfig=ca.raspiconfig,
         motionconfig=motionconfig,
         display_mode=display_mode,
@@ -136,7 +136,7 @@ def minview():
 @login_required
 def multiview():
     """Camera multiview page."""
-    multiviews = multiviews_db.query.all()
+    multiviews = db.session.scalars(db.select(Multiviews)).all()
     return render_template("multiview.html", multiviews=multiviews)
 
 
@@ -148,8 +148,7 @@ def view():
         "rHost", request.args.get("pHost", 0)
     )
 
-    if (host := multiviews_db.query.get(int(id))) is None:
-        abort(404)
+    host = db.get_or_404(Multiviews, int(id))
 
     def _gather_img(url, delay):
         while True:

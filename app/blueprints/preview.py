@@ -30,6 +30,7 @@ from ..helpers.filer import (
 )
 from ..helpers.utils import disk_usage, execute_cmd, write_log
 from ..models import Files as files_db
+from ..models import db
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
@@ -103,8 +104,9 @@ def zipdata():
     if check_list:
         zip_list = []
         for id in check_list:
-            thumb = files_db.query.get(id)
-            zip_list.append(thumb.name)
+            thumb = db.session.scalars(db.select(files_db).filter_by(id=id)).first()
+            if thumb:
+                zip_list.append(thumb.name)
 
         return get_zip(zip_list)
     abort(404, {"message": "List empty"})

@@ -6,7 +6,7 @@ from flask import Blueprint
 from flask.cli import with_appcontext
 
 from ..helpers.utils import get_pid
-from ..models import Settings as settings_db
+from ..models import Settings, db
 from ..services.rsync import rsync
 
 bp = Blueprint("rsync", __name__, url_prefix="/rsync", cli_group="rsync")
@@ -25,6 +25,6 @@ def stop() -> None:
 @with_appcontext
 def start() -> None:
     """Start rsync."""
-    settings = settings_db.query.first()
+    settings = db.session.scalars(db.select(Settings)).first()
     if settings.data.get("rs_enabled"):
         rsync()

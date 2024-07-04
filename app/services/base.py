@@ -8,7 +8,7 @@ from flask_babel import Babel
 from flask_login import LoginManager
 from flask_restx import abort
 
-from ..models.schema import Users
+from ..models import Users, db
 from .raspiconfig import RaspiConfig
 
 assets = Environment()
@@ -44,7 +44,9 @@ def handle_bad_gateway(error):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Users.query.filter_by(alternative_id=user_id).first()
+    return db.session.scalars(
+        db.select(Users).filter_by(alternative_id=user_id)
+    ).first()
 
 
 @login_manager.unauthorized_handler
@@ -59,7 +61,9 @@ def unauthorized():
 def load_user_from_request(request):
     cam_token = request.args.get("cam_token")
     if cam_token and request.blueprint == "camera":
-        user = Users.query.filter_by(id=0, cam_token=cam_token).first()
+        user = db.session.scalars(
+            db.select(Users).filter_by(id=0, cam_token=cam_token)
+        ).first()
         if user:
             return user
 
@@ -74,7 +78,9 @@ def load_user_from_request(request):
         except jwt.DecodeError:
             abort(401, "API token is incorrect.")
 
-        user = Users.query.filter_by(id=0, name=jwt_content.get("iss")).first()
+        user = db.session.scalars(
+            db.select(Users).filter_by(id=0, name=jwt_content.get("iss"))
+        ).first()
         if user:
             return user
 

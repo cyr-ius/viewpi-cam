@@ -11,7 +11,7 @@ from typing import Any
 from flask import current_app as ca
 
 from ..config import ALLOWED_EXTENSIONS
-from ..models import Files as files_db
+from ..models import Files, db
 
 
 def find_lapse_files(filename: str) -> list[str]:
@@ -83,8 +83,9 @@ def delete_mediafiles(filename: str, delete: bool = True) -> int:
     compute_delete_file(f"{media_path}/{filename}", size, delete)
 
     # Remove database
-    file = files_db.query.get(get_file_id(filename))
-    file.delete()
+    file = db.get_or_404(Files, get_file_id(filename))
+    db.session.delete(file)
+    db.session.commit()
 
     return round(size / 1024)
 
@@ -136,7 +137,7 @@ def get_file_duration(file: str) -> int:
     if get_file_ext(file) == "mp4" and os.path.isfile(info_file):
         with open(info_file, encoding="utf-8") as info:
             duration = info.readline().replace("\n", "")
-            if duration and duration != '':
+            if duration and duration != "":
                 duration = dt.strptime(duration, "%H:%M:%S.%f")
                 return duration.hour * 3600 + duration.minute * 60 + duration.second
     return 0
@@ -184,7 +185,7 @@ def get_file_info(file: str) -> dict[str, Any] | None:
     realname = data_file_name(file)
     id = get_file_id(file)
     number = get_file_index(file)
-    locked = True if (thumb := files_db.query.get(id)) and thumb.locked else False
+    locked = True if (thumb := db.one_or_404(Files, id)) and thumb.locked else False
     size = 0
     lapse_count = 0
     duration = 0

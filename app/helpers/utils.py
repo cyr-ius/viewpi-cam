@@ -13,7 +13,7 @@ from flask import request
 from flask_login import current_user
 from psutil import ZombieProcess, process_iter
 
-from ..models import Settings as settings_db
+from ..models import Settings, db
 from .exceptions import ViewPiCamException
 
 
@@ -63,7 +63,8 @@ def write_log(msg: str, level: str = "info") -> None:
     mode = "w" if not os.path.isfile(log_file) else "a"
     with open(log_file, mode=mode, encoding="utf-8") as file:
         line = json.dumps(
-            {"datetime": str_now, "level": level.upper(), "msg": msg}, separators=(',', ':')
+            {"datetime": str_now, "level": level.upper(), "msg": msg},
+            separators=(",", ":"),
         )
         file.write(line + "\n")
 
@@ -109,7 +110,7 @@ def get_locale() -> str | list[str]:
 
 def get_timezone() -> str | list[str]:
     """Get timezone."""
-    settings = settings_db.query.first()
+    settings = db.session.scalars(db.select(Settings)).first()
     return settings.data["gmt_offset"]
 
 

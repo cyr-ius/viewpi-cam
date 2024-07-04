@@ -17,7 +17,7 @@ from flask_login import login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash
 
 from ..helpers.utils import reverse
-from ..models import Users
+from ..models import Users, db
 
 bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 
@@ -64,10 +64,9 @@ def login():
             abort(404)
         session["remember"] = request.form.get("remember") == "on"
 
-        if (
-            user := Users.query.filter_by(name=request.form.get("username"))
-        ) and user.count() == 1:
-            user = user.one()
+        if user := db.session.scalars(
+            db.select(Users).filter_by(name=request.form.get("username"))
+        ).first():
             if user.check_password(request.form.get("password")):
                 session["first_auth"] = True
                 if user.otp_confirmed:
@@ -98,7 +97,7 @@ def totpverified():
         if next and reverse(next) is False:
             abort(404)
 
-        if (user := Users.query.get(id)) and user.check_otp_secret(
+        if (user := db.one_or_404(Users, id)) and user.check_otp_secret(
             request.form.get("secret")
         ):
             login_user(user, remember=session["remember"])

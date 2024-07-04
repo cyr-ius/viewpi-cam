@@ -26,8 +26,7 @@ from ..helpers.filer import (
 )
 from ..helpers.utils import delete_log, get_pid, write_log
 from ..models import Scheduler as scheduler_db
-from ..models import Settings as settings_db
-from ..models import db
+from ..models import Settings, db
 from ..services.raspiconfig import RaspiConfigError
 from ..services.rsync import rsync
 
@@ -46,8 +45,10 @@ bp.cli.short_help = "Stop/Start scheduler"
 @role_required(["max"])
 def index():
     """Index page."""
-    settings = settings_db.query.first()
-    schedulers = scheduler_db.query.filter_by(daysmode_id=settings.data["daymode"])
+    settings = db.session.scalars(db.select(Settings)).first()
+    schedulers = db.session.scalars(
+        db.select(scheduler_db).filter_by(daysmode_id=settings.data["daymode"])
+    ).all()
 
     selected_scheduler = []
     for scheduler in schedulers:
@@ -104,7 +105,7 @@ def scheduler() -> None:
     while timeout_max == 0 or timeout < timeout_max:
         write_log("Scheduler loop is started")
         db.session.remove()
-        settings = settings_db.query.first()
+        settings = db.session.scalars(db.select(Settings)).first()
         last_on_cmd = None
         last_day_period = None
         poll_time = settings.data["cmd_poll"]
@@ -127,8 +128,8 @@ def scheduler() -> None:
             if cmd == ca.config["SCHEDULE_STOP"] and autocapture == 0:
                 if last_on_cmd:
                     write_log("Stop capture requested")
-                    schedule = scheduler_db.query.filter_by(
-                        period=last_day_period
+                    schedule = db.session.scalars(
+                        db.select(scheduler_db).filter_by(period=last_day_period)
                     ).one()
                     send = schedule.command_off
                     settings.data["last_detection_stop"] = str(dt_now())
@@ -147,8 +148,8 @@ def scheduler() -> None:
                         write_log("Start capture requested from Pipe")
                         settings.data["last_detection_start"] = str(dt_now())
                         db.session.commit()
-                    schedule = scheduler_db.query.filter_by(
-                        period=last_day_period
+                    schedule = db.session.scalars(
+                        db.select(scheduler_db).filter_by(period=last_day_period)
                     ).one()
                     send = schedule.command_on
                     if send:
@@ -179,8 +180,10 @@ def scheduler() -> None:
                     if settings.data["max_capture"] > 0:
                         if (timenow - capture_start) >= settings.data["max_capture"]:
                             write_log("Maximum Capture reached. Sending off command")
-                            schedule = scheduler_db.query.filter_by(
-                                period=last_day_period
+                            schedule = db.session.scalars(
+                                db.select(scheduler_db).filter_by(
+                                    period=last_day_period
+                                )
                             ).one()
                             send_cmds(str_cmd=schedule.command_off)
                             last_on_cmd = None
@@ -193,8 +196,8 @@ def scheduler() -> None:
                         new_day_period = get_calendar(settings.data["daymode"])
                         if new_day_period != last_day_period:
                             write_log(f"New period detected {new_day_period}")
-                            schedule = scheduler_db.query.filter_by(
-                                period=new_day_period
+                            schedule = db.session.scalars(
+                                db.select(scheduler_db).filter_by(period=new_day_period)
                             ).one()
                             send_cmds(str_cmd=schedule.mode, days=schedule.calendars)
                             last_day_period = new_day_period
