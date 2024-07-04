@@ -83,7 +83,9 @@ def delete_mediafiles(filename: str, delete: bool = True) -> int:
     compute_delete_file(f"{media_path}/{filename}", size, delete)
 
     # Remove database
-    file = db.get_or_404(Files, get_file_id(filename))
+    file = db.session.scalars(
+        db.select(Files).filter_by(id=get_file_id(filename))
+    ).first()
     db.session.delete(file)
     db.session.commit()
 

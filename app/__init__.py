@@ -92,7 +92,7 @@ def create_app(config=None):
     @app.before_request
     def before_app_request():
         """Execute before request."""
-        settings = db.first_or_404(db.select(Settings))
+        settings = db.session.scalars(db.select(Settings)).first()
         if settings:
             g.loglevel = settings.data["loglevel"]
 
@@ -106,7 +106,7 @@ def create_app(config=None):
     with app.app_context():
         if db.inspect(db.engine).has_table("Setting"):
             # Get settings
-            settings = db.one_or_404(db.select(Settings))
+            settings = db.session.scalars(db.select(Settings)).first()
 
             # Custom log level
             if custom_level := settings.data.get("loglevel"):
