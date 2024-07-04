@@ -10,16 +10,16 @@ from flask import current_app as ca
 from flask import request
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
+from sqlalchemy import update
 from suntime import Sun
 
 from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.fifo import send_pipe
 from ..helpers.utils import execute_cmd, get_pid, set_timezone, write_log
-from ..models import Calendar as calendar_db
+from ..models import Calendar, db
 from ..models import Scheduler as scheduler_db
 from ..models import Settings as settings_db
-from ..models import db
 from .models import (
     calendar,
     date_time,
@@ -53,18 +53,18 @@ class Settings(Resource):
     @api.marshal_with(schedule)
     def get(self):
         """Get settings scheduler."""
-        settings = settings_db.query.first()
+        settings = db.first_or_404(db.select(Settings))
         return settings.data
 
     @api.expect(schedule)
     @api.response(204, "Success")
     def put(self):
         """Set settings."""
-        settings = settings_db.query.first()
+        settings = db.first_or_404(db.select(Settings))
         cur_tz = settings.data["gmt_offset"]
-        settings.data.update(**api.payload)
+        settings.data.update(api.payload)
+        db.session.execute(update(settings_db), settings.__dict__)
         db.session.commit()
-
         if (new_tz := settings.data["gmt_offset"]) != cur_tz:
             try:
                 set_timezone(new_tz)
@@ -85,26 +85,29 @@ class Scheduler(Resource):
     def get(self):
         """Get settings scheduler."""
         if id := request.args.get("daymode"):
-            return scheduler_db.query.filter_by(daysmode_id=id).all()
-        return scheduler_db.query.all()
+            return db.session.scalars(
+                db.select(scheduler_db).filter_by(daysmode_id=id)
+            ).all()
+        return db.session.scalars(db.select(scheduler_db)).all()
 
     @api.expect(scheduler)
     @api.response(204, "Success")
     def put(self):
         """Set settings."""
         for sch_id, sch in api.payload.items():
-            my_schedule = scheduler_db.query.filter_by(
-                daysmode_id=sch["daymode"], id=int(sch_id)
+            my_schedule = db.first_or_404(
+                db.select(scheduler_db).filter_by(
+                    daysmode_id=sch["daymode"], id=int(sch_id)
+                )
             )
-            my_schedule = my_schedule.scalar()
             my_schedule.command_on = sch["commands_on"]
             my_schedule.command_off = sch["commands_off"]
             my_schedule.mode = sch["modes"]
             my_schedule.calendars = []
             for key, value in sch["calendar"].items():
                 if value:
-                    cal = calendar_db.query.filter_by(name=key)
-                    my_schedule.calendars.append(cal.scalar())
+                    cal = db.first_or_404(db.select(Calendar).filter_by(name=key))
+                    my_schedule.calendars.append(cal)
             db.session.commit()
 
         send_pipe(ca.config["SCHEDULE_RESET"])
@@ -191,7 +194,7 @@ def utc_offset(offset) -> timezone:
 def dt_now(minute: bool = False) -> dt | int:
     """Get current local time."""
     now = dt.utcnow()
-    settings = settings_db.query.first()
+    settings = db.first_or_404(db.select(Settings))
     if settings.data["gmt_offset"]:
         offset = time_offset(settings.data["gmt_offset"])
         now = (now + offset).replace(tzinfo=utc_offset(offset.seconds))
@@ -202,7 +205,7 @@ def dt_now(minute: bool = False) -> dt | int:
 
 def sun_info(mode: str) -> dt:
     """Return sunset or sunrise datetime."""
-    settings = settings_db.query.first()
+    settings = db.first_or_404(db.select(Settings))
     offset = time_offset(settings.data["gmt_offset"])
     sun = Sun(settings.data["latitude"], settings.data["longitude"])
     if mode.lower() == "sunset":
@@ -217,43 +220,53 @@ def get_calendar(daymode: int) -> int:
     now = dt_now()
     sunrise = sun_info("sunrise")
     sunset = sun_info("sunset")
-    settings = settings_db.query.first()
+    settings = db.first_or_404(db.select(Settings))
 
     match daymode:
         case 0:
             if now < (sunrise + td(minutes=settings.data["dawnstart_minutes"])):
                 # Night
-                mem_sch = scheduler_db.query.filter_by(
-                    period="night", daysmode_id=daymode
-                ).one()
+                mem_sch = db.first_or_404(
+                    db.select(scheduler_db).filter_by(
+                        period="night", daysmode_id=daymode
+                    )
+                )
             elif now < (sunrise + td(minutes=settings.data["daystart_minutes"])):
                 # Dawn
-                mem_sch = scheduler_db.query.filter_by(
-                    period="dawn", daysmode_id=daymode
-                ).one()
+                mem_sch = db.first_or_404(
+                    db.select(scheduler_db).filter_by(
+                        period="dawn", daysmode_id=daymode
+                    )
+                )
             elif now > (sunset + td(minutes=settings.data["duskend_minutes"])):
                 # Night
-                mem_sch = scheduler_db.query.filter_by(
-                    period="night", daysmode_id=daymode
-                ).one()
+                mem_sch = db.first_or_404(
+                    db.select(scheduler_db).filter_by(
+                        period="night", daysmode_id=daymode
+                    )
+                )
             elif now > (sunset + td(minutes=settings.data["dayend_minutes"])):
                 # Dusk
-                mem_sch = scheduler_db.query.filter_by(
-                    period="dusk", daysmode_id=daymode
-                ).one()
+                mem_sch = db.first_or_404(
+                    db.select(scheduler_db).filter_by(
+                        period="dusk", daysmode_id=daymode
+                    )
+                )
             else:
                 # Day
-                mem_sch = scheduler_db.query.filter_by(
-                    period="day", daysmode_id=daymode
-                ).one()
+                mem_sch = db.first_or_404(
+                    db.select(scheduler_db).filter_by(period="day", daysmode_id=daymode)
+                )
         case 1:
             # AllDay
-            mem_sch = scheduler_db.query.filter_by(
-                period="allday", daysmode_id=daymode
-            ).one()
+            mem_sch = db.first_or_404(
+                db.select(scheduler_db).filter_by(period="allday", daysmode_id=daymode)
+            )
         case 2:
             # Times
-            schedulers = scheduler_db.query.filter_by(daysmode_id=2).all()
+            schedulers = db.session.scalars(
+                db.select(scheduler_db).filter_by(daysmode_id=2)
+            ).all()
             max_less_v = -1
             for scheduler in schedulers:
                 str_time = scheduler.period

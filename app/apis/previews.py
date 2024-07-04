@@ -8,8 +8,7 @@ from flask_restx import Namespace, Resource, abort
 from ..blueprints.preview import get_thumbs, video_convert
 from ..helpers.decorator import role_required
 from ..helpers.filer import delete_mediafiles, maintain_folders
-from ..models import Files as files_db
-from ..models import db
+from ..models import Files, db
 from .models import deletes, files, lock_mode, message
 
 api = Namespace(
@@ -38,7 +37,7 @@ class Thumbs(Resource):
         time_filter = int(request.args.get("time_filter", 1))
         return get_thumbs(sort_order, show_types, time_filter)
 
-    @api.doc(description="Delete  all files or files list")
+    @api.doc(description="Delete all files or files list")
     @api.expect(deletes)
     @api.marshal_with(deletes, code=201)
     def delete(self):
@@ -46,7 +45,9 @@ class Thumbs(Resource):
         deleted_ids = []
         if self.api.payload:
             for id in self.api.payload.get("thumb_id", []):
-                if thumb := files_db.query.get(id):
+                if thumb := db.session.scalars(
+                    db.select(Files).filter_by(id=id)
+                ).first():
                     if thumb.locked:
                         continue
                     delete_mediafiles(thumb.name)
@@ -68,19 +69,18 @@ class Thumb(Resource):
     @api.marshal_with(files)
     def get(self, id: str):
         """Get file information."""
-        return db.get_or_404(files_db, id)
+        return db.get_or_404(Files, id, description="Thumb not found")
 
     @api.doc(description="Delete file")
     @api.response(204, "Success")
     def delete(self, id: str):
         """Delete file."""
-        if thumb := files_db.query.get(id):
-            if thumb.locked:
-                abort(422, f"Protected thumbnail ({id})")
-            delete_mediafiles(thumb.name)
-            maintain_folders(ca.raspiconfig.media_path, False, False)
-            return "", 204
-        abort(404, "Thumb not found")
+        thumb = db.get_or_404(Files, id, description="Thumb not found")
+        if thumb.locked:
+            abort(422, f"Protected thumbnail ({id})")
+        delete_mediafiles(thumb.name)
+        maintain_folders(ca.raspiconfig.media_path, False, False)
+        return "", 204
 
 
 @api.route("/lock_mode")
@@ -96,7 +96,7 @@ class LockMode(Resource):
         mode = self.api.payload["mode"] is True
         ids = [ids] if isinstance(ids, str) else ids
         for id in ids:
-            if thumb := files_db.query.get(id):
+            if thumb := db.session.scalars(db.select(Files).filter_by(id=id)).first():
                 thumb.locked = mode
                 db.session.commit()
         return "", 204
@@ -106,50 +106,47 @@ class LockMode(Resource):
 @api.response(201, "Already lock", message)
 @api.response(204, "Success")
 @api.response(401, "Unauthorized")
-@api.response(422, "Error", message)
+@api.response(404, "Not Found")
 class Lock(Resource):
     """Lock file."""
 
     def post(self, id: str):
         """Lock."""
-        if thumb := files_db.query.get(id):
-            if thumb.locked is False:
-                thumb.locked = True
-                db.session.commit()
-                return "", 204
+        thumb = db.get_or_404(Files, id, description="Thumb not found")
+        if thumb.locked is True:
             return {"message": "Thumb is already locked"}, 201
-        abort(422, f"Thumb not found ({id})")
+        thumb.locked = True
+        db.session.commit()
+        return "", 204
 
 
 @api.route("/<string:id>/unlock")
 @api.response(201, "Already unlock", message)
 @api.response(204, "Success")
 @api.response(401, "Unauthorized")
-@api.response(422, "Error", message)
+@api.response(404, "Not Found")
 class Unlock(Resource):
     """Unock file."""
 
     def post(self, id: str):
         """Unlock."""
-        if thumb := files_db.query.get(id):
-            if thumb.locked is True:
-                thumb.locked = False
-                db.session.commit()
-                return "", 204
+        thumb = db.get_or_404(Files, id, description="Thumb not found")
+        if thumb.locked is False:
             return {"message": "Thumb is already unlocked"}, 201
-        abort(422, f"Thumb not found ({id})")
+        thumb.locked = False
+        db.session.commit()
+        return "", 204
 
 
 @api.route("/<string:id>/convert")
 @api.response(204, "Success")
 @api.response(401, "Unauthorized")
-@api.response(422, "Error", message)
+@api.response(404, "Not Found")
 class Convert(Resource):
     """Convert timelapse file to mp4."""
 
     def post(self, id: str):
         """Coonvert timelapse."""
-        if thumb := files_db.query.get(id):
-            video_convert(thumb.name)
-            return "", 204
-        abort(422, "Thumb not found")
+        thumb = db.get_or_404(Files, id, description="Thumb not found")
+        video_convert(thumb.name)
+        return "", 204

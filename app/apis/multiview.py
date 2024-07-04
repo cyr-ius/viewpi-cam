@@ -1,7 +1,8 @@
 """Blueprint Multiview API."""
 
 from flask_login import login_required
-from flask_restx import Namespace, Resource, abort
+from flask_restx import Namespace, Resource
+from sqlalchemy import update
 
 from ..helpers.decorator import role_required
 from ..models import Multiviews as multiviews_db
@@ -25,7 +26,7 @@ class Multiviews(Resource):
     @api.marshal_with(multiview, as_list=True)
     def get(self):
         """List hosts."""
-        return multiviews_db.query.all()
+        return db.session.scalars(db.select(multiviews_db)).all()
 
     @api.expect(multiview)
     @api.marshal_with(multiviews, code=201)
@@ -39,6 +40,7 @@ class Multiviews(Resource):
 
 
 @api.response(401, "Unauthorized")
+@api.response(404, "Not found", message)
 @api.route("/<int:id>")
 class Multiview(Resource):
     """Multiview object."""
@@ -46,27 +48,20 @@ class Multiview(Resource):
     @api.marshal_with(multiview)
     def get(self, id: int):
         """Get multiview."""
-        return db.get_or_404(multiviews_db, id)
+        return db.get_or_404(multiviews_db, id, description="View not found")
 
     @api.response(204, "Success")
-    @api.response(404, "NotFound", message)
     @api.expect(multiviews)
     def put(self, id: int):
         """Set multiview."""
-        if (
-            multiview := multiviews_db.query.filter_by(id=id)
-        ) and multiview.first() is not None:
-            multiview.update(api.payload)
-            db.session.commit()
-            return "", 204
-        abort(404, "Host not found")
+        db.session.execute(update(multiviews_db), api.payload)
+        db.session.commit()
+        return "", 204
 
     @api.response(204, "Success")
-    @api.response(404, "NotFound", message)
     def delete(self, id: int):
         """Delete multiview."""
-        if multiview := db.get_or_404(multiviews_db, id):
-            db.session.delete(multiview)
-            db.session.commit()
-            return "", 204
-        abort(404, "Host not found")
+        multiview = db.get_or_404(multiviews_db, id, description="View not found")
+        db.session.delete(multiview)
+        db.session.commit()
+        return "", 204

@@ -4,13 +4,15 @@ import random
 import uuid
 from datetime import datetime as dt
 from datetime import timezone
+from typing import Optional
 
 import jwt
 import pyotp
 from flask import current_app as ca
 from flask_restx import abort
+from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.sqlite import JSON
-from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash
 
 from .base import db
@@ -18,8 +20,8 @@ from .base import db
 
 class Settings(db.Model):
     __tablename__ = "settings"
-    id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(MutableDict.as_mutable(JSON))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    data: Mapped[JSON] = mapped_column(type_=JSON)
 
     def delete(self, *args, **kwargs):
         """Delete."""
@@ -33,42 +35,26 @@ class Settings(db.Model):
 
 class Multiviews(db.Model):
     __tablename__ = "multiviews"
-    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    delay: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-    state: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-    url: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-
-    def delete(self):
-        """Delete."""
-        db.session.delete(self)
-        db.session.commit()
+    id: Mapped[int] = mapped_column(primary_key=True)
+    delay: Mapped[int]
+    state: Mapped[int]
+    url: Mapped[str]
 
 
 class Users(db.Model):
     __tablename__ = "users"
-    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    alternative_id: db.Mapped[int] = db.mapped_column(
-        db.String, default=str(uuid.uuid4()), nullable=False
-    )
-    enabled: db.Mapped[bool] = db.mapped_column(
-        db.Boolean, nullable=False, default=True
-    )
-    locale: db.Mapped[str] = db.mapped_column(
-        db.String(2), default="en", nullable=False
-    )
-    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False, unique=True)
-    secret: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
-    otp_secret: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
-    otp_confirmed: db.Mapped[str] = db.mapped_column(
-        db.Boolean, default=False, nullable=False
-    )
-    api_token: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
-    cam_token: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
-    right: db.Mapped[str] = db.mapped_column(
-        db.ForeignKey("roles.level"), nullable=False
-    )
-
-    roles: db.Mapped["Roles"] = db.relationship(back_populates="users")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    alternative_id: Mapped[int] = mapped_column(default=str(uuid.uuid4()))
+    enabled: Mapped[bool] = mapped_column(default=True)
+    locale: Mapped[str] = mapped_column(default="en")
+    name: Mapped[str] = mapped_column(unique=True)
+    secret: Mapped[Optional[str]]
+    otp_secret: Mapped[Optional[str]]
+    otp_confirmed: Mapped[str] = mapped_column(default=False)
+    api_token: Mapped[Optional[str]]
+    cam_token: Mapped[Optional[str]]
+    right: Mapped[str] = mapped_column(ForeignKey("roles.level"))
+    roles: Mapped["Roles"] = relationship(back_populates="users")
 
     def is_authenticated(self):
         return True
@@ -153,46 +139,36 @@ class Users(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def delete(self):
-        """Delete."""
-        db.session.delete(self)
-        db.session.commit()
-
 
 class Roles(db.Model):
     __tablename__ = "roles"
-    level: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False, unique=True)
-
-    users: db.Mapped["Users"] = db.relationship(back_populates="roles")
+    level: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    users: Mapped["Users"] = relationship(back_populates="roles")
 
 
 class Presets(db.Model):
     __tablename__ = "presets"
-    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    mode: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    width: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-    height: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-    fps: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-    i_width: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-    i_height: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-    i_rate: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    mode: Mapped[str]
+    name: Mapped[str]
+    width: Mapped[int]
+    height: Mapped[int]
+    fps: Mapped[int]
+    i_width: Mapped[int]
+    i_height: Mapped[int]
+    i_rate: Mapped[int]
 
 
 class Ubuttons(db.Model):
     __tablename__ = "ubuttons"
-    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    macro: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    style: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
-    other: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
-    css_class: db.Mapped[str] = db.mapped_column(db.String, nullable=True)
-    display: db.Mapped[bool] = db.mapped_column(
-        db.Boolean,
-        default=False,
-        nullable=False,
-    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    macro: Mapped[str]
+    style: Mapped[Optional[str]]
+    other: Mapped[Optional[str]]
+    css_class: Mapped[Optional[str]]
+    display: Mapped[bool] = mapped_column(default=False)
 
     def delete(self):
         """Delete."""
@@ -203,64 +179,47 @@ class Ubuttons(db.Model):
 scheduler_calendar = db.Table(
     "scheduler_calendar",
     db.Model.metadata,
-    db.Column(
-        "scheduler_id", db.Integer, db.ForeignKey("scheduler.id"), nullable=False
-    ),
-    db.Column("calendar_id", db.Integer, db.ForeignKey("calendar.id"), nullable=False),
+    db.Column("scheduler_id", db.Integer, ForeignKey("scheduler.id"), nullable=False),
+    db.Column("calendar_id", db.Integer, ForeignKey("calendar.id"), nullable=False),
 )
 
 
 class Calendar(db.Model):
     __tablename__ = "calendar"
-    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
 
 
 class DaysMode(db.Model):
     __tablename__ = "daysmode"
-    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    name: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-
-    scheduler: db.Mapped["Scheduler"] = db.relationship(back_populates="daysmode")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    scheduler: Mapped["Scheduler"] = relationship(back_populates="daysmode")
 
 
 class Scheduler(db.Model):
     __tablename__ = "scheduler"
-    id: db.Mapped[int] = db.mapped_column(db.Integer, primary_key=True)
-    command_on: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    command_off: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    mode: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    enabled: db.Mapped[bool] = db.mapped_column(db.Boolean, nullable=False)
-    period: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    daysmode_id: db.Mapped[int] = db.mapped_column(
-        db.ForeignKey("daysmode.id"), nullable=False
-    )
-
-    daysmode: db.Mapped["DaysMode"] = db.relationship(back_populates="scheduler")
-    calendars: db.Mapped[list["Calendar"]] = db.relationship(
-        secondary=scheduler_calendar
-    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    command_on: Mapped[str]
+    command_off: Mapped[str]
+    mode: Mapped[str]
+    enabled: Mapped[bool]
+    period: Mapped[str]
+    daysmode_id: Mapped[int] = mapped_column(ForeignKey("daysmode.id"))
+    daysmode: Mapped["DaysMode"] = relationship(back_populates="scheduler")
+    calendars: Mapped[list["Calendar"]] = relationship(secondary=scheduler_calendar)
 
 
 class Files(db.Model):
     __tablename__ = "files"
-    id: db.Mapped[str] = db.mapped_column(db.String, primary_key=True)
-    name: db.Mapped[str] = db.mapped_column(
-        db.String, index=True, unique=True, nullable=False
-    )
-    type: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    size: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-    icon: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    datetime: db.Mapped[dt] = db.mapped_column(db.DateTime, nullable=False)
-    locked: db.Mapped[bool] = db.mapped_column(db.Boolean, nullable=False)
-    realname: db.Mapped[str] = db.mapped_column(
-        db.String, index=True, unique=True, nullable=False
-    )
-    number: db.Mapped[str] = db.mapped_column(db.String, nullable=False)
-    lapse_count: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-    duration: db.Mapped[int] = db.mapped_column(db.Integer, nullable=False)
-
-    def delete(self):
-        """Delete file in database."""
-        db.session.delete(self)
-        db.session.commit()
+    id: Mapped[str] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(index=True, unique=True)
+    type: Mapped[str]
+    size: Mapped[int]
+    icon: Mapped[str]
+    datetime: Mapped[dt]
+    locked: Mapped[bool]
+    realname: Mapped[str] = mapped_column(index=True, unique=True)
+    number: Mapped[str]
+    lapse_count: Mapped[int]
+    duration: Mapped[int]

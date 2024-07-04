@@ -4,7 +4,7 @@ from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required
-from ..models import Users as users_db
+from ..models import Users, db
 from .models import message, otp, secret
 
 api = Namespace(
@@ -29,12 +29,10 @@ class Totp(Resource):
         """Get OTP for a user."""
         if id == 0:
             abort(403, "System account cannot be modified")
-        user = users_db.query.get(id)
-        if user:
-            if not user.otp_confirmed:
-                user.set_otp_secret()
-            return user
-        abort(404, "User not found")
+        user = db.get_or_404(Users, id, description="User not found")
+        if not user.otp_confirmed:
+            user.set_otp_secret()
+        return user
 
     @api.response(204, "Success")
     @api.response(422, "Error", message)
@@ -43,20 +41,16 @@ class Totp(Resource):
         """Check OTP code."""
         if id == 0:
             abort(403, "System account cannot be modified")
-        user = users_db.query.get(id)
-        if user:
-            if user.check_otp_secret(api.payload["secret"]):
-                return "", 204
-            abort(422, "OTP incorrect")
-        abort(404, "User not found")
+        user = db.get_or_404(Users, id, description="User not found")
+        if user.check_otp_secret(api.payload["secret"]):
+            return "", 204
+        abort(422, "OTP incorrect")
 
     @api.response(204, "Success")
     def delete(self, id: int):
         """Delete OTP infos for a user."""
         if id == 0:
             abort(403, "System account cannot be modified")
-        user = users_db.query.get(id)
-        if user:
-            user.delete_otp_secret()
-            return "", 204
-        abort(404, "User not found")
+        user = db.get_or_404(Users, id, description="User not found")
+        user.delete_otp_secret()
+        return "", 204

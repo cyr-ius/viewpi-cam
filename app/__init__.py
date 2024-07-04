@@ -10,8 +10,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from . import apis, blueprints, models, services
 from .helpers.utils import get_pid, launch_module, set_timezone
-from .models import Settings as settings_db
-from .models import db
+from .models import Settings, db
 
 
 # pylint: disable=E1101,W0613
@@ -93,8 +92,9 @@ def create_app(config=None):
     @app.before_request
     def before_app_request():
         """Execute before request."""
-        settings = settings_db.query.first()
-        g.loglevel = settings.data["loglevel"]
+        settings = db.first_or_404(db.select(Settings))
+        if settings:
+            g.loglevel = settings.data["loglevel"]
 
     @app.after_request
     def set_secure_headers(response):
@@ -106,7 +106,7 @@ def create_app(config=None):
     with app.app_context():
         if db.inspect(db.engine).has_table("Setting"):
             # Get settings
-            settings = settings_db.query.first()
+            settings = db.one_or_404(db.select(Settings))
 
             # Custom log level
             if custom_level := settings.data.get("loglevel"):

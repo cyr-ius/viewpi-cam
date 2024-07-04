@@ -2,10 +2,11 @@
 
 from flask import current_app as ca
 from flask_login import login_required
-from flask_restx import Namespace, Resource, abort
+from flask_restx import Namespace, Resource
+from sqlalchemy import update
 
 from ..helpers.decorator import role_required
-from ..models import Settings as settting_db
+from ..models import Settings as settings_db
 from ..models import Ubuttons, db
 from .models import button, buttons, macro, message, setting
 
@@ -28,16 +29,17 @@ class Sets(Resource):
     @api.marshal_with(setting)
     def get(self):
         """Get settings."""
-        settings = settting_db.query.first()
-        return settings.data
+        return db.first_or_404(db.select(settings_db))
 
     @api.expect(setting)
     @api.response(204, "Success")
     def post(self):
         """Set settings."""
-        settings = settting_db.query.first()
-        settings.data.update(**api.payload)
+        settings = db.first_or_404(db.select(settings_db))
+        settings.data.update(api.payload)
+        db.session.execute(update(settings_db), settings.__dict__)
         db.session.commit()
+
         if loglevel := api.payload.get("loglevel"):
             ca.logger.setLevel(loglevel)
             ca.logger.debug(f"Log level: {loglevel}")
@@ -52,7 +54,7 @@ class Buttons(Resource):
     @api.marshal_with(buttons, as_list=True)
     def get(self):
         """List buttons."""
-        return Ubuttons.query.all()
+        return db.session.scalars(db.select(Ubuttons)).all()
 
     @api.expect(button)
     @api.marshal_with(buttons, code=201)
@@ -66,6 +68,7 @@ class Buttons(Resource):
 
 
 @api.response(401, "Unauthorized")
+@api.response(404, "Not found", message)
 @api.route("/buttons/<int:id>")
 class Button(Resource):
     """Button object."""
@@ -74,28 +77,22 @@ class Button(Resource):
     @api.response(404, "Not found", message)
     def get(self, id: int):
         """Get button."""
-        return db.get_or_404(Ubuttons, id)
+        return db.get_or_404(Ubuttons, id, description="Button not found")
 
     @api.expect(button)
     @api.response(204, "Success")
-    @api.response(404, "Not found", message)
     def put(self, id: int):
         """Set button."""
-        if (ubutton := Ubuttons.query.filter_by(id=id)) and ubutton.first() is not None:
-            ubutton.update(api.payload)
-            db.session.commit()
-            return "", 204
-        abort(404, "Button not found")
+        db.session.execute(update(Ubuttons), api.payload)
+        db.session.commit()
+        return "", 204
 
     @api.response(204, "Actions is success")
-    @api.response(404, "Not found", message)
     def delete(self, id: int):
         """Delete button."""
-        if ubutton := db.get_or_404(Ubuttons, id):
-            db.session.delete(ubutton)
-            db.session.commit()
-            return "", 204
-        abort(404, "Button not found")
+        ubutton = db.get_or_404(Ubuttons, id, description="Button not found")
+        ubutton.delete()
+        return "", 204
 
 
 @api.response(401, "Unauthorized")
