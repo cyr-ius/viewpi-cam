@@ -53,14 +53,14 @@ class Settings(Resource):
     @api.marshal_with(schedule)
     def get(self):
         """Get settings scheduler."""
-        settings = db.first_or_404(db.select(Settings))
+        settings = db.first_or_404(db.select(settings_db))
         return settings.data
 
     @api.expect(schedule)
     @api.response(204, "Success")
     def put(self):
         """Set settings."""
-        settings = db.first_or_404(db.select(Settings))
+        settings = db.first_or_404(db.select(settings_db))
         cur_tz = settings.data["gmt_offset"]
         settings.data.update(api.payload)
         db.session.execute(update(settings_db), settings.__dict__)
@@ -194,7 +194,7 @@ def utc_offset(offset) -> timezone:
 def dt_now(minute: bool = False) -> dt | int:
     """Get current local time."""
     now = dt.utcnow()
-    settings = db.first_or_404(db.select(Settings))
+    settings = db.first_or_404(db.select(settings_db))
     if settings.data["gmt_offset"]:
         offset = time_offset(settings.data["gmt_offset"])
         now = (now + offset).replace(tzinfo=utc_offset(offset.seconds))
@@ -205,7 +205,7 @@ def dt_now(minute: bool = False) -> dt | int:
 
 def sun_info(mode: str) -> dt:
     """Return sunset or sunrise datetime."""
-    settings = db.first_or_404(db.select(Settings))
+    settings = db.first_or_404(db.select(settings_db))
     offset = time_offset(settings.data["gmt_offset"])
     sun = Sun(settings.data["latitude"], settings.data["longitude"])
     if mode.lower() == "sunset":
@@ -220,7 +220,7 @@ def get_calendar(daymode: int) -> int:
     now = dt_now()
     sunrise = sun_info("sunrise")
     sunset = sun_info("sunset")
-    settings = db.first_or_404(db.select(Settings))
+    settings = db.first_or_404(db.select(settings_db))
 
     match daymode:
         case 0:
