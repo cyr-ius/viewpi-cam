@@ -6,8 +6,7 @@ from flask_restx import Namespace, Resource
 from sqlalchemy import update
 
 from ..helpers.decorator import role_required
-from ..models import Settings as settings_db
-from ..models import Ubuttons, db
+from ..models import Settings, Ubuttons, db
 from .models import button, buttons, macro, message, setting
 
 api = Namespace(
@@ -29,15 +28,15 @@ class Sets(Resource):
     @api.marshal_with(setting)
     def get(self):
         """Get settings."""
-        return db.first_or_404(db.select(settings_db))
+        return db.session.scalars(db.select(Settings)).first()
 
     @api.expect(setting)
     @api.response(204, "Success")
     def post(self):
         """Set settings."""
-        settings = db.first_or_404(db.select(settings_db))
+        settings = db.session.scalars(db.select(Settings)).first()
         settings.data.update(api.payload)
-        db.session.execute(update(settings_db), settings.__dict__)
+        db.session.execute(update(Settings), settings.__dict__)
         db.session.commit()
 
         if loglevel := api.payload.get("loglevel"):
@@ -91,7 +90,8 @@ class Button(Resource):
     def delete(self, id: int):
         """Delete button."""
         ubutton = db.get_or_404(Ubuttons, id, description="Button not found")
-        ubutton.delete()
+        db.session.delete(ubutton)
+        db.session.commit()
         return "", 204
 
 

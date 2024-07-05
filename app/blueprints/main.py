@@ -21,8 +21,8 @@ from flask_login import current_user, login_required
 from ..apis.logs import get_logs
 from ..helpers.decorator import role_required
 from ..helpers.motion import MotionError, get_motion, is_motion
-from ..helpers.utils import allowed_file, write_log
-from ..models import Multiviews, Presets, Settings, Ubuttons, db
+from ..helpers.utils import allowed_file, get_settings, write_log
+from ..models import Multiviews, Presets, Ubuttons, db
 from ..services.raspiconfig import RaspiConfigError
 from .camera import status_mjpeg
 
@@ -33,7 +33,7 @@ bp = Blueprint("main", __name__, template_folder="templates")
 @login_required
 def index():
     """Index page."""
-    settings = db.session.scalars(db.select(Settings)).first()
+    settings = get_settings()
     write_log(f"Logged in user: {current_user.name}")
     write_log(f"UserLevel {current_user.right}")
     display_mode = request.cookies.get("display_mode", "On")
@@ -49,7 +49,7 @@ def index():
             cam_pos = pipan_sck.split(" ")
             file.close()
 
-    if settings.data.get("servo"):
+    if settings.get("servo"):
         mode = 2
 
     motionconfig = None
@@ -60,7 +60,7 @@ def index():
             flash("Motion config not found")
 
     presets = db.session.scalars(
-        db.select(Presets).filter_by(mode=settings.data["upreset"])
+        db.select(Presets).filter_by(mode=settings["upreset"])
     ).all()
 
     ubuttons = db.session.scalars(db.select(Ubuttons)).all()
@@ -74,7 +74,7 @@ def index():
         motionconfig=motionconfig,
         display_mode=display_mode,
         mjpegmode=mjpegmode,
-        preset=settings.data["upreset"],
+        preset=settings["upreset"],
         presets=presets,
     )
 

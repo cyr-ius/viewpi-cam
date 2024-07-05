@@ -14,6 +14,7 @@ from flask import (
 from flask import current_app as ca
 from flask_babel import lazy_gettext as _
 from flask_login import login_required, login_user, logout_user
+from sqlalchemy import func
 from werkzeug.security import generate_password_hash
 
 from ..helpers.utils import reverse
@@ -25,7 +26,10 @@ bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth"
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     """Register page."""
-    if request.method == "POST" and Users.query.count() == 1:
+    users_count = db.session.execute(
+        db.select(func.count("*")).select_from(Users)
+    ).scalar()
+    if request.method == "POST" and users_count == 1:
         next = request.form.get("next")
         if next and reverse(next) is False:
             abort(404)
@@ -47,7 +51,7 @@ def register():
 
         flash(flash_msg)
 
-    has_registered = Users.query.count() == 1
+    has_registered = users_count == 1
     return render_template(
         "login.html", register=has_registered, next=request.args.get("next")
     )
@@ -56,7 +60,10 @@ def register():
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     """Login page."""
-    if Users.query.count() == 1:
+    users_count = db.session.execute(
+        db.select(func.count("*")).select_from(Users)
+    ).scalar()
+    if users_count == 1:
         return redirect(url_for("auth.register", next=request.args.get("next")))
     if request.method == "POST":
         next = request.form.get("next")
@@ -97,7 +104,7 @@ def totpverified():
         if next and reverse(next) is False:
             abort(404)
 
-        if (user := db.one_or_404(Users, id)) and user.check_otp_secret(
+        if (user := db.session.get(Users, id)) and user.check_otp_secret(
             request.form.get("secret")
         ):
             login_user(user, remember=session["remember"])

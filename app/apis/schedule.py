@@ -16,10 +16,9 @@ from suntime import Sun
 from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.fifo import send_pipe
-from ..helpers.utils import execute_cmd, get_pid, set_timezone, write_log
-from ..models import Calendar, db
+from ..helpers.utils import execute_cmd, get_pid, get_settings, set_timezone, write_log
+from ..models import Calendar, Settings, db
 from ..models import Scheduler as scheduler_db
-from ..models import Settings as settings_db
 from .models import (
     calendar,
     date_time,
@@ -47,25 +46,24 @@ api.add_model("Daysmode", daysmode)
 
 @api.route("/")
 @api.response(401, "Unauthorized")
-class Settings(Resource):
+class Sets(Resource):
     """Schedule."""
 
     @api.marshal_with(schedule)
     def get(self):
         """Get settings scheduler."""
-        settings = db.first_or_404(db.select(settings_db))
-        return settings.data
+        return get_settings()
 
     @api.expect(schedule)
     @api.response(204, "Success")
     def put(self):
         """Set settings."""
-        settings = db.first_or_404(db.select(settings_db))
-        cur_tz = settings.data["gmt_offset"]
-        settings.data.update(api.payload)
-        db.session.execute(update(settings_db), settings.__dict__)
+        settings = get_settings()
+        cur_tz = settings["gmt_offset"]
+        settings.update(api.payload)
+        db.session.execute(update(Settings), {"id": 0, "data": settings})
         db.session.commit()
-        if (new_tz := settings.data["gmt_offset"]) != cur_tz:
+        if (new_tz := settings["gmt_offset"]) != cur_tz:
             try:
                 set_timezone(new_tz)
             except ViewPiCamException as error:
@@ -95,18 +93,20 @@ class Scheduler(Resource):
     def put(self):
         """Set settings."""
         for sch_id, sch in api.payload.items():
-            my_schedule = db.first_or_404(
+            my_schedule = db.session.scalars(
                 db.select(scheduler_db).filter_by(
                     daysmode_id=sch["daymode"], id=int(sch_id)
                 )
-            )
+            ).first()
             my_schedule.command_on = sch["commands_on"]
             my_schedule.command_off = sch["commands_off"]
             my_schedule.mode = sch["modes"]
             my_schedule.calendars = []
             for key, value in sch["calendar"].items():
                 if value:
-                    cal = db.first_or_404(db.select(Calendar).filter_by(name=key))
+                    cal = db.session.scalars(
+                        db.select(Calendar).filter_by(name=key)
+                    ).first()
                     my_schedule.calendars.append(cal)
             db.session.commit()
 
@@ -194,7 +194,7 @@ def utc_offset(offset) -> timezone:
 def dt_now(minute: bool = False) -> dt | int:
     """Get current local time."""
     now = dt.utcnow()
-    settings = db.first_or_404(db.select(settings_db))
+    settings = db.session.scalars(db.select(Settings)).first()
     if settings.data["gmt_offset"]:
         offset = time_offset(settings.data["gmt_offset"])
         now = (now + offset).replace(tzinfo=utc_offset(offset.seconds))
@@ -205,7 +205,7 @@ def dt_now(minute: bool = False) -> dt | int:
 
 def sun_info(mode: str) -> dt:
     """Return sunset or sunrise datetime."""
-    settings = db.first_or_404(db.select(settings_db))
+    settings = db.session.scalars(db.select(Settings)).first()
     offset = time_offset(settings.data["gmt_offset"])
     sun = Sun(settings.data["latitude"], settings.data["longitude"])
     if mode.lower() == "sunset":
@@ -220,48 +220,48 @@ def get_calendar(daymode: int) -> int:
     now = dt_now()
     sunrise = sun_info("sunrise")
     sunset = sun_info("sunset")
-    settings = db.first_or_404(db.select(settings_db))
+    settings = db.session.scalars(db.select(Settings)).first()
 
     match daymode:
         case 0:
             if now < (sunrise + td(minutes=settings.data["dawnstart_minutes"])):
                 # Night
-                mem_sch = db.first_or_404(
+                mem_sch = db.session.scalars(
                     db.select(scheduler_db).filter_by(
                         period="night", daysmode_id=daymode
                     )
-                )
+                ).first()
             elif now < (sunrise + td(minutes=settings.data["daystart_minutes"])):
                 # Dawn
-                mem_sch = db.first_or_404(
+                mem_sch = db.session.scalars(
                     db.select(scheduler_db).filter_by(
                         period="dawn", daysmode_id=daymode
                     )
-                )
+                ).first()
             elif now > (sunset + td(minutes=settings.data["duskend_minutes"])):
                 # Night
-                mem_sch = db.first_or_404(
+                mem_sch = db.session.scalars(
                     db.select(scheduler_db).filter_by(
                         period="night", daysmode_id=daymode
                     )
-                )
+                ).first()
             elif now > (sunset + td(minutes=settings.data["dayend_minutes"])):
                 # Dusk
-                mem_sch = db.first_or_404(
+                mem_sch = db.session.scalars(
                     db.select(scheduler_db).filter_by(
                         period="dusk", daysmode_id=daymode
                     )
-                )
+                ).first()
             else:
                 # Day
-                mem_sch = db.first_or_404(
+                mem_sch = db.session.scalars(
                     db.select(scheduler_db).filter_by(period="day", daysmode_id=daymode)
-                )
+                ).first()
         case 1:
             # AllDay
-            mem_sch = db.first_or_404(
+            mem_sch = db.session.scalars(
                 db.select(scheduler_db).filter_by(period="allday", daysmode_id=daymode)
-            )
+            ).first()
         case 2:
             # Times
             schedulers = db.session.scalars(

@@ -187,7 +187,7 @@ def get_file_info(file: str) -> dict[str, Any] | None:
     realname = data_file_name(file)
     id = get_file_id(file)
     number = get_file_index(file)
-    locked = True if (thumb := db.one_or_404(Files, id)) and thumb.locked else False
+    locked = True if (thumb := db.session.get(Files, id)) and thumb.locked else False
     size = 0
     lapse_count = 0
     duration = 0

@@ -13,14 +13,14 @@ from flask import (
 )
 from flask import current_app as ca
 from flask_login import login_required
+from sqlalchemy import delete
 
 from ..apis.rsync import Rsync
 from ..apis.settings import Macros, Sets
 from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
 from ..helpers.filer import allowed_file, zip_extract, zip_folder
-from ..models import Files as files_db
-from ..models import Multiviews, Presets, Ubuttons, Users, db
+from ..models import Files, Multiviews, Presets, Ubuttons, Users, db
 
 bp = Blueprint(
     "settings", __name__, template_folder="templates", url_prefix="/settings"
@@ -35,14 +35,12 @@ def index():
     settings = Sets().get()
     rsync = Rsync().get()
     users = db.session.scalars(db.select(Users).filter(Users.id > 0)).all()
-    camera_token, api_token = (
-        Users.query.with_entities(Users.cam_token, Users.api_token)
-        .filter(Users.id == 0)
-        .one()
-    )
+    camera_token, api_token = db.session.execute(
+        db.select(Users.cam_token, Users.api_token).filter(Users.id == 0)
+    ).one()
     ubuttons = db.session.scalars(db.select(Ubuttons)).all()
     multiviews = db.session.scalars(db.select(Multiviews)).all()
-    presets = Presets.query.add_column(Presets.mode).group_by("mode").all()
+    presets = db.session.scalars(db.select(Presets.mode).group_by("mode")).all()
     return render_template(
         "settings.html",
         settings=settings,
@@ -50,7 +48,7 @@ def index():
         macros=macros,
         ubuttons=ubuttons,
         multiviews=multiviews,
-        presets=dict(presets).values(),
+        presets=presets,
         camera_token=camera_token,
         api_token=api_token,
         rsync=rsync,
@@ -87,7 +85,7 @@ def restore():
         flash("No selected file")
     if file and allowed_file(file):
         zip_extract(file, ca.config_folder)
-        files_db.query.delete()
+        db.session.execute(delete(Files))
         db.session.commit()
         update_img_db()
     return redirect(url_for("settings.index"))

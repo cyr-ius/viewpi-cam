@@ -9,8 +9,8 @@ from flask import Flask, g
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from . import apis, blueprints, models, services
-from .helpers.utils import get_pid, launch_module, set_timezone
-from .models import Settings, db
+from .helpers.utils import get_pid, get_settings, launch_module, set_timezone
+from .models import db
 
 
 # pylint: disable=E1101,W0613
@@ -92,9 +92,7 @@ def create_app(config=None):
     @app.before_request
     def before_app_request():
         """Execute before request."""
-        settings = db.session.scalars(db.select(Settings)).first()
-        if settings:
-            g.loglevel = settings.data["loglevel"]
+        g.loglevel = get_settings("loglevel")
 
     @app.after_request
     def set_secure_headers(response):
@@ -105,15 +103,11 @@ def create_app(config=None):
 
     with app.app_context():
         if db.inspect(db.engine).has_table("Setting"):
-            # Get settings
-            settings = db.session.scalars(db.select(Settings)).first()
-
             # Custom log level
-            if custom_level := settings.data.get("loglevel"):
+            if custom_level := get_settings("loglevel"):
                 app.logger.setLevel(custom_level.upper())
-
             # Set timezone
-            if offset := settings.data.get("gmt_offset"):
+            if offset := get_settings("gmt_offset"):
                 set_timezone(offset)
 
     return app

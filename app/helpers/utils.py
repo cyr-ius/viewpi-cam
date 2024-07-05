@@ -7,6 +7,7 @@ import re
 import shutil
 from datetime import datetime as dt
 from subprocess import PIPE, Popen
+from typing import Any
 
 from flask import current_app as ca
 from flask import request
@@ -101,6 +102,16 @@ def disk_usage() -> tuple[int, int, int, int, str]:
     )
 
 
+def get_settings(attr: str = None, default: Any = None) -> dict[str, Any] | None:
+    """Return data setting."""
+    settings = db.session.scalars(db.select(Settings)).first()
+    if getattr(settings, "data", None) and attr:
+        return settings.data.get(attr, default)
+    if getattr(settings, "data", None):
+        return settings.data
+    return None
+
+
 def get_locale() -> str | list[str]:
     """Get locale."""
     if current_user.is_authenticated:
@@ -110,8 +121,7 @@ def get_locale() -> str | list[str]:
 
 def get_timezone() -> str | list[str]:
     """Get timezone."""
-    settings = db.session.scalars(db.select(Settings)).first()
-    return settings.data["gmt_offset"]
+    return get_settings("gmt_offset")
 
 
 def launch_module(module: str, action: str = "start") -> None:

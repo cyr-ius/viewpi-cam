@@ -214,7 +214,7 @@ $('#schedule').on('click', '#save', function(){
     } else {
         $("#form_setting").removeClass('was-validated')
         data = $("#form_setting").serializeObject({'checkboxesAsBools': true});
-        $.queryData({method:"put", url:"{{ url_for('api.schedule_settings')}}", data: data})
+        $.queryData({method:"put", url:"{{ url_for('api.schedule_sets')}}", data: data})
     }
 
     if (!document.getElementById('form_schedule').checkValidity()) {
@@ -272,7 +272,7 @@ $('#schedule').on('click','#stop', function(){
 $('#form_setting').on('change','#daymode', function(){
     let data = {"daymode": parseInt($("#daymode").val())}
     let success = function(){ location.reload(true); }
-    $.queryData({method:"put", url:"{{ url_for('api.schedule_settings')}}", data: data, success: success})
+    $.queryData({method:"put", url:"{{ url_for('api.schedule_sets')}}", data: data, success: success})
 });
 
 function daymodeControl(){

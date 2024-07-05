@@ -29,8 +29,7 @@ from ..helpers.filer import (
     get_file_type,
 )
 from ..helpers.utils import disk_usage, execute_cmd, write_log
-from ..models import Files as files_db
-from ..models import db
+from ..models import Files, db
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
 
@@ -104,8 +103,7 @@ def zipdata():
     if check_list:
         zip_list = []
         for id in check_list:
-            thumb = db.session.scalars(db.select(files_db).filter_by(id=id)).first()
-            if thumb:
+            if thumb := db.session.scalars(db.select(Files).filter_by(id=id)).first():
                 zip_list.append(thumb.name)
 
         return get_zip(zip_list)
@@ -191,9 +189,7 @@ def video_convert(filename: str) -> None:
 
 def get_thumbs(sort_order: str, show_types: str, time_filter: int):
     """Return thumbnails from database."""
-    order = (
-        files_db.datetime.desc() if sort_order == "desc" else files_db.datetime.asc()
-    )
+    order = Files.datetime.desc() if sort_order == "desc" else Files.datetime.asc()
     match show_types:
         case "both":
             show_types = ["i", "t", "v"]
@@ -203,19 +199,27 @@ def get_thumbs(sort_order: str, show_types: str, time_filter: int):
             show_types = ["v"]
 
     if (time_filter := int(time_filter)) == 1:
-        files = files_db.query.filter(files_db.type.in_(show_types)).order_by(order)
+        files = db.session.scalars(
+            db.select(Files).filter(Files.type.in_(show_types)).order_by(order)
+        )
     elif time_filter == ca.config.get("TIME_FILTER_MAX"):
         dt_search = dt.fromtimestamp(dt.now().timestamp() - (86400 * (time_filter - 2)))
-        files = files_db.query.filter(
-            files_db.type.in_(show_types), files_db.datetime <= dt_search
-        ).order_by(order)
+        files = db.session.scalars(
+            db.select(Files)
+            .filter(Files.type.in_(show_types), Files.datetime <= dt_search)
+            .order_by(order)
+        )
     else:
         dt_lw = dt.fromtimestamp(dt.now().timestamp() - (86400 * (time_filter - 2)))
         dt_gt = dt.fromtimestamp(dt.now().timestamp() - (time_filter - 1) * 86400)
-        files = files_db.query.filter(
-            files_db.type.in_(show_types),
-            files_db.datetime < dt_lw,
-            files_db.datetime >= dt_gt,
-        ).order_by(order)
+        files = db.session.scalars(
+            db.select(Files)
+            .filter(
+                Files.type.in_(show_types),
+                Files.datetime < dt_lw,
+                Files.datetime >= dt_gt,
+            )
+            .order_by(order)
+        )
 
     return files.all()

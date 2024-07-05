@@ -23,5 +23,6 @@ def update_img_db() -> None:
             file = files_db(**info)
             files.append(file.id)
             db.session.add(file)
+            db.session.commit()
             write_log(f"Add {file.id} to database")
-    db.session.commit()
+

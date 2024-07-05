@@ -73,7 +73,7 @@ class User(Resource):
             abort(403, "System account cannot be modified")
         if password := api.payload.pop("password", None):
             api.payload["secret"] = generate_password_hash(password)
-        db.session.execute(update(users_db), api.payload)
+        db.session.execute(update(users_db), [api.payload])
         db.session.commit()
         return "", 204
 

@@ -23,15 +23,6 @@ class Settings(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     data: Mapped[JSON] = mapped_column(type_=JSON)
 
-    def delete(self, *args, **kwargs):
-        """Delete."""
-        args = tuple(kwargs.keys())
-        data = self.data.copy()
-        for arg in args + tuple(kwargs.keys()):
-            data.pop(arg, None)
-        self.data = data
-        db.session.commit()
-
 
 class Multiviews(db.Model):
     __tablename__ = "multiviews"
@@ -132,10 +123,11 @@ class Users(db.Model):
         )
 
     def create_user(self) -> None:
-        user = Users.query.filter(str(Users.name).lower() == self.name.lower()).first()
+        user = db.session.scalars(
+            db.select(Users).filter(Users.name == self.name.lower())
+        ).first()
         if user:
             abort(422, "User name is already exists, please change.")
-
         db.session.add(self)
         db.session.commit()
 
@@ -169,11 +161,6 @@ class Ubuttons(db.Model):
     other: Mapped[Optional[str]]
     css_class: Mapped[Optional[str]]
     display: Mapped[bool] = mapped_column(default=False)
-
-    def delete(self):
-        """Delete."""
-        db.session.delete(self)
-        db.session.commit()
 
 
 scheduler_calendar = db.Table(

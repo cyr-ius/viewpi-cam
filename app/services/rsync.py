@@ -6,8 +6,7 @@ from subprocess import PIPE, Popen
 
 from flask import current_app as ca
 
-from ..helpers.utils import get_pid, write_log
-from ..models import Settings, db
+from ..helpers.utils import get_pid, get_settings, write_log
 
 
 def rsync() -> None:
@@ -17,13 +16,13 @@ def rsync() -> None:
     media_path = ca.raspiconfig.media_path
     binary = ca.config["RSYNC_BINARY"]
 
-    settings = db.session.scalars(db.select(Settings)).first()
-    options = settings.data.get("rs_options", [])
-    pwd = settings.data.get("rs_pwd")
-    mode = settings.data.get("rs_mode")
-    user = settings.data.get("rs_user")
-    host = settings.data.get("rs_remote_host")
-    direction = settings.data.get("rs_direction")
+    settings = get_settings()
+    options = settings.get("rs_options", [])
+    pwd = settings.get("rs_pwd")
+    mode = settings.get("rs_mode")
+    user = settings.get("rs_user")
+    host = settings.get("rs_remote_host")
+    direction = settings.get("rs_direction")
 
     if not isinstance(options, list):
         options = [options]
