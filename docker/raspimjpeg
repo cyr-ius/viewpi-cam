@@ -86,7 +86,7 @@ video_split 0
 #mp4box Off=leave as raw h264, background=box in background
 mp4box background
 mp4box_fps 25
-mp4box_cmd (set -e;MP4Box -fps %i -add %s %s > /dev/null 2>&1;rm "%s";MP4Box -info "%s" 2>&1 | grep "^Duration" | awk '{print $2}' > "%s.info";) &
+mp4box_cmd (set -e;MP4Box -fps %i -add %s %s > /dev/null 2>&1;rm "%s";) &
 
 #
 # Image Options
