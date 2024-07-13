@@ -51,7 +51,7 @@ ENV PATH $PATH:/env/bin
 # Install pip requirements
 ADD requirements.txt /tmp/
 RUN /env/bin/pip3 install --upgrade pip wheel
-RUN /env/bin/pip3 install --no-cache-dir --verbose -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
+RUN /env/bin/pip3 install --no-cache-dir -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
 
 # clean content
 RUN apk del build
