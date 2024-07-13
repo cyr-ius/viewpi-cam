@@ -35,7 +35,7 @@ def rsync() -> None:
         ssh = ""
         shee = ":"
 
-    cmd = f"{binary} -v {options} --no-perms --exclude '*.info' --exclude '*.th.jpg' {ssh} {media_path}/ {user}@{host}:{shee}{direction}"
+    cmd = f"{binary} -v {options} --no-perms --exclude '*.th.jpg' {ssh} {media_path}/ {user}@{host}:{shee}{direction}"
     print_msg(cmd)
 
     if not get_pid("/usr/bin/rsync"):
