@@ -164,7 +164,6 @@ def scheduler() -> None:
                 write_log("Reload parameters command requested")
                 break
             elif cmd == ca.config["SCHEDULE_UPDATE"]:
-                write_log("Encoding completed, update database")
                 update_img_db()
                 if settings.get("rs_enabled"):
                     rsync()
