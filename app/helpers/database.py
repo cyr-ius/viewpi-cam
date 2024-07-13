@@ -2,12 +2,7 @@
 
 from flask import current_app as ca
 
-from ..helpers.filer import (
-    get_file_id,
-    get_file_info,
-    is_thumbnail,
-    list_folder_files,
-)
+from ..helpers.filer import get_file_id, get_file_info, is_thumbnail, list_folder_files
 from ..helpers.utils import write_log
 from ..models import Files as files_db
 from ..models import db
@@ -25,4 +20,3 @@ def update_img_db() -> None:
             db.session.add(file)
             db.session.commit()
             write_log(f"Add {file.id} to database")
-
