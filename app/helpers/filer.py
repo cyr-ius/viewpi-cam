@@ -114,6 +114,11 @@ def is_thumbnail(file: str) -> bool:
     return file[-7:] == ca.config["THUMBNAIL_EXT"]
 
 
+def is_existing(file: str) -> bool:
+    media_path = ca.raspiconfig.media_path
+    return os.path.isfile(f"{media_path}/{file}")
+
+
 def get_file_size(path) -> int:
     """Return file size."""
     if ca.config["FILESIZE_METHOD"] == 0:
