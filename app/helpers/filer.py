@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 import zipfile
 from datetime import datetime as dt
 from io import BytesIO
@@ -12,6 +13,8 @@ from flask import current_app as ca
 
 from ..config import ALLOWED_EXTENSIONS
 from ..models import Files, db
+from .exceptions import ViewPiCamException
+from .utils import execute_cmd
 
 
 def find_lapse_files(filename: str) -> list[str]:
@@ -73,7 +76,6 @@ def delete_mediafiles(filename: str, delete: bool = True) -> int:
             raw_file = thumb_file[: thumb_file.find(".")]
             for file in (
                 f"{media_path}/{thumb_file}.dat",
-                f"{media_path}/{thumb_file}.info",
                 f"{media_path}/{raw_file}.h264",
                 f"{media_path}/{raw_file}.h264.bad",
                 f"{media_path}/{raw_file}.h264.log",
@@ -133,15 +135,23 @@ def get_file_type(file: str) -> str:
     return ""
 
 
+def get_mp4_information(realname_path: str) -> list[str]:
+    """Return MP4 information."""
+    try:
+        cmd = f"MP4Box -info '{realname_path}' 2>&1"
+        response = execute_cmd(cmd)
+        return response.replace("\t", "").split("\n")
+    except ViewPiCamException:
+        return list()
+
+
 def get_file_duration(file: str) -> int:
     """Return duration mp4."""
-    info_file = f"${file}.info".replace("$", "")
-    if get_file_ext(file) == "mp4" and os.path.isfile(info_file):
-        with open(info_file, encoding="utf-8") as info:
-            duration = info.readline().replace("\n", "")
-            if duration and duration != "":
-                duration = dt.strptime(duration, "%H:%M:%S.%f")
-                return duration.hour * 3600 + duration.minute * 60 + duration.second
+    for item in get_mp4_information(file):
+        duration = re.match("Duration (.*)", item)
+        if duration:
+            duration = dt.strptime(duration[1], "%H:%M:%S.%f")
+            return duration.hour * 3600 + duration.minute * 60 + duration.second
     return 0
 
 
