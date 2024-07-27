@@ -10,7 +10,7 @@ from ..config import LOCALES
 from ..helpers.decorator import role_required
 from ..models import Users as users_db
 from ..models import db
-from .models import api_token, cam_token, message, user, users
+from .models import api_token, cam_token, login, message, user, users
 
 api = Namespace(
     "users",
@@ -21,6 +21,7 @@ api.add_model("User", user)
 api.add_model("Users", users)
 api.add_model("CamToken", cam_token)
 api.add_model("APIToken", api_token)
+api.add_model("Login", login)
 
 
 @api.response(401, "Unauthorized")
@@ -168,16 +169,18 @@ class APIToken(Resource):
 class Login:
     """Login class."""
 
+    @api.marshal_with(login, code=201)
     def post(self):
         """Check login"""
-        if user := db.session.scalars(
+        if (user := db.session.scalars(
             db.select(users_db).filter_by(name=api.payload["username"])
-        ).first():
-            if not user.check_password(api.payload["password"]):
-                abort(403, "User or password incorrect")
-            jwt_token = user.generate_jwt()
-            if user.otp_confirmed;
-                if not user.check_otp_secret(api.payload["otp"]:
-                    abort(403, "OTP incoorect")
-            return {"access_token": jwt_token }
+        ).first()) is None:
+            abort(403, "User or password incorrect")
+        if not user.check_password(api.payload["password"]):
+            abort(403, "User or password incorrect")
+        if user.otp_confirmed;
+            if not user.check_otp_secret(api.payload["otp_code"]:
+                abort(403, "OTP incoorect")
+        jwt_token = user.generate_jwt()
+        return {"access_token": jwt_token }
                 
