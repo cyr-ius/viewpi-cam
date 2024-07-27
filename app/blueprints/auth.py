@@ -69,26 +69,16 @@ def login():
         next = request.form.get("next")
         if next and reverse(next) is False:
             abort(404)
-        session["remember"] = request.form.get("remember") == "on"
-
+        remember = request.form.get("remember") == "on"
         if user := db.session.scalars(
             db.select(Users).filter_by(name=request.form.get("username"))
         ).first():
             if user.check_password(request.form.get("password")):
-                session["first_auth"] = True
                 if user.otp_confirmed:
-                    return render_template("totp.html", next=next, id=user.id)
-                login_user(user, remember=session["remember"])
-                response = make_response(redirect(next or url_for("main.index")))
-                response.set_cookie(
-                    "api_token",
-                    value=user.generate_jwt(),
-                    httponly=True,
-                    samesite="strict",
-                )
-
-                return response
-
+                    session["user_id"] = user.id
+                    return render_template("totp.html", next=next, remember=remember, id=user.id)
+                login_user(user, remember=remember)
+                return redirect(next or url_for("main.index"))
             flash(_("User or password invalid."))
         flash(_("User or password invalid."))
 
@@ -98,26 +88,17 @@ def login():
 @bp.route("/totp-verified", methods=["GET", "POST"])
 def totpverified():
     """Totop verified."""
-    if session["first_auth"] is True and request.method == "POST":
-        id = int(request.form.get("id"))  # pylint: disable=W0622
-        next = request.form.get("next")
-        if next and reverse(next) is False:
+    if request.method = "POST" and session.pop("user_id") == (id := int(request.form.get("id"))):
+        if (next := request.form("next")) and reverse(next) is False:
             abort(404)
-
         if (user := db.session.get(Users, id)) and user.check_otp_secret(
             request.form.get("secret")
         ):
-            login_user(user, remember=session["remember"])
-            session.pop("first_auth")
-            session.pop("remember")
-            response = make_response(redirect(next or url_for("main.index")))
-            response.set_cookie(
-                "api_token", value=user.generate_jwt(), httponly=True, samesite="strict"
-            )
-            return response
-        flash(_("Access id denied."))
+            login_user(user, remember=remember)
+            return redirect(next or url_for("main.index")))
+        flash(_("OTP Code is invalid."))
 
-    return render_template("totp.html", id=id, next=next)
+    return render_template("totp.html", id=id, next=next, remember=remember)
 
 
 @bp.route("/logout", methods=["GET", "POST"])
