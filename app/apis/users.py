@@ -163,11 +163,11 @@ class APIToken(Resource):
         user.delete_api_token()
         return "", 204
 
-@api.route("/login")
+@api.route("/login", secure=None)
+@api.response(403, "Forbidden")
 class Login:
     """Login class."""
 
-    @api.response(204, "Success")
     def post(self):
         """Check login"""
         if user := db.session.scalars(
