@@ -128,6 +128,14 @@ log = Model(
         "msg": fields.String(required=True),
     },
 )
+login = Model(
+    "Login",
+    {
+        "username": fields.String(required=True, description="The user name"),
+        "password": fields.Integer(required=True, description="Password"),
+        "otp_code": fields.Boolean(required=False, description="OTP Code"),
+    },
+)
 macro = Model(
     "Macro",
     {
