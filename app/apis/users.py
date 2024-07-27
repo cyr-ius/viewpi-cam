@@ -1,12 +1,13 @@
 """Blueprint Users API."""
 
+from flask import current_app as ca
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort, fields
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
 
-from ..config import LOCALES, PERMANENT_SESSION_LIFETIME
+from ..config import LOCALES
 from ..helpers.decorator import role_required
 from ..models import Users as users_db
 from ..models import db
@@ -179,5 +180,9 @@ class Authorize(Resource):
         if user.otp_confirmed and user.check_otp_secret(api.payload.get("otp_code")) is Flase:
             abort(401, "OTP incorrect")
         jwt_token = user.generate_jwt()
-        return {"access_token": jwt_token, "token_type": "Bearer", "expires_in": PERMANENT_SESSION_LIFETIME}
+        return {
+            "access_token": jwt_token,
+            "token_type": "Bearer",
+            "expires_in": ca.config["PERMANENT_SESSION_LIFETIME"]
+        }
                 
