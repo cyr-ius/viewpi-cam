@@ -164,9 +164,9 @@ class APIToken(Resource):
         user.delete_api_token()
         return "", 204
 
-@api.route("/login", secure=None)
+@api.route("/authorize", secure=None)
 @api.response(403, "Forbidden")
-class Login:
+class Authorize(Resource):
     """Login class."""
 
     @api.marshal_with(login, code=201)
@@ -179,5 +179,5 @@ class Login:
         if user.otp_confirmed and user.check_otp_secret(api.payload.get("otp_code")) is Flase:
             abort(403, "OTP incorrect")
         jwt_token = user.generate_jwt()
-        return {"access_token": jwt_token }
+        return {"access_token": jwt_token, "token_type": "Bearer", "expire_in": 180 }
                 
