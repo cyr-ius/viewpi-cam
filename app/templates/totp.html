@@ -16,6 +16,7 @@
         </div>
         <input name="id" type="hidden" value="{{id}}">
         <input name="next" type="hidden" value="{{next}}">
+        <input name="remember" type="hidden" value="{{remember}}">
         <input class="btn btn-primary w-100 py-2" id="submit" name="submit" type="submit" value="{{_('Check')}}">
         {% for message in get_flashed_messages() %}
         <div class="alert alert-danger d-flex align-items-center mt-2" role="alert">
