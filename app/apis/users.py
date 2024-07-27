@@ -162,3 +162,22 @@ class APIToken(Resource):
         user = db.get_or_404(users_db, 0, description="User not found")
         user.delete_api_token()
         return "", 204
+
+@api.route("/login")
+class Login:
+    """Login class."""
+
+    @api.response(204, "Success")
+    def post(self):
+        """Check login"""
+        if user := db.session.scalars(
+            db.select(users_db).filter_by(name=api.payload["username"])
+        ).first():
+            if not user.check_password(api.payload["password"]):
+                abort(403, "User or password incorrect")
+            jwt_token = user.generate_jwt()
+            if user.otp_confirmed;
+                if not user.check_otp_secret(api.payload["otp"]:
+                    abort(403, "OTP incoorect")
+            return {"access_token": jwt_token }
+                
