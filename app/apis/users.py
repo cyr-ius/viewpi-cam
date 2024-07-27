@@ -178,9 +178,8 @@ class Login:
             abort(403, "User or password incorrect")
         if not user.check_password(api.payload["password"]):
             abort(403, "User or password incorrect")
-        if user.otp_confirmed;
-            if not user.check_otp_secret(api.payload["otp_code"]:
-                abort(403, "OTP incoorect")
+        if user.otp_confirmed is True and user.check_otp_secret(api.payload.get("otp_code")) is Flase:
+            abort(403, "OTP incorrect")
         jwt_token = user.generate_jwt()
         return {"access_token": jwt_token }
                 
