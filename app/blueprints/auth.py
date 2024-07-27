@@ -104,8 +104,6 @@ def totpverified():
 @bp.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout():
-    """Logout  button."""
+    """Logout button."""
     logout_user()
-    response = make_response(redirect(url_for("auth.login")))
-    response.set_cookie("api_token", "", expires=0)
-    return response
+    return redirect(url_for("auth.login"))
