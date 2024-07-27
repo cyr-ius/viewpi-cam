@@ -165,7 +165,7 @@ class APIToken(Resource):
         return "", 204
 
 @api.route("/authorize", secure=None)
-@api.response(403, "Forbidden")
+@api.response(401, "Unauthorized", message)
 class Authorize(Resource):
     """Login class."""
 
@@ -175,9 +175,9 @@ class Authorize(Resource):
         if not ((user := db.session.scalars(
             db.select(users_db).filter_by(name=api.payload["username"])
         ).first()) and user.check_password(api.payload["password"])):
-            abort(403, "User or password incorrect")
+            abort(401, "User or password incorrect")
         if user.otp_confirmed and user.check_otp_secret(api.payload.get("otp_code")) is Flase:
-            abort(403, "OTP incorrect")
+            abort(401, "OTP incorrect")
         jwt_token = user.generate_jwt()
         return {"access_token": jwt_token, "token_type": "Bearer", "expire_in": 180 }
                 
