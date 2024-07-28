@@ -63,23 +63,23 @@ def login():
     users_count = db.session.execute(
         db.select(func.count("*")).select_from(Users)
     ).scalar()
+
     if users_count == 1:
         return redirect(url_for("auth.register", next=request.args.get("next")))
+
     if request.method == "POST":
         next = request.form.get("next")
         if next and reverse(next) is False:
             abort(404)
         remember = request.form.get("remember") == "on"
-        if user := db.session.scalars(
+        if (user := db.session.scalars(
             db.select(Users).filter_by(name=request.form.get("username"))
-        ).first():
-            if user.check_password(request.form.get("password")):
-                if user.otp_confirmed:
-                    session["user_id"] = user.id
-                    return render_template("totp.html", next=next, remember=remember, id=user.id)
-                login_user(user, remember=remember)
-                return redirect(next or url_for("main.index"))
-            flash(_("User or password invalid."))
+        ).first()) and user.check_password(request.form.get("password")):
+            if user.otp_confirmed:
+                session["user_id"] = user.id
+                return render_template("totp.html", next=next, remember=remember, id=user.id)
+            login_user(user, remember=remember)
+            return redirect(next or url_for("main.index"))
         flash(_("User or password invalid."))
 
     return render_template("login.html")
@@ -106,4 +106,5 @@ def totpverified():
 def logout():
     """Logout button."""
     logout_user()
+
     return redirect(url_for("auth.login"))
