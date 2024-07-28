@@ -67,11 +67,11 @@ def load_user_from_request(request):
         if user:
             return user
 
-    api_token = request.headers.get("X-API-KEY") or request.cookies.get("JWToken")
-    if api_token and request.blueprint == "api":
+    api_token = request.headers.get("Authorization").split[" "]
+    if api_token[1] and request.blueprint == "api":
         try:
             jwt_content = jwt.decode(
-                api_token, ca.config["SECRET_KEY"], algorithms=["HS256"]
+                api_token[1], ca.config["SECRET_KEY"], algorithms=["HS256"]
             )
         except (jwt.ImmatureSignatureError, jwt.ExpiredSignatureError):
             abort(422, "API token expired")
