@@ -28,9 +28,9 @@ COPY --from=builder /app/userland/build/bin /usr/bin
 COPY --from=builder /app/userland/build/lib /usr/lib
 
 # set version label
-LABEL org.opencontainers.image.source https://github.com/cyr-ius/viewpi-cam
-LABEL org.opencontainers.image.description ViewPI Cam (inspired by Rpi Cam Interface)
-LABEL org.opencontainers.image.licenses MIT
+LABEL org.opencontainers.image.source="https://github.com/cyr-ius/viewpi-cam"
+LABEL org.opencontainers.image.description="ViewPI Cam (inspired by Rpi Cam Interface)"
+LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="cyr-ius"
 
 # Keeps Python from generating .pyc files in the container
@@ -45,8 +45,8 @@ RUN apk add --no-cache --virtual build build-base python3-dev cmake make gcc lin
 
 # Venv python
 RUN python3 -m venv --system-site-packages --upgrade-deps /env
-ENV VIRTUAL_ENV /env
-ENV PATH $PATH:/env/bin
+ENV VIRTUAL_ENV=/env
+ENV PATH=$PATH:/env/bin
 
 # Install pip requirements
 ADD requirements.txt /tmp/
@@ -75,7 +75,7 @@ VOLUME /app/h264
 VOLUME /app/config
 
 ARG VERSION
-ENV VERSION ${VERSION}
+ENV VERSION=${VERSION}
 
 EXPOSE 8000/tcp
 HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=3","http://127.0.0.1/"]
