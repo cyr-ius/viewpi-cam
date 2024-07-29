@@ -2,7 +2,7 @@ name: Create release
 on:
   push:
     tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+-[0-9]+-.*"
   workflow_dispatch:
 jobs:
   release:
@@ -39,4 +39,5 @@ jobs:
       contents: write
       packages: write
       id-token: write
+    if: ${{ ! contains(github.ref_name,'-') }}
     uses: ./.github/workflows/docker-publish.yml
