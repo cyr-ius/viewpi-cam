@@ -116,31 +116,31 @@ class Locale(Resource):
 @api.response(401, "Unauthorized")
 @api.route("/ctoken")
 class Token(Resource):
-    """Token."""
+    """Camera Token."""
 
     @api.marshal_with(cam_token)
     def get(self):
-        """Get token."""
+        """Get camera token."""
         user = db.get_or_404(users_db, 0, description="User not found")
         return {"cam_token": user.cam_token}
 
     @api.marshal_with(cam_token, code=201)
     def post(self):
-        """Create token."""
+        """Create camera token."""
         user = db.get_or_404(users_db, 0, description="User not found")
         cam_token = user.set_camera_token()
         return {"cam_token": cam_token}, 201
 
     @api.response(204, "Success")
     def delete(self):
-        """Delete token."""
+        """Delete camera token."""
         user = db.get_or_404(users_db, 0, description="User not found")
         user.delete_camera_token()
         return "", 204
 
 
 @api.response(401, "Unauthorized")
-@api.route("/token", doc=False)
+@api.route("/token")
 class APIToken(Resource):
     """Token."""
 
@@ -165,24 +165,33 @@ class APIToken(Resource):
         user.delete_api_token()
         return "", 204
 
-@api.route("/authorize", secure=None)
+
+@api.route("/authorize")
 @api.response(401, "Unauthorized", message)
 class Authorize(Resource):
     """Login class."""
 
-    @api.marshal_with(login, code=201)
+    @api.expect(login, code=201)
+    @api.doc(security=None)
     def post(self):
         """Check login"""
-        if not ((user := db.session.scalars(
-            db.select(users_db).filter_by(name=api.payload["username"])
-        ).first()) and user.check_password(api.payload["password"])):
+        if not (
+            (
+                user := db.session.scalars(
+                    db.select(users_db).filter_by(name=api.payload["username"])
+                ).first()
+            )
+            and user.check_password(api.payload["password"])
+        ):
             abort(401, "User or password incorrect")
-        if user.otp_confirmed and user.check_otp_secret(api.payload.get("otp_code")) is Flase:
+        if (
+            user.otp_confirmed
+            and user.check_otp_secret(api.payload.get("otp_code")) is False
+        ):
             abort(401, "OTP incorrect")
-        jwt_token = user.generate_jwt()
+
         return {
-            "access_token": jwt_token,
+            "access_token": user.generate_jwt(),
             "token_type": "Bearer",
-            "expires_in": ca.config["PERMANENT_SESSION_LIFETIME"]
+            "expires_in": int(ca.config["PERMANENT_SESSION_LIFETIME"].total_seconds()),
         }
-                
