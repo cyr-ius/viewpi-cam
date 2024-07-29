@@ -12,12 +12,12 @@ api = Api(
     description="Apis for Viewpi-Cam",
     doc="/doc",
     authorizations={
-        'apikey': {
-            'type': 'apiKey',
-            'in': 'header',
-            'name': 'Authorization',
-            'description': "Type in the *'Value'* input box below: **'Bearer &lt;JWT&gt;'**, where JWT is the token"
+        "apikey": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization",
+            "description": "Type in the *'Value'* input box below: **'Bearer &lt;JWT&gt;'**, where JWT is the token",
         }
     },
-    security="api_token",
+    security="apikey",
 )
