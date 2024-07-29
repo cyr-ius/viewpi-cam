@@ -4,7 +4,6 @@ from flask import (
     Blueprint,
     abort,
     flash,
-    make_response,
     redirect,
     render_template,
     request,
@@ -72,12 +71,16 @@ def login():
         if next and reverse(next) is False:
             abort(404)
         remember = request.form.get("remember") == "on"
-        if (user := db.session.scalars(
-            db.select(Users).filter_by(name=request.form.get("username"))
-        ).first()) and user.check_password(request.form.get("password")):
+        if (
+            user := db.session.scalars(
+                db.select(Users).filter_by(name=request.form.get("username"))
+            ).first()
+        ) and user.check_password(request.form.get("password")):
             if user.otp_confirmed:
                 session["user_id"] = user.id
-                return render_template("totp.html", next=next, remember=remember, id=user.id)
+                return render_template(
+                    "totp.html", next=next, remember=remember, id=user.id
+                )
             login_user(user, remember=remember)
             return redirect(next or url_for("main.index"))
         flash(_("User or password invalid."))
@@ -88,14 +91,17 @@ def login():
 @bp.route("/totp-verified", methods=["GET", "POST"])
 def totpverified():
     """Totop verified."""
-    if request.method = "POST" and session.pop("user_id") == (id := int(request.form.get("id"))):
+    if request.method == "POST" and session.pop("user_id") == (
+        id := int(request.form.get("id"))
+    ):
         if (next := request.form("next")) and reverse(next) is False:
             abort(404)
         if (user := db.session.get(Users, id)) and user.check_otp_secret(
             request.form.get("secret")
         ):
+            remember = request.form.get("remember")
             login_user(user, remember=remember)
-            return redirect(next or url_for("main.index")))
+            return redirect(next or url_for("main.index"))
         flash(_("OTP Code is invalid."))
 
     return render_template("totp.html", id=id, next=next, remember=remember)
