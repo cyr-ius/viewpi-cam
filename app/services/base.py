@@ -66,8 +66,12 @@ def load_user_from_request(request):
         ).first()
         if user:
             return user
-    
-    token = api_token[8:] if api_token := request.headers.get("Authorization") else None
+
+    token = (
+        auth_header[7:]
+        if (auth_header := request.headers.get("Authorization"))
+        else None
+    )
     if token and request.blueprint == "api":
         try:
             jwt_content = jwt.decode(
@@ -78,10 +82,7 @@ def load_user_from_request(request):
         except jwt.DecodeError:
             abort(401, "API token is incorrect.")
 
-        user = db.session.scalars(
-            db.select(Users).filter_by(id=0, name=jwt_content.get("iss"))
-        ).first()
-        if user:
+        if user := db.session.get(Users, jwt_content.get("id")):
             return user
 
     # finally, return None if both methods did not login the user
