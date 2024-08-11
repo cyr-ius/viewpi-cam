@@ -127,9 +127,12 @@ class Actions(Resource):
         """Post action."""
         match request.endpoint:
             case "api.schedule_start":
-                if not get_pid(["*/flask", "scheduler"]):
-                    Popen(["flask", "scheduler", "start"], stdout=PIPE)
-                return "", 204
+                try:
+                    if not get_pid(["*/flask", "scheduler"]):
+                        Popen(["flask", "scheduler", "start"], stdout=PIPE)
+                    return "", 204
+                except FileNotFoundError as error:
+                    return abort(422, error)
             case "api.schedule_stop":
                 pid = get_pid(["*/flask", "scheduler"])
                 try:
@@ -138,6 +141,20 @@ class Actions(Resource):
                 except ViewPiCamException as error:
                     return abort(422, error)
                 return "", 204
+
+
+@api.route("/state")
+@api.response(201, "Success")
+@api.response(401, "Unauthorized")
+@api.response(422, "Error", message)
+class State(Resource):
+    """State scheduler."""
+
+    def get(self):
+        """State"""
+        if get_pid(["*/flask", "scheduler"]):
+            return {"start": 1, "stop": 0, "state": True}
+        return {"start": 0, "stop": 1, "state": False}, 201
 
 
 @api.route("/period")
