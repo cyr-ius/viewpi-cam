@@ -188,9 +188,9 @@
                         <input class="form-checkbox form-checkbox-sm" type="checkbox" name="scheduler[{{item.id}}][{{day}}]" {{ 'checked' if item.days[i] }}>
                         {%endfor%}
                     </div>
-                    <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_on]" value="{{item.command_on}}"></div>
-                    <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][commands_off]" value="{{item.command_off}}"></div>
-                    <div class="col-8 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][modes]" value="{{item.mode}}"></div>
+                    <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][command_on]" value="{{item.command_on}}"></div>
+                    <div class="col-2 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][command_off]" value="{{item.command_off}}"></div>
+                    <div class="col-8 col-md"><input class="form-control form-control-sm" type="text" name="scheduler[{{item.id}}][mode]" value="{{item.mode}}"></div>
                 </div>
                 {%endfor%}
             </form>
