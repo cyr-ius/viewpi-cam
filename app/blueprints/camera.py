@@ -4,9 +4,10 @@ import glob
 import os
 import time
 
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, abort, request
 from flask import current_app as ca
 from flask_login import login_required
+from ..helpers.utils import write_log
 
 bp = Blueprint("camera", __name__, url_prefix="/cam")
 
@@ -57,12 +58,16 @@ def status_mjpeg():
     """Return status_mjpeg."""
     file_content = ""
     for _ in range(0, 30):
-        with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
-            file_content = file.read()
-            if file_content != request.args.get("last"):
-                break
-            time.sleep(0.1)
-            file.close()
+        try:
+            with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
+                file_content = file.read()
+                if file_content != request.args.get("last"):
+                    break
+                time.sleep(0.1)
+                file.close()
+        except FileNotFoundError as error:
+            write_log(error)
+            abort(404, "Status Mjpeg not found")
     os.popen(f"touch {ca.raspiconfig.status_file}")
     return Response(file_content)
 

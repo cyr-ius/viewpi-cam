@@ -62,12 +62,15 @@ def write_log(msg: str, level: str = "info") -> None:
     getattr(ca.logger, level)(msg)
 
     mode = "w" if not os.path.isfile(log_file) else "a"
-    with open(log_file, mode=mode, encoding="utf-8") as file:
-        line = json.dumps(
-            {"datetime": str_now, "level": level.upper(), "msg": msg},
-            separators=(",", ":"),
-        )
-        file.write(line + "\n")
+    try:
+        with open(log_file, mode=mode, encoding="utf-8") as file:
+            line = json.dumps(
+                {"datetime": str_now, "level": level.upper(), "msg": msg},
+                separators=(",", ":"),
+            )
+            file.write(line + "\n")
+    except FileNotFoundError as error:
+        ca.logger.error(error)
 
 
 def delete_log(log_size: int) -> None:
