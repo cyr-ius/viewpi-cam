@@ -178,7 +178,7 @@ class Period(Resource):
 class Sunrise(Resource):
     """Sunrise."""
 
-    @api.marshal_with(date_time)
+    @api.marshal_with(date_time, code=201)
     def get(self):
         """Get sunrise datetime."""
         return {"datetime": sun_info("sunrise")}, 201
@@ -190,7 +190,7 @@ class Sunrise(Resource):
 class Sunset(Resource):
     """Sunset."""
 
-    @api.marshal_with(date_time)
+    @api.marshal_with(date_time, code=201)
     def get(self):
         """Get sunset datetime."""
         return {"datetime": sun_info("sunset")}, 201
