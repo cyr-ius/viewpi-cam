@@ -17,6 +17,7 @@ class RaspiConfig:
         """Init object."""
         self.path_file = None
         self.user_config = None
+        self.raspi_config = None
         self.logging = None
         self.bin = None
 
@@ -61,11 +62,11 @@ class RaspiConfig:
         config_orig = self._get_file_config(self.path_file)
         self.user_config = config_orig.get("user_config", "")
 
-        config = self._get_file_config(self.user_config, config_orig)
-        if not isinstance(config, dict):
+        self.raspi_config = self._get_file_config(self.user_config, config_orig)
+        if not isinstance(self.raspi_config, dict):
             raise RaspiConfigError("Raspi config, error loading")
 
-        for key, value in config.items():
+        for key, value in self.raspi_config.items():
             setattr(self, key, value)
 
         self._generate_folder()
