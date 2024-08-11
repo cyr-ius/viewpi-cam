@@ -6,6 +6,7 @@ from datetime import timezone
 from subprocess import PIPE, Popen
 
 import pytz
+import zoneinfo
 from flask import current_app as ca
 from flask import request
 from flask_login import login_required
@@ -98,9 +99,9 @@ class Scheduler(Resource):
                     daysmode_id=sch["daymode"], id=int(sch_id)
                 )
             ).first()
-            my_schedule.command_on = sch["commands_on"]
-            my_schedule.command_off = sch["commands_off"]
-            my_schedule.mode = sch["modes"]
+            my_schedule.command_on = sch["command_on"]
+            my_schedule.command_off = sch["command_off"]
+            my_schedule.mode = sch["mode"]
             my_schedule.calendars = []
             for key, value in sch["calendar"].items():
                 if value:
@@ -172,6 +173,26 @@ class Sunset(Resource):
     def get(self):
         """Get sunset datetime."""
         return {"datetime": sun_info("sunset")}
+
+
+@api.route("/gmtoffset")
+class GmtOffset(Resource):
+    """GMT Offset"""
+
+    def get(self):
+        """GMT Offset."""
+        gmt_offset = get_settings("gmt_offset")
+        return {"gmt_offset": gmt_offset}, 201
+
+
+@api.route("/timezones")
+class TimeZones(Resource):
+    """Timezone"""
+
+    def get(self):
+        """Timezone."""
+        timezones = zoneinfo.available_timezones()
+        return list(timezones)
 
 
 def time_offset(offset: int | float | str = 0) -> td:
