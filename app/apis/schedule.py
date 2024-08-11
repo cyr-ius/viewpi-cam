@@ -153,7 +153,7 @@ class State(Resource):
     def get(self):
         """State"""
         if get_pid(["*/flask", "scheduler"]):
-            return {"start": 1, "stop": 0, "state": True}
+            return {"start": 1, "stop": 0, "state": True}, 201
         return {"start": 0, "stop": 1, "state": False}, 201
 
 
@@ -172,6 +172,8 @@ class Period(Resource):
         abort(422, "Daymode not exist")
 
 
+@api.response(201, "Success")
+@api.response(401, "Unauthorized")
 @api.route("/sun/sunrise")
 class Sunrise(Resource):
     """Sunrise."""
@@ -179,9 +181,11 @@ class Sunrise(Resource):
     @api.marshal_with(date_time)
     def get(self):
         """Get sunrise datetime."""
-        return {"datetime": sun_info("sunrise")}
+        return {"datetime": sun_info("sunrise")}, 201
 
 
+@api.response(201, "Success")
+@api.response(401, "Unauthorized")
 @api.route("/sun/sunset")
 class Sunset(Resource):
     """Sunset."""
@@ -189,9 +193,11 @@ class Sunset(Resource):
     @api.marshal_with(date_time)
     def get(self):
         """Get sunset datetime."""
-        return {"datetime": sun_info("sunset")}
+        return {"datetime": sun_info("sunset")}, 201
 
 
+@api.response(201, "Success")
+@api.response(401, "Unauthorized")
 @api.route("/gmtoffset")
 class GmtOffset(Resource):
     """GMT Offset"""
@@ -202,6 +208,8 @@ class GmtOffset(Resource):
         return {"gmt_offset": gmt_offset}, 201
 
 
+@api.response(201, "Success")
+@api.response(401, "Unauthorized")
 @api.route("/timezones")
 class TimeZones(Resource):
     """Timezone"""
@@ -209,7 +217,7 @@ class TimeZones(Resource):
     def get(self):
         """Timezone."""
         timezones = zoneinfo.available_timezones()
-        return list(timezones)
+        return list(timezones), 201
 
 
 def time_offset(offset: int | float | str = 0) -> td:
