@@ -3,22 +3,25 @@
 import requests
 import semver
 from flask import current_app as ca
+from flask import request
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
 from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.utils import disk_usage, execute_cmd
+from ..models import Presets as db_presets, db
 from ..services.raspiconfig import RaspiConfigError
-from .models import command, locales, message
+from .models import command, locales, message, preset
 
 api = Namespace(
     "system",
     description="Host command",
-    decorators=[role_required("max"), login_required],
+    # decorators=[role_required("max"), login_required],
 )
 api.add_model("Command", command)
 api.add_model("Locales", locales)
+api.add_model("Preset", preset)
 
 
 @api.response(204, "Success")
@@ -28,6 +31,8 @@ api.add_model("Locales", locales)
 class Restart(Resource):
     """Restart host."""
 
+    @login_required
+    @role_required("max")
     def post(self):
         """Execute command."""
         try:
@@ -45,6 +50,8 @@ class Restart(Resource):
 class Shutdown(Resource):
     """Restart application."""
 
+    @login_required
+    @role_required("max")
     def post(self):
         """Execute command."""
         try:
@@ -62,6 +69,8 @@ class Shutdown(Resource):
 class RestartApp(Resource):
     """Restart application."""
 
+    @login_required
+    @role_required("max")
     def post(self):
         """Execute command."""
         try:
@@ -79,6 +88,8 @@ class RestartApp(Resource):
 class Command(Resource):
     """FIFO Command."""
 
+    @login_required
+    @role_required("max")
     @api.expect(command)
     def post(self):
         """Send command to control fifo."""
@@ -130,6 +141,8 @@ class Version(Resource):
 class Freespace(Resource):
     """Free space disk."""
 
+    @login_required
+    @role_required("max")
     def get(self):
         """Get free space."""
         try:
@@ -154,3 +167,21 @@ class Locales(Resource):
     def get(self):
         """Get all languages."""
         return {"locales": ca.config["LOCALES"]}
+
+
+@api.response(401, "Unauthorized")
+@api.route("/presets")
+class Presets(Resource):
+    """Presets."""
+
+    @api.param(
+        "preset", "Select preset ['v2'|'P-OV5647'|'P-IMX219'|'N-OV5647|'N-IMX219']"
+    )
+    @api.marshal_with(preset, as_list=True)
+    def get(self):
+        """Presets video."""
+        if preset := request.args.get("preset"):
+            return db.session.scalars(
+                db.select(db_presets).filter_by(mode=preset)
+            ).all()
+        return abort(404)

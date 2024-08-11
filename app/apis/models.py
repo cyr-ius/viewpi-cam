@@ -37,10 +37,10 @@ class Days(fields.Raw):
         for idx, day in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]):
             for item in obj.calendars:
                 if item.name == day:
-                    calendar.update({int(idx): 1})
+                    calendar.update({day: 1})
                     break
             else:
-                calendar.update({int(idx): 0})
+                calendar.update({day: 0})
 
         return calendar
 
@@ -98,7 +98,7 @@ files = Model(
         "size": fields.Integer(required=True, description="Size"),
         # "file_icon": fields.String(required=False, description="Icon"),
         "datetime": fields.DateTime(required=False, description="DateTime"),
-        "lock": fields.Boolean(
+        "locked": fields.Boolean(
             required=True, description="Read/Write right on disk", default=False
         ),
         "realname": fields.String(required=True, description="Original name"),
@@ -172,6 +172,22 @@ otp = Model(
     },
 )
 period = Model("Period", {"period": fields.String(description="period")})
+
+preset = Model(
+    "Preset", {
+        "id": fields.Integer(required=True, description="Id"),
+        "width": fields.Integer(required=True),
+        "height": fields.Integer(required=True),
+        "fps": fields.Integer(required=True),
+        "i_width": fields.Integer(required=True),
+        "i_height": fields.Integer(required=True),
+        "i_rate": fields.Integer(required=True),
+        "name": fields.String(required=True),
+        "mode": fields.String(required=True),
+    }
+)
+
+
 schedule = Model(
     "Schedule",
     {
@@ -203,13 +219,9 @@ scheduler = Model(
         "id": fields.Integer(required=True),
         "command_on": fields.String(),
         "command_off": fields.String(),
-        "daysmode": fields.Nested(daysmode),
-        "daysmode_id": fields.Integer(),
         "daymode": DayMode(required=True),
-        "enabled": fields.Boolean(required=True),
         "mode": fields.String(),
-        "period": fields.String(required=True),
-        "days": Days(),
+        "calendar": Days(),
     },
 )
 setting = Model(
