@@ -4,7 +4,7 @@ import os
 from json.decoder import JSONDecodeError
 
 from flask import current_app as ca
-from flask import json, request
+from flask import json, request, send_file
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
@@ -36,6 +36,21 @@ class Content(Resource):
             return "", 204
         except Exception as error:  # pylint: disable=W0718
             abort(422, error)
+
+
+@api.route("/download")
+class Download(Resource):
+    """Download log."""
+
+    def get(self):
+        """Log."""
+        response = send_file(
+            path_or_file=ca.raspiconfig.log_file,
+            mimetype="application/octet-stream",
+            as_attachment=True,
+            download_name="ViewpiCam.log",
+        )
+        return response
 
 
 def get_logs(reverse: bool) -> list[str]:
