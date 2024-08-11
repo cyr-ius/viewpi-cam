@@ -4,9 +4,9 @@ from subprocess import PIPE, Popen
 
 from flask import request
 from flask_login import login_required
-from flask_restx import Namespace, Resource, abort
+from flask_restx import Namespace, Resource, abort, marshal
 from sqlalchemy import update
-
+from werkzeug.exceptions import UnsupportedMediaType
 from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.utils import execute_cmd, get_pid, get_settings
@@ -41,16 +41,19 @@ class Rsync(Resource):
         db.session.commit()
         return "", 204
 
-    @api.expect(rsync)
     @api.response(204, "Success")
     def delete(self):
         """Delete settings."""
         settings = get_settings()
-        for key in api.payload:
-            settings.pop(key, None)
+        try:
+            for key in api.payload:
+                settings.pop(key, None)
+        except UnsupportedMediaType:
+             for key in marshal(settings, rsync).keys():
+                settings.pop(key, None)
         db.session.execute(update(Settings), {"id": 0, "data": settings})
         db.session.commit()
-        return "", 204  
+        return "", 204
 
 
 @api.route("/stop", endpoint="rsync_stop", doc={"description": "Stop rsync"})
