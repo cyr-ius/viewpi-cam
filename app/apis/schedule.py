@@ -93,22 +93,22 @@ class Scheduler(Resource):
     @api.response(204, "Success")
     def put(self):
         """Set settings."""
-        for sch_id, sch in api.payload.items():
-            my_schedule = db.session.scalars(
+        for item in api.payload:
+            schedule = db.session.scalars(
                 db.select(scheduler_db).filter_by(
-                    daysmode_id=sch["daymode"], id=int(sch_id)
+                    daysmode_id=item["daymode"], id=int(item["id"])
                 )
             ).first()
-            my_schedule.command_on = sch["command_on"]
-            my_schedule.command_off = sch["command_off"]
-            my_schedule.mode = sch["mode"]
-            my_schedule.calendars = []
-            for key, value in sch["calendar"].items():
+            schedule.command_on = item["command_on"]
+            schedule.command_off = item["command_off"]
+            schedule.mode = item["mode"]
+            schedule.calendars = []
+            for key, value in item["calendar"].items():
                 if value:
                     cal = db.session.scalars(
-                        db.select(Calendar).filter_by(name=key)
+                        db.select(Calendar).filter_by(name=key.capitalize())
                     ).first()
-                    my_schedule.calendars.append(cal)
+                    schedule.calendars.append(cal)
             db.session.commit()
 
         send_pipe(ca.config["SCHEDULE_RESET"])

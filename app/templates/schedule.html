@@ -224,26 +224,30 @@ $('#schedule').on('click', '#save', function(){
         data = $("#form_schedule").serializeObject({'checkboxesAsBools': true});    
 
         // Format days field
-        var schedulers = new Object();
+        var scheduler = new Object();
         const regexp = /scheduler\[(.*)\]\[(.*)\]/g;
-        let sch_id;
         keys = Object.keys(data)
         for (const key of keys) {
             const matchs = key.matchAll(regexp);
             for (const match of matchs) {
                 let sch_id = parseInt(match[1]);
-                if (schedulers[sch_id] == null){
-                    schedulers[sch_id] = {"daymode": data["daymode"]}
-                    schedulers[sch_id]["calendar"] = {}
+                if (scheduler[sch_id] == null){
+                    scheduler[sch_id] = {"daymode": data["daymode"]}
+                    scheduler[sch_id]["calendar"] = {}
                 }
+                scheduler[sch_id]["id"] = sch_id
                 const str = match[2];
                 if (["Mon","Tue", "Wed","Thu","Fri","Sat","Sun"].includes(str)) {
-                    schedulers[sch_id]["calendar"][str] = data[key]  
+                    scheduler[sch_id]["calendar"][str] = data[key]  
                 } else {
-                    schedulers[sch_id][str] = data[key]     
+                    scheduler[sch_id][str] = data[key]
                 }   
                 delete data[key]
             }
+        }
+        let schedulers = []
+        for (const item of Object.values(scheduler)) { 
+            schedulers.push(item) 
         }
         $.queryData({method:"put", url:"{{ url_for('api.schedule_scheduler')}}", data: schedulers})
     }
