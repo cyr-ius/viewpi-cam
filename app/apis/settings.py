@@ -2,11 +2,12 @@
 
 from flask import current_app as ca
 from flask_login import login_required
-from flask_restx import Namespace, Resource
+from flask_restx import Namespace, Resource, abort
 from sqlalchemy import update
 
 from ..helpers.decorator import role_required
 from ..models import Settings, Ubuttons, db
+from ..services.raspiconfig import RaspiConfigError
 from .models import button, buttons, macro, message, setting
 
 api = Namespace(
@@ -28,7 +29,8 @@ class Sets(Resource):
     @api.marshal_with(setting)
     def get(self):
         """Get settings."""
-        return db.session.scalars(db.select(Settings)).first()
+        settings = db.session.scalars(db.select(Settings)).first()
+        return settings.data
 
     @api.expect(setting)
     @api.response(204, "Success")
@@ -129,5 +131,9 @@ class Macros(Resource):
             cmd = api.payload["command"]
             if not api.payload["state"]:
                 cmd = f"-{cmd}"
-            ca.raspiconfig.send(f"um {idx} {cmd}")
+            try:
+                ca.raspiconfig.send(f"um {idx} {cmd}")
+            except RaspiConfigError as error:
+                abort(500, error)
+
         return "", 204
