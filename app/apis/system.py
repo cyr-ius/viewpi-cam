@@ -185,3 +185,15 @@ class Presets(Resource):
                 db.select(db_presets).filter_by(mode=preset)
             ).all()
         return abort(404)
+
+
+@api.response(401, "Unauthorized")
+@api.route("/userlevel")
+class UserLevel(Resource):
+    """User Level."""
+
+    def get(self):
+        """Get user level."""
+       
+        userlevel = [{"name":k, "right":v} for k, v in ca.config["USERLEVEL"].items()]
+        return userlevel
