@@ -148,6 +148,7 @@ message = Model("Msg", {"message": fields.String(required=True)})
 multiview = Model(
     "Multiview",
     {
+        "id": fields.Integer(required=True, description="Id"),
         "url": fields.String(
             required=True,
             description="URL Stream MJPEG",
@@ -174,7 +175,8 @@ otp = Model(
 period = Model("Period", {"period": fields.String(description="period")})
 
 preset = Model(
-    "Preset", {
+    "Preset",
+    {
         "id": fields.Integer(required=True, description="Id"),
         "width": fields.Integer(required=True),
         "height": fields.Integer(required=True),
@@ -184,7 +186,7 @@ preset = Model(
         "i_rate": fields.Integer(required=True),
         "name": fields.String(required=True),
         "mode": fields.String(required=True),
-    }
+    },
 )
 
 
