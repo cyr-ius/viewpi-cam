@@ -8,10 +8,15 @@ from flask import json, request, send_file
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
+from ..helpers.decorator import role_required
 from ..helpers.utils import delete_log
 from .models import log, message
 
-api = Namespace("logs", description="Log management", decorators=[login_required])
+api = Namespace(
+    "logs",
+    description="Log management",
+    decorators=[role_required("max"), login_required],
+)  # noqa: F821
 api.add_model("Log", log)
 
 
@@ -38,6 +43,8 @@ class Content(Resource):
             abort(422, error)
 
 
+@api.response(200, "Success")
+@api.response(401, "Unauthorized")
 @api.route("/download")
 class Download(Resource):
     """Download log."""
