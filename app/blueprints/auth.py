@@ -94,12 +94,12 @@ def totpverified():
     if request.method == "POST" and session.pop("user_id") == (
         id := int(request.form.get("id"))
     ):
-        if (next := request.form("next")) and reverse(next) is False:
+        remember = request.form.get("remember")
+        if (next := request.form.get("next")) and reverse(next) is False:
             abort(404)
         if (user := db.session.get(Users, id)) and user.check_otp_secret(
             request.form.get("secret")
         ):
-            remember = request.form.get("remember")
             login_user(user, remember=remember)
             return redirect(next or url_for("main.index"))
         flash(_("OTP Code is invalid."))
