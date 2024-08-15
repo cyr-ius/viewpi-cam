@@ -13,12 +13,13 @@ api.add_model("Secret", secret)
 
 
 @api.route("/authorize")
+@api.response(204, "Success")
 @api.response(401, "Unauthorized")
 @api.response(412, "OTP Required")
 class Authorize(Resource):
     """Login class."""
 
-    @api.expect(login, code=201)
+    @api.expect(login)
     @api.doc(security=None)
     def post(self):
         """Check login"""
