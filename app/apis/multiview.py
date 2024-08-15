@@ -1,5 +1,6 @@
 """Blueprint Multiview API."""
 
+from flask import url_for
 from flask_login import login_required
 from flask_restx import Namespace, Resource
 from sqlalchemy import update
@@ -36,7 +37,7 @@ class Multiviews(Resource):
         multiview = multiviews_db(**api.payload)
         db.session.add(multiview)
         db.session.commit()
-        return multiview, 201
+        return multiview, 201, {"Location": url_for("api.multiview_multiview", id=multiview.id)}
 
 
 @api.response(401, "Unauthorized")

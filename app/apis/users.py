@@ -1,5 +1,6 @@
 """Blueprint Users API."""
 
+from flask import url_for
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort, fields
 from sqlalchemy import update
@@ -45,7 +46,11 @@ class Users(Resource):
             api.payload["secret"] = generate_password_hash(password)
             user = users_db(**api.payload)
             user.create_user()
-            return user, 201
+            return (
+                user,
+                201,
+                {"Location": url_for("api.users_user", id=user.id)},
+            )
         except IntegrityError:
             abort(422, "User name is already exists, please change.")
 
@@ -163,4 +168,3 @@ class APIToken(Resource):
         user = db.get_or_404(users_db, 0, description="User not found")
         user.delete_api_token()
         return "", 204
-
