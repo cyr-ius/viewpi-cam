@@ -38,11 +38,11 @@ class Totp(Resource):
     @api.response(422, "Error", message)
     @api.expect(secret)
     def post(self, id: int):
-        """Check OTP code."""
+        """Confirmed OTP code."""
         if id == 0:
             abort(403, "System account cannot be modified")
         user = db.get_or_404(Users, id, description="User not found")
-        if user.check_otp_secret(api.payload["secret"]):
+        if user.confirmed_otp_secret(api.payload["secret"]):
             return "", 204
         abort(422, "OTP incorrect")
 

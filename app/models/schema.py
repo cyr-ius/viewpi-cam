@@ -98,12 +98,17 @@ class Users(db.Model):
         self.api_token = None
         db.session.commit()
 
-    def check_otp_secret(self, code: str) -> bool:
+    def confirmed_otp_secret(self, code: str) -> bool:
         """Validate otp code."""
         otp = pyotp.TOTP(self.otp_secret)
         self.otp_confirmed = otp.verify(code)
         db.session.commit()
         return self.otp_confirmed
+
+    def check_otp_secret(self, code: str) -> bool:
+        """Validate otp code."""
+        otp = pyotp.TOTP(self.otp_secret)
+        return otp.verify(code)
 
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.secret, password)
@@ -117,6 +122,7 @@ class Users(db.Model):
                 "id": self.id,
                 "iat": dt_now,
                 "exp": dt_lifetime,
+                "otp": self.otp_confirmed == 1
             },
             key=ca.config["SECRET_KEY"],
             algorithm="HS256",
