@@ -5,14 +5,16 @@ from flask_restx import Namespace, Resource, abort
 
 from ..models import Users as users_db
 from ..models import db
-from .models import login, message
+from .models import login, secret
 
 api = Namespace("idp", description="Authenticate endpoint.")
 api.add_model("Login", login)
+api.add_model("Secret", secret)
 
 
 @api.route("/authorize")
-@api.response(401, "Unauthorized", message)
+@api.response(401, "Unauthorized")
+@api.response(412, "OTP Required")
 class Authorize(Resource):
     """Login class."""
 
@@ -29,11 +31,14 @@ class Authorize(Resource):
             and user.check_password(api.payload["password"])
         ):
             abort(401, "User or password incorrect")
-        if (
+
+        if user.otp_confirmed and api.payload.get("otp_code") is None:
+            abort(412, "OTP Required")
+        elif (
             user.otp_confirmed
             and user.check_otp_secret(api.payload.get("otp_code")) is False
         ):
-            abort(401, "OTP incorrect")
+            abort(401, "OTP Failed")
 
         return {
             "access_token": user.generate_jwt(),
