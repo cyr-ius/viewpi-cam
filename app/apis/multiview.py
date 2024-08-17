@@ -8,7 +8,7 @@ from sqlalchemy import update
 from ..helpers.decorator import role_required
 from ..models import Multiviews as multiviews_db
 from ..models import db
-from .models import message, multiview, multiviews
+from .models import message, multiview
 
 api = Namespace(
     "multiview",
@@ -16,7 +16,6 @@ api = Namespace(
     decorators=[role_required("max"), login_required],
 )
 api.add_model("Multiview", multiview)
-api.add_model("Multiviews", multiviews)
 
 
 @api.response(401, "Unauthorized")
@@ -29,15 +28,19 @@ class Multiviews(Resource):
         """List hosts."""
         return db.session.scalars(db.select(multiviews_db)).all()
 
-    @api.expect(multiview)
-    @api.marshal_with(multiviews, code=201)
+    @api.expect(multiview.copy().pop("id"))
+    @api.response(204, "Success")    
     def post(self):
         """Create host."""
         api.payload.pop("id", None)
         multiview = multiviews_db(**api.payload)
         db.session.add(multiview)
         db.session.commit()
-        return multiview, 201, {"Location": url_for("api.multiview_multiview", id=multiview.id)}
+        return (
+            "",
+            204,
+            {"Location": url_for("api.multiview_multiview", id=multiview.id)},
+        )
 
 
 @api.response(401, "Unauthorized")
@@ -52,7 +55,7 @@ class Multiview(Resource):
         return db.get_or_404(multiviews_db, id, description="View not found")
 
     @api.response(204, "Success")
-    @api.expect(multiviews)
+    @api.expect(multiview)
     def put(self, id: int):
         """Set multiview."""
         db.session.execute(update(multiviews_db), api.payload)

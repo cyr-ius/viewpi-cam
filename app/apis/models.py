@@ -54,6 +54,7 @@ api_token = Model("APIToken", {"api_token": fields.String(required=True)})
 button = Model(
     "Button",
     {
+        "id": fields.Integer(required=True, description="Id"),
         "display": fields.Boolean(required=True, description="Display"),
         "name": fields.String(required=True, description="Button name"),
         "macro": fields.String(required=True, description="Script name"),
@@ -61,9 +62,6 @@ button = Model(
         "style": fields.String(required=False, description="Style"),
         "other": fields.String(required=False, description="Others options"),
     },
-)
-buttons = Model(
-    "Buttons", {"id": fields.Integer(required=True, description="Id"), **button}
 )
 cam_token = Model("CamToken", {"cam_token": fields.String(required=True)})
 calendar = Model(
@@ -159,9 +157,6 @@ multiview = Model(
             required=True, default=False, description="Display camera"
         ),
     },
-)
-multiviews = Model(
-    "Multiviews", {"id": fields.Integer(required=True, description="Id"), **multiview}
 )
 otp = Model(
     "Otp",
@@ -266,6 +261,7 @@ secret = Model(
 user = Model(
     "User",
     {
+        "id": fields.Integer(required=True, description="Id"),
         "name": fields.String(required=True, description="The user name"),
         "right": fields.Integer(
             required=True, description="The user rights", enum=[1, 2, 4, 8]
@@ -273,4 +269,3 @@ user = Model(
         "otp_confirmed": fields.Boolean(required=False, description="otp status"),
     },
 )
-users = Model("Users", {"id": fields.Integer(required=True, description="Id"), **user})

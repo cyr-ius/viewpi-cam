@@ -1,14 +1,20 @@
 """Blueprint Settings API."""
 
+from datetime import datetime as dt
+
 from flask import current_app as ca
+from flask import send_file, url_for
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
-from sqlalchemy import update
+from sqlalchemy import delete, update
+from werkzeug.datastructures import FileStorage
 
+from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
-from ..models import Settings, Ubuttons, db
+from ..helpers.filer import allowed_file, zip_extract, zip_folder
+from ..models import Files, Settings, Ubuttons, db
 from ..services.raspiconfig import RaspiConfigError
-from .models import button, buttons, macro, message, setting
+from .models import button, macro, message, setting
 
 api = Namespace(
     "settings",
@@ -18,7 +24,10 @@ api = Namespace(
 api.add_model("Set", setting)
 api.add_model("Macro", macro)
 api.add_model("Button", button)
-api.add_model("Buttons", buttons)
+
+
+upload_parser = api.parser()
+upload_parser.add_argument("file", location="files", type=FileStorage, required=True)
 
 
 @api.response(401, "Unauthorized")
@@ -52,20 +61,24 @@ class Sets(Resource):
 class Buttons(Resource):
     """List buttons."""
 
-    @api.marshal_with(buttons, as_list=True)
+    @api.marshal_with(button, as_list=True)
     def get(self):
         """List buttons."""
         return db.session.scalars(db.select(Ubuttons)).all()
 
-    @api.expect(button)
-    @api.marshal_with(buttons, code=201)
+    @api.expect(button.copy().pop("id"))
+    @api.response(204, "Success")
     def post(self):
         """Create button."""
         api.payload.pop("id", None)
         ubutton = Ubuttons(**api.payload)
         db.session.add(ubutton)
         db.session.commit()
-        return ubutton, 201
+        return (
+            "",
+            204,
+            {"Location": url_for("api.settings_button", id=ubutton.id)},
+        )
 
 
 @api.response(401, "Unauthorized")
@@ -136,4 +149,41 @@ class Macros(Resource):
             except RaspiConfigError as error:
                 abort(500, error)
 
+        return "", 204
+
+
+@api.response(200, "Success")
+@api.response(401, "Unauthorized")
+@api.route("/backup")
+class Backup(Resource):
+    """Download settings."""
+
+    def get(self):
+        date_str = dt.now().strftime("%Y%m%d_%H%M%S")
+        zipname = f"config_{date_str}.zip"
+        zip_file = zip_folder(ca.config_folder)
+
+        return send_file(
+            zip_file,
+            mimetype="application/zip",
+            as_attachment=True,
+            download_name=zipname,
+        )
+
+
+@api.response(204, "Success")
+@api.response(401, "Unauthorized")
+@api.route("/restore")
+@api.expect(upload_parser)
+class Restore(Resource):
+    """Upload settings."""
+
+    def post(self):
+        args = upload_parser.parse_args()
+        file = args["file"]
+        if file and allowed_file(file):
+            zip_extract(file, ca.config_folder)
+            db.session.execute(delete(Files))
+            db.session.commit()
+            update_img_db()
         return "", 204

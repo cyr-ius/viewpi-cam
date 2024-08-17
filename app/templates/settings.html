@@ -15,8 +15,8 @@
                         <input class="form-check-input" name="display" type="checkbox" {% if ubutton.display == 1 %}checked{%endif%}>
                     </div>
                 </div>
-                <div class="col-10 col-sm"><input class="form-control form-control-sm" name="name" placeholder="{{_('Name')}}" required="" type="text" value="{{ubutton.name}}"></div>
-                <div class="col-6 col-sm"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" value="{{ubutton.macro}}"></div>
+                <div class="col-10 col-sm"><input class="form-control form-control-sm" name="name" placeholder="{{_('Name')}}" type="text" value="{{ubutton.name}}" required></div>
+                <div class="col-6 col-sm"><input class="form-control form-control-sm" name="macro" placeholder="Macro" type="text" value="{{ubutton.macro}}" required></div>
                 <div class="col-6 col-sm"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text" value="{{ubutton.css_class}}"></div>
                 <div class="col-12 col-sm"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text" value="{{ubutton.style}}"></div>
                 <div class="col-10 col-sm"><input class="form-control form-control-sm" name="other" placeholder="{{_('Other')}}" type="text" value="{{ubutton.other}}"></div>
@@ -26,8 +26,8 @@
             <div id="ubuttons-ref" class="row g-1 ms-2 needs-validation">
                 <input type="hidden" name="id">
                 <div class="col-2 col-auto"><div class="form-check form-switch"><input class="form-check-input" name="display" type="checkbox"></div></div>
-                <div class="col-10 col-sm"><input class="form-control form-control-sm" name="name" placeholder="{{_('Name')}}" required="" type="text" required></div>
-                <div class="col-6 col-sm"><input class="form-control form-control-sm" name="macro" placeholder="Macro" required="" type="text" required></div>
+                <div class="col-10 col-sm"><input class="form-control form-control-sm" name="name" placeholder="{{_('Name')}}" type="text" required></div>
+                <div class="col-6 col-sm"><input class="form-control form-control-sm" name="macro" placeholder="Macro" type="text" required></div>
                 <div class="col-6 col-sm"><input class="form-control form-control-sm" name="css_class" placeholder="class" type="text"></div>
                 <div class="col-12 col-sm"><input class="form-control form-control-sm" name="style" placeholder="Style" type="text"></div>
                 <div class="col-10 col-sm"><input class="form-control form-control-sm" name="other" placeholder="{{_('Other')}}" type="text"></div>
@@ -308,9 +308,15 @@ $('#users').on('click','.add', function() {
         parent.clearFields();
         parent.removeClass('was-validated')
     }
+
+    let successLocation= function(data, response, xhr) {
+        let url = xhr.getResponseHeader('Location');
+        $.queryData({method:"get", url: url, success:success})
+    }
+
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
     if (this.dispatchEvent(divsubmit))
-        $.queryData({url:"{{url_for('api.users_users')}}",data:data, success:success});
+        $.queryData({url:"{{url_for('api.users_users')}}",data:data, success:successLocation});
 });
 
 $('#users').on('click','.delete', function() {
@@ -344,24 +350,30 @@ $('#ubuttons').on('click','.add', function() {
         templ.find('input[name="id"]').val(data["id"]);
         templ.insertBefore(parent);
         parent.clearFields();
-        parent.removeClass('was-validated')
+        parent.removeClass('was-validated');
     }
+
+    let successLocation= function(data, response, xhr) {
+        let url = xhr.getResponseHeader('Location');
+        $.queryData({method:"get", url: url, success:success})
+    }
+
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
     if (this.dispatchEvent(divsubmit))
-        $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, success:success});
+        $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, success:successLocation});
 
 });
 
 $('#ubuttons').on('click','.delete', function() {
     let parent = $(this).parent().parent();
-    let data = $(parent).find('input').serializeObject({"checkboxesAsBools":true});
+    let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
     let success = function(data){ parent.remove() }
-    $.queryData({method:"delete", url:`{{ url_for('api.settings_buttons')}}/${data["id"]}`, success:success});
+    $.queryData({method:"delete", url:"{{ url_for('api.settings_button',id=0)}}".replace(0,data["id"]), success:success});
 });
 
 $('#ubuttons').on('change','.uchange', function(){
     let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-    $.queryData({method:"put", url:`{{url_for('api.settings_buttons')}}/${data["id"]}`, data:data});
+    $.queryData({method:"put", url:"{{url_for('api.settings_button', id=0)}}".replace(0,data["id"]), data:data});
 });
 
 $('#multiviews').on('click','.add', function() {
@@ -378,9 +390,15 @@ $('#multiviews').on('click','.add', function() {
         parent.clearFields();
         parent.removeClass('was-validated')
     }
+
+    let successLocation= function(data, response, xhr) {
+        let url = xhr.getResponseHeader('Location');
+        $.queryData({method:"get", url: url, success:success})
+    }
+    
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
     if (this.dispatchEvent(divsubmit))
-        $.queryData({url:"{{url_for('api.multiview_multiviews')}}",data:data, success:success});
+        $.queryData({url:"{{url_for('api.multiview_multiviews')}}",data:data, success:successLocation});
 });
 
 $('#multiviews').on('click','.delete', function() {

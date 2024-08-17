@@ -11,7 +11,7 @@ from ..config import LOCALES
 from ..helpers.decorator import role_required
 from ..models import Users as users_db
 from ..models import db
-from .models import api_token, cam_token, login, message, user, users
+from .models import api_token, cam_token, login, message, user
 
 api = Namespace(
     "users",
@@ -19,7 +19,6 @@ api = Namespace(
     decorators=[role_required("max"), login_required],
 )
 api.add_model("User", user)
-api.add_model("Users", users)
 api.add_model("CamToken", cam_token)
 api.add_model("APIToken", api_token)
 api.add_model("Login", login)
@@ -30,14 +29,13 @@ api.add_model("Login", login)
 class Users(Resource):
     """List users."""
 
-    @api.marshal_with(users, as_list=True)
+    @api.marshal_with(user, as_list=True)
     def get(self):
         """List users."""
         return db.session.scalars(db.select(users_db).filter(users_db.id > 0)).all()
 
-    @api.expect(user)
-    @api.marshal_with(users, code=201)
-    @api.response(422, "Error", message)
+    @api.expect(user.copy().pop("id"))
+    @api.response(204, "Success")
     def post(self):
         """Create user."""
         try:
@@ -47,8 +45,8 @@ class Users(Resource):
             user = users_db(**api.payload)
             user.create_user()
             return (
-                user,
-                201,
+                "",
+                204,
                 {"Location": url_for("api.users_user", id=user.id)},
             )
         except IntegrityError:
@@ -132,8 +130,8 @@ class Token(Resource):
     def post(self):
         """Create camera token."""
         user = db.get_or_404(users_db, 0, description="User not found")
-        cam_token = user.set_camera_token()
-        return {"cam_token": cam_token}, 201
+        user.set_camera_token()
+        return "", 204
 
     @api.response(204, "Success")
     def delete(self):
@@ -159,8 +157,8 @@ class APIToken(Resource):
     def post(self):
         """Create token."""
         user = db.get_or_404(users_db, 0, description="User not found")
-        api_token = user.set_api_token()
-        return {"api_token": api_token}, 201
+        user.set_api_token()
+        return "", 204
 
     @api.response(204, "Success")
     def delete(self):
