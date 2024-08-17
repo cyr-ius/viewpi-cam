@@ -1,6 +1,7 @@
 """Api logs."""
 
 import os
+from datetime import datetime as dt
 from json.decoder import JSONDecodeError
 
 from flask import current_app as ca
@@ -51,11 +52,14 @@ class Download(Resource):
 
     def get(self):
         """Log."""
+        date_str = dt.now().strftime("%Y%m%d_%H%M%S")
+        logname = f"viewpicam_{date_str}.log"
+
         response = send_file(
             path_or_file=ca.raspiconfig.log_file,
             mimetype="application/octet-stream",
             as_attachment=True,
-            download_name="ViewpiCam.log",
+            download_name=logname,
         )
         return response
 
