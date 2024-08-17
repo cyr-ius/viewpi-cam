@@ -2,9 +2,10 @@
 
 from flask import current_app as ca
 from flask_restx import Namespace, Resource, abort
+from sqlalchemy import func
 
+from ..models import Users, db
 from ..models import Users as users_db
-from ..models import db
 from .models import login, secret
 
 api = Namespace("idp", description="Authenticate endpoint.")
@@ -46,3 +47,18 @@ class Authorize(Resource):
             "token_type": "Bearer",
             "expires_in": int(ca.config["PERMANENT_SESSION_LIFETIME"].total_seconds()),
         }
+
+
+@api.response(204, "Success")
+@api.response(422, "Already Enrollment")
+@api.route("/firstenrollment")
+class FirstEnrollment(Resource):
+    """First enrollment."""
+
+    def get(self):
+        users_count = db.session.execute(
+            db.select(func.count("*")).select_from(Users)
+        ).scalar()
+        if users_count != 1:
+            abort(422)
+        return "", 204
