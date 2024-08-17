@@ -56,7 +56,7 @@ class Sets(Resource):
         return get_settings()
 
     @api.expect(schedule)
-    @api.response(204, "Success")
+    @api.response(201, "Success")
     def put(self):
         """Set settings."""
         settings = get_settings()
@@ -71,7 +71,7 @@ class Sets(Resource):
                 write_log(f"[Timezone] {str(error)}", "error")
 
         send_pipe(ca.config["SCHEDULE_RESET"])
-        return "", 204
+        return api.payload, 201
 
 
 @api.route("/scheduler")
@@ -90,7 +90,7 @@ class Scheduler(Resource):
         return db.session.scalars(db.select(scheduler_db)).all()
 
     @api.expect(scheduler)
-    @api.response(204, "Success")
+    @api.response(201, "Success")
     def put(self):
         """Set settings."""
         for item in api.payload:
@@ -112,7 +112,7 @@ class Scheduler(Resource):
             db.session.commit()
 
         send_pipe(ca.config["SCHEDULE_RESET"])
-        return "", 204
+        return api.payload, 201
 
 
 @api.route("/stop", endpoint="schedule_stop", doc={"description": "Stop scheduler"})

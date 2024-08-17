@@ -36,7 +36,7 @@ class Settings(Resource):
         except (ValueError, requests.RequestException, MotionError) as error:
             abort(422, str(error))
 
-    @api.response(204, "Success")
+    @api.response(201, "Success")
     def put(self):
         """Set settings."""
         try:
@@ -53,4 +53,4 @@ class Settings(Resource):
         except (ValueError, requests.RequestException, MotionError) as error:
             abort(422, str(error))
 
-        return "", 204
+        return api.payload, 201
