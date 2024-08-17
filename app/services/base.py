@@ -72,7 +72,7 @@ def load_user_from_request(request):
         if (auth_header := request.headers.get("Authorization"))
         else None
     )
-    if token and request.blueprint == "api":
+    if token and request.blueprint in ["api","camera"]:
         try:
             jwt_content = jwt.decode(
                 token, ca.config["SECRET_KEY"], algorithms=["HS256"]
