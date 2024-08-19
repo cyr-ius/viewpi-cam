@@ -72,6 +72,10 @@ def load_user_from_request(request):
         if (auth_header := request.headers.get("Authorization"))
         else None
     )
+    
+    if token is None:
+        token = request.cookies.get('x-api-key')
+
     if token and request.blueprint in ["api","camera"]:
         try:
             jwt_content = jwt.decode(
