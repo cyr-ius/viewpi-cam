@@ -126,7 +126,7 @@ class Users(db.Model):
             },
             key=ca.config["SECRET_KEY"],
             algorithm="HS256",
-        )
+        ) , dt_lifetime
 
     def create_user(self) -> None:
         user = db.session.scalars(
