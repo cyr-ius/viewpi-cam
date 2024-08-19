@@ -163,7 +163,10 @@ def scheduler() -> None:
             elif cmd == ca.config["SCHEDULE_RESET"]:
                 write_log("Reload parameters command requested")
                 break
-            elif cmd == ca.config["SCHEDULE_UPDATE"]:
+            elif cmd in [
+                ca.config["SCHEDULE_UPDATE_VID"],
+                ca.config["SCHEDULE_UPDATE_IMG"],
+            ]:
                 update_img_db()
                 if settings.get("rs_enabled"):
                     rsync()
