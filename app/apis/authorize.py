@@ -1,6 +1,8 @@
 """Blueprint Authorize API."""
 
+from datetime import datetime as dt , timedelta as td
 from flask import current_app as ca
+from flask import make_response
 from flask_restx import Namespace, Resource, abort
 from sqlalchemy import func
 
@@ -35,18 +37,24 @@ class Authorize(Resource):
             abort(401, "User or password incorrect")
 
         if user.otp_confirmed and api.payload.get("otp_code") is None:
-            return "",202
+            return "", 202
         elif (
             user.otp_confirmed
             and user.check_otp_secret(api.payload.get("otp_code")) is False
         ):
             abort(401, "OTP Failed")
 
-        return {
-            "access_token": user.generate_jwt(),
-            "token_type": "Bearer",
-            "expires_in": int(ca.config["PERMANENT_SESSION_LIFETIME"].total_seconds()),
-        }, 200
+        jwtoken = user.generate_jwt()  # Generate JWT token
+        expires_in = int(ca.config["PERMANENT_SESSION_LIFETIME"].total_seconds())
+        resp = make_response(
+            {"access_token": jwtoken, "token_type": "Bearer", "expires_in": expires_in},
+            200,
+        )
+        # Add Token in secure cookie
+        resp.set_cookie(
+            "x-api-key", jwtoken, secure=True, httponly=True, samesite="strict", expires= dt.now() + td(seconds=expires_in)
+        )
+        return resp
 
 
 @api.response(202, "Already Enrollment")
@@ -60,5 +68,5 @@ class FirstEnrollment(Resource):
             db.select(func.count("*")).select_from(Users)
         ).scalar()
         if users_count != 1:
-            return "",202
+            return "", 202
         return "", 204
