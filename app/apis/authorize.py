@@ -14,9 +14,9 @@ api.add_model("Secret", secret)
 
 
 @api.route("/authorize")
-@api.response(204, "Success")
+@api.response(200, "Success")
+@api.response(202, "OTP Required")
 @api.response(401, "Unauthorized")
-@api.response(412, "OTP Required")
 class Authorize(Resource):
     """Login class."""
 
@@ -35,7 +35,7 @@ class Authorize(Resource):
             abort(401, "User or password incorrect")
 
         if user.otp_confirmed and api.payload.get("otp_code") is None:
-            abort(412, "OTP Required")
+            return "",202
         elif (
             user.otp_confirmed
             and user.check_otp_secret(api.payload.get("otp_code")) is False
@@ -46,11 +46,11 @@ class Authorize(Resource):
             "access_token": user.generate_jwt(),
             "token_type": "Bearer",
             "expires_in": int(ca.config["PERMANENT_SESSION_LIFETIME"].total_seconds()),
-        }
+        }, 200
 
 
+@api.response(202, "Already Enrollment")
 @api.response(204, "Success")
-@api.response(422, "Already Enrollment")
 @api.route("/firstenrollment")
 class FirstEnrollment(Resource):
     """First enrollment."""
@@ -60,5 +60,5 @@ class FirstEnrollment(Resource):
             db.select(func.count("*")).select_from(Users)
         ).scalar()
         if users_count != 1:
-            abort(422)
+            return "",202
         return "", 204
