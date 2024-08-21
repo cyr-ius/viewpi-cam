@@ -14,7 +14,7 @@ from .models import command, message
 
 api = Namespace(
     "raspiconfig",
-    description="RaspiMjpeg is the component that drives video capture. This API allows access to these parameters",
+    description="RaspiMjpeg is the component that drives video/image capture. This API allows access to these parameters",
     decorators=[role_required("max"), login_required],
 )
 api.add_model("Command", command)
