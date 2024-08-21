@@ -47,6 +47,7 @@ class Command(Resource):
         if cmd := api.payload.get("cmd"):
             try:
                 if params := api.payload.get("params"):
+                    params = [str(item) for item in params]
                     params = " ".join(params)
                     ca.raspiconfig.send(f"{cmd} {params}")
                 else:
