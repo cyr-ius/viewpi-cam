@@ -13,13 +13,13 @@
         "--platform",
         "linux/arm/v6,linux/arm/v7",
         "-t",
-        "cyrius44/viewpicam:latest",   
+        "cyrius44/backend:latest",
         "--push",
         "--file",
-        "./docker/Dockerfile",        
+        "./Dockerfile",
         "."
       ],
-      "group": { 
+      "group": {
         "kind": "build",
         "isDefault": true
       },
@@ -38,10 +38,10 @@
         "--platform",
         "linux/arm/v7",
         "-t",
-        "cyr-ius/viewpicam:armhf-latest",
+        "cyr-ius/backend:armhf-latest",
         "--load",
         "--file",
-        "./docker/Dockerfile",        
+        "./Dockerfile",
         "."
       ],
       "group": {
@@ -57,16 +57,16 @@
       "label": "Docker Buildx ARMv6",
       "type": "shell",
       "command": "docker",
-      "args": [  
+      "args": [
         "buildx",
         "build",
         "--platform",
         "linux/arm/v6",
         "-t",
-        "cyr-ius/viewpicam:armv6-latest",
+        "cyr-ius/backend:armv6-latest",
         "--load",
         "--file",
-        "./docker/Dockerfile",
+        "./Dockerfile",
         "."
       ],
       "group": {
@@ -77,6 +77,6 @@
         "reveal": "silent"
       },
       "problemMatcher": []
-    }            
+    }
   ]
 }

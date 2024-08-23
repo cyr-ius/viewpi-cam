@@ -1,23 +1,24 @@
 ---
 services:
   backend:
-    image: cyr-ius/viewpicam:armhf-latest
+    image: cyr-ius/backend:armhf-latest
     container_name: backend
     restart: unless-stopped
     volumes:
-      - static_volume:/app/media
+      - static_volume:/app/data
       - /dev/vchiq:/dev/vchiq
       - /dev/vcsm:/dev/vcsm
+    ports:
+      - 81:8000
   frontend:
-    image: frontend:latest
+    image: cyr-ius/frontend:armhf-latest
     restart: unless-stopped
     depends_on:
       - backend
     volumes:
-      - static_volume:/usr/share/nginx/html/media
+      - static_volume:/usr/share/nginx/html/data
       - /etc/timezone:/etc/timezone:ro
     ports:
       - 80:80
-
 volumes:
   static_volume:
