@@ -1,34 +1,20 @@
 """Blueprint preview."""
 
 import os
-import shutil
 import time
 import zipfile
 from datetime import datetime as dt
 from io import BytesIO
 
-from flask import (
-    Blueprint,
-    abort,
-    make_response,
-    render_template,
-    request,
-    send_file,
-)
+from flask import Blueprint, abort, make_response, render_template, request, send_file
 from flask import current_app as ca
 from flask_login import login_required
 
 from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
-from ..helpers.exceptions import ViewPiCamException
-from ..helpers.filer import (
-    data_file_ext,
-    data_file_name,
-    find_lapse_files,
-    get_file_index,
-    get_file_type,
-)
-from ..helpers.utils import disk_usage, execute_cmd, write_log
+from ..helpers.filer import data_file_ext, data_file_name, get_file_type
+from ..helpers.transform import check_media_path, get_thumbs
+from ..helpers.utils import disk_usage
 from ..models import Files, db
 
 bp = Blueprint("preview", __name__, template_folder="templates", url_prefix="/preview")
@@ -98,7 +84,7 @@ def download():
 @role_required(["preview", "medium", "max"])
 def zipdata():
     """ZIP File."""
-    check_list = request.json.get("thumb_id", [])
+    check_list = request.json.get("thumb_ids", [])
     check_list = [check_list] if isinstance(check_list, str) else check_list
     if check_list:
         zip_list = []
@@ -137,89 +123,3 @@ def get_zip(files: list):
         as_attachment=True,
         download_name=zipname,
     )
-
-
-def check_media_path(filename):
-    """Check file if existe media path."""
-    media_path = ca.raspiconfig.media_path
-    if os.path.realpath(
-        os.path.dirname(f"{media_path}/{filename}")
-    ) == os.path.realpath(media_path):
-        fullpath = os.path.normpath(os.path.join(media_path, filename))
-        if not fullpath.startswith(media_path):
-            abort(500, "Media ath not allowed")
-
-        return os.path.isfile(fullpath)
-
-
-def video_convert(filename: str) -> None:
-    media_path = ca.raspiconfig.media_path
-    if check_media_path(filename):
-        file_type = get_file_type(filename)
-        file_index = get_file_index(filename)
-
-        if file_type == "t" and isinstance(int(file_index), int):
-            thumb_files = find_lapse_files(filename)
-            tmp = f"{media_path}/{file_type}{file_index}"
-            if not os.path.isdir(tmp):
-                os.makedirs(tmp, 0o744, True)
-
-            i = 0
-            for thumb in thumb_files:
-                os.symlink(thumb, f"{tmp}/i_{i:05d}.jpg")
-                i += 1
-
-            i = 0
-            video_file = f"{data_file_name(filename)[:-4]}.mp4"
-            cmd = ca.config["CONVERT_CMD"]
-            ext = ca.config["THUMBNAIL_EXT"]
-            rst = cmd.replace(f"i_{i:05d}", f"tmp/i_{i:05d}")
-            cmd = f"({rst} {media_path}/{video_file}; rm -rf {tmp};) >/dev/null 2>&1 &"
-            try:
-                write_log(f"Start lapse convert: {cmd}")
-                execute_cmd(cmd)
-                shutil.copy(
-                    src=f"{media_path}/{filename}",
-                    dst=f"{media_path}/{video_file}.v{file_index}{ext}",
-                )
-                write_log("Convert finished")
-            except ViewPiCamException as error:
-                write_log(f"[Convert] {str(error)}", "error")
-
-
-def get_thumbs(sort_order: str, show_types: str, time_filter: int):
-    """Return thumbnails from database."""
-    order = Files.datetime.desc() if sort_order == "desc" else Files.datetime.asc()
-    match show_types:
-        case "both":
-            show_types = ["i", "t", "v"]
-        case "image":
-            show_types = ["i", "t"]
-        case _:
-            show_types = ["v"]
-
-    if (time_filter := int(time_filter)) == 1:
-        files = db.session.scalars(
-            db.select(Files).filter(Files.type.in_(show_types)).order_by(order)
-        )
-    elif time_filter == ca.config.get("TIME_FILTER_MAX"):
-        dt_search = dt.fromtimestamp(dt.now().timestamp() - (86400 * (time_filter - 2)))
-        files = db.session.scalars(
-            db.select(Files)
-            .filter(Files.type.in_(show_types), Files.datetime <= dt_search)
-            .order_by(order)
-        )
-    else:
-        dt_lw = dt.fromtimestamp(dt.now().timestamp() - (86400 * (time_filter - 2)))
-        dt_gt = dt.fromtimestamp(dt.now().timestamp() - (time_filter - 1) * 86400)
-        files = db.session.scalars(
-            db.select(Files)
-            .filter(
-                Files.type.in_(show_types),
-                Files.datetime < dt_lw,
-                Files.datetime >= dt_gt,
-            )
-            .order_by(order)
-        )
-
-    return files.all()
