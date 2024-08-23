@@ -1,6 +1,7 @@
 """Apis viewpicam."""
 
 from .authorize import api as authorize
+from .buttons import api as buttons
 from .base import api, bp
 from .captures import api as captures
 from .logs import api as logs
@@ -22,6 +23,7 @@ def init_app(app):
     app.register_blueprint(bp, url_prefix="/api")
 
     api.add_namespace(authorize)
+    api.add_namespace(buttons)
     api.add_namespace(captures)
     api.add_namespace(logs)
     api.add_namespace(multiview)

@@ -360,7 +360,7 @@ $('#ubuttons').on('click','.add', function() {
 
     let divsubmit = new Event('submit-line', {bubbles: true, cancelable: true})
     if (this.dispatchEvent(divsubmit))
-        $.queryData({url:"{{url_for('api.settings_buttons')}}",data:data, success:successLocation});
+        $.queryData({url:"{{url_for('api.buttons_buttons')}}",data:data, success:successLocation});
 
 });
 
@@ -368,12 +368,12 @@ $('#ubuttons').on('click','.delete', function() {
     let parent = $(this).parent().parent();
     let data = $(parent).find('input,select,textarea').serializeObject({"checkboxesAsBools":true});
     let success = function(data){ parent.remove() }
-    $.queryData({method:"delete", url:"{{ url_for('api.settings_button',id=0)}}".replace(0,data["id"]), success:success});
+    $.queryData({method:"delete", url:"{{ url_for('api.buttons_button',id=0)}}".replace(0,data["id"]), success:success});
 });
 
 $('#ubuttons').on('change','.uchange', function(){
     let data = $(this).find('input, select, textarea').serializeObject({"checkboxesAsBools":true});
-    $.queryData({method:"put", url:"{{url_for('api.settings_button', id=0)}}".replace(0,data["id"]), data:data});
+    $.queryData({method:"put", url:"{{url_for('api.buttons_button', id=0)}}".replace(0,data["id"]), data:data});
 });
 
 $('#multiviews').on('click','.add', function() {

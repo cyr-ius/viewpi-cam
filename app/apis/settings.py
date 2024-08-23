@@ -3,7 +3,7 @@
 from datetime import datetime as dt
 
 from flask import current_app as ca
-from flask import send_file, url_for
+from flask import send_file
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 from sqlalchemy import delete, update
@@ -12,9 +12,9 @@ from werkzeug.datastructures import FileStorage
 from ..helpers.database import update_img_db
 from ..helpers.decorator import role_required
 from ..helpers.filer import allowed_file, zip_extract, zip_folder
-from ..models import Files, Settings, Ubuttons, db
+from ..models import Files, Settings, db
 from ..services.raspiconfig import RaspiConfigError
-from .models import button, macro, message, setting
+from .models import button, macro, setting
 
 api = Namespace(
     "settings",
@@ -53,60 +53,6 @@ class Sets(Resource):
         if loglevel := api.payload.get("loglevel"):
             ca.logger.setLevel(loglevel)
             ca.logger.debug(f"Log level: {loglevel}")
-        return "", 204
-
-
-@api.response(401, "Unauthorized")
-@api.route("/buttons")
-class Buttons(Resource):
-    """List buttons."""
-
-    @api.marshal_with(button, as_list=True)
-    def get(self):
-        """List buttons."""
-        return db.session.scalars(db.select(Ubuttons)).all()
-
-    @api.expect(button.copy().pop("id"))
-    @api.response(204, "Success")
-    def post(self):
-        """Create button."""
-        api.payload.pop("id", None)
-        ubutton = Ubuttons(**api.payload)
-        db.session.add(ubutton)
-        db.session.commit()
-        return (
-            "",
-            204,
-            {"Location": url_for("api.settings_button", id=ubutton.id)},
-        )
-
-
-@api.response(401, "Unauthorized")
-@api.response(404, "Not found", message)
-@api.route("/buttons/<int:id>")
-class Button(Resource):
-    """Button object."""
-
-    @api.marshal_with(button)
-    @api.response(404, "Not found", message)
-    def get(self, id: int):
-        """Get button."""
-        return db.get_or_404(Ubuttons, id, description="Button not found")
-
-    @api.expect(button)
-    @api.response(204, "Success")
-    def put(self, id: int):
-        """Set button."""
-        db.session.execute(update(Ubuttons), api.payload)
-        db.session.commit()
-        return "", 204
-
-    @api.response(204, "Actions is success")
-    def delete(self, id: int):
-        """Delete button."""
-        ubutton = db.get_or_404(Ubuttons, id, description="Button not found")
-        db.session.delete(ubutton)
-        db.session.commit()
         return "", 204
 
 
