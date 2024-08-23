@@ -2,8 +2,9 @@
 
 from datetime import datetime as dt
 
+import jwt
 from flask import current_app as ca
-from flask import make_response, url_for
+from flask import make_response, request, url_for
 from flask_restx import Namespace, Resource, abort
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
@@ -120,3 +121,46 @@ class Register(Resource):
             )
         except IntegrityError:
             abort(422, "User name is already exists, please change.")
+
+
+@api.response(200, "Success")
+@api.response(422, "Error")
+@api.route("/userinfo")
+class UserInfo(Resource):
+    """First enrollment."""
+
+    @api.marshal_with(user)
+    def get(self):
+        jwtoken = request.cookies.get("x-api-key")
+        toks = request.headers.get("Authorization", "").split("Bearer ")
+        if toks.count == 2:
+            jwtoken = toks[1]
+
+        try:
+            jwt_content = jwt.decode(
+                jwtoken, ca.config["SECRET_KEY"], algorithms=["HS256"]
+            )
+        except jwt.PyJWTError:
+            abort(422, "Error to decode JWToken")
+
+        if user := db.session.get(Users, jwt_content.get("id")):
+            return user
+
+        return "", 204
+
+
+@api.response(200, "Success")
+@api.response(422, "Error")
+@api.route("/logout")
+class Logout(Resource):
+    """First enrollment."""
+
+    def get(self):
+        resp = make_response("", 200)
+        resp.set_cookie("x-api-key", "", expires=0)
+        return resp
+
+    def post(self):
+        resp = make_response("", 200)
+        resp.set_cookie("x-api-key", "", expires=0)
+        return resp
