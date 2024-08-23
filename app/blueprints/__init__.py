@@ -6,7 +6,6 @@ from .motion import bp as motion_bp
 from .preview import bp as pview_bp
 from .schedule import bp as sch_bp
 from .settings import bp as sets_bp
-from .rsync import bp as rsync_bp
 
 
 def init_app(app):
@@ -18,4 +17,3 @@ def init_app(app):
     app.register_blueprint(pview_bp)
     app.register_blueprint(sch_bp)
     app.register_blueprint(sets_bp)
-    app.register_blueprint(rsync_bp)

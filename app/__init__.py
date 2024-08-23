@@ -8,7 +8,7 @@ import shutil
 from flask import Flask, g
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from . import apis, blueprints, models, services
+from . import apis, blueprints, models, services, daemon
 from .helpers.utils import get_pid, get_settings, launch_module, set_timezone
 from .models import db
 
@@ -69,6 +69,7 @@ def create_app(config=None):
     # Load app's components
     apis.init_app(app)
     blueprints.init_app(app)
+    daemon.init_app(app)
     services.init_app(app)
     models.init_app(app)
 
