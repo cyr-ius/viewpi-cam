@@ -6,6 +6,7 @@ import jwt
 from flask import current_app as ca
 from flask import make_response, request, url_for
 from flask_restx import Namespace, Resource, abort
+from flask_login import login_required
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
@@ -33,7 +34,7 @@ class Authorize(Resource):
         if not (
             (
                 user := db.session.scalars(
-                    db.select(Users).filter_by(name=api.payload["name"])
+                    db.select(Users).filter_by(name=api.payload["username"])
                 ).first()
             )
             and user.check_password(api.payload["password"])
@@ -75,6 +76,7 @@ class Authorize(Resource):
 class FirstEnrollment(Resource):
     """First enrollment."""
 
+    @api.doc(security=None)
     def get(self):
         users_count = db.session.execute(
             db.select(func.count("*")).select_from(Users)
@@ -92,6 +94,7 @@ class Register(Resource):
     """Register first account."""
 
     @api.expect(user.copy().pop("id"))
+    @api.doc(security=None)
     @api.response(204, "Success")
     def post(self):
         """Create Admin account."""
@@ -109,7 +112,7 @@ class Register(Resource):
         try:
             password = api.payload.pop("password")
             user = Users(
-                name=api.payload.pop("name"),
+                name=api.payload.pop("username"),
                 secret=generate_password_hash(password),
                 right=ca.config["USERLEVEL"]["max"],
             )
@@ -129,6 +132,7 @@ class Register(Resource):
 class UserInfo(Resource):
     """First enrollment."""
 
+    @login_required
     @api.marshal_with(user)
     def get(self):
         jwtoken = request.cookies.get("x-api-key")
@@ -155,11 +159,13 @@ class UserInfo(Resource):
 class Logout(Resource):
     """First enrollment."""
 
+    @login_required
     def get(self):
         resp = make_response("", 200)
         resp.set_cookie("x-api-key", "", expires=0)
         return resp
 
+    @login_required
     def post(self):
         resp = make_response("", 200)
         resp.set_cookie("x-api-key", "", expires=0)
