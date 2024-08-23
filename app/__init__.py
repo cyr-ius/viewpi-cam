@@ -3,7 +3,6 @@
 import json
 import logging
 import os
-import shutil
 
 from flask import Flask, g
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -18,23 +17,8 @@ def create_app(config=None):
     """Create Flask application."""
     app = Flask(__name__)
 
-    # Create static folder outside app folder
-    app.static_folder = f"{app.root_path}/../static"
-    os.makedirs(app.static_folder, exist_ok=True)
-
     app.config_folder = f"{app.root_path}/../config"
     os.makedirs(app.config_folder, exist_ok=True)
-
-    shutil.copytree(
-        f"{app.root_path}/resources/css/fonts",
-        f"{ app.static_folder}/css/fonts",
-        dirs_exist_ok=True,
-    )
-    shutil.copytree(
-        f"{app.root_path}/resources/img",
-        f"{ app.static_folder}/img",
-        dirs_exist_ok=True,
-    )
 
     # Set log level
     log_level = logging.getLevelName(os.environ.get("LOG_LEVEL", "INFO").upper())
