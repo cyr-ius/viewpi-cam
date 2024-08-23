@@ -83,10 +83,7 @@ daysmode = Model(
     "Daysmode",
     {"id": fields.Integer(required=True), "name": fields.String(required=True)},
 )
-deletes = Model(
-    "Deletes",
-    {"thumb_id": fields.List(fields.String(description="id thumb"), default=None)},
-)
+
 files = Model(
     "Files",
     {
@@ -184,6 +181,18 @@ preset = Model(
     },
 )
 
+rsync = Model(
+    "Rsync",
+    {
+        "rs_enabled": fields.String(required=True, default=False),
+        "rs_user": fields.String(required=True, default=""),
+        "rs_pwd": fields.String(required=True, default=""),
+        "rs_direction": fields.String(required=True, default=""),
+        "rs_mode": fields.String(required=True, default="Module"),
+        "rs_remote_host": fields.String(required=True, default=""),
+        "rs_options": fields.List(fields.String(default=None), default=["-a", "-z"]),
+    },
+)
 
 schedule = Model(
     "Schedule",
@@ -243,21 +252,16 @@ setting = Model(
         ),
     },
 )
-rsync = Model(
-    "Rsync",
-    {
-        "rs_enabled": fields.String(required=True, default=False),
-        "rs_user": fields.String(required=True, default=""),
-        "rs_pwd": fields.String(required=True, default=""),
-        "rs_direction": fields.String(required=True, default=""),
-        "rs_mode": fields.String(required=True, default="Module"),
-        "rs_remote_host": fields.String(required=True, default=""),
-        "rs_options": fields.List(fields.String(default=None), default=["-a", "-z"]),
-    },
-)
+
 secret = Model(
     "Secret", {"secret": fields.String(required=True, description="OTP code")}
 )
+
+thumb_ids = Model(
+    "ThumbIds",
+    {"thumb_ids": fields.List(fields.String(description="id thumb"), default=None)},
+)
+
 user = Model(
     "User",
     {

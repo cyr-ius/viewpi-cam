@@ -1,15 +1,17 @@
 """Api gallery."""
 
+from datetime import datetime as dt
+
 from flask import current_app as ca
-from flask import request
+from flask import request, send_file
 from flask_login import login_required
 from flask_restx import Namespace, Resource, abort
 
-from ..blueprints.preview import get_thumbs, video_convert
 from ..helpers.decorator import role_required
-from ..helpers.filer import delete_mediafiles, maintain_folders
+from ..helpers.filer import delete_mediafiles, get_zip, maintain_folders
+from ..helpers.transform import get_thumbs, video_convert
 from ..models import Files, db
-from .models import deletes, files, lock_mode, message
+from .models import thumb_ids, files, lock_mode, message
 
 api = Namespace(
     "previews",
@@ -17,7 +19,7 @@ api = Namespace(
     decorators=[role_required(["medium", "max"]), login_required],
 )
 api.add_model("Files", files)
-api.add_model("Deletes", deletes)
+api.add_model("ThumbIds", thumb_ids)
 api.add_model("LockMode", lock_mode)
 
 
@@ -38,13 +40,13 @@ class Thumbs(Resource):
         return get_thumbs(sort_order, show_types, time_filter)
 
     @api.doc(description="Delete all files or files list")
-    @api.expect(deletes)
-    @api.marshal_with(deletes, code=201)
+    @api.expect(thumb_ids)
+    @api.marshal_with(thumb_ids, code=201)
     def delete(self):
         """Delete all media files."""
         deleted_ids = []
         if self.api.payload:
-            for id in self.api.payload.get("thumb_id", []):
+            for id in self.api.payload.get("thumb_ids", []):
                 if thumb := db.session.scalars(
                     db.select(Files).filter_by(id=id)
                 ).first():
@@ -150,3 +152,37 @@ class Convert(Resource):
         thumb = db.get_or_404(Files, id, description="Thumb not found")
         video_convert(thumb.name)
         return "", 204
+
+
+@api.route("/zipfile")
+@api.response(401, "Unauthorized")
+class ZipFile(Resource):
+    """Make Zip."""
+
+    @api.expect(thumb_ids)
+    def post(self):
+        """Make Zip from thumbs list."""
+        date_str = dt.now().strftime("%Y%m%d_%H%M%S")
+        zipname = f"cam_{date_str}.zip"
+
+        thumbs = api.payload.get("thumbs")
+        thumbs = [thumbs] if isinstance(thumbs, str) else thumbs
+        if thumbs:
+            zip_list = [
+                thumb.name
+                for id in thumbs
+                if (
+                    thumb := db.session.scalars(
+                        db.select(Files).filter_by(id=id)
+                    ).first()
+                )
+            ]
+            raw_file = get_zip(zip_list)
+
+        response = send_file(
+            raw_file,
+            mimetype="application/octet-stream",
+            as_attachment=True,
+            download_name=zipname,
+        )
+        return response
