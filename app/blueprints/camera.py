@@ -4,10 +4,9 @@ import glob
 import os
 import time
 
-from flask import Blueprint, Response, abort, request
+from flask import Blueprint, Response, request
 from flask import current_app as ca
 from flask_login import login_required
-from ..helpers.utils import write_log
 
 bp = Blueprint("camera", __name__, url_prefix="/cam")
 
@@ -50,26 +49,6 @@ def cam_pic_new():
         _gather_img(preview_path, delay),
         mimetype="multipart/x-mixed-replace; boundary=PIderman",
     )
-
-
-@bp.route("/status_mjpeg", methods=["GET"])
-@login_required
-def status_mjpeg():
-    """Return status_mjpeg."""
-    file_content = ""
-    for _ in range(0, 30):
-        try:
-            with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
-                file_content = file.read()
-                if file_content != request.args.get("last"):
-                    break
-                time.sleep(0.1)
-                file.close()
-        except FileNotFoundError as error:
-            write_log(error)
-            abort(404, "Status Mjpeg not found")
-    os.popen(f"touch {ca.raspiconfig.status_file}")
-    return Response(file_content)
 
 
 def _get_shm_cam(preview_path=None):

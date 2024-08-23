@@ -3,7 +3,6 @@ from http import HTTPStatus
 import jwt
 from flask import current_app as ca
 from flask import flash, redirect, render_template, request, url_for
-from flask_assets import Environment
 from flask_babel import Babel
 from flask_login import LoginManager
 from flask_restx import abort
@@ -11,7 +10,6 @@ from flask_restx import abort
 from ..models import Users, db
 from .raspiconfig import RaspiConfig
 
-assets = Environment()
 babel = Babel()
 login_manager = LoginManager()
 raspiconfig = RaspiConfig()
@@ -59,6 +57,9 @@ def unauthorized():
 
 @login_manager.request_loader
 def load_user_from_request(request):
+    if request.path == "/api/doc":
+        return True
+
     cam_token = request.args.get("cam_token")
     if cam_token and request.blueprint == "camera":
         user = db.session.scalars(
@@ -72,11 +73,11 @@ def load_user_from_request(request):
         if (auth_header := request.headers.get("Authorization"))
         else None
     )
-    
-    if token is None:
-        token = request.cookies.get('x-api-key')
 
-    if token and request.blueprint in ["api","camera"]:
+    if token is None:
+        token = request.cookies.get("x-api-key")
+
+    if token and request.blueprint in ["api", "camera"]:
         try:
             jwt_content = jwt.decode(
                 token, ca.config["SECRET_KEY"], algorithms=["HS256"]
