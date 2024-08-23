@@ -74,6 +74,5 @@ ARG VERSION
 ENV VERSION=${VERSION}
 
 EXPOSE 8000/tcp
-HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=3","http://127.0.0.1/"]
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["gunicorn","app:create_app()"]
