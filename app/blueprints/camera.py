@@ -58,7 +58,7 @@ def _get_shm_cam(preview_path=None):
     display_path = (
         preview_path
         if os.path.isfile(preview_path)
-        else "app/resources/img/unavailable.png"
+        else "app/resources/unavailable.png"
     )
 
     with open(display_path, "rb") as file:
