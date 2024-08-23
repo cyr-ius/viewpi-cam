@@ -5,7 +5,7 @@ services:
     container_name: backend
     restart: unless-stopped
     volumes:
-      - static_volume:/app/app/media
+      - static_volume:/app/media
       - /dev/vchiq:/dev/vchiq
       - /dev/vcsm:/dev/vcsm
   frontend:
