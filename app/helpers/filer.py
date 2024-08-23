@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import re
+import time
 import zipfile
 from datetime import datetime as dt
 from io import BytesIO
@@ -296,3 +297,23 @@ def zip_extract(file, path: str):
 def allowed_file(filename):
     type, sub_type = filename.mimetype.split("/")
     return sub_type.lower() in ALLOWED_EXTENSIONS
+
+
+def get_zip(files: list):
+    """Zip files."""
+    media_path = ca.raspiconfig.media_path
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, "a") as zip_file:
+        for file in files:
+            file_name = data_file_name(file)
+            try:
+                data = zipfile.ZipInfo(file_name)
+                data.date_time = time.localtime(time.time())[:6]
+                data.compress_type = zipfile.ZIP_DEFLATED
+                zip_file.write(
+                    f"{media_path}/{file_name}", file_name, data.compress_type
+                )
+            except FileNotFoundError:
+                continue
+    memory_file.seek(0)
+    return memory_file
