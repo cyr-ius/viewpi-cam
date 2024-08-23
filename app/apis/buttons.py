@@ -39,7 +39,7 @@ class Buttons(Resource):
         return (
             "",
             204,
-            {"Location": url_for("api.settings_button", id=ubutton.id)},
+            {"Location": url_for("api.buttons_button", id=ubutton.id)},
         )
 
 
