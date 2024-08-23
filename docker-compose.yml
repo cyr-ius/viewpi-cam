@@ -6,10 +6,6 @@ services:
     restart: unless-stopped
     volumes:
       - static_volume:/app/data
-      - /dev/vchiq:/dev/vchiq
-      - /dev/vcsm:/dev/vcsm
-    ports:
-      - 81:8000
   frontend:
     image: cyr-ius/frontend:armhf-latest
     restart: unless-stopped
