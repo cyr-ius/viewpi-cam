@@ -165,7 +165,7 @@ class ZipFile(Resource):
         date_str = dt.now().strftime("%Y%m%d_%H%M%S")
         zipname = f"cam_{date_str}.zip"
 
-        thumbs = api.payload.get("thumbs")
+        thumbs = api.payload.get("thumb_ids")
         thumbs = [thumbs] if isinstance(thumbs, str) else thumbs
         if thumbs:
             zip_list = [

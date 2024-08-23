@@ -299,7 +299,7 @@ def allowed_file(filename):
     return sub_type.lower() in ALLOWED_EXTENSIONS
 
 
-def get_zip(files: list):
+def get_zip(files: list) -> BytesIO:
     """Zip files."""
     media_path = ca.raspiconfig.media_path
     memory_file = BytesIO()
@@ -317,3 +317,4 @@ def get_zip(files: list):
                 continue
     memory_file.seek(0)
     return memory_file
+    
