@@ -1,7 +1,16 @@
-{% extends "base.html" %}
-{% block title %}{{ SITE_NAME }} - Error{% endblock %}
-{% block header %}{%endblock%}
-{% block header_scripts %}{%endblock%}
-{% block content %}{% endblock %}
-{% block footer %}{%endblock%}
-{% block scripts%}{%endblock%}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
+        <title>{{ config['CAM_STRING'] }} - Error</title>
+    </head>
+    <body>
+        <header></header>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <footer></footer>
+    </body>
+</html>
