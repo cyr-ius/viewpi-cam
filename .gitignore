@@ -136,7 +136,7 @@ dmypy.json
 # Custom
 *.code-workspace
 static/
-media/
+data/
 config/
 macros/
 h264/

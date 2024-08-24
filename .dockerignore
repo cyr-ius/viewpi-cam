@@ -12,10 +12,9 @@ messages.pot
 babel
 config
 h264
-media
-medias
 node_modules
 static
 docker-compose.*
 Dockerfile
 docker
+data
