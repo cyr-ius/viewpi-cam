@@ -5,16 +5,14 @@ services:
     container_name: backend
     restart: unless-stopped
     volumes:
-      - static_volume:/app/data
+      - /media/data/viewpicam/backend/data:/app/data
   frontend:
     image: cyr-ius/frontend:armhf-latest
     restart: unless-stopped
     depends_on:
       - backend
     volumes:
-      - static_volume:/usr/share/nginx/html/data
+      - /media/data/viewpicam/backend/data:/usr/share/nginx/html/data
       - /etc/timezone:/etc/timezone:ro
     ports:
       - 80:80
-volumes:
-  static_volume:
