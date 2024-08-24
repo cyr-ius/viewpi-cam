@@ -136,9 +136,9 @@ class UserInfo(Resource):
     @api.marshal_with(user)
     def get(self):
         jwtoken = request.cookies.get("x-api-key")
-        toks = request.headers.get("Authorization", "").split("Bearer ")
-        if toks.count == 2:
-            jwtoken = toks[1]
+        auth_header = request.headers.get("Authorization", "").split("Bearer ")
+        if auth_header.count == 2:
+            jwtoken = auth_header[1]
 
         try:
             jwt_content = jwt.decode(
