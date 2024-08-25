@@ -1,7 +1,7 @@
 """Confilg file."""
 
 import os
-
+from datetime import timedelta
 # GENERAL SETTINGS
 SITE_NAME = "ViewPI Camera"
 VERSION = os.getenv("VERSION", "0.0.0")
@@ -14,6 +14,7 @@ SESSION_TYPE = "filesystem"
 # SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
+PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
 # Allowed extension for mask file
 ALLOWED_EXTENSIONS = ["pgm", "zip"]
