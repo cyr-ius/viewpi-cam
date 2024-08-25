@@ -10,7 +10,8 @@ from flask_restx import Namespace, Resource, abort
 from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.utils import disk_usage, execute_cmd
-from ..models import Presets as db_presets, db
+from ..models import Presets as db_presets
+from ..models import db
 from ..services.raspiconfig import RaspiConfigError
 from .models import command, locales, message, preset
 
@@ -184,7 +185,7 @@ class Presets(Resource):
             return db.session.scalars(
                 db.select(db_presets).filter_by(mode=preset)
             ).all()
-        return abort(404)
+        return db.session.scalars(db.select(db_presets)).all()
 
 
 @api.response(401, "Unauthorized")
@@ -194,6 +195,6 @@ class UserLevel(Resource):
 
     def get(self):
         """Get user level."""
-       
-        userlevel = [{"name":k, "right":v} for k, v in ca.config["USERLEVEL"].items()]
+
+        userlevel = [{"name": k, "right": v} for k, v in ca.config["USERLEVEL"].items()]
         return userlevel
