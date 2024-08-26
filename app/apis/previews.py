@@ -46,7 +46,7 @@ class Thumbs(Resource):
         """Delete all media files."""
         deleted_ids = []
         if self.api.payload:
-            for id in self.api.payload.get("thumb_ids", []):
+            for id in self.api.payload:
                 if thumb := db.session.scalars(
                     db.select(Files).filter_by(id=id)
                 ).first():
