@@ -11,7 +11,7 @@ from ..helpers.decorator import role_required
 from ..helpers.filer import delete_mediafiles, get_zip, maintain_folders
 from ..helpers.transform import get_thumbs, video_convert
 from ..models import Files, db
-from .models import thumb_ids, files, lock_mode, message
+from .models import files, lock_mode, message, thumb_ids
 
 api = Namespace(
     "previews",
@@ -40,7 +40,6 @@ class Thumbs(Resource):
         return get_thumbs(sort_order, show_types, time_filter)
 
     @api.doc(description="Delete all files or files list")
-    @api.expect(thumb_ids)
     @api.marshal_with(thumb_ids, code=201)
     def delete(self):
         """Delete all media files."""
@@ -159,14 +158,12 @@ class Convert(Resource):
 class ZipFile(Resource):
     """Make Zip."""
 
-    @api.expect(thumb_ids)
     def post(self):
         """Make Zip from thumbs list."""
         date_str = dt.now().strftime("%Y%m%d_%H%M%S")
         zipname = f"cam_{date_str}.zip"
 
-        thumbs = api.payload.get("thumb_ids")
-        thumbs = [thumbs] if isinstance(thumbs, str) else thumbs
+        thumbs = [api.payload] if isinstance(api.payload, str) else api.payload
         if thumbs:
             zip_list = [
                 thumb.name
