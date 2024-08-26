@@ -5,7 +5,7 @@ from datetime import datetime as dt
 from flask import current_app as ca
 from flask import request, send_file
 from flask_login import login_required
-from flask_restx import Namespace, Resource, abort
+from flask_restx import Namespace, Resource, abort, fields
 
 from ..helpers.decorator import role_required
 from ..helpers.filer import delete_mediafiles, get_zip, maintain_folders
@@ -40,7 +40,8 @@ class Thumbs(Resource):
         return get_thumbs(sort_order, show_types, time_filter)
 
     @api.doc(description="Delete all files or files list")
-    @api.marshal_with(thumb_ids, code=201)
+    @api.expect([fields.String(example="thumb id")])
+    @api.marshal_with([fields.String(example="thumb id")], code=201)
     def delete(self):
         """Delete all media files."""
         deleted_ids = []
@@ -158,6 +159,7 @@ class Convert(Resource):
 class ZipFile(Resource):
     """Make Zip."""
 
+    @api.expect([fields.String(example="thumb id")])
     def post(self):
         """Make Zip from thumbs list."""
         date_str = dt.now().strftime("%Y%m%d_%H%M%S")
