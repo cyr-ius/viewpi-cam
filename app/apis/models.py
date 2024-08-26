@@ -257,11 +257,6 @@ secret = Model(
     "Secret", {"secret": fields.String(required=True, description="OTP code")}
 )
 
-thumb_ids = Model(
-    "ThumbIds",
-    {"thumb_ids": fields.List(fields.String(description="id thumb"), default=None)},
-)
-
 user = Model(
     "User",
     {

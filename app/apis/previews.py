@@ -11,7 +11,7 @@ from ..helpers.decorator import role_required
 from ..helpers.filer import delete_mediafiles, get_zip, maintain_folders
 from ..helpers.transform import get_thumbs, video_convert
 from ..models import Files, db
-from .models import files, lock_mode, message, thumb_ids
+from .models import files, lock_mode, message
 
 api = Namespace(
     "previews",
@@ -19,7 +19,6 @@ api = Namespace(
     decorators=[role_required(["medium", "max"]), login_required],
 )
 api.add_model("Files", files)
-api.add_model("ThumbIds", thumb_ids)
 api.add_model("LockMode", lock_mode)
 
 
