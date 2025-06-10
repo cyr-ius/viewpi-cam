@@ -14,6 +14,6 @@ psutil==5.9.7
 pyjwt==2.8.0
 pyotp==2.9.0
 qrcode==7.4.2
-requests==2.32.3
+requests==2.32.4
 semver==3.0.2
 suntime==1.2.5
