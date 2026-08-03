@@ -17,7 +17,7 @@ api = Namespace(
     "logs",
     description="Log management",
     decorators=[role_required("max"), login_required],
-)  # noqa: F821
+)
 api.add_model("Log", log)
 
 

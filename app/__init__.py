@@ -8,7 +8,7 @@ import shutil
 from flask import Flask, g
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from . import apis, blueprints, models, services, daemon
+from . import apis, blueprints, daemon, models, services
 from .helpers.utils import get_pid, get_settings, launch_module, set_timezone
 from .models import db
 

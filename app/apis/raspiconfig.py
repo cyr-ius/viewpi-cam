@@ -71,7 +71,7 @@ class StatusMjpeg(Resource):
         file_content = ""
         if not os.path.isfile(ca.raspiconfig.status_file):
             abort(422, "Status file not found.")
-        for _ in range(0, 30):
+        for _ in range(30):
             with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
                 file_content = file.read()
                 if file_content != request.args.get("last"):

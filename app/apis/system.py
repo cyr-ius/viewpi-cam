@@ -10,7 +10,8 @@ from flask_restx import Namespace, Resource, abort
 from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.utils import disk_usage, execute_cmd
-from ..models import Presets as db_presets, db
+from ..models import Presets as db_presets
+from ..models import db
 from ..services.raspiconfig import RaspiConfigError
 from .models import command, locales, message, preset
 

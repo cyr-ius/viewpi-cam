@@ -21,9 +21,9 @@ def open_pipe(pipename: str):
         pipe = os.open(pipename, os.O_RDONLY | os.O_NONBLOCK)
         return pipe
     except OSError as error:
-        write_log(f"[FIFO] Error open pipe {pipename} {str(error)}", "error")
+        write_log(f"[FIFO] Error open pipe {pipename} {error!s}", "error")
     except ViewPiCamException as error:
-        write_log(f"[FIFO] {str(error)}", "error")
+        write_log(f"[FIFO] {error!s}", "error")
 
 
 def send_pipe(cmd: str) -> None:

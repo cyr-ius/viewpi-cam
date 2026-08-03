@@ -11,7 +11,7 @@ from ..helpers.decorator import role_required
 from ..helpers.filer import delete_mediafiles, get_zip, maintain_folders
 from ..helpers.transform import get_thumbs, video_convert
 from ..models import Files, db
-from .models import thumb_ids, files, lock_mode, message
+from .models import files, lock_mode, message, thumb_ids
 
 api = Namespace(
     "previews",

@@ -4,7 +4,6 @@ import random
 import uuid
 from datetime import datetime as dt
 from datetime import timezone
-from typing import Optional
 
 import jwt
 import pyotp
@@ -39,11 +38,11 @@ class Users(db.Model):
     enabled: Mapped[bool] = mapped_column(default=True)
     locale: Mapped[str] = mapped_column(default="en")
     name: Mapped[str] = mapped_column(unique=True)
-    secret: Mapped[Optional[str]]
-    otp_secret: Mapped[Optional[str]]
+    secret: Mapped[str | None]
+    otp_secret: Mapped[str | None]
     otp_confirmed: Mapped[str] = mapped_column(default=False)
-    api_token: Mapped[Optional[str]]
-    cam_token: Mapped[Optional[str]]
+    api_token: Mapped[str | None]
+    cam_token: Mapped[str | None]
     right: Mapped[str] = mapped_column(ForeignKey("roles.level"))
     roles: Mapped["Roles"] = relationship(back_populates="users")
 
@@ -163,9 +162,9 @@ class Ubuttons(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     macro: Mapped[str]
-    style: Mapped[Optional[str]]
-    other: Mapped[Optional[str]]
-    css_class: Mapped[Optional[str]]
+    style: Mapped[str | None]
+    other: Mapped[str | None]
+    css_class: Mapped[str | None]
     display: Mapped[bool] = mapped_column(default=False)
 
 
