@@ -231,7 +231,7 @@ def pipan():
                         servo_data[key] = servo_file[key]
 
         except Exception as error:  # pylint: disable=W0718
-            write_log(f"[Action] Error to loading {servo_data} ({str(error)})", "error")
+            write_log(f"[Action] Error to loading {servo_data} ({error!s})", "error")
 
         if action in servo_data:
             action = servo_data[action]

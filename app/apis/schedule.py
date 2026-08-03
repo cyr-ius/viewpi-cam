@@ -1,12 +1,12 @@
 """Api scheduler."""
 
+import zoneinfo
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import timezone
 from subprocess import PIPE, Popen
 
 import pytz
-import zoneinfo
 from flask import current_app as ca
 from flask import request
 from flask_login import login_required
@@ -68,7 +68,7 @@ class Sets(Resource):
             try:
                 set_timezone(new_tz)
             except ViewPiCamException as error:
-                write_log(f"[Timezone] {str(error)}", "error")
+                write_log(f"[Timezone] {error!s}", "error")
 
         send_pipe(ca.config["SCHEDULE_RESET"])
         return api.payload, 201
@@ -220,7 +220,7 @@ class TimeZones(Resource):
         return list(timezones), 201
 
 
-def time_offset(offset: int | float | str = 0) -> td:
+def time_offset(offset: float | str = 0) -> td:
     """Get time offset."""
     if isinstance(offset, (int, float)):
         noffset = td(hours=offset)

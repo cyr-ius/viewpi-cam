@@ -1,8 +1,8 @@
 """Apis viewpicam."""
 
 from .authorize import api as authorize
-from .buttons import api as buttons
 from .base import api, bp
+from .buttons import api as buttons
 from .captures import api as captures
 from .logs import api as logs
 from .models import message

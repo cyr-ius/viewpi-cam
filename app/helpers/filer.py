@@ -44,7 +44,7 @@ def find_lapse_files(filename: str) -> list[str]:
 
     lapse_count = 1
     for key in sorted(files):
-        if key[int(str(lapse_count).zfill(padlen)) :]:  # noqa: E203
+        if key[int(str(lapse_count).zfill(padlen)) :]:
             lapsefiles.append(f"{media_path}/{key}")
             lapse_count += 1
         else:
@@ -165,7 +165,7 @@ def get_file_index(file: str) -> str:
     """Return index file."""
     i = file.rfind(".", 0, len(file) - 8)
     if i > 0:
-        return file[i + 2 : len(file) - 7]  # noqa: E203
+        return file[i + 2 : len(file) - 7]
     return ""
 
 

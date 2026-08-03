@@ -47,7 +47,7 @@ class RaspiConfig:
                         index = line.find(" ")
                         if index >= 0:
                             key = line[0:index]
-                            value = line[index + 1 :]  # noqa: E203
+                            value = line[index + 1 :]
                             config[key] = value
                             if value == "true":
                                 config[key] = 1

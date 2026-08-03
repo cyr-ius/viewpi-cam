@@ -7,6 +7,7 @@ from flask_login import login_required
 from flask_restx import Namespace, Resource, abort, marshal
 from sqlalchemy import update
 from werkzeug.exceptions import UnsupportedMediaType
+
 from ..helpers.decorator import role_required
 from ..helpers.exceptions import ViewPiCamException
 from ..helpers.utils import execute_cmd, get_pid, get_settings

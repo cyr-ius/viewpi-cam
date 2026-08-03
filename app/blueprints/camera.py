@@ -7,6 +7,7 @@ import time
 from flask import Blueprint, Response, abort, request
 from flask import current_app as ca
 from flask_login import login_required
+
 from ..helpers.utils import write_log
 
 bp = Blueprint("camera", __name__, url_prefix="/cam")
@@ -57,7 +58,7 @@ def cam_pic_new():
 def status_mjpeg():
     """Return status_mjpeg."""
     file_content = ""
-    for _ in range(0, 30):
+    for _ in range(30):
         try:
             with open(ca.raspiconfig.status_file, encoding="utf-8") as file:
                 file_content = file.read()
